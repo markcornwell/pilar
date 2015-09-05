@@ -1,5 +1,6 @@
 ;; Scheme Compiler
 ;; Integers
+;; runs under petite chez scheme
 
 ;; (load "compile.scm")
 ;; (emit-program 67)
@@ -7,10 +8,7 @@
 ;; (exit)
 ;; cat pgm.s
 
-;; (load-option 'format)  ;; mit scheme only
-;; (define pgm-port (open-output-file "pgm.s")) ;; mit
-
-(define pgm-port (open-output-file "pgm.s" 'replace)) ;; chez scheme
+(define pgm-port (open-output-file "pgm.s" 'replace))
 
 (define-syntax emit
   (syntax-rules ()
