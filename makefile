@@ -1,5 +1,5 @@
 go:
-	yes | scheme --load load.scm
+	petite load.scm
 
 pgm.o: pgm.s
 	as pgm.s -o pgm.o
@@ -7,8 +7,7 @@ pgm.o: pgm.s
 main: main.c pgm.o
 	gcc main.c pgm.o -o main
 
-# legacy (for reference)
-
+# useful for getting sample assembly code from gcc
 test.s: test.c
 	gcc -O3 --omit-frame-pointer -S test.c
 

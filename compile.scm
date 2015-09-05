@@ -7,9 +7,10 @@
 ;; (exit)
 ;; cat pgm.s
 
-(load-option 'format)
+;; (load-option 'format)  ;; mit scheme only
+;; (define pgm-port (open-output-file "pgm.s")) ;; mit
 
-(define pgm-port (open-output-file "pgm.s"))
+(define pgm-port (open-output-file "pgm.s" 'replace)) ;; chez scheme
 
 (define-syntax emit
   (syntax-rules ()
@@ -19,7 +20,7 @@
       (format pgm-port s x))))
 
 (define (emit-program x)
-  (or (integer? x) (error ---))
+  (unless (integer? x) (error ---))
   (emit "   .text~%")
   (emit "   .align 4,0x90~%")
   (emit "   .globl _scheme_entry~%")
