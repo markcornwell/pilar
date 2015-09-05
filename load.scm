@@ -8,6 +8,6 @@
 (close-port pgm-port)
 (system "cat pgm.s")
 (system "as pgm.s -o pgm.o")
-(system "gcc main.c pgm.o -o main")
+(system "gcc -Wall main.c pgm.o -o main")
 (system "./main")
 (exit)
