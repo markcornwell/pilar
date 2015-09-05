@@ -1,5 +1,5 @@
 go:
-	scheme --load load.scm
+	yes | scheme --load load.scm
 
 pgm.o: pgm.s
 	as pgm.s -o pgm.o
