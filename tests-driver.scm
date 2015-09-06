@@ -27,11 +27,11 @@
 (define (build)
   (unless (zero? (system "as pgm.s -o pgm.o"))
      (error 'build "produced program failed assembly"))
-  (unless (zero? (system "gcc -Wall main.c pgm.o -o main"))
+  (unless (zero? (system "gcc -Wall runtime.c pgm.o -o stst"))
      (error 'build "produced program failed to link")))
 
 (define (execute)
-  (unless (zero? (system "./main > main.out"))
+  (unless (zero? (system "./stst > stst.out"))
 	  (error 'execute "produced program exited abnormally")))
 
 (define (test-one test-id test)
@@ -72,7 +72,7 @@
 (define (get-string)
   (with-output-to-string
     (lambda ()
-      (with-input-from-file "main.out"
+      (with-input-from-file "stst.out"
         (lambda ()
           (let f ()
             (let ([c (read-char)])
