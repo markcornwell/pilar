@@ -9,9 +9,9 @@
            '(test-name [expr string  output-string] ...)
             all-tests))]))
 
-(define (run-compile expr)
+(define (run-kompile expr)
   (let ([p (open-output-file "stst.s" 'replace)])
-    (compile-program expr p)
+    (kompile-program expr p)
     (close-output-port p)))
 
 (define (build)
@@ -24,7 +24,7 @@
 
 
 (define (build-program expr)
-   (run-compile expr)
+   (run-kompile expr)
    (build))
 
 (define (get-string)
@@ -39,9 +39,12 @@
                [else (display c) (f)]))))))))
 
 (define (test-with-string-output test-id expr expected-output)
-   (run-compile expr)
-   (build)
-   (execute)
+  (run-kompile expr)
+  (format #t "at 1~%")
+  (build)
+  (format #t "at 2~%")  
+  (execute)
+    (format #t "at 3~%")
    (unless (string=? expected-output (get-string))
      (error 'test "output mismatch for test ~s, expected ~s, got ~s"
         test-id expected-output (get-string))))
@@ -50,6 +53,7 @@
   (let ([expr (car test)]
         [type (cadr test)]
         [out  (caddr test)])
+    (printf "enter test-one")
     (printf "test ~s:~s ..." test-id expr)
     (flush-output-port)
     (case type
@@ -89,20 +93,20 @@
       fname)))
 
 
-(define compile-port
+(define kompile-port
   (make-parameter
     (current-output-port)
     (lambda (p)
        (unless (output-port? p) 
-         (error 'compile-port "not an output port ~s" p))
+         (error 'kompile-port "not an output port ~s" p))
        p)))
 
-(define show-compiler-output (make-parameter #f))
+(define show-kompiler-output (make-parameter #f))
 
-(define (run-compile expr)
+(define (run-kompile expr)
   (let ([p (open-output-file "stst.s" 'replace)])
-    (parameterize ([compile-port p])
-       (compile-program expr))
+    (parameterize ([kompile-port p])
+       (kompile-program expr))
     (close-output-port p)))
 
 
@@ -122,7 +126,7 @@
                [else (display c) (f)]))))))))
 
 (define (test-with-string-output test-id expr expected-output)
-   (run-compile expr)
+   (run-kompile expr)
    (build)
    (execute)
    (unless (string=? expected-output (get-string))
@@ -130,6 +134,6 @@
         test-id expected-output (get-string))))
 
 (define (emit . args)
-  (apply fprintf (compile-port) args)
-  (newline (compile-port)))
+  (apply fprintf (kompile-port) args)
+  (newline (kompile-port)))
 
