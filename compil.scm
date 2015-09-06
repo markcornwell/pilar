@@ -2,35 +2,13 @@
 ;; Integers
 ;; runs under petite chez scheme
 
-;; (load "compile.scm")
-;; (emit-program 67)
-;; (close-port pgm-port)
-;; (exit)
-;; cat pgm.s
+;; petite compil.scm
+;; (test-all)
 
-(define compil-port
-  (make-parameter
-      (current-output-port)
-      (lambda (p)
-          (unless (output-port? p)
-	     (error 'compil-port "not an output port ~s" p))
-	  p)))
+(load "tests-driver.scm")
+(load "tests/tests-1.1-req.scm")
 
-(define (run-compil expr)
-  (let ([p (open-output-file "pgm.s" 'replace)])
-    (parameterize ([compil-port p])
-       (compil-program expr))
-    (close-output-port p)))
-
-(define (build)
-  (unless (zero? (system "as pgm.s -o pgm.o"))
-	  (error 'build "produced program failed assembly"))
-  (unless (zero? (system "gcc main.c pgm.o -o main"))
-	  (error 'build "produced program failed to link")))
-
-(define (emit . args)
-  (apply fprintf (compil-port) args)
-  (newline (compil-port)))
+;;---------------- integer compiler
 
 (define (compil-program x)
   (unless (integer? x) (error "emit-program" "not an integer"))

@@ -4,7 +4,7 @@
 # kept around for documentation
 
 go:
-	petite load.scm
+	echo "(test-all)" | petite compil.scm | tee tests.out
 
 # useful for getting sample assembly code from gcc
 test.s: test.c

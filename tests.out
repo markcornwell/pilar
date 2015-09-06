@@ -1,0 +1,17 @@
+Petite Chez Scheme Version 8.4
+Copyright (c) 1985-2011 Cadence Research Systems
+
+> Performing integers tests ...
+test 0:0 ... ok
+test 1:1 ... ok
+test 2:-1 ... ok
+test 3:10 ... ok
+test 4:-10 ... ok
+test 5:2736 ... ok
+test 6:-2736 ... ok
+test 7:536870911 ... ok
+test 8:-536870912 ... ok
+test 9:2147483647 ... ok
+test 10:-2147483648 ... ok
+passed all 11 tests
+> 
