@@ -12,14 +12,17 @@
 (load "tests/tests-1.1-req.scm")
 
 (define fxshift      2)
-(define fxmask     #x3)
-(define fxtag      #x0)
+(define fxmask     #b11)   ; #x03
+(define fxtag      #b00)   ; #x00
 
 (define cshift       8)
-(define ctag      #x0F)
-(define bool-f    #x2F)
-(define bool-t    #x6F)
+(define ctag      #b00001111)
+(define cmask     #b11111111)
+(define bool-f    #b00101111) ; #x2F
+(define bool-t    #b01101111) ; #x6F
 (define bool-bit     6)
+(define bmask     #b10111111)
+(define btag      #b00101111)
 
 (define nil-value #x3F)
 (define wordsize     4) ; bytes
@@ -53,16 +56,54 @@
        (putprop 'prim-name '*emitter*
 		(lambda (arg* ...) b b* ...)))]))
 
-(define-primitive ($fxadd1 arg)
+(define-primitive (fxadd1 arg)
   (emit-expr arg)
   (emit "     addl $~s, %eax" (immediate-rep 1)))
 
-(define-primitive ($fixnum->char arg)
+(define-primitive (fxsub1 arg)
+    (emit-expr arg)
+    (emit "    addl $~s, %eax" (immediate-rep -1)))
+
+(define-primitive (fxzero? arg)
+    (emit-expr arg)
+    (emit "    cmp $0, %eax")
+    ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fixnum->char arg)
   (emit-expr arg)
   (emit "    shll $~s, %eax" (- cshift fxshift))
   (emit "    orl $~s, %eax" ctag))
 
-(define-primitive ($fixnum? arg)
+(define-primitive (char->fixnum arg)
+    (emit-expr arg)
+    (emit "   shrl $~s, %eax" cshift)
+    (emit "   shll $~s, %eax" fxshift))
+
+(define-primitive (null? arg)
+    (emit-expr arg)
+    (emit "    cmp $~s, %eax" nil-value)
+    (emit "    mov $0, %eax")
+     ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (char? arg)
+    (emit-expr arg)
+    (emit "    and $~s, %eax" cmask)
+    (emit "    cmp $~s, %eax" ctag)
+     ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fixnum? arg)
   (emit-expr arg)
   (emit "    and $~s, %al" fxmask)
   (emit "    cmp $~s, %al" fxtag)
@@ -70,6 +111,33 @@
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
+
+;; not takes any kind of value and return #t if
+;; the object is #f, otherwise it returns #f
+
+(define-primitive (not arg)
+    (emit-expr arg)
+    (emit "    cmp $~s, %eax" bool-f)
+    ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (boolean? arg)
+    (emit-expr arg)
+    (emit "    and $~s, %eax" bmask)
+    (emit "    cmp $~s, %eax" btag)
+     ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fxlognot arg)
+    (emit-expr arg)
+    (emit "    or $~s, %al" fxmask)
+    (emit "    notl %eax"))
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
