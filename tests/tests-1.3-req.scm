@@ -13,6 +13,7 @@
   [($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 12)))))) => "18\n"]
   )
 
+#|
 (add-tests-with-string-output "fixnum->char and char->fixnum"
    [($fixnum->char 65) => "#\\A\n"]
    [($fixnum->char 97) => "#\\a\n"]
@@ -29,6 +30,7 @@
    [($char->fixnum ($fixnum->char 12)) => "12\n"]
    [($fixnum->char ($char->fixnum #\x)) => "#\\x\n"]
 )
+|#
 
 (add-tests-with-string-output "fixnum?"
    [(fixnum? 0) => "#t\n"]
@@ -49,7 +51,7 @@
    [(fixnum? ($fixnum->char 12)) => "#f\n"]
 )
 
-
+#|
 (add-tests-with-string-output "fxzero?"
    [($fxzero? 0) => "#t\n"]
    [($fxzero? 1) => "#f\n"]
@@ -115,3 +117,4 @@
  [($fxlognot ($fxlognot 237463)) => "237463\n"]
 )
 
+|#
