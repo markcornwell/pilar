@@ -13,7 +13,6 @@
   [($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 ($fxadd1 12)))))) => "18\n"]
   )
 
-#|
 (add-tests-with-string-output "fixnum->char and char->fixnum"
    [($fixnum->char 65) => "#\\A\n"]
    [($fixnum->char 97) => "#\\a\n"]
@@ -21,34 +20,33 @@
    [($fixnum->char 90) => "#\\Z\n"]
    [($fixnum->char 48) => "#\\0\n"]
    [($fixnum->char 57) => "#\\9\n"]
-   [($char->fixnum #\A) => "65\n"]
-   [($char->fixnum #\a) => "97\n"]
-   [($char->fixnum #\z) => "122\n"]
-   [($char->fixnum #\Z) => "90\n"]
-   [($char->fixnum #\0) => "48\n"]
-   [($char->fixnum #\9) => "57\n"]
-   [($char->fixnum ($fixnum->char 12)) => "12\n"]
-   [($fixnum->char ($char->fixnum #\x)) => "#\\x\n"]
+;   [($char->fixnum #\A) => "65\n"]
+;   [($char->fixnum #\a) => "97\n"]
+;   [($char->fixnum #\z) => "122\n"]
+;   [($char->fixnum #\Z) => "90\n"]
+;   [($char->fixnum #\0) => "48\n"]
+;   [($char->fixnum #\9) => "57\n"]
+;   [($char->fixnum ($fixnum->char 12)) => "12\n"]
+;   [($fixnum->char ($char->fixnum #\x)) => "#\\x\n"]
 )
-|#
 
 (add-tests-with-string-output "fixnum?"
-   [(fixnum? 0) => "#t\n"]
-   [(fixnum? 1) => "#t\n"]
-   [(fixnum? -1) => "#t\n"]
-   [(fixnum? 37287) => "#t\n"]
-   [(fixnum? -23873) => "#t\n"]
-   [(fixnum? 536870911) => "#t\n"]
-   [(fixnum? -536870912) => "#t\n"]
-   [(fixnum? #t) => "#f\n"]
-   [(fixnum? #f) => "#f\n"]
-   [(fixnum? ()) => "#f\n"]
-   [(fixnum? #\Q) => "#f\n"]
-   [(fixnum? (fixnum? 12)) => "#f\n"]
-   [(fixnum? (fixnum? #f)) => "#f\n"]
-   [(fixnum? (fixnum? #\A)) => "#f\n"]
-   [(fixnum? ($char->fixnum #\r)) => "#t\n"]
-   [(fixnum? ($fixnum->char 12)) => "#f\n"]
+   [($fixnum? 0) => "#t\n"]
+   [($fixnum? 1) => "#t\n"]
+   [($fixnum? -1) => "#t\n"]
+   [($fixnum? 37287) => "#t\n"]
+   [($fixnum? -23873) => "#t\n"]
+   [($fixnum? 536870911) => "#t\n"]
+   [($fixnum? -536870912) => "#t\n"]
+   [($fixnum? #t) => "#f\n"]
+   [($fixnum? #f) => "#f\n"]
+   [($fixnum? ()) => "#f\n"]
+   [($fixnum? #\Q) => "#f\n"]
+   [($fixnum? ($fixnum? 12)) => "#f\n"]
+   [($fixnum? ($fixnum? #f)) => "#f\n"]
+   [($fixnum? ($fixnum? #\A)) => "#f\n"]
+;   [($fixnum? ($char->fixnum #\r)) => "#t\n"]
+   [($fixnum? ($fixnum->char 12)) => "#f\n"]
 )
 
 #|

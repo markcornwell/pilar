@@ -17,9 +17,10 @@
 
 (define cshift       8)
 (define ctag      #x0F)
-(define bool_f    #x2F)
-(define bool_t    #x6F)
-(define bool-bit  64)
+(define bool-f    #x2F)
+(define bool-t    #x6F)
+(define bool-bit     6)
+
 (define nil-value #x3F)
 (define wordsize     4) ; bytes
 
@@ -38,7 +39,7 @@
 (define (immediate-rep x)
    (cond
       [(fixnum? x) (ash x fxshift)]
-      [(boolean? x) (if x bool_t bool_f) ]
+      [(boolean? x) (if x bool-t bool-f) ]
       [(char? x) (logor (ash (char->integer x) cshift) ctag) ]
       [(null? x) nil-value ]))
 
@@ -56,25 +57,26 @@
   (emit-expr arg)
   (emit "     addl $~s, %eax" (immediate-rep 1)))
 
-(define-primitive ($char->fixnum arg)
+(define-primitive ($fixnum->char arg)
   (emit-expr arg)
   (emit "    shll $~s, %eax" (- cshift fxshift))
   (emit "    orl $~s, %eax" ctag))
 
-(define-primitive (fixnum? arg)
+(define-primitive ($fixnum? arg)
   (emit-expr arg)
   (emit "    and $~s, %al" fxmask)
   (emit "    cmp $~s, %al" fxtag)
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
-  (emit "    or $~s, %al" bool_f))
+  (emit "    or $~s, %al" bool-f))
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
 
 (define (primitive-emitter x)
-  (or (getprop x '*emitter*) (error "primitive-emitter" "no emitter defined for ~s" x)))
+  (or (getprop x '*emitter*)
+      (error "primitive-emitter" "no emitter defined for ~s" x)))
 
 (define (primcall? x)
   (and (pair? x) (primitive? (car x))))
@@ -109,13 +111,5 @@
 
 (define compil-program emit-program)
 
-;(define (compil-program x)
-;   (unless (immediate? x) (error "compil-program" "not an immediate constant"))
-;   (emit "     .text")
-;   (emit "     .align 4,0x90")
-;   (emit "     .globl _scheme_entry")
-;   (emit "_scheme_entry:")
-
-;   (emit "     ret"))
 
 
