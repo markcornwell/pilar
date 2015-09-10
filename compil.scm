@@ -1,12 +1,18 @@
 ;; compil.scm
+;;
 ;; Scheme Compiler
+;; 1.1 Integers
+;; 1.2 Immediate Constants
 ;; 1.3 Unary Primitives
+;; 1.4 Conditional Expressions
+;;
 ;; runs under petite chez scheme
 
 ;; petite compil.scm
 ;; (test-all)
 
 (load "tests-driver.scm")
+(load "tests/tests-1.4-req.scm")
 (load "tests/tests-1.3-req.scm")
 (load "tests/tests-1.2-req.scm")
 (load "tests/tests-1.1-req.scm")
@@ -155,16 +161,61 @@
     (apply (primitive-emitter prim) args)))
 
 (define (check-primcall-args prim args)
-    (= (length args) (getprop prim '*arg-count*)))
+  (unless (= (length args) (getprop prim '*arg-count*))
+	  (error prim "wrong number of arguments" args)))
+
+(define unique-label
+  (let ([count 0])
+    (lambda ()
+      (let ([L (format "L_~s" count)])
+	(set! count (add1 count))
+	L))))
+
+(define (if? x) (and (eq? (car x) 'if) (eq? 4 (length x))))
+(define (if-test x) (cadr x))
+(define (if-conseq x) (caddr x))
+(define (if-altern x) (cadddr x))
+
+(define (emit-if x)
+  (let ([alt-label (unique-label)]
+	[end-label (unique-label)])
+    (emit-expr (if-test x))
+    (emit "    cmp $~s, %al" bool-f)
+    (emit "    je ~a" alt-label)
+    (emit-expr (if-conseq x))
+    (emit "    jmp ~a" end-label)
+    (emit "~a:" alt-label)
+    (emit-expr (if-altern x))
+    (emit "~a:" end-label)))
+
+(define (and? x) (eq? (car x) 'and))
+
+(define (emit-and x)
+  (cond
+   [(eq? (length x) 1) (emit-expr #t)]
+   [(eq? (length x) 2) (emit-expr (cadr x))]
+   [else (emit-expr (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
+
+(define (or? x) (eq? (car x) 'or))
+
+(define (emit-or x)
+  (cond
+   [(eq? (length x) 1) (emit-expr #f)]
+   [(eq? (length x) 2) (emit-expr (cadr x))]
+   [else (emit-expr (list 'if (cadr x) #t (cons 'or (cddr x))))]))
 
 (define (emit-expr x)
   (cond
-    [(immediate? x)
-     (emit "     movl $~s, %eax" (immediate-rep x))]
-    [(primcall? x)
-     (emit-primcall x)]
+    [(immediate? x)  (emit-immediate x)]
+    [(primcall? x)   (emit-primcall x)]
+    [(if? x)         (emit-if x)]
+    [(and? x)        (emit-and x)]
+    [(or? x)         (emit-or x)]
     [else
-     (error "emit-expr" "unrecognized expr -- not immediate or primcall ~s" x)]))
+     (error "emit-expr" "unrecognized form:" x)]))
+
+(define (emit-immediate x)
+   (emit "     movl $~s, %eax" (immediate-rep x)))
 
 (define (emit-program x)
   (emit-function-header "_scheme_entry")
@@ -178,6 +229,4 @@
   (emit "~s:" entry))
 
 (define compil-program emit-program)
-
-
 
