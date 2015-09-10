@@ -188,11 +188,29 @@
     (emit-expr (if-altern x))
     (emit "~a:" end-label)))
 
+(define (and? x) (eq? (car x) 'and))
+
+(define (emit-and x)
+  (cond
+   [(eq? (length x) 1) (emit-expr #t)]
+   [(eq? (length x) 2) (emit-expr (cadr x))]
+   [else (emit-expr (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
+
+(define (or? x) (eq? (car x) 'or))
+
+(define (emit-or x)
+  (cond
+   [(eq? (length x) 1) (emit-expr #f)]
+   [(eq? (length x) 2) (emit-expr (cadr x))]
+   [else (emit-expr (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+
 (define (emit-expr x)
   (cond
     [(immediate? x)  (emit-immediate x)]
     [(primcall? x)   (emit-primcall x)]
     [(if? x)         (emit-if x)]
+    [(and? x)        (emit-and x)]
+    [(or? x)         (emit-or x)]
     [else
      (error "emit-expr" "unrecognized form:" x)]))
 
@@ -211,6 +229,4 @@
   (emit "~s:" entry))
 
 (define compil-program emit-program)
-
-
 

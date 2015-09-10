@@ -15,4 +15,31 @@
   [(if (char? 12) 13 14) => "14\n"]
   [(if (char? #\a) 13 14) => "13\n"]
   [(fxadd1 (if (fxsub1 1) (fxsub1 13) 14)) => "13\n"]
-)
+  )
+
+(add-tests-with-string-output "and"
+  [(and) => "#t\n"]
+  [(and #t) => "#t\n"]
+  [(and #f) => "#f\n"]
+  [(and #t #t) => "#t\n"]
+  [(and #t #f) => "#f\n"]
+  [(and #t #t #t) => "#t\n"]
+  [(and #t #t #t #t #t #t #t) => "#t\n"]
+  [(and #t #t #t #f #t #t #t) => "#f\n"]
+  [(and (char? 12) (boolean? #f)) => "#f\n"]
+  [(and (char? #\a) (boolean? #f)) => "#t\n"]
+  [(and (char? #\newline) (not #f)) => "#t\n"]
+  [(and (char? #\newline) (not #f) (not ())) => "#f\n"]
+  )
+
+(add-tests-with-string-output "or"
+  [(or) => "#f\n"]
+  [(or #t) => "#t\n"]
+  [(or #f) => "#f\n"]
+  [(or #t #f) => "#t\n"]
+  [(or #f #t) => "#t\n"]
+  [(or #f #f #f #f #f #f #f #f #f #f #f #t) => "#t\n"]
+  [(or #f #f #f #f #f (char? 14) (boolean? #\a)) => "#f\n"]
+  [(and (or (char? 12) (char? #\a)) (or (boolean? 13) (boolean? #f))) => "#t\n"]
+  [(or (char? #\a) (boolean? #f)) => "#t\n"]
+  )
