@@ -9,6 +9,7 @@
 ;; (test-all)
 
 (load "tests-driver.scm")
+(load "tests/tests-1.5-req.scm")
 (load "tests/tests-1.4-req.scm")
 (load "tests/tests-1.3-req.scm")
 (load "tests/tests-1.2-req.scm")
@@ -142,6 +143,12 @@
     (emit "    or $~s, %al" fxmask)
     (emit "    notl %eax"))
 
+(define-primitive (fx+ si arg1 arg2)
+  (emit-expr si arg1)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg2)
+  (emit "    addl ~s(%esp), %eax" si))
+
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
 
@@ -188,8 +195,8 @@
 
 (define (emit-and si x)
   (cond
-   [(eq? (length x) 1) (emit-expr #t)]
-   [(eq? (length x) 2) (emit-expr (cadr x))]
+   [(eq? (length x) 1) (emit-expr si #t)]
+   [(eq? (length x) 2) (emit-expr si (cadr x))]
    [else (emit-expr si (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
 
 (define (or? x) (eq? (car x) 'or))
@@ -218,10 +225,10 @@
   (emit-expr (- wordsize) x)
   (emit "    ret")
   (emit-function-header "_scheme_entry")
- ; (emit "    movl %esp, %ecx")
- ; (emit "    movl 4(%esp), %esp")
+  (emit "    movl %esp, %ecx")     
+  (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
   (emit "    call _L_scheme_entry")
- ; (emit "    movl %ecx, %esp")
+  (emit "    movl %ecx, %esp")
   (emit "    ret"))
 
 (define (emit-function-header entry)
