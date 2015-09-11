@@ -1,12 +1,20 @@
 ;; compil.scm
 ;; Scheme Compiler
+
+;; 1.5 Binary Primitives
+;; 1.4 Conditional Expressions
 ;; 1.3 Unary Primitives
+;; 1.2 Immediate Constants
+;; 1.1 Integers
+;;
 ;; runs under petite chez scheme
 
 ;; petite compil.scm
 ;; (test-all)
 
 (load "tests-driver.scm")
+(load "tests/tests-1.5-req.scm")
+(load "tests/tests-1.4-req.scm")
 (load "tests/tests-1.3-req.scm")
 (load "tests/tests-1.2-req.scm")
 (load "tests/tests-1.1-req.scm")
@@ -48,24 +56,24 @@
 
 (define-syntax define-primitive
   (syntax-rules ()
-    [(_ (prim-name arg* ...) b b* ...)
+    [(_ (prim-name si arg* ...) b b* ...)
      (begin
        (putprop 'prim-name '*is-prim* #t)
        (putprop 'prim-name '*arg-count*
-	  (length '(arg* ...)))
+	        (length '(arg* ...)))
        (putprop 'prim-name '*emitter*
-		(lambda (arg* ...) b b* ...)))]))
+		(lambda (si arg* ...) b b* ...)))]))
 
-(define-primitive (fxadd1 arg)
-  (emit-expr arg)
+(define-primitive (fxadd1 si arg)
+  (emit-expr si arg)
   (emit "     addl $~s, %eax" (immediate-rep 1)))
 
-(define-primitive (fxsub1 arg)
-    (emit-expr arg)
+(define-primitive (fxsub1 si arg)
+    (emit-expr si arg)
     (emit "    addl $~s, %eax" (immediate-rep -1)))
 
-(define-primitive (fxzero? arg)
-    (emit-expr arg)
+(define-primitive (fxzero? si arg)
+    (emit-expr si arg)
     (emit "    cmp $0, %eax")
     ;; convert the cc to a boolean
     (emit "    sete %al")
@@ -73,18 +81,18 @@
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (fixnum->char arg)
-  (emit-expr arg)
+(define-primitive (fixnum->char si arg)
+  (emit-expr si arg)
   (emit "    shll $~s, %eax" (- cshift fxshift))
   (emit "    orl $~s, %eax" ctag))
 
-(define-primitive (char->fixnum arg)
-    (emit-expr arg)
+(define-primitive (char->fixnum si arg)
+    (emit-expr si arg)
     (emit "   shrl $~s, %eax" cshift)
     (emit "   shll $~s, %eax" fxshift))
 
-(define-primitive (null? arg)
-    (emit-expr arg)
+(define-primitive (null? si arg)
+    (emit-expr si arg)
     (emit "    cmp $~s, %eax" nil-value)
     (emit "    mov $0, %eax")
      ;; convert the cc to a boolean
@@ -93,8 +101,8 @@
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (char? arg)
-    (emit-expr arg)
+(define-primitive (char? si arg)
+    (emit-expr si arg)
     (emit "    and $~s, %eax" cmask)
     (emit "    cmp $~s, %eax" ctag)
      ;; convert the cc to a boolean
@@ -103,8 +111,8 @@
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (fixnum? arg)
-  (emit-expr arg)
+(define-primitive (fixnum? si arg)
+  (emit-expr si arg)
   (emit "    and $~s, %al" fxmask)
   (emit "    cmp $~s, %al" fxtag)
   (emit "    sete %al")
@@ -112,11 +120,11 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-;; not takes any kind of value and return #t if
+;; not takes any kind of value and returns #t if
 ;; the object is #f, otherwise it returns #f
 
-(define-primitive (not arg)
-    (emit-expr arg)
+(define-primitive (not si arg)
+    (emit-expr si arg)
     (emit "    cmp $~s, %eax" bool-f)
     ;; convert the cc to a boolean
     (emit "    sete %al")
@@ -124,20 +132,107 @@
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (boolean? arg)
-    (emit-expr arg)
+(define-primitive (boolean? si arg)
+    (emit-expr si arg)
     (emit "    and $~s, %eax" bmask)
     (emit "    cmp $~s, %eax" btag)
-     ;; convert the cc to a boolean
+    ;; convert the cc to a boolean
     (emit "    sete %al")
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (fxlognot arg)
-    (emit-expr arg)
+(define-primitive (fxlognot si arg)
+    (emit-expr si arg)
     (emit "    or $~s, %al" fxmask)
     (emit "    notl %eax"))
+
+(define-primitive (fxlogand si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    and ~s(%esp), %eax" si))
+
+(define-primitive (fxlogor si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    or ~s(%esp), %eax" si))
+
+(define-primitive (fx= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx< si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setl %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx<= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setle %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx> si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setg %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx>= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setge %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+
+(define-primitive (fx+ si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    addl ~s(%esp), %eax" si))
+
+(define-primitive (fx- si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    subl ~s(%esp), %eax" si))
+
+(define-primitive (fx* si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    sar $~s, %eax" fxshift)   ;; 4x/4
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
@@ -149,33 +244,83 @@
 (define (primcall? x)
   (and (pair? x) (primitive? (car x))))
 
-(define (emit-primcall x)
+(define (emit-primcall si x)
   (let ([prim (car x)] [args (cdr x)])
     (check-primcall-args prim args)
-    (apply (primitive-emitter prim) args)))
+    (apply (primitive-emitter prim) si args)))
 
 (define (check-primcall-args prim args)
     (= (length args) (getprop prim '*arg-count*)))
 
-(define (emit-expr x)
+(define unique-label
+  (let ([count 0])
+    (lambda ()
+      (let ([L (format "L_~s" count)])
+    (set! count (add1 count))
+    L))))
+
+(define (if? x) (and (eq? (car x) 'if) (eq? 4 (length x))))
+(define (if-test x) (cadr x))
+(define (if-conseq x) (caddr x))
+(define (if-altern x) (cadddr x))
+
+(define (emit-if si x)
+  (let ([alt-label (unique-label)]
+    [end-label (unique-label)])
+    (emit-expr si (if-test x))
+    (emit "    cmp $~s, %al" bool-f)
+    (emit "    je ~a" alt-label)
+    (emit-expr si (if-conseq x))
+    (emit "    jmp ~a" end-label)
+    (emit "~a:" alt-label)
+    (emit-expr si (if-altern x))
+    (emit "~a:" end-label)))
+
+(define (and? x) (eq? (car x) 'and))
+
+(define (emit-and si x)
   (cond
-    [(immediate? x)
-     (emit "     movl $~s, %eax" (immediate-rep x))]
-    [(primcall? x)
-     (emit-primcall x)]
+   [(eq? (length x) 1) (emit-expr si #t)]
+   [(eq? (length x) 2) (emit-expr si (cadr x))]
+   [else (emit-expr si (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
+
+(define (or? x) (eq? (car x) 'or))
+
+(define (emit-or si x)
+  (cond
+   [(eq? (length x) 1) (emit-expr si #f)]
+   [(eq? (length x) 2) (emit-expr si (cadr x))]
+   [else (emit-expr si (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+
+(define (emit-expr si x)
+  (cond
+    [(immediate? x)  (emit-immediate x)]
+    [(primcall? x)   (emit-primcall si x)]
+    [(if? x)         (emit-if si x)]
+    [(and? x)        (emit-and si x)]
+    [(or? x)         (emit-or si x)]
     [else
-     (error "emit-expr" "unrecognized expr -- not immediate or primcall ~s" x)]))
+     (error "emit-expr" "unrecognized form:" x)]))
+
+(define (emit-immediate x)
+  (emit "    movl $~s, %eax" (immediate-rep x)))
 
 (define (emit-program x)
+  (emit-function-header "_L_scheme_entry")
+  (emit-expr (- wordsize) x)
+  (emit "    ret")
   (emit-function-header "_scheme_entry")
-  (emit-expr x)
+  (emit "    movl %esp, %ecx")     
+  (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
+  (emit "    call _L_scheme_entry")
+  (emit "    movl %ecx, %esp")
   (emit "    ret"))
 
 (define (emit-function-header entry)
   (emit "    .text")
   (emit "    .align 4,0x90")
-  (emit "    .globl ~s" entry)
-  (emit "~s:" entry))
+  (emit "    .globl ~a" entry)
+  (emit "~a:" entry))
 
 (define compil-program emit-program)
 
