@@ -1,6 +1,7 @@
 ;; compil.scm
 ;; Scheme Compiler
 
+;; 1.6 Local Variables
 ;; 1.5 Binary Primitives
 ;; 1.4 Conditional Expressions
 ;; 1.3 Unary Primitives
@@ -315,7 +316,8 @@
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
 
-(define (lookup var env) (cdr (assoc var env)))
+(define (lookup var env)
+  (cdr (assoc var env))) ;; env is a list of dotted pairs
 
 (define (emit-variable-ref env var)
    (emit-stack-load (lookup var env)))
@@ -324,7 +326,20 @@
    (emit "    movl %eax, ~s(%esp)" si))
 
 (define (emit-stack-load si)
-   (emit "    movl ~s(%esp), %eax" si))
+  (emit "    movl ~s(%esp), %eax" si))
+
+(define (let*? x) (eq? (car x) 'let*))
+
+;; rewrite let* into nested singleton let's
+(define (emit-let* si env bindings body)
+  (cond
+   [(null? bindings) (emit-expr si env body)]
+   [(null? (cdr bindings)) (emit-expr si env (list 'let bindings body))]
+   [else
+    (emit-expr si env
+	 (list 'let
+	       (list (car bindings))
+	       (list 'let* (cdr bindings) body)))]))
 
 (define (emit-expr si env expr)  ;; add environment and variable?
   (define (variable? expr) (and (symbol? expr) (assoc expr env)))
@@ -332,6 +347,7 @@
     [(immediate? expr)  (emit-immediate expr)]
     [(variable? expr)   (emit-variable-ref env expr)]
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
+    [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
     [(if? expr)         (emit-if si env expr)]
     [(and? expr)        (emit-and si env expr)]
