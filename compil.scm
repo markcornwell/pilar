@@ -1,8 +1,12 @@
 ;; compil.scm
 ;; Scheme Compiler
-;; 1.3 Unary Primitives
-;; 1.4 Conditional Expressions
+
 ;; 1.5 Binary Primitives
+;; 1.4 Conditional Expressions
+;; 1.3 Unary Primitives
+;; 1.2 Immediate Constants
+;; 1.1 Integers
+;;
 ;; runs under petite chez scheme
 
 ;; petite compil.scm
@@ -142,6 +146,74 @@
     (emit-expr si arg)
     (emit "    or $~s, %al" fxmask)
     (emit "    notl %eax"))
+
+(define-primitive (fxlogand si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    and ~s(%esp), %eax" si))
+
+(define-primitive (fxlogor si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    or ~s(%esp), %eax" si))
+
+(define-primitive (fx= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx< si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setl %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx<= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setle %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx> si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setg %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (fx>= si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    cmp ~s(%esp), %eax" si)
+  ;; convert the cc to a boolean
+  (emit "    setge %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
 
 (define-primitive (fx+ si arg1 arg2)
   (emit-expr si arg2)

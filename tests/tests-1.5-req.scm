@@ -83,7 +83,6 @@
   [(fx* 2 (fx* 3 (fx* 4 (fx* 5 (fx* 6 7))))) => "5040\n"]
   )
 
-#|
 (add-tests-with-string-output "fxlogand and fxlogor"
   [(fxlogor 3 16) => "19\n"]
   [(fxlogor 3 5)  => "7\n"]
@@ -95,7 +94,7 @@
   [(fxlogand 2346 (fxlognot 2346)) => "0\n"]
   [(fxlogand (fxlognot 2346) 2346) => "0\n"]
   [(fxlogand 2376 2376) => "2376\n"]
-)
+  )
 
 (add-tests-with-string-output "fx="
   [(fx= 12 13) => "#f\n"]
@@ -154,7 +153,6 @@
   [(fx>= (fx+ 13 13) 16) => "#t\n"]
 )
 
-
 (add-tests-with-string-output "if"
   [(if (fx= 12 13) 12 13) => "13\n"]
   [(if (fx= 12 12) 13 14) => "13\n"]
@@ -172,4 +170,3 @@
   [(if (fx>= 13 12) 13 14) => "13\n"]
 )
 
-|#
