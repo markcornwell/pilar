@@ -1,399 +1,410 @@
 Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
-> Performing fx+ tests ...
-test 0:(fx+ 1 2) ... ok
-test 1:(fx+ 1 -2) ... ok
-test 2:(fx+ -1 2) ... ok
-test 3:(fx+ -1 -2) ... ok
-test 4:(fx+ 536870911 -1) ... ok
-test 5:(fx+ 536870910 1) ... ok
-test 6:(fx+ -536870912 1) ... ok
-test 7:(fx+ -536870911 -1) ... ok
-test 8:(fx+ 536870911 -536870912) ... ok
-test 9:(fx+ 1 (fx+ 2 3)) ... ok
-test 10:(fx+ 1 (fx+ 2 -3)) ... ok
-test 11:(fx+ 1 (fx+ -2 3)) ... ok
-test 12:(fx+ 1 (fx+ -2 -3)) ... ok
-test 13:(fx+ -1 (fx+ 2 3)) ... ok
-test 14:(fx+ -1 (fx+ 2 -3)) ... ok
-test 15:(fx+ -1 (fx+ -2 3)) ... ok
-test 16:(fx+ -1 (fx+ -2 -3)) ... ok
-test 17:(fx+ (fx+ 1 2) 3) ... ok
-test 18:(fx+ (fx+ 1 2) -3) ... ok
-test 19:(fx+ (fx+ 1 -2) 3) ... ok
-test 20:(fx+ (fx+ 1 -2) -3) ... ok
-test 21:(fx+ (fx+ -1 2) 3) ... ok
-test 22:(fx+ (fx+ -1 2) -3) ... ok
-test 23:(fx+ (fx+ -1 -2) 3) ... ok
-test 24:(fx+ (fx+ -1 -2) -3) ... ok
-test 25:(fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
-test 26:(fx+ 1 (fx+ 2 (fx+ 3 (fx+ 4 (fx+ 5 (fx+ 6 (fx+ 7 (fx+ 8 9)))))))) ... ok
+> Performing let tests ...
+test 0:(let ((x 5)) x) ... ok
+test 1:(let ((x (fx+ 1 2))) x) ... ok
+test 2:(let ((x (fx+ 1 2))) (let ((y (fx+ 3 4))) (fx+ x y))) ... ok
+test 3:(let ((x (fx+ 1 2))) (let ((y (fx+ 3 4))) (fx- y x))) ... ok
+test 4:(let ((x (fx+ 1 2)) (y (fx+ 3 4))) (fx- y x)) ... ok
+test 5:(let ((x (let ((y (fx+ 1 2))) (fx* y y)))) (fx+ x x)) ... ok
+test 6:(let ((x (fx+ 1 2))) (let ((x (fx+ 3 4))) x)) ... ok
+test 7:(let ((x (fx+ 1 2))) (let ((x (fx+ x 4))) x)) ... ok
+test 8:(let ((t (let ((t (let ((t (let ((t (fx+ 1 2))) t))) t))) t))) t) ... ok
+test 9:(let ((x 12)) (let ((x (fx+ x x))) (let ((x (fx+ x x))) (let ((x (fx+ x x))) (fx+ x x))))) ... ok
+Performing fx+ tests ...
+test 10:(fx+ 1 2) ... ok
+test 11:(fx+ 1 -2) ... ok
+test 12:(fx+ -1 2) ... ok
+test 13:(fx+ -1 -2) ... ok
+test 14:(fx+ 536870911 -1) ... ok
+test 15:(fx+ 536870910 1) ... ok
+test 16:(fx+ -536870912 1) ... ok
+test 17:(fx+ -536870911 -1) ... ok
+test 18:(fx+ 536870911 -536870912) ... ok
+test 19:(fx+ 1 (fx+ 2 3)) ... ok
+test 20:(fx+ 1 (fx+ 2 -3)) ... ok
+test 21:(fx+ 1 (fx+ -2 3)) ... ok
+test 22:(fx+ 1 (fx+ -2 -3)) ... ok
+test 23:(fx+ -1 (fx+ 2 3)) ... ok
+test 24:(fx+ -1 (fx+ 2 -3)) ... ok
+test 25:(fx+ -1 (fx+ -2 3)) ... ok
+test 26:(fx+ -1 (fx+ -2 -3)) ... ok
+test 27:(fx+ (fx+ 1 2) 3) ... ok
+test 28:(fx+ (fx+ 1 2) -3) ... ok
+test 29:(fx+ (fx+ 1 -2) 3) ... ok
+test 30:(fx+ (fx+ 1 -2) -3) ... ok
+test 31:(fx+ (fx+ -1 2) 3) ... ok
+test 32:(fx+ (fx+ -1 2) -3) ... ok
+test 33:(fx+ (fx+ -1 -2) 3) ... ok
+test 34:(fx+ (fx+ -1 -2) -3) ... ok
+test 35:(fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 36:(fx+ 1 (fx+ 2 (fx+ 3 (fx+ 4 (fx+ 5 (fx+ 6 (fx+ 7 (fx+ 8 9)))))))) ... ok
 Performing fx- tests ...
-test 27:(fx- 1 2) ... ok
-test 28:(fx- 1 -2) ... ok
-test 29:(fx- -1 2) ... ok
-test 30:(fx- -1 -2) ... ok
-test 31:(fx- 536870910 -1) ... ok
-test 32:(fx- 536870911 1) ... ok
-test 33:(fx- -536870911 1) ... ok
-test 34:(fx- -536870912 -1) ... ok
-test 35:(fx- 1 536870911) ... ok
-test 36:(fx- -1 536870911) ... ok
-test 37:(fx- 1 -536870910) ... ok
-test 38:(fx- -1 -536870912) ... ok
-test 39:(fx- 536870911 536870911) ... ok
-test 40:(fx- -536870911 -536870912) ... ok
-test 41:(fx- 1 (fx- 2 3)) ... ok
-test 42:(fx- 1 (fx- 2 -3)) ... ok
-test 43:(fx- 1 (fx- -2 3)) ... ok
-test 44:(fx- 1 (fx- -2 -3)) ... ok
-test 45:(fx- -1 (fx- 2 3)) ... ok
-test 46:(fx- -1 (fx- 2 -3)) ... ok
-test 47:(fx- -1 (fx- -2 3)) ... ok
-test 48:(fx- -1 (fx- -2 -3)) ... ok
-test 49:(fx- 0 (fx- -2 -3)) ... ok
-test 50:(fx- (fx- 1 2) 3) ... ok
-test 51:(fx- (fx- 1 2) -3) ... ok
-test 52:(fx- (fx- 1 -2) 3) ... ok
-test 53:(fx- (fx- 1 -2) -3) ... ok
-test 54:(fx- (fx- -1 2) 3) ... ok
-test 55:(fx- (fx- -1 2) -3) ... ok
-test 56:(fx- (fx- -1 -2) 3) ... ok
-test 57:(fx- (fx- -1 -2) -3) ... ok
-test 58:(fx- (fx- (fx- (fx- (fx- (fx- (fx- (fx- 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
-test 59:(fx- 1 (fx- 2 (fx- 3 (fx- 4 (fx- 5 (fx- 6 (fx- 7 (fx- 8 9)))))))) ... ok
+test 37:(fx- 1 2) ... ok
+test 38:(fx- 1 -2) ... ok
+test 39:(fx- -1 2) ... ok
+test 40:(fx- -1 -2) ... ok
+test 41:(fx- 536870910 -1) ... ok
+test 42:(fx- 536870911 1) ... ok
+test 43:(fx- -536870911 1) ... ok
+test 44:(fx- -536870912 -1) ... ok
+test 45:(fx- 1 536870911) ... ok
+test 46:(fx- -1 536870911) ... ok
+test 47:(fx- 1 -536870910) ... ok
+test 48:(fx- -1 -536870912) ... ok
+test 49:(fx- 536870911 536870911) ... ok
+test 50:(fx- -536870911 -536870912) ... ok
+test 51:(fx- 1 (fx- 2 3)) ... ok
+test 52:(fx- 1 (fx- 2 -3)) ... ok
+test 53:(fx- 1 (fx- -2 3)) ... ok
+test 54:(fx- 1 (fx- -2 -3)) ... ok
+test 55:(fx- -1 (fx- 2 3)) ... ok
+test 56:(fx- -1 (fx- 2 -3)) ... ok
+test 57:(fx- -1 (fx- -2 3)) ... ok
+test 58:(fx- -1 (fx- -2 -3)) ... ok
+test 59:(fx- 0 (fx- -2 -3)) ... ok
+test 60:(fx- (fx- 1 2) 3) ... ok
+test 61:(fx- (fx- 1 2) -3) ... ok
+test 62:(fx- (fx- 1 -2) 3) ... ok
+test 63:(fx- (fx- 1 -2) -3) ... ok
+test 64:(fx- (fx- -1 2) 3) ... ok
+test 65:(fx- (fx- -1 2) -3) ... ok
+test 66:(fx- (fx- -1 -2) 3) ... ok
+test 67:(fx- (fx- -1 -2) -3) ... ok
+test 68:(fx- (fx- (fx- (fx- (fx- (fx- (fx- (fx- 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 69:(fx- 1 (fx- 2 (fx- 3 (fx- 4 (fx- 5 (fx- 6 (fx- 7 (fx- 8 9)))))))) ... ok
 Performing fx* tests ...
-test 60:(fx* 2 3) ... ok
-test 61:(fx* 2 -3) ... ok
-test 62:(fx* -2 3) ... ok
-test 63:(fx* -2 -3) ... ok
-test 64:(fx* 536870911 1) ... ok
-test 65:(fx* 536870911 -1) ... ok
-test 66:(fx* -536870912 1) ... ok
-test 67:(fx* -536870911 -1) ... ok
-test 68:(fx* 2 (fx* 3 4)) ... ok
-test 69:(fx* (fx* 2 3) 4) ... ok
-test 70:(fx* (fx* (fx* (fx* (fx* 2 3) 4) 5) 6) 7) ... ok
-test 71:(fx* 2 (fx* 3 (fx* 4 (fx* 5 (fx* 6 7))))) ... ok
+test 70:(fx* 2 3) ... ok
+test 71:(fx* 2 -3) ... ok
+test 72:(fx* -2 3) ... ok
+test 73:(fx* -2 -3) ... ok
+test 74:(fx* 536870911 1) ... ok
+test 75:(fx* 536870911 -1) ... ok
+test 76:(fx* -536870912 1) ... ok
+test 77:(fx* -536870911 -1) ... ok
+test 78:(fx* 2 (fx* 3 4)) ... ok
+test 79:(fx* (fx* 2 3) 4) ... ok
+test 80:(fx* (fx* (fx* (fx* (fx* 2 3) 4) 5) 6) 7) ... ok
+test 81:(fx* 2 (fx* 3 (fx* 4 (fx* 5 (fx* 6 7))))) ... ok
 Performing fxlogand and fxlogor tests ...
-test 72:(fxlogor 3 16) ... ok
-test 73:(fxlogor 3 5) ... ok
-test 74:(fxlogor 3 7) ... ok
-test 75:(fxlognot (fxlogor (fxlognot 7) 1)) ... ok
-test 76:(fxlognot (fxlogor 1 (fxlognot 7))) ... ok
-test 77:(fxlogand 3 7) ... ok
-test 78:(fxlogand 3 5) ... ok
-test 79:(fxlogand 2346 (fxlognot 2346)) ... ok
-test 80:(fxlogand (fxlognot 2346) 2346) ... ok
-test 81:(fxlogand 2376 2376) ... ok
+test 82:(fxlogor 3 16) ... ok
+test 83:(fxlogor 3 5) ... ok
+test 84:(fxlogor 3 7) ... ok
+test 85:(fxlognot (fxlogor (fxlognot 7) 1)) ... ok
+test 86:(fxlognot (fxlogor 1 (fxlognot 7))) ... ok
+test 87:(fxlogand 3 7) ... ok
+test 88:(fxlogand 3 5) ... ok
+test 89:(fxlogand 2346 (fxlognot 2346)) ... ok
+test 90:(fxlogand (fxlognot 2346) 2346) ... ok
+test 91:(fxlogand 2376 2376) ... ok
 Performing fx= tests ...
-test 82:(fx= 12 13) ... ok
-test 83:(fx= 12 12) ... ok
-test 84:(fx= 16 (fx+ 13 3)) ... ok
-test 85:(fx= 16 (fx+ 13 13)) ... ok
-test 86:(fx= (fx+ 13 3) 16) ... ok
-test 87:(fx= (fx+ 13 13) 16) ... ok
+test 92:(fx= 12 13) ... ok
+test 93:(fx= 12 12) ... ok
+test 94:(fx= 16 (fx+ 13 3)) ... ok
+test 95:(fx= 16 (fx+ 13 13)) ... ok
+test 96:(fx= (fx+ 13 3) 16) ... ok
+test 97:(fx= (fx+ 13 13) 16) ... ok
 Performing fx< tests ...
-test 88:(fx< 12 13) ... ok
-test 89:(fx< 12 12) ... ok
-test 90:(fx< 13 12) ... ok
-test 91:(fx< 16 (fx+ 13 1)) ... ok
-test 92:(fx< 16 (fx+ 13 3)) ... ok
-test 93:(fx< 16 (fx+ 13 13)) ... ok
-test 94:(fx< (fx+ 13 1) 16) ... ok
-test 95:(fx< (fx+ 13 3) 16) ... ok
-test 96:(fx< (fx+ 13 13) 16) ... ok
+test 98:(fx< 12 13) ... ok
+test 99:(fx< 12 12) ... ok
+test 100:(fx< 13 12) ... ok
+test 101:(fx< 16 (fx+ 13 1)) ... ok
+test 102:(fx< 16 (fx+ 13 3)) ... ok
+test 103:(fx< 16 (fx+ 13 13)) ... ok
+test 104:(fx< (fx+ 13 1) 16) ... ok
+test 105:(fx< (fx+ 13 3) 16) ... ok
+test 106:(fx< (fx+ 13 13) 16) ... ok
 Performing fx<= tests ...
-test 97:(fx<= 12 13) ... ok
-test 98:(fx<= 12 12) ... ok
-test 99:(fx<= 13 12) ... ok
-test 100:(fx<= 16 (fx+ 13 1)) ... ok
-test 101:(fx<= 16 (fx+ 13 3)) ... ok
-test 102:(fx<= 16 (fx+ 13 13)) ... ok
-test 103:(fx<= (fx+ 13 1) 16) ... ok
-test 104:(fx<= (fx+ 13 3) 16) ... ok
-test 105:(fx<= (fx+ 13 13) 16) ... ok
+test 107:(fx<= 12 13) ... ok
+test 108:(fx<= 12 12) ... ok
+test 109:(fx<= 13 12) ... ok
+test 110:(fx<= 16 (fx+ 13 1)) ... ok
+test 111:(fx<= 16 (fx+ 13 3)) ... ok
+test 112:(fx<= 16 (fx+ 13 13)) ... ok
+test 113:(fx<= (fx+ 13 1) 16) ... ok
+test 114:(fx<= (fx+ 13 3) 16) ... ok
+test 115:(fx<= (fx+ 13 13) 16) ... ok
 Performing fx> tests ...
-test 106:(fx> 12 13) ... ok
-test 107:(fx> 12 12) ... ok
-test 108:(fx> 13 12) ... ok
-test 109:(fx> 16 (fx+ 13 1)) ... ok
-test 110:(fx> 16 (fx+ 13 3)) ... ok
-test 111:(fx> 16 (fx+ 13 13)) ... ok
-test 112:(fx> (fx+ 13 1) 16) ... ok
-test 113:(fx> (fx+ 13 3) 16) ... ok
-test 114:(fx> (fx+ 13 13) 16) ... ok
+test 116:(fx> 12 13) ... ok
+test 117:(fx> 12 12) ... ok
+test 118:(fx> 13 12) ... ok
+test 119:(fx> 16 (fx+ 13 1)) ... ok
+test 120:(fx> 16 (fx+ 13 3)) ... ok
+test 121:(fx> 16 (fx+ 13 13)) ... ok
+test 122:(fx> (fx+ 13 1) 16) ... ok
+test 123:(fx> (fx+ 13 3) 16) ... ok
+test 124:(fx> (fx+ 13 13) 16) ... ok
 Performing fx>= tests ...
-test 115:(fx>= 12 13) ... ok
-test 116:(fx>= 12 12) ... ok
-test 117:(fx>= 13 12) ... ok
-test 118:(fx>= 16 (fx+ 13 1)) ... ok
-test 119:(fx>= 16 (fx+ 13 3)) ... ok
-test 120:(fx>= 16 (fx+ 13 13)) ... ok
-test 121:(fx>= (fx+ 13 1) 16) ... ok
-test 122:(fx>= (fx+ 13 3) 16) ... ok
-test 123:(fx>= (fx+ 13 13) 16) ... ok
+test 125:(fx>= 12 13) ... ok
+test 126:(fx>= 12 12) ... ok
+test 127:(fx>= 13 12) ... ok
+test 128:(fx>= 16 (fx+ 13 1)) ... ok
+test 129:(fx>= 16 (fx+ 13 3)) ... ok
+test 130:(fx>= 16 (fx+ 13 13)) ... ok
+test 131:(fx>= (fx+ 13 1) 16) ... ok
+test 132:(fx>= (fx+ 13 3) 16) ... ok
+test 133:(fx>= (fx+ 13 13) 16) ... ok
 Performing if tests ...
-test 124:(if (fx= 12 13) 12 13) ... ok
-test 125:(if (fx= 12 12) 13 14) ... ok
-test 126:(if (fx< 12 13) 12 13) ... ok
-test 127:(if (fx< 12 12) 13 14) ... ok
-test 128:(if (fx< 13 12) 13 14) ... ok
-test 129:(if (fx<= 12 13) 12 13) ... ok
-test 130:(if (fx<= 12 12) 12 13) ... ok
-test 131:(if (fx<= 13 12) 13 14) ... ok
-test 132:(if (fx> 12 13) 12 13) ... ok
-test 133:(if (fx> 12 12) 12 13) ... ok
-test 134:(if (fx> 13 12) 13 14) ... ok
-test 135:(if (fx>= 12 13) 12 13) ... ok
-test 136:(if (fx>= 12 12) 12 13) ... ok
-test 137:(if (fx>= 13 12) 13 14) ... ok
+test 134:(if (fx= 12 13) 12 13) ... ok
+test 135:(if (fx= 12 12) 13 14) ... ok
+test 136:(if (fx< 12 13) 12 13) ... ok
+test 137:(if (fx< 12 12) 13 14) ... ok
+test 138:(if (fx< 13 12) 13 14) ... ok
+test 139:(if (fx<= 12 13) 12 13) ... ok
+test 140:(if (fx<= 12 12) 12 13) ... ok
+test 141:(if (fx<= 13 12) 13 14) ... ok
+test 142:(if (fx> 12 13) 12 13) ... ok
+test 143:(if (fx> 12 12) 12 13) ... ok
+test 144:(if (fx> 13 12) 13 14) ... ok
+test 145:(if (fx>= 12 13) 12 13) ... ok
+test 146:(if (fx>= 12 12) 12 13) ... ok
+test 147:(if (fx>= 13 12) 13 14) ... ok
 Performing if tests ...
-test 138:(if #t 12 13) ... ok
-test 139:(if #f 12 13) ... ok
-test 140:(if 0 12 13) ... ok
-test 141:(if () 43 ()) ... ok
-test 142:(if #t (if 12 13 4) 17) ... ok
-test 143:(if #f 12 (if #f 13 4)) ... ok
-test 144:(if #\X (if 1 2 3) (if 4 5 6)) ... ok
-test 145:(if (not (boolean? #t)) 15 (boolean? #f)) ... ok
-test 146:(if (if (char? #\a) (boolean? #\b) (fixnum? #\c)) 119 -23) ... ok
-test 147:(if (if (if (not 1) (not 2) (not 3)) 4 5) 6 7) ... ok
-test 148:(if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7) ... ok
-test 149:(not (if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7)) ... ok
-test 150:(if (char? 12) 13 14) ... ok
-test 151:(if (char? #\a) 13 14) ... ok
-test 152:(fxadd1 (if (fxsub1 1) (fxsub1 13) 14)) ... ok
+test 148:(if #t 12 13) ... ok
+test 149:(if #f 12 13) ... ok
+test 150:(if 0 12 13) ... ok
+test 151:(if () 43 ()) ... ok
+test 152:(if #t (if 12 13 4) 17) ... ok
+test 153:(if #f 12 (if #f 13 4)) ... ok
+test 154:(if #\X (if 1 2 3) (if 4 5 6)) ... ok
+test 155:(if (not (boolean? #t)) 15 (boolean? #f)) ... ok
+test 156:(if (if (char? #\a) (boolean? #\b) (fixnum? #\c)) 119 -23) ... ok
+test 157:(if (if (if (not 1) (not 2) (not 3)) 4 5) 6 7) ... ok
+test 158:(if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7) ... ok
+test 159:(not (if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7)) ... ok
+test 160:(if (char? 12) 13 14) ... ok
+test 161:(if (char? #\a) 13 14) ... ok
+test 162:(fxadd1 (if (fxsub1 1) (fxsub1 13) 14)) ... ok
 Performing and tests ...
-test 153:(and) ... ok
-test 154:(and #t) ... ok
-test 155:(and #f) ... ok
-test 156:(and #t #t) ... ok
-test 157:(and #t #f) ... ok
-test 158:(and #t #t #t) ... ok
-test 159:(and #t #t #t #t #t #t #t) ... ok
-test 160:(and #t #t #t #f #t #t #t) ... ok
-test 161:(and (char? 12) (boolean? #f)) ... ok
-test 162:(and (char? #\a) (boolean? #f)) ... ok
-test 163:(and (char? #\newline) (not #f)) ... ok
-test 164:(and (char? #\newline) (not #f) (not ())) ... ok
+test 163:(and) ... ok
+test 164:(and #t) ... ok
+test 165:(and #f) ... ok
+test 166:(and #t #t) ... ok
+test 167:(and #t #f) ... ok
+test 168:(and #t #t #t) ... ok
+test 169:(and #t #t #t #t #t #t #t) ... ok
+test 170:(and #t #t #t #f #t #t #t) ... ok
+test 171:(and (char? 12) (boolean? #f)) ... ok
+test 172:(and (char? #\a) (boolean? #f)) ... ok
+test 173:(and (char? #\newline) (not #f)) ... ok
+test 174:(and (char? #\newline) (not #f) (not ())) ... ok
 Performing or tests ...
-test 165:(or) ... ok
-test 166:(or #t) ... ok
-test 167:(or #f) ... ok
-test 168:(or #t #f) ... ok
-test 169:(or #f #t) ... ok
-test 170:(or #f #f #f #f #f #f #f #f #f #f #f #t) ... ok
-test 171:(or #f #f #f #f #f (char? 14) (boolean? #\a)) ... ok
-test 172:(and (or (char? 12) (char? #\a)) (or (boolean? 13) (boolean? #f))) ... ok
-test 173:(or (char? #\a) (boolean? #f)) ... ok
+test 175:(or) ... ok
+test 176:(or #t) ... ok
+test 177:(or #f) ... ok
+test 178:(or #t #f) ... ok
+test 179:(or #f #t) ... ok
+test 180:(or #f #f #f #f #f #f #f #f #f #f #f #t) ... ok
+test 181:(or #f #f #f #f #f (char? 14) (boolean? #\a)) ... ok
+test 182:(and (or (char? 12) (char? #\a)) (or (boolean? 13) (boolean? #f))) ... ok
+test 183:(or (char? #\a) (boolean? #f)) ... ok
 Performing fxadd1 tests ...
-test 174:(fxadd1 0) ... ok
-test 175:(fxadd1 -1) ... ok
-test 176:(fxadd1 1) ... ok
-test 177:(fxadd1 -100) ... ok
-test 178:(fxadd1 1000) ... ok
-test 179:(fxadd1 536870910) ... ok
-test 180:(fxadd1 -536870912) ... ok
-test 181:(fxadd1 (fxadd1 0)) ... ok
-test 182:(fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 12)))))) ... ok
+test 184:(fxadd1 0) ... ok
+test 185:(fxadd1 -1) ... ok
+test 186:(fxadd1 1) ... ok
+test 187:(fxadd1 -100) ... ok
+test 188:(fxadd1 1000) ... ok
+test 189:(fxadd1 536870910) ... ok
+test 190:(fxadd1 -536870912) ... ok
+test 191:(fxadd1 (fxadd1 0)) ... ok
+test 192:(fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 12)))))) ... ok
 Performing fixnum->char and char->fixnum tests ...
-test 183:(fixnum->char 65) ... ok
-test 184:(fixnum->char 97) ... ok
-test 185:(fixnum->char 122) ... ok
-test 186:(fixnum->char 90) ... ok
-test 187:(fixnum->char 48) ... ok
-test 188:(fixnum->char 57) ... ok
-test 189:(char->fixnum #\A) ... ok
-test 190:(char->fixnum #\a) ... ok
-test 191:(char->fixnum #\z) ... ok
-test 192:(char->fixnum #\Z) ... ok
-test 193:(char->fixnum #\0) ... ok
-test 194:(char->fixnum #\9) ... ok
-test 195:(char->fixnum (fixnum->char 12)) ... ok
-test 196:(fixnum->char (char->fixnum #\x)) ... ok
+test 193:(fixnum->char 65) ... ok
+test 194:(fixnum->char 97) ... ok
+test 195:(fixnum->char 122) ... ok
+test 196:(fixnum->char 90) ... ok
+test 197:(fixnum->char 48) ... ok
+test 198:(fixnum->char 57) ... ok
+test 199:(char->fixnum #\A) ... ok
+test 200:(char->fixnum #\a) ... ok
+test 201:(char->fixnum #\z) ... ok
+test 202:(char->fixnum #\Z) ... ok
+test 203:(char->fixnum #\0) ... ok
+test 204:(char->fixnum #\9) ... ok
+test 205:(char->fixnum (fixnum->char 12)) ... ok
+test 206:(fixnum->char (char->fixnum #\x)) ... ok
 Performing fixnum? tests ...
-test 197:(fixnum? 0) ... ok
-test 198:(fixnum? 1) ... ok
-test 199:(fixnum? -1) ... ok
-test 200:(fixnum? 37287) ... ok
-test 201:(fixnum? -23873) ... ok
-test 202:(fixnum? 536870911) ... ok
-test 203:(fixnum? -536870912) ... ok
-test 204:(fixnum? #t) ... ok
-test 205:(fixnum? #f) ... ok
-test 206:(fixnum? ()) ... ok
-test 207:(fixnum? #\Q) ... ok
-test 208:(fixnum? (fixnum? 12)) ... ok
-test 209:(fixnum? (fixnum? #f)) ... ok
-test 210:(fixnum? (fixnum? #\A)) ... ok
-test 211:(fixnum? (char->fixnum #\r)) ... ok
-test 212:(fixnum? (fixnum->char 12)) ... ok
+test 207:(fixnum? 0) ... ok
+test 208:(fixnum? 1) ... ok
+test 209:(fixnum? -1) ... ok
+test 210:(fixnum? 37287) ... ok
+test 211:(fixnum? -23873) ... ok
+test 212:(fixnum? 536870911) ... ok
+test 213:(fixnum? -536870912) ... ok
+test 214:(fixnum? #t) ... ok
+test 215:(fixnum? #f) ... ok
+test 216:(fixnum? ()) ... ok
+test 217:(fixnum? #\Q) ... ok
+test 218:(fixnum? (fixnum? 12)) ... ok
+test 219:(fixnum? (fixnum? #f)) ... ok
+test 220:(fixnum? (fixnum? #\A)) ... ok
+test 221:(fixnum? (char->fixnum #\r)) ... ok
+test 222:(fixnum? (fixnum->char 12)) ... ok
 Performing fxzero? tests ...
-test 213:(fxzero? 0) ... ok
-test 214:(fxzero? 1) ... ok
-test 215:(fxzero? -1) ... ok
+test 223:(fxzero? 0) ... ok
+test 224:(fxzero? 1) ... ok
+test 225:(fxzero? -1) ... ok
 Performing null? tests ...
-test 216:(null? ()) ... ok
-test 217:(null? #f) ... ok
-test 218:(null? #t) ... ok
-test 219:(null? (null? ())) ... ok
-test 220:(null? #\a) ... ok
-test 221:(null? 0) ... ok
-test 222:(null? -10) ... ok
-test 223:(null? 10) ... ok
+test 226:(null? ()) ... ok
+test 227:(null? #f) ... ok
+test 228:(null? #t) ... ok
+test 229:(null? (null? ())) ... ok
+test 230:(null? #\a) ... ok
+test 231:(null? 0) ... ok
+test 232:(null? -10) ... ok
+test 233:(null? 10) ... ok
 Performing boolean? tests ...
-test 224:(boolean? #t) ... ok
-test 225:(boolean? #f) ... ok
-test 226:(boolean? 0) ... ok
-test 227:(boolean? 1) ... ok
-test 228:(boolean? -1) ... ok
-test 229:(boolean? ()) ... ok
-test 230:(boolean? #\a) ... ok
-test 231:(boolean? (boolean? 0)) ... ok
-test 232:(boolean? (fixnum? (boolean? 0))) ... ok
+test 234:(boolean? #t) ... ok
+test 235:(boolean? #f) ... ok
+test 236:(boolean? 0) ... ok
+test 237:(boolean? 1) ... ok
+test 238:(boolean? -1) ... ok
+test 239:(boolean? ()) ... ok
+test 240:(boolean? #\a) ... ok
+test 241:(boolean? (boolean? 0)) ... ok
+test 242:(boolean? (fixnum? (boolean? 0))) ... ok
 Performing char? tests ...
-test 233:(char? #\a) ... ok
-test 234:(char? #\Z) ... ok
-test 235:(char? #\newline) ... ok
-test 236:(char? #t) ... ok
-test 237:(char? #f) ... ok
-test 238:(char? ()) ... ok
-test 239:(char? (char? #t)) ... ok
-test 240:(char? 0) ... ok
-test 241:(char? 23870) ... ok
-test 242:(char? -23789) ... ok
+test 243:(char? #\a) ... ok
+test 244:(char? #\Z) ... ok
+test 245:(char? #\newline) ... ok
+test 246:(char? #t) ... ok
+test 247:(char? #f) ... ok
+test 248:(char? ()) ... ok
+test 249:(char? (char? #t)) ... ok
+test 250:(char? 0) ... ok
+test 251:(char? 23870) ... ok
+test 252:(char? -23789) ... ok
 Performing not tests ...
-test 243:(not #t) ... ok
-test 244:(not #f) ... ok
-test 245:(not 15) ... ok
-test 246:(not ()) ... ok
-test 247:(not #\A) ... ok
-test 248:(not (not #t)) ... ok
-test 249:(not (not #f)) ... ok
-test 250:(not (not 15)) ... ok
-test 251:(not (fixnum? 15)) ... ok
-test 252:(not (fixnum? #f)) ... ok
+test 253:(not #t) ... ok
+test 254:(not #f) ... ok
+test 255:(not 15) ... ok
+test 256:(not ()) ... ok
+test 257:(not #\A) ... ok
+test 258:(not (not #t)) ... ok
+test 259:(not (not #f)) ... ok
+test 260:(not (not 15)) ... ok
+test 261:(not (fixnum? 15)) ... ok
+test 262:(not (fixnum? #f)) ... ok
 Performing fxlognot tests ...
-test 253:(fxlognot 0) ... ok
-test 254:(fxlognot -1) ... ok
-test 255:(fxlognot 1) ... ok
-test 256:(fxlognot -2) ... ok
-test 257:(fxlognot 536870911) ... ok
-test 258:(fxlognot -536870912) ... ok
-test 259:(fxlognot (fxlognot 237463)) ... ok
+test 263:(fxlognot 0) ... ok
+test 264:(fxlognot -1) ... ok
+test 265:(fxlognot 1) ... ok
+test 266:(fxlognot -2) ... ok
+test 267:(fxlognot 536870911) ... ok
+test 268:(fxlognot -536870912) ... ok
+test 269:(fxlognot (fxlognot 237463)) ... ok
 Performing immediate constants tests ...
-test 260:#f ... ok
-test 261:#t ... ok
-test 262:() ... ok
-test 263:#\tab ... ok
-test 264:#\newline ... ok
-test 265:#\return ... ok
-test 266:#\space ... ok
-test 267:#\! ... ok
-test 268:#\" ... ok
-test 269:#\# ... ok
-test 270:#\$ ... ok
-test 271:#\% ... ok
-test 272:#\& ... ok
-test 273:#\' ... ok
-test 274:#\( ... ok
-test 275:#\) ... ok
-test 276:#\* ... ok
-test 277:#\+ ... ok
-test 278:#\, ... ok
-test 279:#\- ... ok
-test 280:#\. ... ok
-test 281:#\/ ... ok
-test 282:#\0 ... ok
-test 283:#\1 ... ok
-test 284:#\2 ... ok
-test 285:#\3 ... ok
-test 286:#\4 ... ok
-test 287:#\5 ... ok
-test 288:#\6 ... ok
-test 289:#\7 ... ok
-test 290:#\8 ... ok
-test 291:#\9 ... ok
-test 292:#\: ... ok
-test 293:#\; ... ok
-test 294:#\< ... ok
-test 295:#\= ... ok
-test 296:#\> ... ok
-test 297:#\? ... ok
-test 298:#\@ ... ok
-test 299:#\A ... ok
-test 300:#\B ... ok
-test 301:#\C ... ok
-test 302:#\D ... ok
-test 303:#\E ... ok
-test 304:#\F ... ok
-test 305:#\G ... ok
-test 306:#\H ... ok
-test 307:#\I ... ok
-test 308:#\J ... ok
-test 309:#\K ... ok
-test 310:#\L ... ok
-test 311:#\M ... ok
-test 312:#\N ... ok
-test 313:#\O ... ok
-test 314:#\P ... ok
-test 315:#\Q ... ok
-test 316:#\R ... ok
-test 317:#\S ... ok
-test 318:#\T ... ok
-test 319:#\U ... ok
-test 320:#\V ... ok
-test 321:#\W ... ok
-test 322:#\X ... ok
-test 323:#\Y ... ok
-test 324:#\Z ... ok
-test 325:#\[ ... ok
-test 326:#\\ ... ok
-test 327:#\] ... ok
-test 328:#\^ ... ok
-test 329:#\_ ... ok
-test 330:#\` ... ok
-test 331:#\a ... ok
-test 332:#\b ... ok
-test 333:#\c ... ok
-test 334:#\d ... ok
-test 335:#\e ... ok
-test 336:#\f ... ok
-test 337:#\g ... ok
-test 338:#\h ... ok
-test 339:#\i ... ok
-test 340:#\j ... ok
-test 341:#\k ... ok
-test 342:#\l ... ok
-test 343:#\m ... ok
-test 344:#\n ... ok
-test 345:#\o ... ok
-test 346:#\p ... ok
-test 347:#\q ... ok
-test 348:#\r ... ok
-test 349:#\s ... ok
-test 350:#\t ... ok
-test 351:#\u ... ok
-test 352:#\v ... ok
-test 353:#\w ... ok
-test 354:#\x ... ok
-test 355:#\y ... ok
-test 356:#\z ... ok
-test 357:#\{ ... ok
-test 358:#\| ... ok
-test 359:#\} ... ok
-test 360:#\~ ... ok
+test 270:#f ... ok
+test 271:#t ... ok
+test 272:() ... ok
+test 273:#\tab ... ok
+test 274:#\newline ... ok
+test 275:#\return ... ok
+test 276:#\space ... ok
+test 277:#\! ... ok
+test 278:#\" ... ok
+test 279:#\# ... ok
+test 280:#\$ ... ok
+test 281:#\% ... ok
+test 282:#\& ... ok
+test 283:#\' ... ok
+test 284:#\( ... ok
+test 285:#\) ... ok
+test 286:#\* ... ok
+test 287:#\+ ... ok
+test 288:#\, ... ok
+test 289:#\- ... ok
+test 290:#\. ... ok
+test 291:#\/ ... ok
+test 292:#\0 ... ok
+test 293:#\1 ... ok
+test 294:#\2 ... ok
+test 295:#\3 ... ok
+test 296:#\4 ... ok
+test 297:#\5 ... ok
+test 298:#\6 ... ok
+test 299:#\7 ... ok
+test 300:#\8 ... ok
+test 301:#\9 ... ok
+test 302:#\: ... ok
+test 303:#\; ... ok
+test 304:#\< ... ok
+test 305:#\= ... ok
+test 306:#\> ... ok
+test 307:#\? ... ok
+test 308:#\@ ... ok
+test 309:#\A ... ok
+test 310:#\B ... ok
+test 311:#\C ... ok
+test 312:#\D ... ok
+test 313:#\E ... ok
+test 314:#\F ... ok
+test 315:#\G ... ok
+test 316:#\H ... ok
+test 317:#\I ... ok
+test 318:#\J ... ok
+test 319:#\K ... ok
+test 320:#\L ... ok
+test 321:#\M ... ok
+test 322:#\N ... ok
+test 323:#\O ... ok
+test 324:#\P ... ok
+test 325:#\Q ... ok
+test 326:#\R ... ok
+test 327:#\S ... ok
+test 328:#\T ... ok
+test 329:#\U ... ok
+test 330:#\V ... ok
+test 331:#\W ... ok
+test 332:#\X ... ok
+test 333:#\Y ... ok
+test 334:#\Z ... ok
+test 335:#\[ ... ok
+test 336:#\\ ... ok
+test 337:#\] ... ok
+test 338:#\^ ... ok
+test 339:#\_ ... ok
+test 340:#\` ... ok
+test 341:#\a ... ok
+test 342:#\b ... ok
+test 343:#\c ... ok
+test 344:#\d ... ok
+test 345:#\e ... ok
+test 346:#\f ... ok
+test 347:#\g ... ok
+test 348:#\h ... ok
+test 349:#\i ... ok
+test 350:#\j ... ok
+test 351:#\k ... ok
+test 352:#\l ... ok
+test 353:#\m ... ok
+test 354:#\n ... ok
+test 355:#\o ... ok
+test 356:#\p ... ok
+test 357:#\q ... ok
+test 358:#\r ... ok
+test 359:#\s ... ok
+test 360:#\t ... ok
+test 361:#\u ... ok
+test 362:#\v ... ok
+test 363:#\w ... ok
+test 364:#\x ... ok
+test 365:#\y ... ok
+test 366:#\z ... ok
+test 367:#\{ ... ok
+test 368:#\| ... ok
+test 369:#\} ... ok
+test 370:#\~ ... ok
 Performing integers tests ...
-test 361:0 ... ok
-test 362:1 ... ok
-test 363:-1 ... ok
-test 364:10 ... ok
-test 365:-10 ... ok
-test 366:2736 ... ok
-test 367:-2736 ... ok
-test 368:536870911 ... ok
-test 369:-536870912 ... ok
-passed all 370 tests
+test 371:0 ... ok
+test 372:1 ... ok
+test 373:-1 ... ok
+test 374:10 ... ok
+test 375:-10 ... ok
+test 376:2736 ... ok
+test 377:-2736 ... ok
+test 378:536870911 ... ok
+test 379:-536870912 ... ok
+passed all 380 tests
 > 
