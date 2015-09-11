@@ -1,8 +1,11 @@
 /* a simple driver for scheme_entry */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
-int scheme_entry();
+int scheme_entry(char*);
 
 /* runtime.c */
 
@@ -49,7 +52,53 @@ static void print_ptr(ptr x) {
   printf("\n");
 }
 
+static char* allocate_protected_space(int size) {
+  //printf("allocating protected space %i\n", size);
+  int page = getpagesize();
+  //printf("page size %i\n", page);
+  int status;
+  int aligned_size = ((size + page - 1) / page) * page;
+  //printf("aligned size %i\n", aligned_size);
+  char *p = mmap(0, aligned_size + 2 * page,
+		 PROT_READ | PROT_WRITE,
+		 MAP_ANON | MAP_PRIVATE,
+		 0, 0);
+  //printf("memory mapped at %p\n",p);
+  if (p == MAP_FAILED) { printf("MAP FAILED exiting\n"); exit(-1); }
+  status = mprotect(p, page, PROT_NONE);
+  if (status != 0) { printf("mprotect returned non-zero status; exiting\n"); exit(-2); }
+  //printf("protected first page at %p\n",p);
+  status = mprotect(p + page + aligned_size, page, PROT_NONE);
+  if (status != 0) { printf("mprotect failed; exiting\n"); exit(-3); }
+  //printf("protected last  page at %p\n", p + page + aligned_size);
+  return (p + page);
+}
+
+static void deallocate_protected_space(char *p, int size) {
+  //printf("deallocating protected space\n");
+  int page = getpagesize();
+  int status;
+  int aligned_size = ((size + page - 1) / page) * page;
+  status = munmap(p - page, aligned_size + 2 * page);
+  if (status != 0) { printf("munmap returned non-zero status\n"); }
+}
+
 int main(int argc, char** argv){
-   print_ptr(scheme_entry());
-   return 0;
+  //printf("Entering main\n");
+  
+  int stack_size = (16 * 4096); /* holds 16K cells */
+  //printf("stack size is %i\n", stack_size);
+  
+  char* stack_top = allocate_protected_space(stack_size);
+  //printf("stack top is %p\n", stack_top);
+  
+  char* stack_base = stack_top + stack_size;
+  //printf("calling scheme_entry with stack base %p\n", stack_base);
+  
+  print_ptr(scheme_entry(stack_base));
+  
+  //printf("returned from scheme_entry\n");
+  deallocate_protected_space(stack_top, stack_size);
+  //printf("exiting normally\n");
+  return 0;
 }
