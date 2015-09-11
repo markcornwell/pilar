@@ -144,10 +144,23 @@
     (emit "    notl %eax"))
 
 (define-primitive (fx+ si arg1 arg2)
-  (emit-expr si arg1)
+  (emit-expr si arg2)
   (emit "    movl %eax, ~s(%esp)" si)
-  (emit-expr (- si wordsize) arg2)
+  (emit-expr (- si wordsize) arg1)
   (emit "    addl ~s(%esp), %eax" si))
+
+(define-primitive (fx- si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    subl ~s(%esp), %eax" si))
+
+(define-primitive (fx* si arg1 arg2)
+  (emit-expr si arg2)
+  (emit "    sar $~s, %eax" fxshift)   ;; 4x/4
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) arg1)
+  (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
