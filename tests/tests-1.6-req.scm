@@ -35,7 +35,19 @@
    => "192\n"]
 )
  
-
+(add-tests-with-string-output "let*"
+  [(let* ([x 5]) x) => "5\n"]
+  [(let ([x 1])
+     (let ([x (fx+ x 1)]
+	   [y (fx+ x 1)])
+       y))
+   => "2\n"]			      
+  [(let* ([x 1])
+     (let* ([x (fx+ x 1)]
+	    [y (fx+ x 1)])
+       y))
+   => "3\n"]
+)
 
 
 
