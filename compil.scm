@@ -102,6 +102,7 @@
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
+
 (define-primitive (char? si env arg)
     (emit-expr si env arg)
     (emit "    and $~s, %eax" cmask)
@@ -376,6 +377,4 @@
   (emit "~a:" entry))
 
 (define compil-program emit-program)
-
-
 
