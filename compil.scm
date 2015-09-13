@@ -1,6 +1,7 @@
 ;; compil.scm
 ;; Scheme Compiler
 
+;; 1.8 Procedures
 ;; 1.6 Local Variables
 ;; 1.5 Binary Primitives
 ;; 1.4 Conditional Expressions
@@ -13,13 +14,40 @@
 ;; petite compil.scm
 ;; (test-all)
 
+;;-----------------------------------------------------
+;; Input Language:
+;;
+;;  <Program> -> <Expr>
+;;            |  (letrec ([lvar <Lambda>] ...) <Expr>)
+;;
+;;  <Lambda>  -> (lamba (var ...) <Expr>)
+;;
+;;  <Expr>    -> <Imm>
+;;            |  var
+;;            | (if <Expr> <Expr> <Expr>)
+;;            | (let ([var <Expr>] ...) <Expr>
+;;            | (app lvar <Expr> ...)
+;;            | (prim <Expr>)
+;;
+;;  <Imm>     -> fixnum | boolean | char | null
+;;-----------------------------------------------------
+
+
 (load "tests-driver.scm")
-(load "tests/tests-1.6-req.scm")
-(load "tests/tests-1.5-req.scm")
-(load "tests/tests-1.4-req.scm")
-(load "tests/tests-1.3-req.scm")
-(load "tests/tests-1.2-req.scm")
-(load "tests/tests-1.1-req.scm")
+(load "tests/tests-1.8-req.scm")
+;(load "tests/tests-1.7-req.scm")
+;(load "tests/tests-1.6-req.scm")
+;(load "tests/tests-1.5-req.scm")
+;(load "tests/tests-1.4-req.scm")
+;(load "tests/tests-1.3-req.scm")
+;(load "tests/tests-1.2-req.scm")
+;(load "tests/tests-1.1-req.scm")
+
+;; utility
+(define first car)
+(define second cadr)
+(define third caddr)
+(define rest cdr)
 
 (define fxshift      2)
 (define fxmask     #b11)   ; #x03
@@ -215,12 +243,11 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-
-(define-primitive (fx+ si env arg1 arg2)
+(define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
-  (emit "    movl %eax, ~s(%esp)" si)
+  (emit "    movl %eax, ~s(%esp)  # fx+ push arg1" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit "    addl ~s(%esp), %eax" si))
+  (emit "    addl ~s(%esp), %eax  # fx+ arg1 arg2" si))
 
 (define-primitive (fx- si env arg1 arg2)
   (emit-expr si env arg2)
@@ -316,17 +343,28 @@
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
 
-(define (lookup var env)
-  (cdr (assoc var env))) ;; env is a list of dotted pairs
+;;------------------------------------------------------------------
+;; env is a list of dotted pairs
+;; after adding procedure labels we have two kinds of bindings
+;; lvars bind to strings, vars bind to integers
+;; think this through
+;; - clearly emit-variable-ref should take only vars
+;; - variable? needs to distingush a var from an lvar
+;; - might be some advantage to having function label in environment
+;;------------------------------------------------------------------
+
+(define (lookup var env) ;; env is a list of dotted pairs
+  (let ([pair (assoc var env)])
+    (and pair (cdr pair))))
 
 (define (emit-variable-ref env var)
    (emit-stack-load (lookup var env)))
 
 (define (emit-stack-save si)
-   (emit "    movl %eax, ~s(%esp)" si))
+  (emit "    movl %eax, ~s(%esp)   # stk save" si))
 
 (define (emit-stack-load si)
-  (emit "    movl ~s(%esp), %eax" si))
+  (emit "    movl ~s(%esp), %eax   # stk load" si))
 
 (define (let*? x) (eq? (car x) 'let*))
 
@@ -341,11 +379,98 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
-(define (emit-expr si env expr)  ;; add environment and variable?
-  (define (variable? expr) (and (symbol? expr) (assoc expr env)))
+(define (letrec? expr)
+  (and (pair? expr) (eq? (car expr) 'letrec)))
+  
+(define (letrec-bindings expr) (cadr expr))
+(define (letrec-body expr) (caddr expr))
+
+(define (emit-letrec expr)  ;; <<---<< messed up
+  (emit "# emit-letrec expr=~s" expr)
+  (let* ([bindings (letrec-bindings expr)]
+	 [lvars (map lhs bindings)]
+	 [lambdas (map rhs bindings)]
+	 [labels (unique-labels lvars)]
+	 [env (make-initial-env lvars labels)])
+    (emit "#  bindings=~s" bindings)
+    (emit "#  lvars=~s" lvars)
+    (emit "#  lambdas=~s" lambdas)
+    (emit "#  labels=~s" labels)
+    (emit "#  env=~s" env)
+    (emit "#  ---- >>>>> emit-lambdas start ----")
+    (for-each (emit-lambda env) lambdas labels)
+    (emit "#  ---- <<<<<  emit-lambdas end ------")
+    (emit-scheme-entry env (letrec-body expr))))
+
+(define (unique-labels lvars)
+    (define (assign-label v) (unique-label))
+    (map assign-label lvars))
+
+;;(define (unique-labels lvars)
+;;  (define (assign-label v) (cons v (unique-label)))
+;;  (map assign-label lvars))
+
+(define (make-initial-env lvars labels)
+  (cond
+   [(null? lvars) '()]
+   [else (cons (cons (car lvars) (car labels))
+	       (make-initial-env (cdr lvars) (cdr labels)))])) 
+
+
+(define lambda-formals cadr)
+(define lambda-body  caddr)
+
+(define empty? null?)
+
+(define (emit-lambda env)
+  (lambda (expr label)
+    (emit-function-header label)
+    (let ([fmls (lambda-formals expr)]
+	  [body (lambda-body expr)])
+      (let f ([fmls fmls] [si (- wordsize)] [env env])
+	(cond
+	 [(empty? fmls)
+	  (emit-expr si env body)
+	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
+	 [else
+	  (f (rest fmls)
+	     (- si wordsize)
+	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
+
+(define call-target cadr) ;; (app lvar <Expr> ... )
+(define call-args cddr)   ;;           ^-- that part
+
+(define (emit-app si env expr)
+  (define (emit-arguments si args)
+    (unless (empty? args)
+        (emit-expr si env (first args))    ;; evaluated arg in %eax
+	(emit "    mov %eax, ~s(%esp)    # arg" si) ;; save %eax as evaluated arg    
+	(emit-arguments (- si wordsize) (rest args))))
+  (define (emit-adjust-base si)
+    (unless (eq? si 0)
+	(emit "    lea ~s(%esp), %esp    # adjust base" si )))
+  (define (emit-call si label)
+    (emit "    call ~a   # app  " label))
+  (emit-arguments (- si wordsize) (call-args expr))
+  (emit-adjust-base (+ si wordsize))
+  (emit-call si (lookup (call-target expr) env))
+  (emit-adjust-base (- (+ si wordsize)))
+  )
+
+(define (emit-expr si env expr) ;; <---<< ?
+  (define (variable? expr)
+    (and (symbol? expr)
+	 (let ([pair (assoc expr env)])
+	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings
+  (define (app? expr)
+    (and (pair? expr) (eq? (car expr) 'app)))
+  (define (lvar-app? exp)
+    (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
   (cond
     [(immediate? expr)  (emit-immediate expr)]
     [(variable? expr)   (emit-variable-ref env expr)]
+    [(app? expr)        (emit-app si env expr)]
+    [(lvar-app? expr)   (emit-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
@@ -356,18 +481,35 @@
      (error "emit-expr" "unrecognized form:" expr)]))
 
 (define (emit-immediate x)
-  (emit "    movl $~s, %eax" (immediate-rep x)))
+  (emit "    movl $~s, %eax     # immediate" (immediate-rep x)))
+
+;(define (emit-program expr)
+;  (emit-function-header "_L_scheme_entry")
+;  (emit-expr (- wordsize) '() expr)
+;  (emit "    ret")
+;  (emit-function-header "_scheme_entry")
+;  (emit "    movl %esp, %ecx")     
+;  (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
+;  (emit "    call _L_scheme_entry")
+;  (emit "    movl %ecx, %esp")
+;  (emit "    ret"))
 
 (define (emit-program expr)
+  (emit "# ~s~%" expr)
+  (if (letrec? expr)
+      (emit-letrec expr)  ;; <--
+      (emit-scheme-entry '() expr)))
+
+(define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
-  (emit-expr (- wordsize) '() expr)
+  (emit-expr (- wordsize) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")
   (emit "    movl %esp, %ecx")     
   (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
   (emit "    call _L_scheme_entry")
   (emit "    movl %ecx, %esp")
-  (emit "    ret"))
+  (emit "    ret"))  
 
 (define (emit-function-header entry)
   (emit "    .text")
