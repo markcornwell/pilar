@@ -1,7 +1,8 @@
 ;; compil.scm
 ;; Scheme Compiler
 
-;; 1.8 Procedures
+;; 1.8 Proper Tail Calls
+;; 1.7 Procedures
 ;; 1.6 Local Variables
 ;; 1.5 Binary Primitives
 ;; 1.4 Conditional Expressions
@@ -31,7 +32,6 @@
 ;;
 ;;  <Imm>     -> fixnum | boolean | char | null
 ;;-----------------------------------------------------
-
 
 (load "tests-driver.scm")
 (load "tests/tests-1.8-req.scm")
@@ -92,7 +92,7 @@
        (putprop 'prim-name '*arg-count*
             (length '(arg* ...)))
        (putprop 'prim-name '*emitter*
-        (lambda (si env arg* ...) b b* ...)))]))
+            (lambda (si env arg* ...) b b* ...)))]))
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
@@ -277,6 +277,12 @@
     (check-primcall-args prim args)
     (apply (primitive-emitter prim) si env args)))
 
+(define (emit-tail-primcall si env x)
+  (let ([prim (car x)] [args (cdr x)])
+    (check-primcall-args prim args)
+    (apply (primitive-emitter prim) si env args)
+    (emit "    ret")))
+
 (define (check-primcall-args prim args)
     (= (length args) (getprop prim '*arg-count*)))
 
@@ -304,6 +310,18 @@
     (emit-expr si env (if-altern x))
     (emit "~a:" end-label)))
 
+(define (emit-tail-if si env x)
+  (let ([alt-label (unique-label)]
+    [end-label (unique-label)])
+    (emit-expr si env (if-test x))
+    (emit "    cmp $~s, %al" bool-f)
+    (emit "    je ~a" alt-label)
+    (emit-tail-expr si env (if-conseq x))
+    (emit "    jmp ~a" end-label)
+    (emit "~a:" alt-label)
+    (emit-tail-expr si env (if-altern x))
+    (emit "~a:" end-label)))
+
 (define (and? x) (eq? (car x) 'and))
 
 (define (emit-and si env x)
@@ -312,6 +330,12 @@
    [(eq? (length x) 2) (emit-expr si env (cadr x))]
    [else (emit-expr si env (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
 
+(define (emit-tail-and si env x)
+  (cond
+   [(eq? (length x) 1) (emit-tail-expr si env #t)]
+   [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
+   [else (emit-tail-expr si env (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
+
 (define (or? x) (eq? (car x) 'or))
 
 (define (emit-or si env x)
@@ -319,6 +343,12 @@
    [(eq? (length x) 1) (emit-expr si env #f)]
    [(eq? (length x) 2) (emit-expr si env (cadr x))]
    [else (emit-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+
+(define (emit-tail-or si env x)
+  (cond
+   [(eq? (length x) 1) (emit-tail-expr si env #f)]
+   [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
+   [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
 
 (define (next-stack-index si) (- si wordsize))
 
@@ -343,6 +373,18 @@
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
 
+(define (emit-tail-let si env bindings body) ;; look at the version on p. 30
+  (let f ((si si) (new-env env) (b* bindings))
+     (cond
+       [(null? b*)  (emit-tail-expr si new-env body)]
+       [else
+         (let ([b (car b*)])
+           (emit-expr si env (rhs b))
+           (emit-stack-save si)
+           (f (next-stack-index si)
+              (extend-env si new-env (lhs b))
+              (cdr b*)))])))
+
 ;;------------------------------------------------------------------
 ;; env is a list of dotted pairs
 ;; after adding procedure labels we have two kinds of bindings
@@ -358,7 +400,11 @@
     (and pair (cdr pair))))
 
 (define (emit-variable-ref env var)
-   (emit-stack-load (lookup var env)))
+  (emit-stack-load (lookup var env)))
+
+(define (emit-tail-variable-ref env var)
+  (emit-stack-load (lookup var env))
+  (emit "    ret"))
 
 (define (emit-stack-save si)
   (emit "    movl %eax, ~s(%esp)   # stk save" si))
@@ -375,6 +421,16 @@
    [(null? (cdr bindings)) (emit-expr si env (list 'let bindings body))]
    [else
     (emit-expr si env
+	 (list 'let
+	       (list (car bindings))
+	       (list 'let* (cdr bindings) body)))]))
+
+(define (emit-tail-let* si env bindings body)
+  (cond
+   [(null? bindings) (emit-tail-expr si env body)]
+   [(null? (cdr bindings)) (emit-tail-expr si env (list 'let bindings body))]
+   [else
+    (emit-tail-expr si env
 	 (list 'let
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
@@ -406,16 +462,11 @@
     (define (assign-label v) (unique-label))
     (map assign-label lvars))
 
-;;(define (unique-labels lvars)
-;;  (define (assign-label v) (cons v (unique-label)))
-;;  (map assign-label lvars))
-
 (define (make-initial-env lvars labels)
   (cond
    [(null? lvars) '()]
    [else (cons (cons (car lvars) (car labels))
 	       (make-initial-env (cdr lvars) (cdr labels)))])) 
-
 
 (define lambda-formals cadr)
 (define lambda-body  caddr)
@@ -430,7 +481,7 @@
       (let f ([fmls fmls] [si (- wordsize)] [env env])
 	(cond
 	 [(empty? fmls)
-	  (emit-expr si env body)
+	  (emit-tail-expr si env body)
 	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
 	 [else
 	  (f (rest fmls)
@@ -454,10 +505,30 @@
   (emit-arguments (- si wordsize) (call-args expr))
   (emit-adjust-base (+ si wordsize))
   (emit-call si (lookup (call-target expr) env))
-  (emit-adjust-base (- (+ si wordsize)))
-  )
+  (emit-adjust-base (- (+ si wordsize))))
 
-(define (emit-expr si env expr) ;; <---<< ?
+(define (emit-tail-app si env expr)
+  (define (emit-arguments si args)
+    (unless (empty? args)
+        (emit-expr si env (first args))    ;; evaluated arg in %eax
+	(emit "    mov %eax, ~s(%esp)    # arg" si) ;; save %eax as evaluated arg    
+	(emit-arguments (- si wordsize) (rest args))))
+  (define (emit-shift-args argc si delta)
+    (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
+    (unless (zero? argc)
+	(emit "    mov ~a(%esp), %ebx  # shift arg" si )
+	(emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
+	(emit-shift-args (- argc 1) (- si wordsize) delta)))
+  (define (emit-jmp si label)
+    (emit "    jmp ~a   # app  " label))
+  (emit-arguments (- si wordsize) (call-args expr))
+  (let ([argc (length (call-args expr))]
+	[si (- si wordsize)]
+	[delta (- -4 (- si wordsize))])
+     (emit-shift-args argc si delta))
+  (emit-jmp si (lookup (call-target expr) env)))
+
+(define (emit-expr si env expr) 
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
@@ -480,19 +551,35 @@
     [else
      (error "emit-expr" "unrecognized form:" expr)]))
 
+(define (emit-tail-expr si env expr) ;; <---<< ?
+  (define (variable? expr)
+    (and (symbol? expr)
+	 (let ([pair (assoc expr env)])
+	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings
+  (define (app? expr)
+    (and (pair? expr) (eq? (car expr) 'app)))
+  (define (lvar-app? exp)
+    (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
+  (cond
+    [(immediate? expr)  (emit-tail-immediate expr)]
+    [(variable? expr)   (emit-tail-variable-ref env expr)]
+    [(app? expr)        (emit-tail-app si env expr)]
+    [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
+    [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
+    [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
+    [(primcall? expr)   (emit-tail-primcall si env expr)]
+    [(if? expr)         (emit-tail-if si env expr)]
+    [(and? expr)        (emit-tail-and si env expr)]
+    [(or? expr)         (emit-tail-or si env expr)]
+    [else
+     (error "emit-expr" "unrecognized form:" expr)]))
+
 (define (emit-immediate x)
   (emit "    movl $~s, %eax     # immediate" (immediate-rep x)))
 
-;(define (emit-program expr)
-;  (emit-function-header "_L_scheme_entry")
-;  (emit-expr (- wordsize) '() expr)
-;  (emit "    ret")
-;  (emit-function-header "_scheme_entry")
-;  (emit "    movl %esp, %ecx")     
-;  (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
-;  (emit "    call _L_scheme_entry")
-;  (emit "    movl %ecx, %esp")
-;  (emit "    ret"))
+(define (emit-tail-immediate x)
+  (emit-immediate x)
+  (emit "    ret"))
 
 (define (emit-program expr)
   (emit "# ~s~%" expr)
@@ -518,6 +605,3 @@
   (emit "~a:" entry))
 
 (define compil-program emit-program)
-
-
-

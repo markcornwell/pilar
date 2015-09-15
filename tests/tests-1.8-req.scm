@@ -63,7 +63,7 @@
   [(letrec ([f (lambda () (fx+ 5 7))]
             [g (lambda () 13)]) 
     (fx+ (f) (g))) => "25\n"]
-  [(letrec ([f (lambda (x) (fx+ x 12))]) (f 13)) => "25\n"]  ;; <<-- broken --<<<
+  [(letrec ([f (lambda (x) (fx+ x 12))]) (f 13)) => "25\n"] 
   [(letrec ([f (lambda (x) (fx+ x 12))]) (f (f 10))) => "34\n"]
   [(letrec ([f (lambda (x) (fx+ x 12))]) (f (f (f 0)))) => "36\n"]
   [(letrec ([f (lambda (x y) (fx+ x y))] 
@@ -82,7 +82,6 @@
      (e 25)) => "#f\n"]
 )
 
-#|
 (add-tests-with-string-output "deeply nested procedures"   ;; requires Proper Tail Calls
   [(letrec ([sum (lambda (n ac)
                    (if (fxzero? n)
@@ -92,5 +91,5 @@
   [(letrec ([e (lambda (x) (if (fxzero? x) #t (app o (fxsub1 x))))]
             [o (lambda (x) (if (fxzero? x) #f (app e (fxsub1 x))))])
      (app e 5000000)) => "#t\n"]
-)
-|#
+  )
+
