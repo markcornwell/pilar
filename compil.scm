@@ -1,6 +1,8 @@
 ;; compil.scm
-;; Scheme Compiler
-
+;; Pilar: A Scheme Compiler
+;; Mark Cornwell
+;;
+;; 1.9 Heap Allocation
 ;; 1.8 Proper Tail Calls
 ;; 1.7 Procedures
 ;; 1.6 Local Variables
@@ -62,6 +64,13 @@
 (define bmask     #b10111111)
 (define btag      #b00101111)
 
+(define pair-shift   3)
+(define pair-mask #b00000111) ; #x03
+(define pair-tag  #b00000001) ; #x01
+(define size-pair    8)
+(define car-offset   0)
+(define cdr-offset   4)
+
 (define nil-value #x3F)
 (define wordsize     4) ; bytes
 
@@ -83,6 +92,10 @@
       [(boolean? x) (if x bool-t bool-f) ]
       [(char? x) (logor (ash (char->integer x) cshift) ctag) ]
       [(null? x) nil-value ]))
+
+;;-----------------------------------------------------
+;;                      Primitives
+;;-----------------------------------------------------
 
 (define-syntax define-primitive
   (syntax-rules ()
@@ -171,6 +184,10 @@
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
+
+;;---------------------------------------
+;;            fixnum
+;;---------------------------------------
 
 (define-primitive (fxlognot si env arg)
     (emit-expr si env arg)
@@ -263,6 +280,40 @@
   (emit-expr (- si wordsize) env arg1)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
+;;-------------------------------------------
+;;                 Pairs
+;;-------------------------------------------
+
+(define-primitive (pair? si env arg)
+  (emit-expr si env arg)
+  (emit "    and $~s, %al" pair-mask)
+  (emit "    cmp $~s, %al" pair-tag)
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (cons si env arg1 arg2)
+  (emit-expr si env arg2)                     ;; evaluate arg2
+  (emit "    movl %eax, ~s(%eax)" si)         ;; push arg2
+  (emit-expr (- si wordsize) env arg1)        ;; evaluate arg1
+  (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
+  (emit "    movl ~s(%eax), %eax" si)         ;; pop arg2
+  (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
+  (emit "    movl %ebp, %eax")                ;; return ptr to cons'd pair
+  (emit "    or  $~s, %eax" pair-tag)          ;; or in the tag
+  (emit "    addl $~s, %ebp" size-pair))       ;; bump heap ptr %ebp
+
+(define-primitive (car si env arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax)" (- car-offset pair-tag)))
+
+(define-primitive (cdr si env arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax)" (- cdr-offset pair-tag)))  
+    
+;;---------------------------------------------------------
+
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
 
@@ -293,6 +344,10 @@
       (let ([L (format "L_~s" count)])
     (set! count (add1 count))
     L))))
+
+;;-------------------------------------------
+;;               Conditionals
+;;-------------------------------------------
 
 (define (if? x) (and (eq? (car x) 'if) (eq? 4 (length x))))
 (define (if-test x) (cadr x))
@@ -350,6 +405,11 @@
    [(eq? (length x) 1) (emit-tail-expr si env #f)]
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+
+
+;;---------------------------------------------
+;;                Local Variables
+;;---------------------------------------------
 
 (define (next-stack-index si) (- si wordsize))
 
@@ -435,6 +495,10 @@
 	 (list 'let
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
+
+;;---------------------------------------------
+;;                 Procedures
+;;---------------------------------------------
 
 (define (letrec? expr)
   (and (pair? expr) (eq? (car expr) 'letrec)))
@@ -529,6 +593,10 @@
      (emit-shift-args argc si delta))
   (emit-jmp si (lookup (call-target expr) env)))
 
+;;--------------------------------------------
+;;           Expression Dispatcher
+;;--------------------------------------------
+
 (define (emit-expr si env expr) 
   (define (variable? expr)
     (and (symbol? expr)
@@ -587,18 +655,6 @@
   (if (letrec? expr)
       (emit-letrec expr)  ;; <--
       (emit-scheme-entry '() expr)))
-
-;(define (emit-scheme-entry env expr)
-;  (emit-function-header "_L_scheme_entry")
-;  (emit-expr (- wordsize) env expr)
-;  (emit "    ret")
-;  (emit-function-header "_scheme_entry")
-;  (emit "    movl %esp, %ecx")     
-;  (emit "    movl 4(%esp), %esp")   ;; linkage assume i386 (32 bit)
-;  (emit "    call _L_scheme_entry")
-;  (emit "    movl %ecx, %esp")
-;  (emit "    ret"))  
-
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")

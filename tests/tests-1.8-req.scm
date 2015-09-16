@@ -1,4 +1,4 @@
-#|
+
 (add-tests-with-string-output "cons"
   [(fxadd1 0) => "1\n"]
   [(pair? (cons 1 2)) => "#t\n"]
@@ -44,7 +44,7 @@
                ())) 
    => "((#t #t . #t) ((#f . #f) . #f))\n"]
 )
-|#
+
   
 
 (add-tests-with-string-output "procedures"

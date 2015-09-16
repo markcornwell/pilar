@@ -19,9 +19,40 @@
 #define char_tag 0x0F
 #define char_shift 8
 #define nil 0x3F
+#define pair_mask 0x03
+#define pair_tag  0x01
 
-/* all scheme values are of type ptrs */
+// Note: Pointer arithmetic already scales these by ptr size of 4 bytes
+#define car_offset 0
+#define cdr_offset 1
+
+/* All scheme values are of type ptrs */
+
 typedef unsigned int ptr;
+typedef struct { ptr car; ptr cdr; } *pair;
+
+ptr car(ptr x) {
+  x = x - 1;
+  return ((pair) x)->car;
+}
+
+ptr cdr(ptr x) {
+  x = x - 1;
+  return ((pair) x)->cdr;
+}
+  
+
+/*
+typedef union {
+  unsigned int imm;
+  struct {
+    unsigned int car;
+    unsigned int cdr;
+  } *pair;
+} ptr;
+*/
+
+static void print_pairs (pair p);
 
 static void print_ptr(ptr x) {
    if ((x & fx_mask) == fx_tag) {
@@ -38,6 +69,10 @@ static void print_ptr(ptr x) {
        } else {
             printf("#\\%c", ((int) x) >> char_shift);
        }
+   } else if((x & pair_mask) == pair_tag) {
+       printf("(");
+       print_pairs((pair)(x-1)); // zero out pair-tag
+       printf(")");
    } else if(x == bool_f) {
        printf("#f");
    } else if(x == bool_t) {
@@ -48,6 +83,19 @@ static void print_ptr(ptr x) {
        printf("#<unknown 0x%08x>", x);
   }
   printf("\n");
+}
+
+static void print_pairs (pair p) {
+  print_ptr(p->car);
+  if ((p->cdr) == nil) {
+    printf("(");
+  } else if (((p->cdr) & pair_mask) == pair_tag) {
+    printf(" ");
+    print_pairs((pair)((p->cdr)-1));
+  } else {
+    printf (" . ");
+    print_ptr((p->cdr));
+  }
 }
 
 static char* allocate_protected_space(int size) {
@@ -94,13 +142,12 @@ int main(int argc, char** argv){
   char* stack_base = stack_top + stack_size;
   // heap
   int heap_size =  (16 * 4096); /* heap */
-  char* heap_top = allocate_protected_space(heap_size);
-  char* heap_base = heap_top + heap_size;
+  char* heap = allocate_protected_space(heap_size);
   // save registers & call scheme
   context ctxt;
-  print_ptr(scheme_entry(&ctxt, stack_base, heap_base));
+  print_ptr(scheme_entry(&ctxt, stack_base, heap));
   // free heap & stack
   deallocate_protected_space(stack_top, stack_size);
-  deallocate_protected_space(heap_top, heap_size);
+  deallocate_protected_space(heap, heap_size);
   return 0;
 }

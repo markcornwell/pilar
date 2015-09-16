@@ -1,10 +1,24 @@
-# -536870912
+# (pair? (cons 1 2))
 
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-    movl $-2147483648, %eax     # immediate
+    movl $8, %eax     # immediate
+    movl %eax, -4(%eax)
+    movl $4, %eax     # immediate
+    movl %eax, 0(%ebp)
+    movl -4(%eax), %eax
+    movl %eax, 4(%ebp)
+    movl %ebp, %eax
+    or  $1, %eax
+    addl $8, %ebp
+    and $7, %al
+    cmp $1, %al
+    sete %al
+    movzbl %al, %eax
+    sal $6, %al
+    or $47, %al
     ret
     .text
     .align 4,0x90
