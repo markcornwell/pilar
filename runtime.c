@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-int scheme_entry(char*);
-
 /* runtime.c */
 
 #include <stdio.h>
@@ -53,29 +51,22 @@ static void print_ptr(ptr x) {
 }
 
 static char* allocate_protected_space(int size) {
-  //printf("allocating protected space %i\n", size);
   int page = getpagesize();
-  //printf("page size %i\n", page);
   int status;
   int aligned_size = ((size + page - 1) / page) * page;
-  //printf("aligned size %i\n", aligned_size);
   char *p = mmap(0, aligned_size + 2 * page,
 		 PROT_READ | PROT_WRITE,
 		 MAP_ANON | MAP_PRIVATE,
 		 0, 0);
-  //printf("memory mapped at %p\n",p);
   if (p == MAP_FAILED) { printf("MAP FAILED exiting\n"); exit(-1); }
   status = mprotect(p, page, PROT_NONE);
   if (status != 0) { printf("mprotect returned non-zero status; exiting\n"); exit(-2); }
-  //printf("protected first page at %p\n",p);
   status = mprotect(p + page + aligned_size, page, PROT_NONE);
   if (status != 0) { printf("mprotect failed; exiting\n"); exit(-3); }
-  //printf("protected last  page at %p\n", p + page + aligned_size);
   return (p + page);
 }
 
 static void deallocate_protected_space(char *p, int size) {
-  //printf("deallocating protected space\n");
   int page = getpagesize();
   int status;
   int aligned_size = ((size + page - 1) / page) * page;
@@ -83,22 +74,33 @@ static void deallocate_protected_space(char *p, int size) {
   if (status != 0) { printf("munmap returned non-zero status\n"); }
 }
 
+typedef struct {
+  void* eax;  /* 0    scratch  */
+  void* ebx;  /* 4    preserve */
+  void* ecx;  /* 8    scratch  */
+  void* edx;  /* 12   scratch  */
+  void* esi;  /* 16   preserve */
+  void* edi;  /* 20   preserve */
+  void* ebp;  /* 24   preserve */
+  void* esp;  /* 28   preserve */
+} context;
+
+int scheme_entry(context* ctxt, char* stack_base, char* heap_base);
+
 int main(int argc, char** argv){
-  //printf("Entering main\n");
-  
-  int stack_size = (16 * 4096); /* holds 16K cells */
-  //printf("stack size is %i\n", stack_size);
-  
+  // stack
+  int stack_size = (16 * 4096); /* holds 16K cells */ 
   char* stack_top = allocate_protected_space(stack_size);
-  //printf("stack top is %p\n", stack_top);
-  
   char* stack_base = stack_top + stack_size;
-  //printf("calling scheme_entry with stack base %p\n", stack_base);
-  
-  print_ptr(scheme_entry(stack_base));
-  
-  //printf("returned from scheme_entry\n");
+  // heap
+  int heap_size =  (16 * 4096); /* heap */
+  char* heap_top = allocate_protected_space(heap_size);
+  char* heap_base = heap_top + heap_size;
+  // save registers & call scheme
+  context ctxt;
+  print_ptr(scheme_entry(&ctxt, stack_base, heap_base));
+  // free heap & stack
   deallocate_protected_space(stack_top, stack_size);
-  //printf("exiting normally\n");
+  deallocate_protected_space(heap_top, heap_size);
   return 0;
 }
