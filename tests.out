@@ -3,4 +3,19 @@ Copyright (c) 1985-2011 Cadence Research Systems
 
 > Performing cons tests ...
 test 0:(fxadd1 0) ... ok
-test 1:(pair? (cons 1 2)) ...> 
+test 1:(pair? 12) ... ok
+test 2:(pair? #t) ... ok
+test 3:(pair? #f) ... ok
+test 4:(pair? ()) ... ok
+test 5:(cons 1 2) ... ok
+test 6:(pair? (cons 1 2)) ... ok
+test 7:(fixnum? (cons 12 43)) ... ok
+test 8:(boolean? (cons 12 43)) ... ok
+test 9:(null? (cons 12 43)) ... ok
+test 10:(not (cons 12 43)) ... ok
+test 11:(if (cons 12 43) 32 43) ... ok
+test 12:(car (cons 1 23)) ... ok
+test 13:(cdr (cons 43 123)) ... ok
+test 14:(cons #t #f) ... ok
+test 15:(car (cons #t #f)) ... ok
+test 16:(cons (cons 12 3) (cons 45 6)) ...> 

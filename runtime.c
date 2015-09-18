@@ -29,28 +29,7 @@
 /* All scheme values are of type ptrs */
 
 typedef unsigned int ptr;
-typedef struct { ptr car; ptr cdr; } *pair;
-
-ptr car(ptr x) {
-  x = x - 1;
-  return ((pair) x)->car;
-}
-
-ptr cdr(ptr x) {
-  x = x - 1;
-  return ((pair) x)->cdr;
-}
-  
-
-/*
-typedef union {
-  unsigned int imm;
-  struct {
-    unsigned int car;
-    unsigned int cdr;
-  } *pair;
-} ptr;
-*/
+typedef struct { ptr car; ptr cdr; } *pair;  // 8-byte aligned
 
 static void print_pairs (pair p);
 
@@ -82,13 +61,13 @@ static void print_ptr(ptr x) {
   } else {
        printf("#<unknown 0x%08x>", x);
   }
-  printf("\n");
+   //printf("\n");
 }
 
 static void print_pairs (pair p) {
   print_ptr(p->car);
   if ((p->cdr) == nil) {
-    printf("(");
+    printf(")");
   } else if (((p->cdr) & pair_mask) == pair_tag) {
     printf(" ");
     print_pairs((pair)((p->cdr)-1));
@@ -136,16 +115,21 @@ typedef struct {
 int scheme_entry(context* ctxt, char* stack_base, char* heap_base);
 
 int main(int argc, char** argv){
-  // stack
+  
+  // create the stack
   int stack_size = (16 * 4096); /* holds 16K cells */ 
   char* stack_top = allocate_protected_space(stack_size);
   char* stack_base = stack_top + stack_size;
-  // heap
-  int heap_size =  (16 * 4096); /* heap */
+  
+  // create the heap
+  int heap_size =  (8 * 16 * 4096); /* holdes 16K pairs */
   char* heap = allocate_protected_space(heap_size);
-  // save registers & call scheme
+
+  // save registers, call scheme, upon return print result
   context ctxt;
   print_ptr(scheme_entry(&ctxt, stack_base, heap));
+  printf("\n");
+  
   // free heap & stack
   deallocate_protected_space(stack_top, stack_size);
   deallocate_protected_space(heap, heap_size);

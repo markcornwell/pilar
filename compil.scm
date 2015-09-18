@@ -105,7 +105,11 @@
        (putprop 'prim-name '*arg-count*
             (length '(arg* ...)))
        (putprop 'prim-name '*emitter*
-            (lambda (si env arg* ...) b b* ...)))]))
+		(lambda (si env arg* ...) b b* ...)))]))
+
+;;------------------------------------------------------
+;;                Unary Primitives
+;;------------------------------------------------------
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
@@ -186,7 +190,7 @@
     (emit "    or $~s, %al" bool-f))
 
 ;;---------------------------------------
-;;            fixnum
+;;        Binary Primitives
 ;;---------------------------------------
 
 (define-primitive (fxlognot si env arg)
@@ -294,25 +298,25 @@
   (emit "    or $~s, %al" bool-f))
 
 (define-primitive (cons si env arg1 arg2)
-  (emit-expr si env arg2)                     ;; evaluate arg2
-  (emit "    movl %eax, ~s(%eax)" si)         ;; push arg2
-  (emit-expr (- si wordsize) env arg1)        ;; evaluate arg1
+  (emit-expr si env arg1)                     ;; evaluate arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
-  (emit "    movl ~s(%eax), %eax" si)         ;; pop arg2
+  (emit-expr si env arg2)                     ;; evaluate arg2  
   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
   (emit "    movl %ebp, %eax")                ;; return ptr to cons'd pair
-  (emit "    or  $~s, %eax" pair-tag)          ;; or in the tag
-  (emit "    addl $~s, %ebp" size-pair))       ;; bump heap ptr %ebp
+  (emit "    or  $~s, %eax" pair-tag)         ;; or in the pair tag
+  (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
 
 (define-primitive (car si env arg)
   (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax)" (- car-offset pair-tag)))
+  (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
 
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax)" (- cdr-offset pair-tag)))  
+  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))  
     
-;;---------------------------------------------------------
+;;-------------------------------------------------------
+;; support for primitives
+;;-------------------------------------------------------
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
@@ -667,8 +671,8 @@
   (emit "    movl %edi, 20(%ecx)")
   (emit "    movl %ebp, 24(%ecx)")
   (emit "    movl %esp, 28(%ecx)")
-  (emit "    movl 12(%esp), %ebp")
-  (emit "    movl 8(%esp), %esp")  
+  (emit "    movl 12(%esp), %ebp") ;; set heap base
+  (emit "    movl 8(%esp), %esp")  ;; set stack base
   (emit "    call _L_scheme_entry")
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
