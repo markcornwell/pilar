@@ -67,7 +67,7 @@ static void print_ptr(ptr x) {
 static void print_pairs (pair p) {
   print_ptr(p->car);
   if ((p->cdr) == nil) {
-    printf(")");
+    return;
   } else if (((p->cdr) & pair_mask) == pair_tag) {
     printf(" ");
     print_pairs((pair)((p->cdr)-1));

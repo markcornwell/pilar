@@ -16,6 +16,7 @@
   [(cdr (cons 43 123)) => "123\n"]
   [(cons #t #f) => "(#t . #f)\n"]
   [(car (cons #t #f)) => "#t\n"]
+  [(cons 1 ()) => "(1)\n"]
   [(cons (cons 12 3) (cons 45 6)) => "((12 . 3) (45 . 6))\n"]
   [(cons (cons 12 3) (cons #t #f)) => "((12 . 3) (#t . #f))\n"]
   [(car (car (cons (cons 12 3) (cons #t #f)))) => "12\n"]
