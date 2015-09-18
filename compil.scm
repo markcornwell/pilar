@@ -299,10 +299,12 @@
 
 (define-primitive (cons si env arg1 arg2)
   (emit-expr si env arg1)                     ;; evaluate arg1
-  (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
-  (emit-expr si env arg2)                     ;; evaluate arg2  
+  (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
+  (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2  
   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
-  (emit "    movl %ebp, %eax")                ;; return ptr to cons'd pair
+  (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
+  (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
+  (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
   (emit "    or  $~s, %eax" pair-tag)         ;; or in the pair tag
   (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
 

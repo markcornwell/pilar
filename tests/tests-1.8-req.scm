@@ -18,12 +18,13 @@
   [(car (cons #t #f)) => "#t\n"]
   [(cons 1 ()) => "(1)\n"]
   [(cons 1 (cons 2 ())) => "(1 2)\n"]
-  [(cons (cons 12 3) (cons 45 6)) => "((12 . 3) (45 . 6))\n"]
-  [(cons (cons 12 3) (cons #t #f)) => "((12 . 3) (#t . #f))\n"]
+  [(cons (cons 12 3) (cons 45 6)) => "((12 . 3) 45 . 6)\n"]
+  [(cons (cons 12 3) (cons #t #f)) => "((12 . 3) #t . #f)\n"]
   [(car (car (cons (cons 12 3) (cons #t #f)))) => "12\n"]
   [(cdr (car (cons (cons 12 3) (cons #t #f)))) => "3\n"]
   [(car (cdr (cons (cons 12 3) (cons #t #f)))) => "#t\n"]
   [(cdr (cdr (cons (cons 12 3) (cons #t #f)))) => "#f\n"]
+  [(cons 1 (cons 2 (cons 3 ()))) => "(1 2 3)\n"]
   [(let ([x (let ([y (fx+ 1 2)]) (fx* y y))])
      (cons x (fx+ x x)))
    => "(9 . 18)\n"]
@@ -51,8 +52,6 @@
                ())) 
    => "((#t #t . #t) ((#f . #f) . #f))\n"]
 )
-
-  
 
 (add-tests-with-string-output "procedures"
   [(letrec () 12) => "12\n"]
