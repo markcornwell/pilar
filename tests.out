@@ -19,4 +19,4 @@ test 13:(cdr (cons 43 123)) ... ok
 test 14:(cons #t #f) ... ok
 test 15:(car (cons #t #f)) ... ok
 test 16:(cons 1 ()) ... ok
-test 17:(cons (cons 12 3) (cons 45 6)) ...> 
+test 17:(cons 1 (cons 2 ())) ...> 
