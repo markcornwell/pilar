@@ -64,6 +64,9 @@
   [(null? (make-vector 12)) => "#f\n"]
   [(boolean? (make-vector 12)) => "#f\n"]
   [(make-vector 0) => "#()\n"]
+  [(let ([v (make-vector 1)])
+     (vector-set! v 1 #t)
+     v) => "#(#t)\n"]    ;;;  <<----<<< implicit begin is required here!!!
   [(let ([v (make-vector 2)])
      (vector-set! v 0 #t)
      (vector-set! v 1 #f)
@@ -127,8 +130,8 @@
                       (fxsub1 (vector-length (if (vector? v0) v0 v1))))))
       (cons v0 v1))) => "(#(2) . #(13))\n"]
 )
-|#
 
+#|
 (add-tests-with-string-output "strings"
   [(string? (make-string 0)) => "#t\n"]
   [(make-string 0) => "\"\"\n"]
@@ -227,3 +230,4 @@
      (string-set! s 0 #\\)
      s) => "\"\\\\\"\n"]
 )
+|#

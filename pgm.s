@@ -1,10 +1,26 @@
-# -536870912
+# (let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v)
 
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-    movl $-2147483648, %eax     # immediate
+    movl $8, %eax     # immediate
+    movl %eax, 0(%ebp)
+    movl %eax, %ebx
+    movl %ebp, %eax
+    orl  $5, %eax
+    addl $11, %ebx
+    andl $-8, %ebx
+    addl %ebx, %ebp
+    movl %eax, -4(%esp)   # stk save
+    movl -4(%esp), %eax   # stk load
+    movl %eax, -8(%esp)
+    movl $0, %eax     # immediate
+    movl %eax, -12(%esp)
+    movl $111, %eax     # immediate
+    movl -8(%esp), %ebx
+    movl -12(%esp), %ecx
+    movl %eax, -5(%ebx,%ecx)
     ret
     .text
     .align 4,0x90

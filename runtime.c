@@ -21,17 +21,17 @@
 #define nil 0x3F
 #define pair_mask 0x03
 #define pair_tag  0x01
-
-// Note: Pointer arithmetic already scales these by ptr size of 4 bytes
-#define car_offset 0
-#define cdr_offset 1
+#define vect_mask 0x07
+#define vect_tag  0x05
 
 /* All scheme values are of type ptrs */
 
 typedef unsigned int ptr;
 typedef struct { ptr car; ptr cdr; } *pair;  // 8-byte aligned
+typedef struct { int len; ptr elt[]; } *vector;
 
 static void print_pairs (pair p);
+static void print_vector (vector v);
 
 static void print_ptr(ptr x) {
    if ((x & fx_mask) == fx_tag) {
@@ -48,6 +48,10 @@ static void print_ptr(ptr x) {
        } else {
             printf("#\\%c", ((int) x) >> char_shift);
        }
+   } else if((x & vect_mask) == vect_tag) {
+       printf("#(");
+       print_vector((vector) (x - vect_tag));
+       printf(")");
    } else if((x & pair_mask) == pair_tag) {
        printf("(");
        print_pairs((pair)(x-1)); // zero out pair-tag
@@ -74,6 +78,12 @@ static void print_pairs (pair p) {
   } else {
     printf (" . ");
     print_ptr((p->cdr));
+  }
+}
+
+static void print_vector(vector v) {
+  for (int i=0; i< v->len ; i++) {
+    print_ptr(v->elt[i]);
   }
 }
 

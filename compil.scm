@@ -2,6 +2,8 @@
 ;; Pilar: A Scheme Compiler
 ;; Mark Cornwell
 ;;
+;; 1.9.2  Vector
+;; 1.9.1  Pair
 ;; 1.9 Heap Allocation
 ;; 1.8 Proper Tail Calls
 ;; 1.7 Procedures
@@ -36,6 +38,7 @@
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
+(load "tests/tests-1.9-req.scm")
 (load "tests/tests-1.8-req.scm")
 (load "tests/tests-1.7-req.scm")
 (load "tests/tests-1.6-req.scm")
@@ -65,11 +68,15 @@
 (define btag      #b00101111)
 
 (define pair-shift   3)
-(define pair-mask #b00000111) ; #x03
+(define pair-mask #b00000111) ; #x07
 (define pair-tag  #b00000001) ; #x01
 (define size-pair    8)
 (define car-offset   0)
 (define cdr-offset   4)
+
+(define vector-shift 3)
+(define vector-mask  #b00000111) ; #x07
+(define vector-tag   #b00000101) ; #x05
 
 (define nil-value #x3F)
 (define wordsize     4) ; bytes
@@ -315,7 +322,48 @@
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
   (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))  
-    
+
+;;-------------------------------------------
+;;                 Vectors
+;;-------------------------------------------
+
+(define-primitive (vector? si env arg)
+  (emit-expr si env arg)
+  (emit "    and $~s, %al" vector-mask)
+  (emit "    cmp $~s, %al" vector-tag)
+  ;; convert cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+;; the single argument version is primitive
+
+(define-primitive (make-vector si env length)
+  (emit-expr si env length)
+  (emit "    movl %eax, 0(%ebp)")     ;; set the length
+  (emit "    movl %eax, %ebx")        ;; save the length
+  (emit "    movl %ebp, %eax")        ;; eax = ebp | vector-tag
+  (emit "    orl  $~s, %eax" vector-tag)
+  (emit "    addl $11, %ebx")         ;; align size to the next
+  (emit "    andl $-8, %ebx")         ;;   object boundary
+  (emit "    addl %ebx, %ebp"))       ;; advance alloc ptr
+
+(define-primitive (vector-length si env v)
+  (emit-expr si env v)
+  (emit "    movl -5(%eax), %eax")         ;; fetch length  
+  )   ;; length always 4-byte aligned, coincidentally already a fixnum
+
+(define-primitive (vector-set! si env vector k object)
+  (emit-expr si env vector)
+  (emit "    movl %eax, ~s(%esp)" si)  ;; save the vector
+  (emit-expr (- si wordsize) env k)
+  (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
+  (emit-expr (- si (* 2 wordsize)) env object)      ;; eax = object
+  (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
+  (emit "    movl ~s(%esp), %ecx" (- si wordsize))  ;; ecx = k
+  (emit "    movl %eax, -5(%ebx,%ecx)"))            ;; v[index] <- value
+
 ;;-------------------------------------------------------
 ;; support for primitives
 ;;-------------------------------------------------------
