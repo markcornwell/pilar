@@ -1,4 +1,4 @@
-
+#|
 (add-tests-with-string-output "begin/implicit-begin"
  [(begin 12) => "12\n"]
  [(begin 13 122) => "122\n"]
@@ -50,7 +50,7 @@
 ;;;        #f)
 ;;;    x) => "#f\n"]
 )
-
+|#
 
 (add-tests-with-string-output "vectors"
   [(vector? (make-vector 0)) => "#t\n"]
@@ -127,7 +127,7 @@
                       (fxsub1 (vector-length (if (vector? v0) v0 v1))))))
       (cons v0 v1))) => "(#(2) . #(13))\n"]
 )
-
+|#
 
 (add-tests-with-string-output "strings"
   [(string? (make-string 0)) => "#t\n"]
