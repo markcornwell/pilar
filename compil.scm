@@ -30,7 +30,7 @@
 ;;  <Expr>    -> <Imm>
 ;;            |  var
 ;;            | (if <Expr> <Expr> <Expr>)
-;;            | (let ([var <Expr>] ...) <Expr>
+;;            | (let ([var <Expr>] ...) <Expr> ...)
 ;;            | (app lvar <Expr> ...)
 ;;            | (prim <Expr>)
 ;;
@@ -467,9 +467,10 @@
 
 (define (next-stack-index si) (- si wordsize))
 
-(define (let? x) (eq? (car x) 'let))
+(define (let? x) (and (pair? x) (symbol? (car x))(eq? (car x) 'let)))
 (define (let-bindings x) (cadr x))
-(define (let-body x) (caddr x))
+;(define (let-body x) (caddr x))
+(define (let-body x) (cons 'begin (cddr x)))
 
 (define lhs car)
 (define rhs cadr)
@@ -647,22 +648,52 @@
      (emit-shift-args argc si delta))
   (emit-jmp si (lookup (call-target expr) env)))
 
+
+(define begin-body cdr)
+
+(define (emit-begin si env body)
+  (emit "# begin body=~s" body)
+  (cond
+   [(null? body) '()]
+   [(not (pair? body))
+     (error "begin" "begin body must be null or a pair" body)]
+   [else
+     (emit-expr si env (car body))
+     (emit-begin si env (cdr body))]))
+
+(define (emit-tail-begin si env body)
+  (cond
+   [(null? body)
+    (emit "    ret")]
+   [(not (pair? body))
+    (error "begin" "begin body must be null or a pair" body)]
+   [else
+    (emit-expr si env (car body))
+    (emit-tail-begin si env (cdr body))]))
+
 ;;--------------------------------------------
 ;;           Expression Dispatcher
 ;;--------------------------------------------
 
-(define (emit-expr si env expr) 
+
+
+(define (app? expr)
+    (and (pair? expr) (eq? (car expr) 'app)))
+
+(define (begin? expr)
+    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin))) 
+
+(define (emit-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
-	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings
-  (define (app? expr)
-    (and (pair? expr) (eq? (car expr) 'app)))
-  (define (lvar-app? exp)
-    (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
+	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings  
+  (define (lvar-app? expr)
+    (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))  
   (cond
     [(immediate? expr)  (emit-immediate expr)]
     [(variable? expr)   (emit-variable-ref env expr)]
+    [(begin? expr)      (emit-begin si env (begin-body expr))]
     [(app? expr)        (emit-app si env expr)]
     [(lvar-app? expr)   (emit-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
@@ -679,13 +710,12 @@
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings
-  (define (app? expr)
-    (and (pair? expr) (eq? (car expr) 'app)))
-  (define (lvar-app? exp)
+  (define (lvar-app? expr)
     (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
-  (cond
+(cond
     [(immediate? expr)  (emit-tail-immediate expr)]
     [(variable? expr)   (emit-tail-variable-ref env expr)]
+    [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
     [(app? expr)        (emit-tail-app si env expr)]
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
@@ -698,7 +728,7 @@
      (error "emit-expr" "unrecognized form:" expr)]))
 
 (define (emit-immediate x)
-  (emit "    movl $~s, %eax     # immediate" (immediate-rep x)))
+  (emit "    movl $~s, %eax     # immediate ~s" (immediate-rep x) x))
 
 (define (emit-tail-immediate x)
   (emit-immediate x)

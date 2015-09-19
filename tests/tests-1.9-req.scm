@@ -1,4 +1,4 @@
-#|
+
 (add-tests-with-string-output "begin/implicit-begin"
  [(begin 12) => "12\n"]
  [(begin 13 122) => "122\n"]
@@ -12,7 +12,7 @@
         (begin t)
         12)) => "(1 . 2)\n"]
 )
-
+#|
 (add-tests-with-string-output "set-car! set-cdr!"
   [(let ([x (cons 1 2)])
      (begin (set-cdr! x ())
@@ -65,7 +65,7 @@
   [(boolean? (make-vector 12)) => "#f\n"]
   [(make-vector 0) => "#()\n"]
   [(let ([v (make-vector 1)])
-     (vector-set! v 1 #t)
+     (vector-set! v 0 #t)
      v) => "#(#t)\n"]    ;;;  <<----<<< implicit begin is required here!!!
   [(let ([v (make-vector 2)])
      (vector-set! v 0 #t)

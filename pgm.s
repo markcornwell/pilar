@@ -1,10 +1,10 @@
-# (let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v)
+# (let ((v (make-vector 1))) (vector-set! v 0 #t) v)
 
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-    movl $8, %eax     # immediate
+    movl $4, %eax     # immediate 1
     movl %eax, 0(%ebp)
     movl %eax, %ebx
     movl %ebp, %eax
@@ -13,14 +13,18 @@ _L_scheme_entry:
     andl $-8, %ebx
     addl %ebx, %ebp
     movl %eax, -4(%esp)   # stk save
+# begin body=((vector-set! v 0 #t) v)
     movl -4(%esp), %eax   # stk load
     movl %eax, -8(%esp)
-    movl $0, %eax     # immediate
+    movl $0, %eax     # immediate 0
     movl %eax, -12(%esp)
-    movl $111, %eax     # immediate
+    movl $111, %eax     # immediate #t
     movl -8(%esp), %ebx
     movl -12(%esp), %ecx
     movl %eax, -5(%ebx,%ecx)
+# begin body=(v)
+    movl -4(%esp), %eax   # stk load
+# begin body=()
     ret
     .text
     .align 4,0x90
