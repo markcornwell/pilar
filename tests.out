@@ -1,6 +1,36 @@
 Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
-> Performing vectors tests ...
-test 0:(cons 1 2) ... ok
-test 1:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ...> 
+> Performing begin/implicit-begin tests ...
+test 0:(begin 12) ... ok
+test 1:(begin 13 122) ... ok
+test 2:(begin 123 2343 #t) ... ok
+test 3:(let ((t (begin 12 (cons 1 2)))) (begin t t)) ... ok
+test 4:(let ((t (begin 13 (cons 1 2)))) (cons 1 t) t) ... ok
+test 5:(let ((t (cons 1 2))) (if (pair? t) (begin t) 12)) ... ok
+Performing eq? tests ...
+test 6:(eq? 1 1) ... ok
+test 7:(eq? 1 2) ... ok
+test 8:(eq? #t 2) ... ok
+test 9:(eq? #t #t) ... ok
+test 10:(eq? () ()) ... ok
+test 11:(eq? (cons 1 2) (cons 1 2)) ... ok
+test 12:(let ((v (cons 1 2))) (eq? v v)) ... ok
+Performing vectors tests ...
+test 13:(vector? (make-vector 0)) ... ok
+test 14:(vector-length (make-vector 12)) ... ok
+test 15:(vector? (cons 1 2)) ... ok
+test 16:(vector? 1287) ... ok
+test 17:(vector? ()) ... ok
+test 18:(vector? #t) ... ok
+test 19:(vector? #f) ... ok
+test 20:(pair? (make-vector 12)) ... ok
+test 21:(null? (make-vector 12)) ... ok
+test 22:(boolean? (make-vector 12)) ... ok
+test 23:(make-vector 0) ... ok
+test 24:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ... ok
+test 25:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) ... ok
+test 26:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ... ok
+test 27:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (eq? y (vector-ref v 0))) ... ok
+test 28:(cons 1 2) ... ok
+test 29:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ...> 
