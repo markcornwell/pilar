@@ -34,6 +34,7 @@ static void print_pairs (pair p);
 static void print_vector (vector v);
 
 static void print_ptr(ptr x) {
+  //printf("print_ptr %i\n", x);
    if ((x & fx_mask) == fx_tag) {
        printf("%d", ((int) x) >> fx_shift);
    } else if((x & char_mask) == char_tag) {
@@ -69,6 +70,10 @@ static void print_ptr(ptr x) {
 }
 
 static void print_pairs (pair p) {
+  if ((int)p != ((int) p*8)/8)  {
+    printf("error: print_pairs p=%x must be 8-byte aligned\n", (unsigned int) p);
+    exit(-1);
+  }
   print_ptr(p->car);
   if ((p->cdr) == nil) {
     return;

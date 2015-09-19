@@ -200,10 +200,22 @@
 ;;        Binary Primitives
 ;;---------------------------------------
 
+(define-primitive (eq? si env arg1 arg2)
+  (emit "# eq? arg1=~s arg2=~s" arg1 arg2)
+  (emit-expr si env arg1)
+  (emit "    movl %eax, ~s(%esp)" si)
+  (emit-expr (- si wordsize) env arg2)
+  (emit "    cmp %eax, ~s(%esp)" si)
+  ;; convert the cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))  
+
 (define-primitive (fxlognot si env arg)
-    (emit-expr si env arg)
-    (emit "    or $~s, %al" fxmask)
-    (emit "    notl %eax"))
+  (emit-expr si env arg)
+  (emit "    or $~s, %al" fxmask)
+  (emit "    notl %eax"))
 
 (define-primitive (fxlogand si env arg1 arg2)
   (emit-expr si env arg2)
@@ -305,6 +317,7 @@
   (emit "    or $~s, %al" bool-f))
 
 (define-primitive (cons si env arg1 arg2)
+  (emit "# cons arg1=~s arg2=~s" arg1 arg2);
   (emit-expr si env arg1)                     ;; evaluate arg1
   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
   (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2  
@@ -369,7 +382,7 @@
   (emit-expr si env vector)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
   (emit-expr (- si wordsize) env k)      ;; eax <- eval(k)
-  (emit "    movl ~s($esp), %esi" si)    ;; esi <- vector + 5
+  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + 5
   (emit "    movl 3(%eax,%esi), %eax"))  ;; eax <- v[k]  3 = -5 (=tag) + 8(=offset)
 
 ;;-------------------------------------------------------
@@ -670,6 +683,7 @@
      (emit-begin si env (cdr body))]))
 
 (define (emit-tail-begin si env body)
+  (emit "# tail-begin body=~s" body)
   (cond
    [(null? body)
     (emit "    ret")]
@@ -682,8 +696,6 @@
 ;;--------------------------------------------
 ;;           Expression Dispatcher
 ;;--------------------------------------------
-
-
 
 (define (app? expr)
     (and (pair? expr) (eq? (car expr) 'app)))
