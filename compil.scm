@@ -361,8 +361,16 @@
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
   (emit-expr (- si (* 2 wordsize)) env object)      ;; eax = object
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
-  (emit "    movl ~s(%esp), %ecx" (- si wordsize))  ;; ecx = k
-  (emit "    movl %eax, -5(%ebx,%ecx)"))            ;; v[index] <- value
+  (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k
+  (emit "    movl %eax, 3(%ebx,%esi)")              ;; v[k] <- value  3 = -5+8 
+  )
+
+(define-primitive (vector-ref si env vector k)
+  (emit-expr si env vector)
+  (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
+  (emit-expr (- si wordsize) env k)      ;; eax <- eval(k)
+  (emit "    movl ~s($esp), %esi" si)    ;; esi <- vector + 5
+  (emit "    movl 3(%eax,%esi), %eax"))  ;; eax <- v[k]  3 = -5 (=tag) + 8(=offset)
 
 ;;-------------------------------------------------------
 ;; support for primitives

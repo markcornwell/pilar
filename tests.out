@@ -20,4 +20,6 @@ test 13:(pair? (make-vector 12)) ... ok
 test 14:(null? (make-vector 12)) ... ok
 test 15:(boolean? (make-vector 12)) ... ok
 test 16:(make-vector 0) ... ok
-test 17:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ...> 
+test 17:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ... ok
+test 18:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) ... ok
+test 19:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ...> 

@@ -26,9 +26,9 @@
 
 /* All scheme values are of type ptrs */
 
-typedef unsigned int ptr;
-typedef struct { ptr car; ptr cdr; } *pair;  // 8-byte aligned
-typedef struct { int len; ptr elt[]; } *vector;
+typedef unsigned int ptr; // 4 bytes
+typedef struct { ptr car; ptr cdr; } *pair;      // 8-byte aligned
+typedef struct { ptr len; ptr elt[]; } *vector;  // 8-byte aligned
 
 static void print_pairs (pair p);
 static void print_vector (vector v);
@@ -82,8 +82,11 @@ static void print_pairs (pair p) {
 }
 
 static void print_vector(vector v) {
-  for (int i=0; i< v->len ; i++) {
-    print_ptr(v->elt[i]);
+  int len = (v->len)/4;
+  for (int i=0; i< len ; i++) {
+    //printf("{len=%i,i=%i}",len,i);
+    print_ptr(v->elt[i+1]);
+    if (i+1 < len) printf(" ");
   }
 }
 

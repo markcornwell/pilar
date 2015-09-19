@@ -52,7 +52,7 @@
 )
 |#
 
-(add-tests-with-string-output "vectors"
+(add-tests-with-string-output "vectors"			      
   [(vector? (make-vector 0)) => "#t\n"]
   [(vector-length (make-vector 12)) => "12\n"]
   [(vector? (cons 1 2)) => "#f\n"]
@@ -66,7 +66,7 @@
   [(make-vector 0) => "#()\n"]
   [(let ([v (make-vector 1)])
      (vector-set! v 0 #t)
-     v) => "#(#t)\n"]    ;;;  <<----<<< implicit begin is required here!!!
+     v) => "#(#t)\n"]  
   [(let ([v (make-vector 2)])
      (vector-set! v 0 #t)
      (vector-set! v 1 #f)
