@@ -358,8 +358,10 @@
   (emit "    movl %eax, %ebx")        ;; save the length
   (emit "    movl %ebp, %eax")        ;; eax = ebp | vector-tag
   (emit "    orl  $~s, %eax" vector-tag)
-  (emit "    addl $3, %ebx")          ;; align size to the next  ????
+  
+  (emit "    addl $3, %ebx")          ;; align ebx the next 8-byte boundary WHAT ????
   (emit "    andl $-8, %ebx")         ;;   object boundary
+  
   (emit "    addl %ebx, %ebp"))       ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
