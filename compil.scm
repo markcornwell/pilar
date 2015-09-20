@@ -358,7 +358,7 @@
   (emit "    movl %eax, %ebx")        ;; save the length
   (emit "    movl %ebp, %eax")        ;; eax = ebp | vector-tag
   (emit "    orl  $~s, %eax" vector-tag)
-  (emit "    addl $11, %ebx")         ;; align size to the next
+  (emit "    addl $3, %ebx")          ;; align size to the next  ????
   (emit "    andl $-8, %ebx")         ;;   object boundary
   (emit "    addl %ebx, %ebp"))       ;; advance alloc ptr
 

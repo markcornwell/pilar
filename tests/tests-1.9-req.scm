@@ -11,7 +11,8 @@
     (if (pair? t) 
         (begin t)
         12)) => "(1 . 2)\n"]
-)
+ )
+
 #|
 (add-tests-with-string-output "set-car! set-cdr!"
   [(let ([x (cons 1 2)])
@@ -89,6 +90,41 @@
      (vector-set! v 0 y)
      (eq? y (vector-ref v 0))) => "#t\n"]
   [(cons 1 2) => "(1 . 2)\n"]
+
+  ;; if the problem is printing lets try not printing
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+	 (pair? w)) => "#t\n"] 
+
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+     (and (pair? w)
+	  (pair? (car w)))) => "#t\n"]
+  
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+     (cdr w)) => "#f\n"] 
+  
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+     (car w)) => "(1 . 2)\n"]   ;; <---- broken: sees unprintable thing blows up print_ptr
+  
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+	 (eq? (car (car w)) 1)) => "#t\n"] 
+ 
+  [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
+	      (vector-set! v 0 y)
+	      (cons y (eq? y 0))))]
+	 (and (eq? (car (car w)) 1)
+	      (eq? (cdr (car w)) 2)
+	      (eq? (cdr w) #f))) => "#t\n"]   ;; <<--- as below but via intospection
+
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (cons y (eq? y 0))) => "((1 . 2) . #f)\n"]   ;; <<----<< broken

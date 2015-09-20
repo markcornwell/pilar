@@ -33,4 +33,12 @@ test 25:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) 
 test 26:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ... ok
 test 27:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (eq? y (vector-ref v 0))) ... ok
 test 28:(cons 1 2) ... ok
-test 29:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ...> 
+test 29:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (pair? w)) ... ok
+test 30:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (pair? w) (pair? (car w)))) ... ok
+test 31:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (cdr w)) ... ok
+test 32:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (car w)) ... ok
+test 33:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (eq? (car (car w)) 1)) ... ok
+test 34:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (eq? (car (car w)) 1) (eq? (cdr (car w)) 2) (eq? (cdr w) #f))) ... ok
+test 35:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ... ok
+test 36:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y (vector-ref v 0)))) ... ok
+test 37:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))) ...> 
