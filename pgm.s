@@ -1,4 +1,4 @@
-# (let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1)))
+# (let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1)))
 
     .text
     .align 4,0x90
@@ -14,7 +14,8 @@ _L_scheme_entry:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -4(%esp)   # stk save
-# begin body=((let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1)))
+# begin body=((let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1)))
+#       env=((v0 . -4))
 # make-vector 2
     movl $8, %eax     # immediate 2
     movl %eax, %esi
@@ -25,7 +26,8 @@ _L_scheme_entry:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -8(%esp)   # stk save
-# begin body=((vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))
+# begin body=((vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))
+#       env=((v1 . -8) (v0 . -4))
     movl -4(%esp), %eax   # stk load
     movl %eax, -12(%esp)
     movl $0, %eax     # immediate 0
@@ -34,46 +36,44 @@ _L_scheme_entry:
     movl -12(%esp), %ebx
     movl -16(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# begin body=((vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))
+# begin body=((vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))
+#       env=((v1 . -8) (v0 . -4))
     movl -4(%esp), %eax   # stk load
-    movl %eax, -12(%esp)
-    movl $4, %eax     # immediate 1
     movl %eax, -16(%esp)
+    movl $4, %eax     # immediate 1
+    movl %eax, -20(%esp)
     movl $800, %eax     # immediate 200
-    movl -12(%esp), %ebx
-    movl -16(%esp), %esi
+    movl -16(%esp), %ebx
+    movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# begin body=((vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))
+# begin body=((vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))
+#       env=((v1 . -8) (v0 . -4))
     movl -8(%esp), %eax   # stk load
-    movl %eax, -12(%esp)
+    movl %eax, -20(%esp)
     movl $0, %eax     # immediate 0
-    movl %eax, -16(%esp)
+    movl %eax, -24(%esp)
     movl $1200, %eax     # immediate 300
-    movl -12(%esp), %ebx
-    movl -16(%esp), %esi
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# begin body=((vector-set! v1 1 400) (cons v0 v1))
+# begin body=((vector-set! v1 1 400) (vector-length v1))
+#       env=((v1 . -8) (v0 . -4))
     movl -8(%esp), %eax   # stk load
-    movl %eax, -12(%esp)
+    movl %eax, -24(%esp)
     movl $4, %eax     # immediate 1
-    movl %eax, -16(%esp)
+    movl %eax, -28(%esp)
     movl $1600, %eax     # immediate 400
-    movl -12(%esp), %ebx
-    movl -16(%esp), %esi
+    movl -24(%esp), %ebx
+    movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# begin body=((cons v0 v1))
-# cons arg1=v0 arg2=v1
-    movl -4(%esp), %eax   # stk load
-    movl %eax, -12(%esp)
+# begin body=((vector-length v1))
+#       env=((v1 . -8) (v0 . -4))
     movl -8(%esp), %eax   # stk load
-    movl %eax, 4(%ebp)
-    movl -12(%esp), %eax
-    movl %eax, 0(%ebp)
-    movl %ebp, %eax
-    or  $1, %eax
-    addl $8, %ebp
+    movl -5(%eax), %eax
 # begin body=()
+#       env=((v1 . -8) (v0 . -4))
 # begin body=()
+#       env=((v0 . -4))
     ret
     .text
     .align 4,0x90

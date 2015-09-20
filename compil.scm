@@ -364,8 +364,8 @@
   (emit "    addl %esi, %ebp"))       ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
-  (emit-expr si env v)
-  (emit "    movl -5(%eax), %eax")         ;; fetch length  
+  (emit-expr si env v)                     ;; eax <- vector + 5
+  (emit "    movl -5(%eax), %eax")         ;; correct for tag(-5)  
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
 
 (define-primitive (vector-set! si env vector k object)
@@ -373,18 +373,18 @@
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the vector
   (emit-expr (- si wordsize) env k)                 ;; eax <- k
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
-  (emit-expr (- si (* 2 wordsize)) env object)      ;; eax <- value of object
+  (emit-expr (- si (* 2 wordsize)) env object)      ;; eax <- object
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k
-  (emit "    movl %eax, -1(%ebx,%esi)")              ;; v[k] <- value ; offset 3 = tag(-5) + lenfield_size(4) 
+  (emit "    movl %eax, -1(%ebx,%esi)")              ;; v[k] <- object ; offset -1 = tag(-5) + lenfield_size(4) 
   )
 
 (define-primitive (vector-ref si env vector k)
   (emit-expr si env vector)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
-  (emit-expr (- si wordsize) env k)      ;; eax <- eval(k)
+  (emit-expr (- si wordsize) env k)      ;; eax <- k
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
-  (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = - tag(5) + lenfield_size(4)
+  (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
 ;;-------------------------------------------------------
 ;; support for primitives
@@ -425,7 +425,7 @@
 ;;               Conditionals
 ;;-------------------------------------------
 
-(define (if? x) (and (eq? (car x) 'if) (eq? 4 (length x))))
+(define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))
 (define (if-test x) (cadr x))
 (define (if-conseq x) (caddr x))
 (define (if-altern x) (cadddr x))
@@ -454,7 +454,7 @@
     (emit-tail-expr si env (if-altern x))
     (emit "~a:" end-label)))
 
-(define (and? x) (eq? (car x) 'and))
+(define (and? x) (and (pair? x) (eq? (car x) 'and)))
 
 (define (emit-and si env x)
   (cond
@@ -468,7 +468,7 @@
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
 
-(define (or? x) (eq? (car x) 'or))
+(define (or? x) (and (pair? x) (eq? (car x) 'or)))
 
 (define (emit-or si env x)
   (cond
@@ -550,7 +550,7 @@
 (define (emit-stack-load si)
   (emit "    movl ~s(%esp), %eax   # stk load" si))
 
-(define (let*? x) (eq? (car x) 'let*))
+(define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
 
 ;; rewrite let* into nested singleton let's
 (define (emit-let* si env bindings body)
@@ -675,13 +675,14 @@
 
 (define (emit-begin si env body)
   (emit "# begin body=~s" body)
+  (emit "#       env=~s" env)
   (cond
    [(null? body) '()]
    [(not (pair? body))
      (error "begin" "begin body must be null or a pair" body)]
    [else
      (emit-expr si env (car body))
-     (emit-begin si env (cdr body))]))
+     (emit-begin (- si wordsize) env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 (define (emit-tail-begin si env body)
   (emit "# tail-begin body=~s" body)
@@ -692,7 +693,7 @@
     (error "begin" "begin body must be null or a pair" body)]
    [else
     (emit-expr si env (car body))
-    (emit-tail-begin si env (cdr body))]))
+    (emit-tail-begin (- si wordsize) env (cdr body))]))  ;; <<--- reuse si or bump it ???
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
