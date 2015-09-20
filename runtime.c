@@ -90,7 +90,7 @@ static void print_vector(vector v) {
   int len = (v->len)/4;
   for (int i=0; i< len ; i++) {
     //printf("{len=%i,i=%i}",len,i);
-    print_ptr(v->elt[i+1]);
+    print_ptr(v->elt[i]);   // ????
     if (i+1 < len) printf(" ");
   }
 }

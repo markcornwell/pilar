@@ -75,7 +75,7 @@
 (define cdr-offset   4)
 
 (define vector-shift 3)
-(define vector-mask  #b00000111) ; #x07
+(define vector-mask  #b00000111) ; #x07 
 (define vector-tag   #b00000101) ; #x05
 
 (define nil-value #x3F)
@@ -353,16 +353,15 @@
 ;; the single argument version is primitive
 
 (define-primitive (make-vector si env length)
+  (emit "# make-vector ~s" length)
   (emit-expr si env length)
-  (emit "    movl %eax, 0(%ebp)")     ;; set the length
-  (emit "    movl %eax, %ebx")        ;; save the length
-  (emit "    movl %ebp, %eax")        ;; eax = ebp | vector-tag
-  (emit "    orl  $~s, %eax" vector-tag)
-  
-  (emit "    addl $3, %ebx")          ;; align ebx the next 8-byte boundary WHAT ????
-  (emit "    andl $-8, %ebx")         ;;   object boundary
-  
-  (emit "    addl %ebx, %ebp"))       ;; advance alloc ptr
+  (emit "    movl %eax, %esi")        ;; save length in esi as offset (not yet aliged)
+  (emit "    movl %eax, 0(%ebp)")     ;; set the vector length field 
+  (emit "    movl %ebp, %eax")        ;; save the base pointer as return value
+  (emit "    orl  $~s, %eax" vector-tag) ;; set the vector tag in the lower 3 bits 
+  (emit "    addl $4, %esi")          ;; align lenth in esi to 8 bytes
+  (emit "    andl $-8, %esi")         ;; by adding #0100 and clearing bottom 3 bits  
+  (emit "    addl %esi, %ebp"))       ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
   (emit-expr si env v)
@@ -371,21 +370,21 @@
 
 (define-primitive (vector-set! si env vector k object)
   (emit-expr si env vector)
-  (emit "    movl %eax, ~s(%esp)" si)  ;; save the vector
-  (emit-expr (- si wordsize) env k)
+  (emit "    movl %eax, ~s(%esp)" si)               ;; save the vector
+  (emit-expr (- si wordsize) env k)                 ;; eax <- k
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
-  (emit-expr (- si (* 2 wordsize)) env object)      ;; eax = object
+  (emit-expr (- si (* 2 wordsize)) env object)      ;; eax <- value of object
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k
-  (emit "    movl %eax, 3(%ebx,%esi)")              ;; v[k] <- value  3 = -5+8 
+  (emit "    movl %eax, -1(%ebx,%esi)")              ;; v[k] <- value ; offset 3 = tag(-5) + lenfield_size(4) 
   )
 
 (define-primitive (vector-ref si env vector k)
   (emit-expr si env vector)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
   (emit-expr (- si wordsize) env k)      ;; eax <- eval(k)
-  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + 5
-  (emit "    movl 3(%eax,%esi), %eax"))  ;; eax <- v[k]  3 = -5 (=tag) + 8(=offset)
+  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
+  (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = - tag(5) + lenfield_size(4)
 
 ;;-------------------------------------------------------
 ;; support for primitives
