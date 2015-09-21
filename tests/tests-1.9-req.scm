@@ -144,22 +144,13 @@
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (cons y (eq? y (vector-ref v 0)))) => "((1 . 2) . #t)\n"]
-  ;;-------------------------------------------------------------------------------------------
 
    [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])  
-       ;(vector-set! v0 0 100)
-       ;(vector-set! v0 1 200)
-       ;(vector-set! v1 0 300)
-       ;(vector-set! v1 1 400)
        (vector? v1))) => "#t\n"] 
   
    [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])   
-       ;(vector-set! v0 0 100)
-       ;(vector-set! v0 1 200)
-       ;(vector-set! v1 0 300)
-       ;(vector-set! v1 1 400)
        (and (vector? v0)
 	    (vector? v1)))) => "#t\n"]  
   
@@ -180,13 +171,14 @@
        (vector-set! v1 1 400)
        v0)) => "#(100 200)\n"]
 
+  [(vector-length (make-vector 1)) => "1\n"]
   [(let ([v0 (make-vector 2)])
-     (let ([v1 (make-vector 2)])  
-       (vector-set! v0 0 100)
-       (vector-set! v0 1 200)
-       (vector-set! v1 0 300)
-       (vector-set! v1 1 400)
-       (vector-length v1))) => "2\n"]   ;; <<--- broken: says 200    AHA!  vector-set v2 stomped on the length of v1
+     (vector-length v0)) => "2\n"]
+  [(let ([v0 (make-vector 2)])
+     (vector-set! v0 0 100)
+     (vector-set! v0 1 200)
+     (vector-length v0)) => "2\n"]
+  
 
   [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])  
@@ -194,7 +186,41 @@
        (vector-set! v0 1 200)
        (vector-set! v1 0 300)
        (vector-set! v1 1 400)
-       v1)) => "#(300 400)\n"] ;; <<------- broken: goes way past end
+       (vector-length v1))) => "2\n"]
+
+  [(let ([v0 (make-vector 2)])
+     (let ([v1 (make-vector 2)])  
+       (vector-set! v0 0 100)
+       (vector-set! v0 1 200)
+       (vector-set! v1 0 300)
+       (vector-set! v1 1 400)
+       v1)) => "#(300 400)\n"]
+
+  [(let ([v0 (make-vector 2)])
+     (let ([v1 (make-vector 2)])  
+       (vector-set! v0 0 100)
+       (vector-set! v0 1 200)
+       (vector-set! v1 0 300)
+       (vector-set! v1 1 400)
+       (car (cons v0 v1)))) => "#(100 200)\n"]
+
+  [(let ([v0 (make-vector 2)])
+     (let ([v1 (make-vector 2)])  
+       (vector-set! v0 0 100)
+       (vector-set! v0 1 200)
+       (vector-set! v1 0 300)
+       (vector-set! v1 1 400)
+       (cdr (cons v0 v1)))) => "#(300 400)\n"]
+
+  [(let ([v0 (make-vector 2)])
+       (vector-set! v0 0 100)
+       (vector-set! v0 1 200)
+       (cons v0 ())) => "(#(100 200))\n"] 
+
+  [(let ([v0 (make-vector 2)])
+       (vector-set! v0 0 100)
+       (vector-set! v0 1 200)
+       (cons #t v0)) => "(#t . #(100 200))\n"]  ;; <<---- broken: "(#t  . 100)\n"
   
   [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])   ;; first test the allocates two vectors
@@ -203,6 +229,7 @@
        (vector-set! v1 0 300)
        (vector-set! v1 1 400)
        (cons v0 v1))) => "(#(100 200) . #(300 400))\n"]  ;; <<--broken:- "(#(100 200) 300 100 . 200)\n"
+
   [(let ([v0 (make-vector 3)])
      (let ([v1 (make-vector 3)])
        (vector-set! v0 0 100)

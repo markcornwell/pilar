@@ -325,7 +325,7 @@
   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
-  (emit "    or  $~s, %eax" pair-tag)         ;; or in the pair tag
+  (emit "    or  $~s, %al" pair-tag)         ;; or in the pair tag
   (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
 
 (define-primitive (car si env arg)
@@ -359,13 +359,16 @@
   (emit "    movl %eax, 0(%ebp)")     ;; set the vector length field 
   (emit "    movl %ebp, %eax")        ;; save the base pointer as return value
   (emit "    orl  $~s, %eax" vector-tag) ;; set the vector tag in the lower 3 bits 
-  (emit "    addl $4, %esi")          ;; align lenth in esi to 8 bytes
+; (emit "    addl $4, %esi")          ;; align length in esi to 8 bytes
+  (emit "    addl $15, %esi")         ;; align length in esi to 8 bytes 
   (emit "    andl $-8, %esi")         ;; by adding #0100 and clearing bottom 3 bits  
   (emit "    addl %esi, %ebp"))       ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
-  (emit-expr si env v)                     ;; eax <- vector + 5
-  (emit "    movl -5(%eax), %eax")         ;; correct for tag(-5)  
+  (emit-expr si env v) ;; eax <- vector + 5
+  ;(emit "    movl -5(%eax), %eax")  ;; correct for tag(-5)
+  (emit "andl $-8, %eax")             ;; clear 3-bit tag to yield 8-byte aligned value
+  (emit "movl 0(%eax), %eax")         ;; follow pointer to get length
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
 
 (define-primitive (vector-set! si env vector k object)
@@ -682,7 +685,7 @@
      (error "begin" "begin body must be null or a pair" body)]
    [else
      (emit-expr si env (car body))
-     (emit-begin (- si wordsize) env (cdr body))])) ;; <<--- reuse si or bump it ???
+     (emit-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 (define (emit-tail-begin si env body)
   (emit "# tail-begin body=~s" body)
@@ -693,7 +696,7 @@
     (error "begin" "begin body must be null or a pair" body)]
    [else
     (emit-expr si env (car body))
-    (emit-tail-begin (- si wordsize) env (cdr body))]))  ;; <<--- reuse si or bump it ???
+    (emit-tail-begin si env (cdr body))]))  ;; <<--- reuse si or bump it ???
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
