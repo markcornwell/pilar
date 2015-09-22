@@ -1,4 +1,4 @@
-
+#|
 (add-tests-with-string-output "begin/implicit-begin"
  [(begin 12) => "12\n"]
  [(begin 13 122) => "122\n"]
@@ -13,7 +13,6 @@
         12)) => "(1 . 2)\n"]
  )
 
-#|
 (add-tests-with-string-output "set-car! set-cdr!"
   [(let ([x (cons 1 2)])
      (begin (set-cdr! x ())
@@ -51,7 +50,6 @@
 ;;;        #f)
 ;;;    x) => "#f\n"]
 )
-|#
 
 (add-tests-with-string-output "eq?"
   [(eq? 1 1) => "#t\n"]
@@ -62,9 +60,11 @@
   [(eq? (cons 1 2) (cons 1 2)) => "#f\n"]
   [(let [(v (cons 1 2))] (eq? v v)) => "#t\n"]
   )
-
-(add-tests-with-string-output "vectors"			      
+|#
+(add-tests-with-string-output "vectors"
+#|
   [(vector? (make-vector 0)) => "#t\n"]
+
   [(vector-length (make-vector 12)) => "12\n"]
   [(vector? (cons 1 2)) => "#f\n"]
   [(vector? 1287) => "#f\n"]
@@ -75,17 +75,21 @@
   [(null? (make-vector 12)) => "#f\n"]
   [(boolean? (make-vector 12)) => "#f\n"]
   [(make-vector 0) => "#()\n"]
+
   [(let ([v (make-vector 1)])
      (vector-set! v 0 #t)
-     v) => "#(#t)\n"]  
+     v) => "#(#t)\n"]
+
   [(let ([v (make-vector 2)])
      (vector-set! v 0 #t)
      (vector-set! v 1 #f)
      v) => "#(#t #f)\n"]
+
   [(let ([v (make-vector 2)])
      (vector-set! v 0 v)
      (vector-set! v 1 v)
      (eq? (vector-ref v 0) (vector-ref v 1))) => "#t\n"]
+  
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (eq? y (vector-ref v 0))) => "#t\n"]
@@ -141,6 +145,7 @@
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (cons y (eq? y 0))) => "((1 . 2) . #f)\n"]  
+
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (cons y (eq? y (vector-ref v 0)))) => "((1 . 2) . #t)\n"]
@@ -162,7 +167,7 @@
        (vector-set! v1 1 400)
        (and (vector? v0)
 	    (vector? v1)))) => "#t\n"]  
-
+|#
   [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])  
        (vector-set! v0 0 100)

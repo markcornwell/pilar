@@ -1,6 +1,7 @@
 /* a simple driver for scheme_entry */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -161,9 +162,28 @@ typedef struct {
   void* esp;  /* 28   preserve */
 } context;
 
+static void dump(char *heap, int words) {
+   while(words > 0) {
+     printf("@%p  %08x  %d\n", heap, *heap, (unsigned int) *heap);
+     words--;
+     heap = heap + 4;
+   }
+}
+
 int scheme_entry(context* ctxt, char* stack_base, char* heap_base);
 
 int main(int argc, char** argv){
+
+  int dump_enabled = 0; //default for heap dump flag
+
+  // process command line args
+  for (int i=0; i<argc; i++) {
+    if (strcmp(argv[i],"-d") == 0) {
+	dump_enabled = 1;
+    }
+    /* other args later */
+  }
+  
   
   // create the stack
   int stack_size = (16 * 4096); /* holds 16K cells */ 
@@ -178,6 +198,11 @@ int main(int argc, char** argv){
   context ctxt;
   print_ptr(scheme_entry(&ctxt, stack_base, heap));
   printf("\n");
+
+  // dump heap diagnostics if enabled
+  if (dump_enabled) {
+    dump(heap,10);
+  }
   
   // free heap & stack
   deallocate_protected_space(stack_top, stack_size);
