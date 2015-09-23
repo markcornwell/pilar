@@ -1,4 +1,4 @@
-#|
+
 (add-tests-with-string-output "begin/implicit-begin"
  [(begin 12) => "12\n"]
  [(begin 13 122) => "122\n"]
@@ -12,7 +12,7 @@
         (begin t)
         12)) => "(1 . 2)\n"]
  )
-
+#|
 (add-tests-with-string-output "set-car! set-cdr!"
   [(let ([x (cons 1 2)])
      (begin (set-cdr! x ())
@@ -50,6 +50,7 @@
 ;;;        #f)
 ;;;    x) => "#f\n"]
 )
+|#
 
 (add-tests-with-string-output "eq?"
   [(eq? 1 1) => "#t\n"]
@@ -60,11 +61,9 @@
   [(eq? (cons 1 2) (cons 1 2)) => "#f\n"]
   [(let [(v (cons 1 2))] (eq? v v)) => "#t\n"]
   )
-|#
-(add-tests-with-string-output "vectors"
-#|
-  [(vector? (make-vector 0)) => "#t\n"]
 
+(add-tests-with-string-output "vectors"
+  [(vector? (make-vector 0)) => "#t\n"]
   [(vector-length (make-vector 12)) => "12\n"]
   [(vector? (cons 1 2)) => "#f\n"]
   [(vector? 1287) => "#f\n"]
@@ -167,7 +166,7 @@
        (vector-set! v1 1 400)
        (and (vector? v0)
 	    (vector? v1)))) => "#t\n"]  
-|#
+
   [(let ([v0 (make-vector 2)])
      (let ([v1 (make-vector 2)])  
        (vector-set! v0 0 100)
@@ -225,15 +224,15 @@
   [(let ([v0 (make-vector 2)])
        (vector-set! v0 0 100)
        (vector-set! v0 1 200)
-       (cons #t v0)) => "(#t . #(100 200))\n"]  ;; <<---- broken: "(#t  . 100)\n"
+       (cons #t v0)) => "(#t . #(100 200))\n"]  
   
   [(let ([v0 (make-vector 2)])
-     (let ([v1 (make-vector 2)])   ;; first test the allocates two vectors
+     (let ([v1 (make-vector 2)])  
        (vector-set! v0 0 100)
        (vector-set! v0 1 200)
        (vector-set! v1 0 300)
        (vector-set! v1 1 400)
-       (cons v0 v1))) => "(#(100 200) . #(300 400))\n"]  ;; <<--broken:- "(#(100 200) 300 100 . 200)\n"
+       (cons v0 v1))) => "(#(100 200) . #(300 400))\n"] 
 
   [(let ([v0 (make-vector 3)])
      (let ([v1 (make-vector 3)])

@@ -325,7 +325,7 @@
   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
-  (emit "    or  $~s, %al" pair-tag)         ;; or in the pair tag
+  (emit "    or  $~s, %al" pair-tag)          ;; or in the pair tag
   (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
 
 (define-primitive (car si env arg)
@@ -358,9 +358,9 @@
   (emit "    movl %eax, %esi")        ;; save length in esi as offset (not yet aliged)
   (emit "    movl %eax, 0(%ebp)")     ;; set the vector length field 
   (emit "    movl %ebp, %eax")        ;; save the base pointer as return value
-  (emit "    orl  $~s, %eax" vector-tag) ;; set the vector tag in the lower 3 bits 
-; (emit "    addl $4, %esi")          ;; align length in esi to 8 bytes
-  (emit "    addl $15, %esi")         ;; align length in esi to 8 bytes 
+  (emit "    orl  $~s, %eax" vector-tag) ;; set the vector tag in the lower 3 bits
+  (emit "    addl $4, %esi")           ;; 4 bytes for length field
+  (emit "    addl $4, %esi")          ;; align length in esi to 8 bytes
   (emit "    andl $-8, %esi")         ;; by adding #0100 and clearing bottom 3 bits  
   (emit "    addl %esi, %ebp"))       ;; advance alloc ptr
 
@@ -548,10 +548,10 @@
   (emit "    ret"))
 
 (define (emit-stack-save si)
-  (emit "    movl %eax, ~s(%esp)   # stk save" si))
+  (emit "    movl %eax, ~s(%esp)" si))
 
 (define (emit-stack-load si)
-  (emit "    movl ~s(%esp), %eax   # stk load" si))
+  (emit "    movl ~s(%esp), %eax" si))
 
 (define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
 

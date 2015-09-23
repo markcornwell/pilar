@@ -11,32 +11,37 @@
 #include <stdio.h>
 
 /* define all scheme constants */
-#define bool_f     0x2F
-#define bool_t     0x6F
-#define fx_mask    0x03
-#define fx_tag     0x00
+#define bool_f     0x002F
+#define bool_t     0x006F
+#define fx_mask    0x0003
+#define fx_tag     0x0000
 #define fx_shift    2
 #define char_mask  0x00FF
-#define char_tag   0x0F
+#define char_tag   0x000F
 #define char_shift  8
-#define nil        0x3F
-#define pair_mask  0x03
-#define pair_tag   0x01
-#define vect_mask  0x07
-#define vect_tag   0x05
+#define nil        0x003F
+
+#define pair_mask  0x0007
+#define pair_tag   0x0001
+
+#define vect_mask  0x0007
+#define vect_tag   0x0005
 
 /* All scheme values are of type ptrs */
 
-typedef unsigned int ptr;                        // 4 bytes
+typedef unsigned int ptr;                        // 4 bytes  ??? not right ???
 typedef struct { ptr car; ptr cdr;   } *pair;    // 8-byte aligned
 typedef struct { ptr len; ptr elt[]; } *vector;  // 8-byte aligned
 
-static void print_car (pair p);
-static void print_cdr (pair p);
+//static void print_car (pair p);
+//static void print_cdr (pair p);
+static void print_pairs (pair p);
 static void print_vector (vector v);
 
 static void print_ptr(ptr x) {
-  //printf("print_ptr %i\n", x);  /* DEBUG */
+  
+   fprintf(stderr,"print_ptr %x\n", x);  /* DEBUG */
+   
    if ((x & fx_mask) == fx_tag) {
        printf("%d", ((int) x) >> fx_shift);
        
@@ -55,13 +60,17 @@ static void print_ptr(ptr x) {
        
    } else if((x & vect_mask) == vect_tag) {
        printf("#(");
-       print_vector((vector) (x & -8)); // zero out vect_tag  -8 = 1111...1000
+       print_vector((vector) (x - vect_tag)); // zero out vect_tag  -8 = 1111...1000
        printf(")");
        
    } else if((x & pair_mask) == pair_tag) {
+     /*
        print_car((pair) (x & -8));
-       print_cdr((pair) (x & -8));   // zero out pair_tag      -8 = 1111...1000
-       
+       print_cdr((pair) (x & -8));     // zero out pair_tag   -8 = 1111...1000
+     */
+     printf("(");
+     print_pairs((pair) (x - 1));
+     printf(")");
    } else if(x == bool_f) {
        printf("#f");
    } else if(x == bool_t) {
@@ -73,25 +82,29 @@ static void print_ptr(ptr x) {
   }
 }
 
-/*
+
 static void print_pairs (pair p) {
-  if ((int)p != ((int) p*8)/8)  {
+  fprintf(stderr,"print_pairs %p (car=%x  cdr=%x)\n", p ,p->car, p->cdr);
+  
+  if (((int) p & -8) != (int) p)  {
     printf("error: print_pairs p=%x must be 8-byte aligned\n", (unsigned int) p);
     exit(-1);
   }
+  
   print_ptr(p->car);
+  
   if ((p->cdr) == nil) {
     return;
   } else if (((p->cdr) & pair_mask) == pair_tag) {
     printf(" ");
-    print_pairs((pair)((p->cdr) & -4)); // zero out pair-tag
+    print_pairs((pair)((p->cdr) - pair_tag));  // zero out pair-tag
   } else {
     printf (" . ");
-    print_ptr((p->cdr));
+    print_ptr(p->cdr);
   }
 }
-*/
 
+/*
 static void print_car (pair p) {
   if ((int) p & 7)  {
     printf("error: print_car p=%i must be 8-byte aligned\n", (unsigned int) p);
@@ -110,18 +123,20 @@ static void print_cdr (pair p) {
     printf(")");
   } else if (((p->cdr) & pair_mask) == pair_tag) {
     printf(" ");
-    print_cdr((pair)((p->cdr) & -8)); // zero out pair-tag
+    print_cdr((pair)((p->cdr) - pair_tag)); // zero out pair-tag
   } else {
     printf (" . ");
     print_ptr((p->cdr));
     printf (")");
   }
 }
+*/
 
 static void print_vector(vector v) {
-  int len = (v->len)/4;
+  unsigned int len = (v->len)/4;
+  fprintf(stderr,"print_vector %p\n", v);
   for (int i=0; i< len ; i++) {
-    //printf("{len=%i,i=%i}",len,i);  /* DEBUG */
+    fprintf(stderr,"print_vector{len=%i,i=%i}\n",len,i);  /* DEBUG */
     print_ptr(v->elt[i]);
     if (i+1 < len) printf(" ");
   }
@@ -164,7 +179,7 @@ typedef struct {
 
 static void dump(char *heap, int words) {
    while(words > 0) {
-     printf("@%p  %08x  %d\n", heap, *heap, (unsigned int) *heap);
+     fprintf(stderr,"@%8p  %02hhx %02hhx %02hhx %02hhx  %ld\n", heap, heap[3], heap[2], heap[1], heap[0], (long) *heap);
      words--;
      heap = heap + 4;
    }
@@ -196,12 +211,19 @@ int main(int argc, char** argv){
 
   // save registers, call scheme, upon return print result
   context ctxt;
-  print_ptr(scheme_entry(&ctxt, stack_base, heap));
+  ptr scheme_value = scheme_entry(&ctxt, stack_base, heap);
+  print_ptr(scheme_value);
   printf("\n");
 
   // dump heap diagnostics if enabled
   if (dump_enabled) {
     dump(heap,10);
+    fprintf(stderr,"value = %x\n", scheme_value);
+    fprintf(stderr,"int    %ld\n", sizeof(int));
+    fprintf(stderr,"long   %ld\n", sizeof(long));
+    fprintf(stderr,"ptr    %ld\n", sizeof(ptr));
+    fprintf(stderr,"pair   %ld\n", sizeof(pair));
+    fprintf(stderr,"pair*  %ld\n", sizeof(pair*));
   }
   
   // free heap & stack
