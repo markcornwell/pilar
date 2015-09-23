@@ -4,7 +4,7 @@
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-    movl $-2147483648, %eax     # immediate
+    movl $-2147483648, %eax     # immediate -536870912
     ret
     .text
     .align 4,0x90
