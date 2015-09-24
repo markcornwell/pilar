@@ -286,11 +286,34 @@
   [(let ([s (make-string 1)]) 
      (string-set! s 0 #\a)
      (string-ref s 0)) => "#\\a\n"]
-  
   [(let ([s (make-string 2)]) 
      (string-set! s 0 #\a)
      (string-set! s 1 #\b)
-     (cons (string-ref s 0) (string-ref s 1))) => "(#\\a . #\\b)\n"]
+     (string-ref s 1)) => "#\\b\n"]
+  [(let ([s (make-string 3)]) 
+     (string-set! s 0 #\a)
+     (string-set! s 1 #\b)
+     (string-set! s 2 #\c)
+     (string-ref s 2)) => "#\\c\n"]
+  [(let ([s (make-string 4)]) 
+     (string-set! s 0 #\a)
+     (string-set! s 1 #\b)
+     (string-set! s 2 #\c)
+     (string-set! s 3 #\d)
+     (string-ref s 3)) => "#\\d\n"]
+  [(let ([s (make-string 5)]) 
+     (string-set! s 0 #\a)
+     (string-set! s 1 #\b)
+     (string-set! s 2 #\c)
+     (string-set! s 3 #\d)
+     (string-set! s 4 #\e)
+     (string-ref s 3)) => "#\\d\n"]
+  
+#|
+  [(let ([s (make-string 2)]) 
+     (string-set! s 0 #\a)
+     (string-set! s 1 #\b)
+     (cons (string-ref s 0) (string-ref s 1))) => "(#\\a . #\\b)\n"]  ;; <--- broken
   [(let ([i 0])
     (let ([s (make-string 1)]) 
      (string-set! s i #\a)
@@ -377,5 +400,6 @@
  [(let ([s (make-string 1)])
      (string-set! s 0 #\\)
      s) => "\"\\\\\"\n"]
+|#
 )
 
