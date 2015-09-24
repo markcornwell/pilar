@@ -100,6 +100,9 @@ static void print_string (string s) {
   }
   unsigned int len = s->len/4;
   for (int i=0; i<len; i++) {
+    if (s->ch[i]=='\\' || s->ch[i]=='\"') {
+      printf("\\");
+    }
     printf("%c",s->ch[i]);      // need to handle escapes
   }
 }

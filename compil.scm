@@ -38,15 +38,15 @@
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
-(load "tests/tests-1.9-req.scm")
-;(load "tests/tests-1.8-req.scm")
-;(load "tests/tests-1.7-req.scm")
-;(load "tests/tests-1.6-req.scm")
-;(load "tests/tests-1.5-req.scm")
-;(load "tests/tests-1.4-req.scm")
-;(load "tests/tests-1.3-req.scm")
-;(load "tests/tests-1.2-req.scm")
-;(load "tests/tests-1.1-req.scm")
+;(load "tests/tests-1.9-req.scm")
+(load "tests/tests-1.8-req.scm")
+(load "tests/tests-1.7-req.scm")
+(load "tests/tests-1.6-req.scm")
+(load "tests/tests-1.5-req.scm")
+(load "tests/tests-1.4-req.scm")
+(load "tests/tests-1.3-req.scm")
+(load "tests/tests-1.2-req.scm")
+(load "tests/tests-1.1-req.scm")
 
 ;; utility
 (define first car)
@@ -178,9 +178,10 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
+
 ;; not takes any kind of value and returns #t if
 ;; the object is #f, otherwise it returns #f
-
+;;
 (define-primitive (not si env arg)
     (emit-expr si env arg)
     (emit "    cmp $~s, %eax" bool-f)
@@ -210,6 +211,18 @@
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg2)
   (emit "    cmp %eax, ~s(%esp)" si)
+  ;; convert the cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (char=? si env c1 c2)
+  (emit "# char= c1=~s c2=~s" c1 c2)
+  (emit-expr si env c1)                ;; eax = c1
+  (emit "    movb %ah, ~s(%esp)" si)  ;; save c1
+  (emit-expr (- si wordsize) env c2)   ;; eax = c2
+  (emit "    cmp %ah, ~s(%esp)" si)   ;; compare c1 c2
   ;; convert the cc to a boolean
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
@@ -324,7 +337,10 @@
   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
   (emit-expr si env arg1)                     ;; evaluate arg1
   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
-  (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2  
+  (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2
+                                               ;; should already be 8-byte aligned
+ ; (emit "    add $7, %ebp")                   ;; force 8-byte alignment of ebp - redundant?
+ ; (emit "    and $-8, %ebp")                  ;; by adding 7 and clearing last 3 bit
   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
@@ -412,16 +428,16 @@
 ;;-------------------------------------------------------
 
 (define-primitive (make-string si env len)
-   (emit-expr si env len)               ;; eax = length (bytes x 4)
-   (emit "    movl %eax, 0(%ebp)")      ;; set string-length field (bytes x 4)
-   (emit "    movl %eax, %esi")         ;; esi = length (bytes x 4)
-   (emit "    sar  $2, %esi")           ;; esi = length (bytes)
-   (emit "    add  $3, %esi")           ;; align esi to 4-bytes: first add 3
-   (emit "    or   $-4, %esi")          ;;   then clear the last 2 bits.
-   (emit "    add $4, %esi")            ;; account for length field
-   (emit "    movl %ebp, %eax")         ;; eax = the old heap base
-   (emit "    add $~s, %eax" string-tag);; tag the ptr
-   (emit "    movl (%ebp,%esi), %ebp")) ;; bump heap base
+   (emit-expr si env len)
+   (emit "    movl %eax, %esi")           ;; esi = length (bytes x 4)
+   (emit "    movl %eax, 0(%ebp)")        ;; set string-length field (bytes x 4)
+   (emit "    movl %ebp, %eax")           ;; save the base pointer as return value
+   (emit "    orl $~s, %eax" string-tag)  ;; set the tag in the lower 3 bits   
+   (emit "    sar  $2, %esi")             ;; esi = divide by 4 to get length (bytes)
+   (emit "    add $4, %esi")              ;; account for length field (4 bytes)    
+   (emit "    add $7, %esi")              ;; align esi to 8-bytes: first add 7
+   (emit "    andl $-8, %esi")            ;; then clear the last 3 bits.
+   (emit "    movl (%ebp,%esi), %ebp"))   ;; bump heap base to the 8 byte aligned boundary
 
 (define-primitive (string? si env object)
     (emit-expr si env object)
@@ -489,7 +505,7 @@
 (define unique-label
   (let ([count 0])
     (lambda ()
-      (let ([L (format "L_~s" count)])
+      (let ([L (format "_L_~s" count)])
     (set! count (add1 count))
     L))))
 
@@ -669,7 +685,7 @@
     (emit "#  env=~s" env)
     (emit "#  ---- >>>>> emit-lambdas start ----")
     (for-each (emit-lambda env) lambdas labels)
-    (emit "#  ---- <<<<<  emit-lambdas end ------")
+    (emit "#  ---- <<<<< emit-lambdas end ------")
     (emit-scheme-entry env (letrec-body expr))))
 
 (define (unique-labels lvars)
@@ -765,7 +781,7 @@
     (error "begin" "begin body must be null or a pair" body)]
    [else
     (emit-expr si env (car body))
-    (emit-tail-begin si env (cdr body))]))  ;; <<--- reuse si or bump it ???
+    (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
