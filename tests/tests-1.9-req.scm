@@ -12,7 +12,7 @@
         (begin t)
         12)) => "(1 . 2)\n"]
  )
-#|
+
 (add-tests-with-string-output "set-car! set-cdr!"
   [(let ([x (cons 1 2)])
      (begin (set-cdr! x ())
@@ -50,7 +50,7 @@
 ;;;        #f)
 ;;;    x) => "#f\n"]
 )
-|#
+
 
 (add-tests-with-string-output "eq?"
   [(eq? 1 1) => "#t\n"]
@@ -280,7 +280,6 @@
       (cons v0 v1))) => "(#(2) . #(13))\n"]
 )
 
-#|
 (add-tests-with-string-output "strings"
   [(string? (make-string 0)) => "#t\n"]
   [(make-string 0) => "\"\"\n"]
@@ -379,4 +378,4 @@
      (string-set! s 0 #\\)
      s) => "\"\\\\\"\n"]
 )
-|#
+

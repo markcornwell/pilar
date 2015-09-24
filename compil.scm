@@ -78,6 +78,10 @@
 (define vector-mask  #b00000111) ; #x07 
 (define vector-tag   #b00000101) ; #x05
 
+(define string-mask  #b00000111) ; #x07
+(define string-tag   #b00000110) ; #x06
+
+
 (define nil-value #x3F)
 (define wordsize     4) ; bytes
 
@@ -334,7 +338,21 @@
 
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))  
+  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
+
+(define-primitive (set-car! si env u obj)
+  (emit-expr si env u)
+  (emit "    movl %eax, ~s(%esp)" si)  ;; save u
+  (emit-expr (- si wordsize) env obj)  ;; eax = obj
+  (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
+  (emit "    movl %eax, ~s(%ebx)" (- car-offset pair-tag)))
+
+(define-primitive (set-cdr! si env u obj)
+  (emit-expr si env u)
+  (emit "    movl %eax, ~s(%esp)" si)  ;; save u
+  (emit-expr (- si wordsize) env obj)  ;; eax = obj
+  (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
+  (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
 
 ;;-------------------------------------------
 ;;                 Vectors
@@ -389,6 +407,57 @@
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
+;;-------------------------------------------------------
+;;                     Strings
+;;-------------------------------------------------------
+
+(define-primitive (make-string si env len)
+   (emit-expr si env len)               ;; eax = length (bytes x 4)
+   (emit "    movl %eax, 0(%ebp)")      ;; set string-length field (bytes x 4)
+   (emit "    movl %eax, %esi")         ;; esi = length (bytes x 4)
+   (emit "    sar  $2, %esi")           ;; esi = length (bytes)
+   (emit "    add  $3, %esi")           ;; align esi to 4-bytes: first add 3
+   (emit "    or   $-4, %esi")          ;;   then clear the last 2 bits.
+   (emit "    add $4, %esi")            ;; account for length field
+   (emit "    movl %ebp, %eax")         ;; eax = the old heap base
+   (emit "    add $~s, %eax" string-tag);; tag the ptr
+   (emit "    movl (%ebp,%esi), %ebp")) ;; bump heap base
+
+(define-primitive (string? si env object)
+    (emit-expr si env object)
+    (emit "    and $~s, %al" string-mask)
+    (emit "    cmp $~s, %al" string-tag)
+    ; convert cc to a Boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit);
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (string-length si env str)
+    (emit-expr si env str)
+    (emit "    movl ~s(%eax), %eax" (- string-tag)))
+
+(define-primitive (string-ref si env str k)
+  (emit-expr si env str)
+  (emit "    movl %eax, ~s(%esp)" si)    ;; save the string
+  (emit-expr si env k)                   ;; eax = k (4 x bytes)
+  (emit "    sar $2, %eax")              ;; eax = k (bytes)
+  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
+  (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
+  (emit "    sal $~s, %eax" cshift)      ;; shift char to content position
+  (emit "    or  $~s, %eax" ctag))       ;; affix the tag
+   
+(define-primitive (string-set! si env str k char)
+  (emit-expr si env str)
+  (emit "    movl %eax, ~s(%esp)" si)               ;; save the string
+  (emit-expr si env k)                              ;; eax = k (4 x bytes)  
+  (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
+  (emit-expr (- si (* 2 wordsize)) env char)        ;; eax <- char
+  (emit "    movl ~s(%esp), %ebx" si)               ;; ebx <- string + 6
+  (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k (4 x bytes)
+  (emit "    sar $2, %esi")                         ;; esi = k bytes
+  (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
+  
 ;;-------------------------------------------------------
 ;; support for primitives
 ;;-------------------------------------------------------
