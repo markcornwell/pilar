@@ -2,6 +2,7 @@
 ;; Pilar: A Scheme Compiler
 ;; Mark Cornwell
 ;;
+;; 1.9.3  String
 ;; 1.9.2  Vector
 ;; 1.9.1  Pair
 ;; 1.9 Heap Allocation
@@ -54,32 +55,36 @@
 (define third caddr)
 (define rest cdr)
 
-(define fxshift      2)
-(define fxmask     #b11)   ; #x03
-(define fxtag      #b00)   ; #x00
+(define fxshift         2)
+(define fxmask       #b00000011)   ; #x03
+(define fxtag        #b00000000)   ; #x00
 
-(define cshift       8)
-(define ctag      #b00001111)
-(define cmask     #b11111111)
-(define bool-f    #b00101111) ; #x2F
-(define bool-t    #b01101111) ; #x6F
-(define bool-bit     6)
-(define bmask     #b10111111)
-(define btag      #b00101111)
+(define cshift          8)
+(define ctag         #b00001111) ; #x0F
+(define cmask        #b11111111)
 
-(define pair-shift   3)
-(define pair-mask #b00000111) ; #x07
-(define pair-tag  #b00000001) ; #x01
-(define size-pair    8)
-(define car-offset   0)
-(define cdr-offset   4)
+(define bool-f       #b00101111) ; #x2F
+(define bool-t       #b01101111) ; #x6F
+(define bool-bit        6)
+(define bmask        #b10111111)
+(define btag         #b00101111)
 
-(define vector-shift 3)
+(define pair-shift      3)
+(define pair-mask    #b00000111) ; #x07
+(define pair-tag     #b00000001) ; #x01
+(define size-pair       8)
+(define car-offset      0)
+(define cdr-offset      4)
+
+(define vector-shift    3)
 (define vector-mask  #b00000111) ; #x07 
 (define vector-tag   #b00000101) ; #x05
 
-(define nil-value #x3F)
-(define wordsize     4) ; bytes
+(define string-mask  #b00000111) ; #x07
+(define string-tag   #b00000110) ; #x06
+
+(define nil-value    #b00111111) ; #x3F)
+(define wordsize        4) ; bytes
 
 (define fixnum-bits (- (* wordsize 8) fxshift))
 
@@ -174,9 +179,10 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
+
 ;; not takes any kind of value and returns #t if
 ;; the object is #f, otherwise it returns #f
-
+;;
 (define-primitive (not si env arg)
     (emit-expr si env arg)
     (emit "    cmp $~s, %eax" bool-f)
@@ -206,6 +212,18 @@
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg2)
   (emit "    cmp %eax, ~s(%esp)" si)
+  ;; convert the cc to a boolean
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+(define-primitive (char=? si env c1 c2)
+  (emit "# char= c1=~s c2=~s" c1 c2)
+  (emit-expr si env c1)                ;; eax = c1
+  (emit "    movb %ah, ~s(%esp)" si)  ;; save c1
+  (emit-expr (- si wordsize) env c2)   ;; eax = c2
+  (emit "    cmp %ah, ~s(%esp)" si)   ;; compare c1 c2
   ;; convert the cc to a boolean
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
@@ -320,13 +338,14 @@
   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
   (emit-expr si env arg1)                     ;; evaluate arg1
   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
-  (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2  
+  (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2
   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
-  (emit "    or  $~s, %al" pair-tag)          ;; or in the pair tag
-  (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
+  (emit "    or   $~s, %al" pair-tag)         ;; or in the pair tag
+  (emit "    add  $~s, %ebp" size-pair)       ;; bump heap ptr
+  (emit "# cons end"))     
 
 (define-primitive (car si env arg)
   (emit-expr si env arg)
@@ -334,7 +353,21 @@
 
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))  
+  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
+
+(define-primitive (set-car! si env u obj)
+  (emit-expr si env u)
+  (emit "    movl %eax, ~s(%esp)" si)  ;; save u
+  (emit-expr (- si wordsize) env obj)  ;; eax = obj
+  (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
+  (emit "    movl %eax, ~s(%ebx)" (- car-offset pair-tag)))
+
+(define-primitive (set-cdr! si env u obj)
+  (emit-expr si env u)
+  (emit "    movl %eax, ~s(%esp)" si)  ;; save u
+  (emit-expr (- si wordsize) env obj)  ;; eax = obj
+  (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
+  (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
 
 ;;-------------------------------------------
 ;;                 Vectors
@@ -355,19 +388,19 @@
 (define-primitive (make-vector si env length)
   (emit "# make-vector ~s" length)
   (emit-expr si env length)
-  (emit "    movl %eax, %esi")        ;; save length in esi as offset (not yet aliged)
-  (emit "    movl %eax, 0(%ebp)")     ;; set the vector length field 
-  (emit "    movl %ebp, %eax")        ;; save the base pointer as return value
-  (emit "    orl  $~s, %eax" vector-tag) ;; set the vector tag in the lower 3 bits
-  (emit "    addl $4, %esi")           ;; 4 bytes for length field
-  (emit "    addl $4, %esi")          ;; align length in esi to 8 bytes
-  (emit "    andl $-8, %esi")         ;; by adding #0100 and clearing bottom 3 bits  
-  (emit "    addl %esi, %ebp"))       ;; advance alloc ptr
+  (emit "    movl %eax, %esi")             ;; save length in esi as offset (not yet aliged)
+  (emit "    movl %eax, 0(%ebp)")          ;; set the vector length field 
+  (emit "    movl %ebp, %eax")             ;; save the base pointer as return value
+  (emit "    orl  $~s, %eax" vector-tag)   ;; set the vector tag in the lower 3 bits
+  (emit "    addl $~s, %esi" wordsize)     ;; 4 bytes for length field
+                                           ;; align length in esi to 8 bytes
+  (emit "    addl $4, %esi")               ;;  by adding #0100 
+  (emit "    andl $-8, %esi")              ;;  and clearing bottom 3 bits  
+  (emit "    addl %esi, %ebp"))            ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
   (emit-expr si env v) ;; eax <- vector + 5
-  ;(emit "    movl -5(%eax), %eax")  ;; correct for tag(-5)
-  (emit "andl $-8, %eax")             ;; clear 3-bit tag to yield 8-byte aligned value
+  (emit "andl $-8, %eax")             ;; clear 3-bit tag to select 8-byte aligned value
   (emit "movl 0(%eax), %eax")         ;; follow pointer to get length
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
 
@@ -390,7 +423,61 @@
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
 ;;-------------------------------------------------------
-;; support for primitives
+;;                     Strings
+;;-------------------------------------------------------
+
+(define-primitive (make-string si env len)
+   (emit "# make-string len=~s" len)
+   (emit-expr si env len)
+   (emit "    movl %eax, %esi")           ;; esi = length (bytes x 4)
+   (emit "    movl %eax, 0(%ebp)")        ;; set string-length field (bytes x 4)
+   (emit "    movl %ebp, %eax")           ;; save the base pointer as return value
+   (emit "    orl $~s, %eax" string-tag)  ;; set the tag in the lower 3 bits   
+   (emit "    sar $~s, %esi" fxshift)     ;; esi = divide by 4 to get length (bytes)
+   (emit "    add $~s, %esi" wordsize)    ;; account for length field (4 bytes)
+                                          ;; align esi to 8-bytes:
+   (emit "    add $7, %esi")              ;;    first add 7
+   (emit "    andl $-8, %esi")            ;;    then clear the last 3 bits.
+   (emit "    add  %esi, %ebp")           ;; bump heap base to the 8 byte aligned boundary
+   (emit "# make-string end"))
+
+(define-primitive (string? si env object)
+    (emit-expr si env object)
+    (emit "    and $~s, %al" string-mask)
+    (emit "    cmp $~s, %al" string-tag)
+    ; convert cc to a Boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit);
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (string-length si env str)
+    (emit-expr si env str)
+    (emit "    movl ~s(%eax), %eax" (- string-tag)))
+
+(define-primitive (string-ref si env str k)
+  (emit-expr si env str)
+  (emit "    movl %eax, ~s(%esp)" si)    ;; save the string
+  (emit-expr si env k)                   ;; eax = k (4 x bytes)
+  (emit "    sar $~s, %eax" fxshift)     ;; eax = k (bytes)
+  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
+  (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
+  (emit "    sal $~s, %eax" cshift)      ;; shift char to content position
+  (emit "    or  $~s, %eax" ctag))       ;; affix the tag
+   
+(define-primitive (string-set! si env str k char)
+  (emit-expr si env str)
+  (emit "    movl %eax, ~s(%esp)" si)               ;; save the string
+  (emit-expr si env k)                              ;; eax = k (4 x bytes)  
+  (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
+  (emit-expr (- si (* 2 wordsize)) env char)        ;; eax <- char
+  (emit "    movl ~s(%esp), %ebx" si)               ;; ebx <- string + 6
+  (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k (4 x bytes)
+  (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
+  (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
+  
+;;-------------------------------------------------------
+;;          Primitive Calls
 ;;-------------------------------------------------------
 
 (define (primitive? x)
@@ -420,7 +507,7 @@
 (define unique-label
   (let ([count 0])
     (lambda ()
-      (let ([L (format "L_~s" count)])
+      (let ([L (format "_L_~s" count)])
     (set! count (add1 count))
     L))))
 
@@ -484,7 +571,6 @@
    [(eq? (length x) 1) (emit-tail-expr si env #f)]
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
-
 
 ;;---------------------------------------------
 ;;                Local Variables
@@ -586,7 +672,7 @@
 (define (letrec-bindings expr) (cadr expr))
 (define (letrec-body expr) (caddr expr))
 
-(define (emit-letrec expr)  ;; <<---<< messed up
+(define (emit-letrec expr)
   (emit "# emit-letrec expr=~s" expr)
   (let* ([bindings (letrec-bindings expr)]
 	 [lvars (map lhs bindings)]
@@ -600,7 +686,7 @@
     (emit "#  env=~s" env)
     (emit "#  ---- >>>>> emit-lambdas start ----")
     (for-each (emit-lambda env) lambdas labels)
-    (emit "#  ---- <<<<<  emit-lambdas end ------")
+    (emit "#  ---- <<<<< emit-lambdas end ------")
     (emit-scheme-entry env (letrec-body expr))))
 
 (define (unique-labels lvars)
@@ -655,7 +741,7 @@
 (define (emit-tail-app si env expr)
   (define (emit-arguments si args)
     (unless (empty? args)
-        (emit-expr si env (first args))    ;; evaluated arg in %eax
+        (emit-expr si env (first args))             ;; evaluated arg in %eax
 	(emit "    mov %eax, ~s(%esp)    # arg" si) ;; save %eax as evaluated arg    
 	(emit-arguments (- si wordsize) (rest args))))
   (define (emit-shift-args argc si delta)
@@ -696,7 +782,7 @@
     (error "begin" "begin body must be null or a pair" body)]
    [else
     (emit-expr si env (car body))
-    (emit-tail-begin si env (cdr body))]))  ;; <<--- reuse si or bump it ???
+    (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
@@ -730,7 +816,7 @@
     [else
      (error "emit-expr" "unrecognized form:" expr)]))
 
-(define (emit-tail-expr si env expr) ;; <---<< ?
+(define (emit-tail-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
@@ -753,7 +839,7 @@
      (error "emit-expr" "unrecognized form:" expr)]))
 
 (define (emit-immediate x)
-  (emit "    movl $~s, %eax     # immediate ~s" (immediate-rep x) x))
+  (emit "    movl $~s, %eax     # immed ~s" (immediate-rep x) x))
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
@@ -762,7 +848,7 @@
 (define (emit-program expr)
   (emit "# ~s~%" expr)
   (if (letrec? expr)
-      (emit-letrec expr)  ;; <--
+      (emit-letrec expr) 
       (emit-scheme-entry '() expr)))
 
 (define (emit-scheme-entry env expr)
@@ -776,8 +862,8 @@
   (emit "    movl %edi, 20(%ecx)")
   (emit "    movl %ebp, 24(%ecx)")
   (emit "    movl %esp, 28(%ecx)")
-  (emit "    movl 12(%esp), %ebp") ;; set heap base
-  (emit "    movl 8(%esp), %esp")  ;; set stack base
+  (emit "    movl 12(%esp), %ebp")  ;; set heap base
+  (emit "    movl 8(%esp), %esp")   ;; set stack base
   (emit "    call _L_scheme_entry")
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
