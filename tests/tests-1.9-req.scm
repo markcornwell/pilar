@@ -44,11 +44,12 @@
         (set-car! x 12)
         #f)
     x) => "#f\n"]
-;;; [(let ([x #f])
-;;;    (if (pair? #f)
-;;;        (set-car! #f 12)
-;;;        #f)
-;;;    x) => "#f\n"]
+ 
+ [(let ([x #f])
+    (if (pair? #f)
+        (set-car! #f 12)
+        #f)
+    x) => "#f\n"]   ;; was commented out
 )
 
 
