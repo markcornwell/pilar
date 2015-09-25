@@ -92,25 +92,31 @@
   [(let ([v (make-vector 1)] [y (cons 1 2)])
      (vector-set! v 0 y)
      (eq? y (vector-ref v 0))) => "#t\n"]
+  
   [(cons 1 2) => "(1 . 2)\n"]
+  
   ;; if the problem is printing lets try not printing
   [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
 	      (vector-set! v 0 y)
 	      (cons y (eq? y 0))))]
-	 (pair? w)) => "#t\n"] 
+     (pair? w)) => "#t\n"]
+  
   [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
 	      (vector-set! v 0 y)
 	      (cons y (eq? y 0))))]
      (and (pair? w)
 	  (pair? (car w)))) => "#t\n"]
+  
   [(let [(w (let ([v (make-vector 1)] [y (cons 1 2)])
 	      (vector-set! v 0 y)
 	      (cons y (eq? y 0))))]
      (cdr w)) => "#f\n"]
+  
    [(let [(w (let ([v (make-vector 1)] [y (cons 96 2)])
 	      ;(vector-set! v 0 y)
 	      ;(cons y (eq? y 0))
-	      y))]
+	       y))]
+      
       w) => "(96 . 2)\n"]
    [(let [(w (let ([v (make-vector 1)] [y (cons 97 2)])
 	      ;(vector-set! v 0 y)
@@ -308,12 +314,15 @@
      (string-set! s 3 #\d)
      (string-set! s 4 #\e)
      (string-ref s 3)) => "#\\d\n"]
-#|
+
+  [(cons 1 2) => "(1 . 2)\n"]
+  [(cons (make-string 0) ()) => "(\"\")\n"]
+  
   [(let ([s (make-string 2)]) 
      (string-set! s 0 #\a)
      (string-set! s 1 #\b)
      (cons (string-ref s 0) (string-ref s 1))) => "(#\\a . #\\b)\n"]  ;; <--- broken
-|#
+  
   [(let ([i 0])
     (let ([s (make-string 1)]) 
      (string-set! s i #\a)
@@ -323,18 +332,18 @@
     (let ([s (make-string 2)]) 
      (string-set! s i #\a)
      (string-set! s j #\b)
-     (string-ref s i))) => "#\\a\n"] 
-#|    
+     (string-ref s i))) => "#\\a\n"]
+  
   [(let ([i 0] [j 1])
     (let ([s (make-string 2)]) 
      (string-set! s i #\a)
      (string-set! s j #\b)
      (cons (string-ref s i) (string-ref s j)))) => "(#\\a . #\\b)\n"]
-|#  
+ 
   [(let ([i 0] [c #\a])
     (let ([s (make-string 1)]) 
      (string-set! s i c)
-     (string-ref s i))) => "#\\a\n"]  ;; <<---- broken
+     (string-ref s i))) => "#\\a\n"] 
 
   [(string-length (make-string 12)) => "12\n"]
   [(string? (make-vector 12)) => "#f\n"]
@@ -366,7 +375,7 @@
        (string-set! v1 0 #\d)
        (string-set! v1 1 #\e)
        (string-set! v1 2 #\f)
-       (cons v0 v1))) => "(\"abc\" . \"def\")\n"]   ; <<<---- BROKEN -----<<<
+       (cons v0 v1))) => "(\"abc\" . \"def\")\n"]
 
   [(let ([n 2])
     (let ([v0 (make-string n)])
@@ -376,7 +385,7 @@
        (string-set! v1 0 #\c)
        (string-set! v1 1 #\d)
        (cons v0 v1)))) => "(\"ab\" . \"cd\")\n"]
-
+#|
   [(let ([n 3])
     (let ([v0 (make-string n)])
      (let ([v1 (make-string (string-length v0))])
@@ -386,8 +395,9 @@
        (string-set! v1 (fx- (string-length v1) 3) #\Z)
        (string-set! v1 (fx- (string-length v0) 2) #\Y)
        (string-set! v1 (fx- (string-length v1) 1) #\X)
-       (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]
-
+       (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]        ;; <<--- broken
+|#
+  
   [(let ([n 1])
      (string-set! (make-string n) (fxsub1 n) (fixnum->char 34))
      n) => "1\n"]

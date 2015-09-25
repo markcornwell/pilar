@@ -40,8 +40,6 @@ typedef struct { ptr car; ptr cdr;   } *pair;    // 8-byte aligned
 typedef struct { ptr len; ptr elt[]; } *vector;  // 8-byte aligned
 typedef struct { ptr len; char ch[]; } *string;  // 4 byte aligned
 
-//static void print_car (pair p);
-//static void print_cdr (pair p);
 static void print_pairs (pair p);
 static void print_vector (vector v);
 static void print_string (string s);
@@ -135,35 +133,6 @@ static void print_vector(vector v) {
   }
 }
 
-/*
-static void print_car (pair p) {
-  if ((int) p & 7)  {
-    printf("error: print_car p=%i must be 8-byte aligned\n", (unsigned int) p);
-    exit(-1);
-  }
-  printf("(");
-  print_ptr(p->car);
-}
-
-static void print_cdr (pair p) {
-  if ((int) p & 7)  {
-    printf("error: print_cdr p=%i must be 8-byte aligned\n", (unsigned int) p);
-    exit(-1);
-  }
-  if ((p->cdr) == nil) {
-    printf(")");
-  } else if (((p->cdr) & pair_mask) == pair_tag) {
-    printf(" ");
-    print_cdr((pair)((p->cdr) - pair_tag)); // zero out pair-tag
-  } else {
-    printf (" . ");
-    print_ptr((p->cdr));
-    printf (")");
-  }
-}
-*/
-
-
 static char* allocate_protected_space(int size) {
   int page = getpagesize();
   int status;
@@ -209,9 +178,11 @@ static void dump(char *heap, int words) {
 
 int scheme_entry(context* ctxt, char* stack_base, char* heap_base);
 
+int dump_enabled;
+
 int main(int argc, char** argv){
 
-  int dump_enabled = 0; //default for heap dump flag
+  dump_enabled = 0; //default for heap dump flag
 
   // process command line args
   for (int i=0; i<argc; i++) {
@@ -229,6 +200,13 @@ int main(int argc, char** argv){
   // create the heap
   int heap_size =  (8 * 16 * 4096); /* holdes 16K pairs */
   char* heap = allocate_protected_space(heap_size);
+
+  // diagnostics
+  if (dump_enabled) {
+    fprintf(stderr,"heap       %p\n", heap);
+    fprintf(stderr,"stack top  %p\n", stack_top);
+    fprintf(stderr,"stack base %p\n", stack_base);
+  }
 
   // save registers, call scheme, upon return print result
   context ctxt;

@@ -38,7 +38,7 @@
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
-;(load "tests/tests-1.9-req.scm")
+(load "tests/tests-1.9-req.scm")
 (load "tests/tests-1.8-req.scm")
 (load "tests/tests-1.7-req.scm")
 (load "tests/tests-1.6-req.scm")
@@ -345,8 +345,9 @@
   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
-  (emit "    or  $~s, %al" pair-tag)          ;; or in the pair tag
-  (emit "    addl $~s, %ebp" size-pair))      ;; bump heap ptr
+  (emit "    or   $~s, %al" pair-tag)         ;; or in the pair tag
+  (emit "    add  $~s, %ebp" size-pair)       ;; bump heap ptr
+  (emit "# cons end"))     
 
 (define-primitive (car si env arg)
   (emit-expr si env arg)
@@ -428,6 +429,7 @@
 ;;-------------------------------------------------------
 
 (define-primitive (make-string si env len)
+   (emit "# make-string len=~s" len)
    (emit-expr si env len)
    (emit "    movl %eax, %esi")           ;; esi = length (bytes x 4)
    (emit "    movl %eax, 0(%ebp)")        ;; set string-length field (bytes x 4)
@@ -437,7 +439,8 @@
    (emit "    add $4, %esi")              ;; account for length field (4 bytes)    
    (emit "    add $7, %esi")              ;; align esi to 8-bytes: first add 7
    (emit "    andl $-8, %esi")            ;; then clear the last 3 bits.
-   (emit "    movl (%ebp,%esi), %ebp"))   ;; bump heap base to the 8 byte aligned boundary
+   (emit "    add  %esi, %ebp")           ;; bump heap base to the 8 byte aligned boundary
+   (emit "# make-string end"))
 
 (define-primitive (string? si env object)
     (emit-expr si env object)
