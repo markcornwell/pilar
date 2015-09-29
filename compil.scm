@@ -790,7 +790,7 @@
     (emit "    call ~a   # app  " label))
   (emit-arguments (- si wordsize) (call-args expr))
   (emit-adjust-base (+ si wordsize))
-  
+
   (emit-call si (lookup (call-target expr) env)) ;; <<--- take into account closures here????
   
   (emit-adjust-base (- (+ si wordsize))))
