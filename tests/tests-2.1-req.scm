@@ -120,7 +120,6 @@
                  (fx* n (f f (fxsub1 n)))))])
    (f f 5)) => "120\n"]
 )
- 
 
 (add-tests-with-string-output "closures"
  [(let ([n 12])
