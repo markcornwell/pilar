@@ -841,9 +841,74 @@
     (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 
-;;--------------------------------------------
-;;           Closures
-;;--------------------------------------------
+;;----------------------------------------------------------------------
+;;                              Closures
+;;----------------------------------------------------------------------
+
+;;; one possible implementation strategy for procedures is via closure
+;;; conversion.
+
+;;; Lambda does many things at the same time:
+;;; 1) It creates a procedure object (ie. one that passes procedure?)
+;;; 2) It contains both code (what to do when applied) and data (what
+;;;    variables it references.
+;;; 3) The procedure object, in addition to passing procedure?, can be
+;;;    applied to arguments.
+
+;;; First step: separate code from data:
+;;; convert every program containing lambda to a program containing
+;;; codes and closures:
+;;; (let ([f (lambda () 12)]) (procedure? f))
+;;; =>
+;;; (codes ([f-code (code () () 12)])
+;;;   (let ([f (closure f-code)])
+;;;     (procedure? f)))
+;;;
+;;; The codes binds code names to code points.  Every code
+;;; is of the form (code (formals ...) (free-vars ...) body)
+;;;
+;;; sexpr
+;;; => recordize
+;;; recognize lambda forms and applications
+;;; =>
+;;; (let ([y 12])
+;;;   (let ([f (lambda (x) (fx+ y x))])
+;;;     (fx+ (f 10) (f 0))))
+;;; => convert closures
+;;; (let ([y 12])
+;;;   (let ([f (closure (code (x) (y) (fx+ x y)) y)])
+;;;     (fx+ (call f 10) (call f 0))
+;;; => lift codes
+;;; (codes ([code0 (code (x) (y) (fx+ x y))])
+;;;   (let ([y 12])
+;;;     (let ([f (closure code0 y)])
+;;;       (fx+ (call f 10) (call f 0)))))
+;;; => code generation
+;;; 1) codes form generates unique-labels for every code and
+;;;    binds the names of the code to these labels.
+;;; 2) Every code object has a list of formals and a list of free vars.
+;;;    The formals are at stack locations -4(%esp), -8(%esp), -12(%esp), ...
+;;;    The free vars are at -2(%edi), 2(%edi), 6(%edi), 10(%edi) ...
+;;;    These are inserted in the environment and then the body of the code
+;;;    is generated.
+;;; 3) A (closure code-name free-vars ...) is generated the same way a
+;;;    (vector val* ...) is generated:  First, the code-label and the free
+;;;    variables are placed at 0(%ebp), 4(%ebp), 8(%ebp), etc..
+;;;    A closure pointer is placed in %eax, and %ebp is incremented to the
+;;;    next boundary.
+;;; 4) A (call f arg* ...) does the following:
+;;;    a) evaluates the args and places them at contiguous stack locations
+;;;       si-8(%esp), si-12(%esp), ... (leaving room for two values).
+;;;    b) The value of the current closure pointer, %edi, is saved on the
+;;;       stack at si(%esp).
+;;;    c) The closure pointer of the callee is loaded in %edi.
+;;;    d) The value of %esp is adjusted by si
+;;;    e) An indirect call to -6(%edi) is issued.
+;;;    f) After return, the value of %esp is adjusted back by -si
+;;;    g) The value of the closure pointer is restored.
+;;;    The returned value is still in %eax.
+
+
 
 (define (closure? expr)
   (and (pair? expr) (eq? (car expr) 'closure)))
@@ -881,21 +946,20 @@
 ;; is transformed to
 ;;
 ;;  (let ((x 5))
-;;     (flambda (y) (x) (flambda () (x y) (+ x y))))
+;;     (code (y) (x) (code () (x y) (+ x y))))
 ;;
-;;    We change lambda to flambda to denote that free variable
-;;    annotations are present.
-;;
-;;     (flambda (<formal-var> ... ) (<free-var> ...)  <expr> ... )
+;;  The codes bind code names to code points.  Every code is
+;;  of the form  (code (formals ... ) (free-vars ...) body)
 ;;
 ;; 2. The lambda forms are transformed into closure forms and the
 ;;    codes are colleted at the top.  The previous example yields:
 ;;
-;;  (labels ((f0 (code () (x y) (+ x y)))
-;;           (f1 (code (y) (x) (closure f0 x y))))
-;;     (let ((x 5)) (closure f1 x)))
+;;  (codes ([f0-code (code () (x y) (+ x y))]
+;;          [f1-code (code (y) (x) (closure f0-code x y))])
+;;     (let ((x 5)) (closure f1-code x)))
 ;;
 ;;--------------------------------------------------------------------
+
 
 (define (flambda? expr)
   (and (pair? expr) (eq? (car expr) 'flambda)))
