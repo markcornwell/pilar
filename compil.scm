@@ -713,7 +713,7 @@
 (define codes-body caddr)
 
 (define (emit-codes expr)
-  (emit "# emit-letrec expr=~s" expr)
+  (emit "# emit-codes expr=~s" expr)
   (let* ([bindings (codes-bindings expr)]
 	 [lvars (map lhs bindings)]
 	 [codes (map rhs bindings)]
@@ -721,7 +721,7 @@
 	 [env (make-initial-env lvars labels)])
     (emit "#  bindings=~s" bindings)
     (emit "#  lvars=~s" lvars)
-    (emit "#  lambdas=~s" lambdas)
+    (emit "#  codes=~s" codes)
     (emit "#  labels=~s" labels)
     (emit "#  env=~s" env)
     (emit "#  ---- >>>>> emit-codes start ----")
@@ -763,7 +763,7 @@
 	     (- si wordsize)
 	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
 
-;; (flambda (formals ...) (freevars ...) <expr>...)
+;; (code (formals ...) (freevars ...) body)
 
 
 (define (code? expr)
@@ -772,18 +772,24 @@
 (define code-formals cadr)
 (define code-freevars caddr)
 (define code-body cdddr)
+;(define (code-body expr) (cons 'begin (cdddr expr)))   ;; implicit begin
 
 (define (emit-code env) 
   (lambda (expr label)
+    (emit "# emit-code ~s" expr)
     (emit-function-header label)  ;; <<--- ???
     (let* ([fmls (code-formals expr)]
 	   [frev (code-freevars expr)]
 	   [body (code-body expr)]
-	   [env (extent-closure-env env frev)])
+	   [env (extend-closure-env env frev)])
+      (emit "# fmls = ~s" fmls)
+      (emit "# frev = ~s" frev)
+      (emit "# body = ~s" body)
+      (emit "# env  = ~s"  env)
       (let f ([fmls fmls] [si (- wordsize)] [env env])
 	(cond
 	 [(empty? fmls)
-	  (emit-tail-expr si env body)
+	  (emit-tail-expr si env (cons ' begin body)) ;; implicit begin
 	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
 	 [else
 	  (f (rest fmls)
@@ -855,6 +861,23 @@
 	[delta (- -4 (- si wordsize))])
      (emit-shift-args argc si delta))
   (emit-jmp si (lookup (call-target expr) env)))
+
+(define (emit-tail-funcall si env expr)    ;; <<<------ FIX LATER; model on emit-tail-app
+  (define (emit-arguments si env args)
+    (unless (empty? args)
+        (emit-expr si env (first args))                    ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
+        (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
+  (define (emit-adjust-base si)
+    (unless (eq? si 0)
+	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
+  (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
+  (emit "    mov %edi $~s(%esp)" si)    ;; save value of current closure pointer on stack
+  (emit "    lea $~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
+  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
+  (emit "    call -6(%edi)")  ; an indirect call to label field of the closure is issued
+  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
+  (emit "    mov $~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define begin-body cdr)
 
@@ -961,18 +984,26 @@
 	i
 	(+ i (- 8 (remainder i 8)))))
 
-(define (emit-closure si env expr)
+(define (emit-closure si env expr)   ;; <<<---- THIS IS WRONG
   (let* [(lvar (closure-lvar expr))
 	 (vars (closure-vars expr))
 	 (size (* wordsize (+ 1 (length vars))))]
-    (emit "   movl ~a, 0(%ebp)" (lookup lvar env))
+    (emit "   movl $~a, 0(%ebp)" (lookup lvar env))
+    (emit "   movl %ebp, %eax")
+    (emit "   add $~s, %eax"  closure-tag)
+    (emit "   add $~s, %ebp" (align-to-8-bytes size))))
+
+(define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
+  (let* [(lvar (closure-lvar expr))
+	 (vars (closure-vars expr))
+	 (size (* wordsize (+ 1 (length vars))))]
+    (emit "   movl $~a, 0(%ebp)" (lookup lvar env))
     (emit "   movl %ebp, %eax")
     (emit "   add $~s, %eax"  closure-tag)
     (emit "   add $~s, %ebp" (align-to-8-bytes size))))
 
 
 (define funcall-args cddr)  ;; (funcall f arg* ...)
-
 
 
 ;;--------------------------------------------------------------------
@@ -1062,7 +1093,7 @@
 	  (transform-codes-to-closures (cdr expr)))]))
 
 (define (simple-constant? expr)
-  (or (null? expr) (fixnum? expr) (char? expr) (string? expr)))
+  (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
   (memq expr '(app begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
@@ -1165,8 +1196,8 @@
     [(variable? expr)   (emit-tail-variable-ref env expr)]
     [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
     [(app? expr)        (emit-tail-app si env expr)]
-    ;; closure?
-    ;; funcall?
+    [(closure? expr)    (emit-tail-closure si env expr)] ;; NEW
+    [(funcall? expr)    (emit-tail-funcall si env expr)] ;; NEW
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
