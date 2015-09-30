@@ -81,7 +81,7 @@
 
 (add-tests-with-string-output "applying thunks"
   [(let ([f (lambda () 12)]) (f)) => "12\n"]
-  [(let ([f (lambda () (fx+ 12 13))]) (f)) => "25\n"]
+  [(let ([f (lambda () (fx+ 12 13))]) (f)) => "25\n"]  ;; <<-- broken
   [(let ([f (lambda () 13)]) (fx+ (f) (f))) => "26\n"]
   [(let ([f (lambda () 
               (let ([g (lambda () (fx+ 2 3))])
