@@ -685,8 +685,8 @@
 (define (letrec? expr)
   (and (pair? expr) (eq? (car expr) 'letrec)))
   
-(define (letrec-bindings expr) (cadr expr))
-(define (letrec-body expr) (caddr expr))
+(define letrec-bindings cadr)
+(define letrec-body caddr)
 
 (define (emit-letrec expr)
   (emit "# emit-letrec expr=~s" expr)
@@ -704,6 +704,31 @@
     (for-each (emit-lambda env) lambdas labels)
     (emit "#  ---- <<<<< emit-lambdas end ------")
     (emit-scheme-entry env (letrec-body expr))))
+
+
+(define (codes? expr)
+  (and (pair? expr) (eq? (car expr) 'codes)))
+
+(define codes-bindings cadr)
+(define codes-body caddr)
+
+(define (emit-codes expr)
+  (emit "# emit-letrec expr=~s" expr)
+  (let* ([bindings (codes-bindings expr)]
+	 [lvars (map lhs bindings)]
+	 [codes (map rhs bindings)]
+	 [labels (unique-labels lvars)]
+	 [env (make-initial-env lvars labels)])
+    (emit "#  bindings=~s" bindings)
+    (emit "#  lvars=~s" lvars)
+    (emit "#  lambdas=~s" lambdas)
+    (emit "#  labels=~s" labels)
+    (emit "#  env=~s" env)
+    (emit "#  ---- >>>>> emit-codes start ----")
+    (for-each (emit-code env) codes labels)
+    (emit "#  ---- <<<<< emit-codes end ------")
+    (emit-scheme-entry env (codes-body expr))))
+
 
 (define (unique-labels lvars)
     (define (assign-label v) (unique-label))
@@ -741,20 +766,20 @@
 ;; (flambda (formals ...) (freevars ...) <expr>...)
 
 
-(define (flambda? expr)
-  (and (pair? expr) (eq? (car expr) 'flambda)))
+(define (code? expr)
+  (and (pair? expr) (eq? (car expr) 'code)))
 
-(define flambda-formals cadr)
-(define flambda-clovars caddr)
-(define flambda-body cdddr)
+(define code-formals cadr)
+(define code-freevars caddr)
+(define code-body cdddr)
 
-(define (emit-flambda env) 
+(define (emit-code env) 
   (lambda (expr label)
     (emit-function-header label)  ;; <<--- ???
-    (let* ([fmls (lambda-formals expr)]
-	   [frev (lambda-freevars expr)]
-	   [body (lambda-body expr)]
-	   [env (extent-closure-env env freev)])
+    (let* ([fmls (code-formals expr)]
+	   [frev (code-freevars expr)]
+	   [body (code-body expr)]
+	   [env (extent-closure-env env frev)])
       (let f ([fmls fmls] [si (- wordsize)] [env env])
 	(cond
 	 [(empty? fmls)
@@ -778,22 +803,37 @@
 (define call-args cddr)   ;;           ^-- that part
 
 (define (emit-app si env expr)    ;; <<------- FIX THIS TO ACCOMODATE CLOSURES
-  (define (emit-arguments si args)
+  (define (emit-arguments si env args)
     (unless (empty? args)
         (emit-expr si env (first args))                ;; evaluated arg in %eax
 	(emit "    mov %eax, ~s(%esp)    # arg" si)    ;; save %eax as evaluated arg    
-	(emit-arguments (- si wordsize) (rest args)))) ;; recursively emit the rest
+	(emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
 	(emit "    lea ~s(%esp), %esp    # adjust base" si )))
-  (define (emit-call si label)
+  (define (emit-labelcall si label)
     (emit "    call ~a   # app  " label))
-  (emit-arguments (- si wordsize) (call-args expr))
+  (emit-arguments (- si wordsize) env (call-args expr))
   (emit-adjust-base (+ si wordsize))
-
-  (emit-call si (lookup (call-target expr) env)) ;; <<--- take into account closures here????
-  
+  (emit-labelcall si (lookup (call-target expr) env)) ;; <<--- take into account closures here????
   (emit-adjust-base (- (+ si wordsize))))
+
+(define (emit-funcall si env expr)
+  (define (emit-arguments si env args)
+    (unless (empty? args)
+        (emit-expr si env (first args))                    ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
+        (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
+  (define (emit-adjust-base si)
+    (unless (eq? si 0)
+	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
+  (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
+  (emit "    mov %edi $~s(%esp)" si)    ;; save value of current closure pointer on stack
+  (emit "    lea $~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
+  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
+  (emit "    call -6(%edi)")  ; an indirect call to label field of the closure is issued
+  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
+  (emit "    mov $~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define (emit-tail-app si env expr)
   (define (emit-arguments si args)
@@ -931,6 +971,10 @@
     (emit "   add $~s, %ebp" (align-to-8-bytes size))))
 
 
+(define funcall-args cddr)  ;; (funcall f arg* ...)
+
+
+
 ;;--------------------------------------------------------------------
 ;;             Free variable annotation & transformation
 ;;--------------------------------------------------------------------
@@ -951,22 +995,20 @@
 ;;  The codes bind code names to code points.  Every code is
 ;;  of the form  (code (formals ... ) (free-vars ...) body)
 ;;
-;; 2. The lambda forms are transformed into closure forms and the
+;; 2. The code forms are transformed into closure forms and the
 ;;    codes are colleted at the top.  The previous example yields:
 ;;
-;;  (codes ([f0-code (code () (x y) (+ x y))]
-;;          [f1-code (code (y) (x) (closure f0-code x y))])
-;;     (let ((x 5)) (closure f1-code x)))
+;;  (codes ([f0 (code () (x y) (+ x y))]
+;;          [f1 (code (y) (x) (closure f0 x y))])
+;;     (let ((x 5)) (closure f1 x)))
 ;;
 ;;--------------------------------------------------------------------
 
+(define (lambda? expr)
+  (and (pair? expr) (eq? (car expr) 'lambda)))
 
-(define (flambda? expr)
-  (and (pair? expr) (eq? (car expr) 'flambda)))
-
-(define flambda-formals cadr)
-(define flambda-freevars caddr)
-(define flambda-body cdddr)
+(define lambda-formals cadr)
+(define lambda-body caddr)
 
 (define (annotate-free-variables bound-vars expr)
   (cond
@@ -974,9 +1016,9 @@
    [(primitive? expr) expr]
    [(symbol? expr) expr]
    [(lambda? expr)
-    (list 'flambda
+    (list 'code
 	  (lambda-formals expr)
-	  (free-variables (merge (lambda-formals expr) bound-vars)
+	  (free-variables (merg (lambda-formals expr) bound-vars)
 			  (lambda-body expr))
 	  (annotate-free-variables bound-vars
 				   (lambda-body expr)))]
@@ -985,9 +1027,9 @@
 	   (annotate-free-variables bound-vars (cdr expr)))]))
 
 (define (transform-to-closures expr)
-  (let* ([body (transform-flambdas-to-closures expr)]
-	 [codes *labels*])
-    (list 'labels
+  (let* ([body (transform-codes-to-closures expr)]
+	 [codes *codes*])
+    (list 'codes
 	  codes
 	  body)))
 
@@ -998,41 +1040,41 @@
 	(set! count (add1 count))
 	(string->symbol f)))))
 
-(define *labels* '())
+(define *codes* '())
 
-(define (transform-flambdas-to-closures expr)
+(define (transform-codes-to-closures expr)
   (cond
    [(simple-constant? expr) expr]
    [(primitive? expr) expr]
    [(symbol? expr) expr]
-   [(flambda? expr)
+   [(code? expr)
     (let ([fk (unique-lvar)])
-      (set! *labels* (cons (list fk
+      (set! *codes* (cons (list fk
 				 (append
 				    (list 'code
-				       (flambda-formals expr)
-				       (flambda-freevars expr)) 
-				    (transform-flambdas-to-closures (flambda-body expr))))
-			   *labels*))
-      (append (list 'closure fk) (flambda-freevars expr)))]
+				       (code-formals expr)
+				       (code-freevars expr)) 
+				    (transform-codes-to-closures (code-body expr))))
+			   *codes*))
+      (append (list 'closure fk) (code-freevars expr)))]
    [else
-    (cons (transform-flambdas-to-closures (car expr))
-	  (transform-flambdas-to-closures (cdr expr)))]))
+    (cons (transform-codes-to-closures (car expr))
+	  (transform-codes-to-closures (cdr expr)))]))
 
 (define (simple-constant? expr)
   (or (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
-  (memq expr '(app begin if let lambda letrec)))
+  (memq expr '(app begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
 
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
 
-(define (merge l1 l2)
+(define (merg l1 l2)
   (cond ((null? l1) l2)
         ((null? l2) l1)
-        ((symbol<? (car l1) (car l2)) (cons (car l1) (merge (cdr l1) l2)))
-        (else (cons (car l2) (merge l1 (cdr l2))))))
+        ((symbol<? (car l1) (car l2)) (cons (car l1) (merg (cdr l1) l2)))
+        (else (cons (car l2) (merg l1 (cdr l2))))))
 
 (define sort
   (lambda (lst)
@@ -1052,19 +1094,6 @@
 
 (define (symbol<=? a b)
   (or (symbol< a b) (symbol=? a b)))
-
-;;--------------------------------------------------------------
-;; should never be any duplicates ??? so no need to eliminate them
-(define (elim-dups lst)
-  (elim-dups1 (sort lst)))
-
-(define (elim-dups1 lst)
-  (cond
-   [(null? lst) '()]
-   [(null? (cdr lst)) lst]
-   [(eq? (car lst) (cadr lst)) (elim-dups1 (cdr lst))]
-   [else (cons (car lst) (elim-dups1 (cdr lst)))]))
-;;---------------------------------------------------------------
 
 (define (free-variables bound-vars expr)
   (format #t "free-variables ~s ~s~%" bound-vars expr)
@@ -1092,7 +1121,10 @@
 ;;--------------------------------------------
 
 (define (app? expr)
-    (and (pair? expr) (eq? (car expr) 'app)))
+  (and (pair? expr) (eq? (car expr) 'app)))
+
+(define (funcall? expr)
+  (and (pair? expr) (eq? (car expr) 'funcall)))
 
 (define (begin? expr)
     (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin))) 
@@ -1109,8 +1141,9 @@
     [(variable? expr)   (emit-variable-ref env expr)]
     [(begin? expr)      (emit-begin si env (begin-body expr))]
     [(closure? expr)    (emit-closure si env expr)]
+    [(funcall? expr)    (emit-funcall si env expr)]
     [(app? expr)        (emit-app si env expr)]  
-    [(lvar-app? expr)   (emit-app si env (cons 'app expr))]   ;; supply implicit app
+    [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
@@ -1124,7 +1157,7 @@
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
-	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings
+	   (and pair (fixnum? (cdr pair))))))   ;; ignore lvar bindings
   (define (lvar-app? expr)
     (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
 (cond
@@ -1132,6 +1165,8 @@
     [(variable? expr)   (emit-tail-variable-ref env expr)]
     [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
     [(app? expr)        (emit-tail-app si env expr)]
+    ;; closure?
+    ;; funcall?
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
@@ -1149,11 +1184,15 @@
   (emit-immediate x)
   (emit "    ret"))
 
-(define (emit-program expr)
-  (emit "# ~s~%" expr)
-  (if (letrec? expr)
-      (emit-letrec expr) 
-      (emit-scheme-entry '() expr)))
+(define (emit-program raw-expr)
+  (emit "# ~s~%" raw-expr)
+  (let ([expr (transform-to-closures (annotate-free-variables '() raw-expr))])
+    (emit "# =>~%")
+    (emit "# ~s~%" expr)
+      (cond
+       [(letrec? expr) (emit-letrec expr)]
+       [(codes? expr)  (emit-codes expr)]
+       [else           (emit-scheme-entry '() expr)])))
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
