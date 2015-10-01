@@ -605,6 +605,11 @@
 (define (extend-env si env var) (cons (bind var si) env))
 
 (define (emit-let si env bindings body) ;; look at the version on p. 30
+  (emit "# emit-let")
+  (emit "#  si   = ~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  bindings = ~s" bindings)
+  (emit "#  body = ~s" body)
   (let f ((si si) (new-env env) (b* bindings))
      (cond
        [(null? b*)  (emit-expr si new-env body)]
@@ -617,6 +622,11 @@
               (cdr b*)))])))
 
 (define (emit-tail-let si env bindings body) ;; look at the version on p. 30
+  (emit "# emit-tail-let")
+  (emit "#  si   = ~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  bindings = ~s" bindings)
+  (emit "#  body = ~s" body)
   (let f ((si si) (new-env env) (b* bindings))
      (cond
        [(null? b*)  (emit-tail-expr si new-env body)]
@@ -834,12 +844,14 @@
     (unless (eq? si 0)
 	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
   (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
-  (emit "    mov %edi $~s(%esp)" si)    ;; save value of current closure pointer on stack
-  (emit "    lea $~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
+  (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
+  (emit "    lea ~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
   (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
-  (emit "    call -6(%edi)")  ; an indirect call to label field of the closure is issued
+  (emit "    call *-6(%edi)")  ; an indirect call to label field of the closure is issued
+  ;(emit "    movl  -6(%edi), %ebx")
+  ;(emit "    call  *%ebx")
   (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
-  (emit "    mov $~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
+  (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define (emit-tail-app si env expr)
   (define (emit-arguments si args)
@@ -872,18 +884,19 @@
     (unless (eq? si 0)
 	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
   (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
-  (emit "    mov %edi $~s(%esp)" si)    ;; save value of current closure pointer on stack
-  (emit "    lea $~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
+  (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
+  (emit "    lea ~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
   (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
   (emit "    call -6(%edi)")  ; an indirect call to label field of the closure is issued
   (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
-  (emit "    mov $~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
+  (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define begin-body cdr)
 
 (define (emit-begin si env body)
-  (emit "# begin body=~s" body)
-  (emit "#       env=~s" env)
+  (emit "# emit-begin")
+  (emit "#   body=~s" body)
+  (emit "#   env=~s" env)
   (cond
    [(null? body) '()]
    [(not (pair? body))
@@ -1057,12 +1070,12 @@
      (cons (annotate-free-variables bound-vars (car expr))
 	   (annotate-free-variables bound-vars (cdr expr)))]))
 
+(define *codes* '())
+
 (define (transform-to-closures expr)
-  (let* ([body (transform-codes-to-closures expr)]
-	 [codes *codes*])
-    (list 'codes
-	  codes
-	  body)))
+  (set! *codes* '())
+  (let* ([body (transform-codes-to-closures expr)])
+    (list 'codes *codes* body)))
 
 (define unique-lvar
   (let ([count 0])
@@ -1071,7 +1084,7 @@
 	(set! count (add1 count))
 	(string->symbol f)))))
 
-(define *codes* '())
+
 
 (define (transform-codes-to-closures expr)
   (cond
@@ -1127,7 +1140,6 @@
   (or (symbol< a b) (symbol=? a b)))
 
 (define (free-variables bound-vars expr)
-  (format #t "free-variables ~s ~s~%" bound-vars expr)
   (cond
    [(simple-constant? expr) '()]
    [(primitive? expr) '()]
@@ -1136,11 +1148,14 @@
 			 '()
 			 (list expr))]
    [(lambda? expr)
-      (free-variables (append (lambda-formals expr)
+      (free-variables (merg (lambda-formals expr)
 			      bound-vars)
 		      (lambda-body expr))]
+  ; [(let? expr)
+  ;  (free-variables (merg (let-bound-vars expr) bound-vars)
+  ;		    (let-body expr))]
+   
    [(pair? expr)
-      ;(format #t "  pair ~s~%" expr)
       (append (free-variables bound-vars (car expr))
 	      (free-variables bound-vars (cdr expr)))]
    [else
@@ -1173,7 +1188,8 @@
     [(begin? expr)      (emit-begin si env (begin-body expr))]
     [(closure? expr)    (emit-closure si env expr)]
     [(funcall? expr)    (emit-funcall si env expr)]
-    [(app? expr)        (emit-app si env expr)]  
+    [(app? expr)        (emit-app si env expr)]
+   ; [(lvar-app? expr)   (emit-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
     [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
@@ -1181,8 +1197,9 @@
     [(if? expr)         (emit-if si env expr)]
     [(and? expr)        (emit-and si env expr)]
     [(or? expr)         (emit-or si env expr)]
+    [(pair? expr)       (emit-funcall si env (cons 'funcall expr))] ;; implicit funcall
     [else
-     (error "emit-expr" "unrecognized form:" expr)]))
+     (error "emit-expr" "unrecognized form" expr)]))
 
 (define (emit-tail-expr si env expr)
   (define (variable? expr)
@@ -1198,6 +1215,7 @@
     [(app? expr)        (emit-tail-app si env expr)]
     [(closure? expr)    (emit-tail-closure si env expr)] ;; NEW
     [(funcall? expr)    (emit-tail-funcall si env expr)] ;; NEW
+   ; [(lvar-app? expr)   (emit-tail-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
@@ -1205,6 +1223,7 @@
     [(if? expr)         (emit-tail-if si env expr)]
     [(and? expr)        (emit-tail-and si env expr)]
     [(or? expr)         (emit-tail-or si env expr)]
+    [(pair? expr)       (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
     [else
      (error "emit-expr" "unrecognized form:" expr)]))
 
@@ -1216,14 +1235,17 @@
   (emit "    ret"))
 
 (define (emit-program raw-expr)
-  (emit "# ~s~%" raw-expr)
-  (let ([expr (transform-to-closures (annotate-free-variables '() raw-expr))])
-    (emit "# =>~%")
-    (emit "# ~s~%" expr)
+  (emit "# ~s" raw-expr)
+  (let ([anno-expr  (annotate-free-variables '() raw-expr)])
+    (emit "# == annotate ==>")
+    (emit "# ~s" anno-expr)
+    (let ([expr (transform-to-closures anno-expr)])
+      (emit "# == transform ==>~%")
+      (emit "# ~s~%" expr)
       (cond
        [(letrec? expr) (emit-letrec expr)]
        [(codes? expr)  (emit-codes expr)]
-       [else           (emit-scheme-entry '() expr)])))
+       [else           (emit-scheme-entry '() expr)]))))
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")

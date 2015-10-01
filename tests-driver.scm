@@ -27,7 +27,7 @@
 (define (build)
   (unless (zero? (system "as -arch i386 pgm.s -o pgm.o"))
      (error 'build "produced program failed assembly"))
-  (unless (zero? (system "gcc -m32 -Wall runtime.c pgm.o -o stst"))
+  (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o -o stst"))
      (error 'build "produced program failed to link")))
 
 (define (execute)

@@ -2,10 +2,8 @@ Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
 > Performing procedure? tests ...
-test 0:(procedure? (lambda (x) x)) ...free-variables (x) x
- ok
-test 1:(let ((f (lambda (x) x))) (procedure? f)) ...free-variables (x) x
- ok
+test 0:(procedure? (lambda (x) x)) ... ok
+test 1:(let ((f (lambda (x) x))) (procedure? f)) ... ok
 test 2:(procedure? (make-vector 0)) ... ok
 test 3:(procedure? (make-string 0)) ... ok
 test 4:(procedure? (cons 1 2)) ... ok
@@ -13,16 +11,10 @@ test 5:(procedure? #\S) ... ok
 test 6:(procedure? ()) ... ok
 test 7:(procedure? #t) ... ok
 test 8:(procedure? #f) ... ok
-test 9:(string? (lambda (x) x)) ...free-variables (x) x
- ok
-test 10:(vector? (lambda (x) x)) ...free-variables (x) x
- ok
-test 11:(boolean? (lambda (x) x)) ...free-variables (x) x
- ok
-test 12:(null? (lambda (x) x)) ...free-variables (x) x
- ok
-test 13:(not (lambda (x) x)) ...free-variables (x) x
- ok
+test 9:(string? (lambda (x) x)) ... ok
+test 10:(vector? (lambda (x) x)) ... ok
+test 11:(boolean? (lambda (x) x)) ... ok
+test 12:(null? (lambda (x) x)) ... ok
+test 13:(not (lambda (x) x)) ... ok
 Performing applying thunks tests ...
-test 14:(let ((f (lambda () 12))) (f)) ...free-variables () 12
-> 
+test 14:(let ((f (lambda () 12))) (f)) ...> 
