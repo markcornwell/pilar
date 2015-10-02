@@ -846,11 +846,9 @@
   (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
   (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
   (emit "    lea ~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
-  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
+  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [?? why by si????]
   (emit "    call *-6(%edi)")  ; an indirect call to label field of the closure is issued
-  ;(emit "    movl  -6(%edi), %ebx")
-  ;(emit "    call  *%ebx")
-  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
+  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
   (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define (emit-tail-app si env expr)
