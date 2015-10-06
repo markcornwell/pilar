@@ -41,15 +41,15 @@
 
 (load "tests-driver.scm")
 (load "tests/tests-2.1-req.scm")
-;(load "tests/tests-1.9-req.scm")
-;(load "tests/tests-1.8-req.scm")
-;(load "tests/tests-1.7-req.scm")
-;(load "tests/tests-1.6-req.scm")
-;(load "tests/tests-1.5-req.scm")
-;(load "tests/tests-1.4-req.scm")
-;(load "tests/tests-1.3-req.scm")
-;(load "tests/tests-1.2-req.scm")
-;(load "tests/tests-1.1-req.scm")
+(load "tests/tests-1.9-req.scm")
+(load "tests/tests-1.8-req.scm")
+(load "tests/tests-1.7-req.scm")
+(load "tests/tests-1.6-req.scm")
+(load "tests/tests-1.5-req.scm")
+(load "tests/tests-1.4-req.scm")
+(load "tests/tests-1.3-req.scm")
+(load "tests/tests-1.2-req.scm")
+(load "tests/tests-1.1-req.scm")
 
 ;; utility
 (define first car)
@@ -595,7 +595,12 @@
 
 (define (next-stack-index si) (- si wordsize))
 
-(define (let? x) (and (pair? x) (symbol? (car x))(eq? (car x) 'let)))
+
+(define (let? x)
+  (and (pair? x)
+       (symbol? (car x))
+       (or (eq? (car x) 'let) (eq? (car x) 'letrec)))) ;; make letrec an alias for let
+
 (define (let-bindings x) (cadr x))
 ;(define (let-body x) (caddr x))
 (define (let-body x) (cons 'begin (cddr x)))
@@ -706,6 +711,7 @@
 ;;                 Procedures
 ;;---------------------------------------------
 
+#|
 (define (letrec? expr)
   (and (pair? expr) (eq? (car expr) 'letrec)))
   
@@ -728,7 +734,7 @@
     (for-each (emit-lambda env) lambdas labels)
     (emit "#  ---- <<<<< emit-lambdas end ------")
     (emit-scheme-entry env (letrec-body expr))))
-
+|#
 
 (define (codes? expr)
   (and (pair? expr) (eq? (car expr) 'codes)))
@@ -859,7 +865,7 @@
   (define (emit-arguments si env args)
     (unless (empty? args)
         (emit-expr si env (first args))                    ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
+        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))        ;; save %eax as evaluated arg
         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
@@ -869,6 +875,7 @@
   (emit "#  env  = ~s" env)
   (emit "#  expr = ~s" expr)
   (emit-arguments (- si 8) env (funcall-args expr)) ;; leaving room for 2 values
+  (emit "#  oper = ~s" (funcall-oper expr))
   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
   (emit "    movl %edi, ~s(%esp)" si)    ;; save old closure frame pointer
   (emit "    movl %eax, %edi")           ;; funcall oper is in %eax; it will be a closure
@@ -1217,7 +1224,10 @@
   (and (pair? expr) (eq? (car expr) 'app)))
 
 (define (funcall? expr)
-  (and (pair? expr) (eq? (car expr) 'funcall)))
+  (and (pair? expr)
+       (or (eq? (car expr) 'funcall) (eq? (car expr) 'app))))  ;; make app a synonym for funcall
+;; NOTE: cleaner to do this substitution in a pre-processing pass.
+
 
 (define (begin? expr)
     (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin))) 
@@ -1235,9 +1245,9 @@
     [(begin? expr)      (emit-begin si env (begin-body expr))]
     [(closure? expr)    (emit-closure si env expr)]
     [(funcall? expr)    (emit-funcall si env expr)]
-    [(app? expr)        (emit-app si env expr)]
+   ; [(app? expr)        (emit-app si env expr)]
    ; [(lvar-app? expr)   (emit-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
-    [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
+   ; [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
@@ -1290,7 +1300,7 @@
       (emit "# == transform ==>~%")
       (emit "# ~s~%" expr)
       (cond
-       [(letrec? expr) (emit-letrec expr)]
+       ;;[(letrec? expr) (emit-letrec expr)]
        [(codes? expr)  (emit-codes expr)]
        [else           (emit-scheme-entry '() expr)]))))
 

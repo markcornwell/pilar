@@ -1,34 +1,68 @@
-# (let ((n 12)) (let ((f (lambda () n))) (f)))
+# (letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12))
 # == annotate ==>
-# (let ((n 12)) (let ((f (code () (n) n))) (f)))
+# (letrec ((f (code (x) (g) (g x x))) (g (code (x y) () (fx+ x y)))) (f 12))
 # == transform ==>
+
 #|
-(codes ((f27 (code () (n) n)))
- (let ((n 12))
-  (let ((f (closure f27 n)))   <<--- when we create the closure, do we need to copy in the value of n ???
-   (f))))
+(codes ((f53 (code (x) (g) (g x x)))
+        (f52 (code (x y) () (fx+ x y))))
+ (letrec ((f (closure f53 g))
+          (g (closure f52)))
+  (f 12)))
 |#
-# emit-codes expr=(codes ((f27 (code () (n) n))) (let ((n 12)) (let ((f (closure f27 n))) (f))))
-#  bindings=((f27 (code () (n) n)))
-#  lvars=(f27)
-#  codes=((code () (n) n))
-#  labels=("_L_33")
-#  env=((f27 . "_L_33"))
+
+# emit-codes expr=(codes ((f53 (code (x) (g) (g x x))) (f52 (code (x y) () (fx+ x y)))) (letrec ((f (closure f53 g)) (g (closure f52))) (f 12)))
+#  bindings=((f53 (code (x) (g) (g x x))) (f52 (code (x y) () (fx+ x y))))
+#  lvars=(f53 f52)
+#  codes=((code (x) (g) (g x x)) (code (x y) () (fx+ x y)))
+#  labels=("_L_97" "_L_96")
+#  env=((f53 . "_L_97") (f52 . "_L_96"))
 #  ---- >>>>> emit-codes start ----
-# emit-code (code () (n) n)
+# emit-code (code (x) (g) (g x x))
     .text
     .align 4,0x90
-    .globl _L_33
-_L_33:
-# fmls = ()
-# frev = (n)
-# body = (n)
-# env  = ((n . 4) (f27 . "_L_33"))    <<------- in this env we have (n . 4) residing in a closure frame
-# tail-begin body=(n)
-    movl 2(%edi), %eax   #  <<------- 4 + -2 = 2 where n lives in the closure frame
+    .globl _L_97
+_L_97:
+# fmls = (x)
+# frev = (g)
+# body = ((g x x))
+# env  = ((g . 4) (f53 . "_L_97") (f52 . "_L_96"))
+# tail-begin body=((g x x))
+# funcall
+#  si   =-8
+#  env  = ((x . -4) (g . 4) (f53 . "_L_97") (f52 . "_L_96"))
+#  expr = (funcall g x x)   <<<--- this repeated variable is odd
+    movl -4(%esp), %eax
+    mov %eax, -16(%esp)    # arg
+    movl -4(%esp), %eax
+    mov %eax, -20(%esp)    # arg
+    movl 2(%edi), %eax
+    movl %edi, -8(%esp)
+    movl %eax, %edi
+    add $-8, %esp    # adjust base
+     call *-2(%edi)    # <<-------------- BLOWS UP HERE - EXC_BAD_ACCESS  addr 0xfffffffe
+    add $8, %esp    # adjust base
+    movl -8(%esp), %edi
 # tail-begin body=()
-    ret          # <<------------------- these 2 ret statements are annoying; 
-    ret   # from lambda   <<------------ is from lambda on always redundant???
+    ret
+    ret   # from lambda
+# emit-code (code (x y) () (fx+ x y))
+    .text
+    .align 4,0x90
+    .globl _L_96
+_L_96:
+# fmls = (x y)
+# frev = ()
+# body = ((fx+ x y))
+# env  = ((f53 . "_L_97") (f52 . "_L_96"))
+# tail-begin body=((fx+ x y))
+    movl -8(%esp), %eax
+    movl %eax, -12(%esp)  # fx+ push arg1
+    movl -4(%esp), %eax
+    addl -12(%esp), %eax  # fx+ arg1 arg2
+# tail-begin body=()
+    ret
+    ret   # from lambda
 #  ---- <<<<< emit-codes end ------
     .text
     .align 4,0x90
@@ -36,36 +70,37 @@ _L_33:
 _L_scheme_entry:
 # emit-let
 #  si   = -4
-#  env  = ((f27 . "_L_33"))
-#  bindings = ((n 12))
-#  body = (begin (let ((f (closure f27 n))) (f)))
-    movl $48, %eax     # immed 12
+#  env  = ((f53 . "_L_97") (f52 . "_L_96"))
+#  bindings = ((f (closure f53 g)) (g (closure f52)))
+#  body = (begin (f 12))
+# closure
+#  si   =-4
+#  env  =((f53 . "_L_97") (f52 . "_L_96"))
+#  expr =(closure f53 g)   <<------- Problem might be I need to initialize a closure variable in the frame.
+   movl $_L_97, 0(%ebp)  # closure label
+   movl %ebp, %eax    # return base ptr
+   add $2, %eax      # closure tag
+   add $8, %ebp      # bump ebp
     movl %eax, -4(%esp)
-# emit-begin
-#   body=((let ((f (closure f27 n))) (f)))
-#   env=((n . -4) (f27 . "_L_33"))
-# emit-let
-#  si   = -8
-#  env  = ((n . -4) (f27 . "_L_33"))     <<---- whoever passed env to let decided to put n at -4
-#  bindings = ((f (closure f27 n)))
-#  body = (begin (f))
 # closure
 #  si   =-8
-#  env  =((n . -4) (f27 . "_L_33"))
-#  expr =(closure f27 n)
-   movl $_L_33, 0(%ebp)  # closure label  <<----- looks like we need to copy (n . -4) value to free-var1 slot right after this!
+#  env  =((f53 . "_L_97") (f52 . "_L_96"))
+#  expr =(closure f52)
+   movl $_L_96, 0(%ebp)  # closure label
    movl %ebp, %eax    # return base ptr
    add $2, %eax      # closure tag
    add $8, %ebp      # bump ebp
     movl %eax, -8(%esp)
 # emit-begin
-#   body=((f))
-#   env=((f . -8) (n . -4) (f27 . "_L_33"))  ;; <<------- who put (n . -4) into the environment???
+#   body=((f 12))
+#   env=((g . -8) (f . -4) (f53 . "_L_97") (f52 . "_L_96"))
 # funcall
 #  si   =-12
-#  env  = ((f . -8) (n . -4) (f27 . "_L_33"))
-#  expr = (funcall f)
-    movl -8(%esp), %eax
+#  env  = ((g . -8) (f . -4) (f53 . "_L_97") (f52 . "_L_96"))
+#  expr = (funcall f 12)
+    movl $48, %eax     # immed 12
+    mov %eax, -20(%esp)    # arg
+    movl -4(%esp), %eax
     movl %edi, -12(%esp)
     movl %eax, %edi
     add $-12, %esp    # adjust base
@@ -74,10 +109,7 @@ _L_scheme_entry:
     movl -12(%esp), %edi
 # emit-begin
 #   body=()
-#   env=((f . -8) (n . -4) (f27 . "_L_33"))
-# emit-begin
-#   body=()
-#   env=((n . -4) (f27 . "_L_33"))   <------ I see n at -4 instead of in the closure where it should be; WTF???
+#   env=((g . -8) (f . -4) (f53 . "_L_97") (f52 . "_L_96"))
     ret
     .text
     .align 4,0x90
