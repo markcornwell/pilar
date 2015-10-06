@@ -2,6 +2,7 @@
 ;; Pilar: A Scheme Compiler
 ;; Mark Cornwell
 ;;
+;; 2.1 Closure
 ;; 1.9.3  String
 ;; 1.9.2  Vector
 ;; 1.9.1  Pair
@@ -40,15 +41,15 @@
 
 (load "tests-driver.scm")
 (load "tests/tests-2.1-req.scm")
-(load "tests/tests-1.9-req.scm")
-(load "tests/tests-1.8-req.scm")
-(load "tests/tests-1.7-req.scm")
-(load "tests/tests-1.6-req.scm")
-(load "tests/tests-1.5-req.scm")
-(load "tests/tests-1.4-req.scm")
-(load "tests/tests-1.3-req.scm")
-(load "tests/tests-1.2-req.scm")
-(load "tests/tests-1.1-req.scm")
+;(load "tests/tests-1.9-req.scm")
+;(load "tests/tests-1.8-req.scm")
+;(load "tests/tests-1.7-req.scm")
+;(load "tests/tests-1.6-req.scm")
+;(load "tests/tests-1.5-req.scm")
+;(load "tests/tests-1.4-req.scm")
+;(load "tests/tests-1.3-req.scm")
+;(load "tests/tests-1.2-req.scm")
+;(load "tests/tests-1.1-req.scm")
 
 ;; utility
 (define first car)
@@ -653,10 +654,15 @@
     (and pair (cdr pair))))
 
 (define (emit-variable-ref env var)
-  (emit-stack-load (lookup var env)))
+  (let ([i (lookup var env)])
+    (cond
+     [(and (fixnum? i) (fx> i 0))
+        (emit-frame-load i)]
+     [else
+        (emit-stack-load i)])))
 
 (define (emit-tail-variable-ref env var)
-  (emit-stack-load (lookup var env))
+  (emit-variable-ref (lookup var env))
   (emit "    ret"))
 
 (define (emit-stack-save si)
@@ -664,6 +670,14 @@
 
 (define (emit-stack-load si)
   (emit "    movl ~s(%esp), %eax" si))
+
+(define (emit-frame-save ci)
+  (emit "    movl %eax, ~s(%edi)" (- ci closure-tag)))
+
+(define (emit-frame-load ci)
+  (emit "    movl ~s(%edi), %eax" (- ci closure-tag)))
+
+;;--------------------------------------------
 
 (define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
 
@@ -826,13 +840,20 @@
 	(emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
-	(emit "    lea ~s(%esp), %esp    # adjust base" si )))
+	(emit "    add $~s, %esp    # adjust base" si )))
   (define (emit-labelcall si label)
     (emit "    call ~a   # app  " label))
   (emit-arguments (- si wordsize) env (call-args expr))
   (emit-adjust-base (+ si wordsize))
   (emit-labelcall si (lookup (call-target expr) env)) ;; <<--- take into account closures here????
   (emit-adjust-base (- (+ si wordsize))))
+
+;;------------------------------------------------------
+;;                   (funcall f arg* ...)
+;;------------------------------------------------------
+
+(define funcall-args cddr)
+(define funcall-oper cadr)
 
 (define (emit-funcall si env expr)
   (define (emit-arguments si env args)
@@ -842,14 +863,21 @@
         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
-	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
-  (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
-  (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
-  (emit "    lea ~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
-  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [?? why by si????]
-  (emit "    call *-6(%edi)")  ; an indirect call to label field of the closure is issued
-  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
-  (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
+	    (emit "    add $~s, %esp    # adjust base" si ))) 
+  (emit "# funcall")
+  (emit "#  si   =~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  expr = ~s" expr)
+  (emit-arguments (- si 8) env (funcall-args expr)) ;; leaving room for 2 values
+  (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
+  (emit "    movl %edi, ~s(%esp)" si)    ;; save old closure frame pointer
+  (emit "    movl %eax, %edi")           ;; funcall oper is in %eax; it will be a closure
+  (emit-adjust-base (+ si))              ;; the value of %esp is adjusted by si [?? why by si????]
+  (emit "     call *-2(%edi)")           ;; closure ptr will be in %eax since arg1 emitted last
+  (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
+  (emit "    movl ~s(%esp), %edi" si))   ;; restore closure frame pointer %edi
+
+;;---------------------End  Funcall ----------------------
 
 (define (emit-tail-app si env expr)
   (define (emit-arguments si args)
@@ -880,13 +908,16 @@
         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
-	    (emit "    lea ~s(%esp), %esp    # adjust base" si ))) 
+	    (emit "    add $~s, %esp    # adjust base" si )))
+  (emit "# tail-funcall")
+  (emit "#  si   =~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  expr = ~s" expr)
   (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
   (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
-  (emit "    lea ~s(%esp), %edi" (- si (* 2 wordsize)));  closure ptr of the callee is loaded into  %edi
-  (emit-adjust-base (+ si))  ;; the value of %esp is adjusted by si [???]
-  (emit "    call -6(%edi)")  ; an indirect call to label field of the closure is issued
-  (emit-adjust-base (- si))  ;; after return the value of %esp is adjusted back by -si  [???]
+  (emit-adjust-base (+ si))              ;; the value of %esp is adjusted by si [???]
+  (emit "    call -6(%edi)")             ;; an indirect call to label field of the closure is issued
+  (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [???]
   (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
 
 (define begin-body cdr)
@@ -982,10 +1013,8 @@
 ;;;    g) The value of the closure pointer is restored.
 ;;;    The returned value is still in %eax.
 
-
-
 (define (closure? expr)
-  (and (pair? expr) (eq? (car expr) 'closure)))
+   (and (pair? expr) (eq? (car expr) 'closure)))
 
 (define closure-lvar cadr)
 (define closure-vars cddr)
@@ -996,26 +1025,37 @@
 	(+ i (- 8 (remainder i 8)))))
 
 (define (emit-closure si env expr)   ;; <<<---- THIS IS WRONG
+  
+  (define (emit-free-vars-init ci env vars)   ;; <<--- I think we need to initialize the free-variables via copy when we build the closure object
+    (unless (null? vars)
+        (if (lookup (car vars) env)  ;; only initialize closure-variables that have a current value.  (Sounds contradictory, right?)
+	   (begin
+	     (emit-variable-ref env (car vars))
+	     (emit "   movl  %eax, ~s(%ebp)" ci)))
+	(emit-free-vars-init (+ wordsize ci) env (cdr vars))))
+  
   (let* [(lvar (closure-lvar expr))
 	 (vars (closure-vars expr))
 	 (size (* wordsize (+ 1 (length vars))))]
-    (emit "   movl $~a, 0(%ebp)" (lookup lvar env))
-    (emit "   movl %ebp, %eax")
-    (emit "   add $~s, %eax"  closure-tag)
-    (emit "   add $~s, %ebp" (align-to-8-bytes size))))
+    (emit "# closure")
+    (emit "#  si   =~s" si)
+    (emit "#  env  =~s" env)
+    (emit "#  expr =~s" expr)
+    (emit "   movl $~a, 0(%ebp)  # closure label" (lookup lvar env))
+    (emit-free-vars-init wordsize env vars)  ;; <<---- copies any current values of free vars into the closure object
+    (emit "   movl %ebp, %eax    # return base ptr")
+    (emit "   add $~s, %eax      # closure tag"  closure-tag)
+    (emit "   add $~s, %ebp      # bump ebp" (align-to-8-bytes size))))
 
 (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
   (let* [(lvar (closure-lvar expr))
 	 (vars (closure-vars expr))
 	 (size (* wordsize (+ 1 (length vars))))]
-    (emit "   movl $~a, 0(%ebp)" (lookup lvar env))
-    (emit "   movl %ebp, %eax")
-    (emit "   add $~s, %eax"  closure-tag)
-    (emit "   add $~s, %ebp" (align-to-8-bytes size))))
-
-
-(define funcall-args cddr)  ;; (funcall f arg* ...)
-
+    (emit "   movl $~a, 0(%ebp) # store label" (lookup lvar env))
+    (emit "   movl %ebp, %eax   # return heap base ptr")
+    (emit "   add $~s, %eax     # closure tag "  closure-tag)
+    (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
+ 
 
 ;;--------------------------------------------------------------------
 ;;             Free variable annotation & transformation
@@ -1040,11 +1080,13 @@
 ;; 2. The code forms are transformed into closure forms and the
 ;;    codes are colleted at the top.  The previous example yields:
 ;;
-;;  (codes ([f0 (code () (x y) (+ x y))]
-;;          [f1 (code (y) (x) (closure f0 x y))])
+;;  (labels ([f0 (code () (x y) (+ x y))]
+;;           [f1 (code (y) (x) (closure f0 x y))])
 ;;     (let ((x 5)) (closure f1 x)))
 ;;
 ;;--------------------------------------------------------------------
+
+
 
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
@@ -1054,19 +1096,17 @@
 
 (define (annotate-free-variables bound-vars expr)
   (cond
-   [(simple-constant? expr) expr]
-   [(primitive? expr) expr]
-   [(symbol? expr) expr]
    [(lambda? expr)
     (list 'code
 	  (lambda-formals expr)
-	  (free-variables (merg (lambda-formals expr) bound-vars)
-			  (lambda-body expr))
+	  (elim-dups (free-variables (merg (lambda-formals expr) bound-vars)
+				     (lambda-body expr)))
 	  (annotate-free-variables bound-vars
 				   (lambda-body expr)))]
-   [else
+   [(pair? expr)
      (cons (annotate-free-variables bound-vars (car expr))
-	   (annotate-free-variables bound-vars (cdr expr)))]))
+	   (annotate-free-variables bound-vars (cdr expr)))]
+   [else expr]))
 
 (define *codes* '())
 
@@ -1082,26 +1122,23 @@
 	(set! count (add1 count))
 	(string->symbol f)))))
 
-
-
 (define (transform-codes-to-closures expr)
   (cond
-   [(simple-constant? expr) expr]
-   [(primitive? expr) expr]
-   [(symbol? expr) expr]
    [(code? expr)
-    (let ([fk (unique-lvar)])
+    (let ([fk (unique-lvar)]
+	  [body (transform-codes-to-closures (code-body expr))])
       (set! *codes* (cons (list fk
 				 (append
 				    (list 'code
 				       (code-formals expr)
 				       (code-freevars expr)) 
-				    (transform-codes-to-closures (code-body expr))))
+				    body))
 			   *codes*))
       (append (list 'closure fk) (code-freevars expr)))]
-   [else
+   [(pair? expr)
     (cons (transform-codes-to-closures (car expr))
-	  (transform-codes-to-closures (cdr expr)))]))
+	  (transform-codes-to-closures (cdr expr)))]
+   [else expr]))
 
 (define (simple-constant? expr)
   (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
@@ -1115,7 +1152,7 @@
 (define (merg l1 l2)
   (cond ((null? l1) l2)
         ((null? l2) l1)
-        ((symbol<? (car l1) (car l2)) (cons (car l1) (merg (cdr l1) l2)))
+	((symbol<? (car l1) (car l2)) (cons (car l1) (merg (cdr l1) l2)))
         (else (cons (car l2) (merg l1 (cdr l2))))))
 
 (define sort
@@ -1135,7 +1172,19 @@
                   (insert elt (cdr sorted-lst)))))))
 
 (define (symbol<=? a b)
-  (or (symbol< a b) (symbol=? a b)))
+  (or (symbol<? a b) (symbol=? a b)))
+
+
+(define (elim-dups lst)
+  (elim-dups1 (sort lst) '()))
+
+(define (elim-dups1 lin lout)
+  (cond
+   [(null? lin) lout]
+   [(null? lout) (elim-dups1 (cdr lin) (cons (car lin) lout))]
+   [(eq? (car lin) (car lout)) (elim-dups1 (cdr lin) lout)]
+   [else
+    (elim-dups1 (cdr lin) (cons (car lin) lout))]))
 
 (define (free-variables bound-vars expr)
   (cond
@@ -1149,8 +1198,8 @@
       (free-variables (merg (lambda-formals expr)
 			      bound-vars)
 		      (lambda-body expr))]
-  ; [(let? expr)
-  ;  (free-variables (merg (let-bound-vars expr) bound-vars)
+   ;[(let? expr)
+   ; (free-variables (merg (let-bound-vars expr) bound-vars)
   ;		    (let-body expr))]
    
    [(pair? expr)
@@ -1204,7 +1253,7 @@
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair))))))   ;; ignore lvar bindings
-  (define (lvar-app? expr)
+  (define (lvar-app? expr)  ;; there used to be lvar applications; resurrect this to co-exist with closures??
     (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
 (cond
     [(immediate? expr)  (emit-tail-immediate expr)]
@@ -1273,3 +1322,28 @@
   (emit "~a:" entry))
 
 (define compil-program emit-program)
+
+#|
+(define t0
+  '(let ((x 5))
+     (lambda (y) (lambda () (fx+ x y)))))
+
+(define t1 (annotate-free-variables '() t0))
+
+(define t2 (transform-to-closures t1))
+
+(transform-to-closures t1)
+
+(labels
+  ((f0 (code (y) (x) (closure f1 y x))))
+  (let ([x 5]) (closure f0 x)))
+
+(define t10
+  '(let ((f (lambda () (let ((g (lambda () (fx+ 2 3)))) (fx* (g) (g))))))
+     (fx+ (f) (f))))
+
+(define t11 (annotate-free-variables '() t1))
+
+(define t12 (transform-to-closures t11))
+
+|#

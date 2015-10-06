@@ -1,0 +1,40 @@
+Petite Chez Scheme Version 8.4
+Copyright (c) 1985-2011 Cadence Research Systems
+
+> Performing procedure? tests ...
+test 0:(procedure? (lambda (x) x)) ... ok
+test 1:(let ((f (lambda (x) x))) (procedure? f)) ... ok
+test 2:(procedure? (make-vector 0)) ... ok
+test 3:(procedure? (make-string 0)) ... ok
+test 4:(procedure? (cons 1 2)) ... ok
+test 5:(procedure? #\S) ... ok
+test 6:(procedure? ()) ... ok
+test 7:(procedure? #t) ... ok
+test 8:(procedure? #f) ... ok
+test 9:(string? (lambda (x) x)) ... ok
+test 10:(vector? (lambda (x) x)) ... ok
+test 11:(boolean? (lambda (x) x)) ... ok
+test 12:(null? (lambda (x) x)) ... ok
+test 13:(not (lambda (x) x)) ... ok
+Performing applying thunks tests ...
+test 14:(let ((f (lambda () 12))) (f)) ... ok
+test 15:(let ((f (lambda () (fx+ 12 13)))) (f)) ... ok
+test 16:(let ((f (lambda () 13))) (fx+ (f) (f))) ... ok
+test 17:(let ((f (lambda () (let ((g (lambda () (fx+ 2 3)))) (fx* (g) (g)))))) (fx+ (f) (f))) ... ok
+test 18:(let ((f (lambda () (let ((f (lambda () (fx+ 2 3)))) (fx* (f) (f)))))) (fx+ (f) (f))) ... ok
+test 19:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
+Performing parameter passing tests ...
+test 20:(let ((f (lambda (x) x))) (f 12)) ... ok
+test 21:(let ((f (lambda (x y) (fx+ x y)))) (f 12 13)) ... ok
+test 22:(let ((f (lambda (x) (let ((g (lambda (x y) (fx+ x y)))) (g x 100))))) (f 1000)) ... ok
+test 23:(let ((f (lambda (g) (g 2 13)))) (f (lambda (n m) (fx* n m)))) ... ok
+test 24:(let ((f (lambda (g) (fx+ (g 10) (g 100))))) (f (lambda (x) (fx* x x)))) ... ok
+test 25:(let ((f (lambda (f n m) (if (fxzero? n) m (f f (fxsub1 n) (fx* n m)))))) (f f 5 1)) ... ok
+test 26:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ... ok
+Performing closures tests ...
+test 27:(let ((n 12)) (let ((f (lambda () n))) (f))) ... ok
+test 28:(let ((n 12)) (let ((f (lambda (m) (fx+ n m)))) (f 100))) ... ok
+test 29:(let ((f (lambda (f n m) (if (fxzero? n) m (f (fxsub1 n) (fx* n m)))))) (let ((g (lambda (g n m) (f (lambda (n m) (g g n m)) n m)))) (g g 5 1))) ... ok
+test 30:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f (fxsub1 n))))))) (let ((g (lambda (g n) (f (lambda (n) (g g n)) n)))) (g g 5))) ... ok
+passed all 31 tests
+> 
