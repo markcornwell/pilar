@@ -1,5 +1,18 @@
 # -536870912
+# == annotate ==>
+# -536870912
+# == transform ==>
 
+# (codes () -536870912)
+
+# emit-codes expr=(codes () -536870912)
+#  bindings=()
+#  lvars=()
+#  codes=()
+#  labels=()
+#  env=()
+#  ---- >>>>> emit-codes start ----
+#  ---- <<<<< emit-codes end ------
     .text
     .align 4,0x90
     .globl _L_scheme_entry
