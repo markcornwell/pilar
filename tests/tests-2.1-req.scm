@@ -1,6 +1,6 @@
 ;;; one possible implementation strategy for procedures is via closure
 ;;; conversion.  
-
+;;;
 ;;; Lambda does many things at the same time:
 ;;; 1) It creates a procedure object (ie. one that passes procedure?)
 ;;; 2) It contains both code (what to do when applied) and data (what 
