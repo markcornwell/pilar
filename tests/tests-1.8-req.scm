@@ -72,7 +72,7 @@
   [(letrec ([f (lambda (x) (fx+ x 12))]) (f 13)) => "25\n"] 
   [(letrec ([f (lambda (x) (fx+ x 12))]) (f (f 10))) => "34\n"]
   [(letrec ([f (lambda (x) (fx+ x 12))]) (f (f (f 0)))) => "36\n"]
-  #|
+
   [(letrec ([f (lambda (x y) (fx+ x y))] 
             [g (lambda (x) (fx+ x 12))])  ;; <<<----- BROKE HERE
     (f 16 (f (g 0) (fx+ 1 (g 0))))) => "41\n"]
@@ -90,7 +90,7 @@
   [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
             [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
      (e 25)) => "#f\n"]
-  |#     
+   
 )
 
 (add-tests-with-string-output "deeply nested procedures"   ;; requires Proper Tail Calls

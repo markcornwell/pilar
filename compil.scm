@@ -40,16 +40,36 @@
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
+
+;(load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
+
+; (load "tests/tests-5.6-req.scm")  ;; fxmodulo
+; (load "tests/tests-5.3-req.scm")  ;; call/cc
+; (load "tests/tests-5.2-req.scm")  ;; overflow
+; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
+; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
+; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
+; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+; (load "tests/tests-3.4-req.scm")  ;; apply
+; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
+; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
+; (load "tests/tests-3.1-req.scm")  ;; vector
+; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+; (load "tests/tests-2.8-req.scm")  ;; symbols
+; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
+; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
+; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
+; (load "tests/tests-2.2-req.scm")  ;; set! TBD
 (load "tests/tests-2.1-req.scm")
 (load "tests/tests-1.9-req.scm")
-(load "tests/tests-1.8-req.scm")
-(load "tests/tests-1.7-req.scm")
-(load "tests/tests-1.6-req.scm")
-(load "tests/tests-1.5-req.scm")
-(load "tests/tests-1.4-req.scm")
-(load "tests/tests-1.3-req.scm")
-(load "tests/tests-1.2-req.scm")
-(load "tests/tests-1.1-req.scm")
+(load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
+(load "tests/tests-1.7-req.scm")   ;; more binary primitives
+(load "tests/tests-1.6-req.scm")   ;; let let*
+(load "tests/tests-1.5-req.scm")   ;; binary primitives if
+(load "tests/tests-1.4-req.scm")   ;; if and or
+(load "tests/tests-1.3-req.scm")   ;; unary primitives
+(load "tests/tests-1.2-req.scm")   ;; immediate constants
+(load "tests/tests-1.1-req.scm")   ;; integers
 
 ;; utility
 (define first car)
@@ -581,13 +601,13 @@
   (cond
    [(eq? (length x) 1) (emit-expr si env #f)]
    [(eq? (length x) 2) (emit-expr si env (cadr x))]
-   [else (emit-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-expr si env (list 'if (cadr x) (cadr x) (cons 'or (cddr x))))]))
 
 (define (emit-tail-or si env x)
   (cond
    [(eq? (length x) 1) (emit-tail-expr si env #f)]
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
-   [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-tail-expr si env (list 'if (cadr x) (cadr x) (cons 'or (cddr x))))]))
 
 ;;---------------------------------------------
 ;;                Local Variables
@@ -820,7 +840,7 @@
 	(cond
 	 [(empty? fmls)
 	  (emit-tail-expr si env (cons ' begin body)) ;; implicit begin
-	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
+	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return (??)
 	 [else
 	  (f (rest fmls)
 	     (- si wordsize)
@@ -957,16 +977,16 @@
 ;;                              Closures
 ;;----------------------------------------------------------------------
 
-;;; one possible implementation strategy for procedures is via closure
+;;; One possible implementation strategy for procedures is via closure
 ;;; conversion.
-
+;;;
 ;;; Lambda does many things at the same time:
 ;;; 1) It creates a procedure object (ie. one that passes procedure?)
 ;;; 2) It contains both code (what to do when applied) and data (what
 ;;;    variables it references.
 ;;; 3) The procedure object, in addition to passing procedure?, can be
 ;;;    applied to arguments.
-
+;;;
 ;;; First step: separate code from data:
 ;;; convert every program containing lambda to a program containing
 ;;; codes and closures:
@@ -1019,6 +1039,7 @@
 ;;;    f) After return, the value of %esp is adjusted back by -si
 ;;;    g) The value of the closure pointer is restored.
 ;;;    The returned value is still in %eax.
+;;;
 
 (define (closure? expr)
    (and (pair? expr) (eq? (car expr) 'closure)))
@@ -1035,7 +1056,7 @@
   
   (define (emit-free-vars-init ci env vars)   ;; <<--- I think we need to initialize the free-variables via copy when we build the closure object
     (unless (null? vars)
-        (if (lookup (car vars) env)  ;; only initialize closure-variables that have a current value.  (Sounds contradictory, right?)
+        (if (lookup (car vars) env)  ;; only initialize closure-variables that have a current value.
 	   (begin
 	     (emit-variable-ref env (car vars))
 	     (emit "   movl  %eax, ~s(%ebp)" ci)))
@@ -1087,13 +1108,16 @@
 ;; 2. The code forms are transformed into closure forms and the
 ;;    codes are colleted at the top.  The previous example yields:
 ;;
-;;  (labels ([f0 (code () (x y) (+ x y))]
-;;           [f1 (code (y) (x) (closure f0 x y))])
+;;  (codes ([f0 (code () (x y) (+ x y))]
+;;          [f1 (code (y) (x) (closure f0 x y))])
 ;;     (let ((x 5)) (closure f1 x)))
 ;;
 ;;--------------------------------------------------------------------
-
-
+;;
+;; The language recognized is different at each pass of the transformations.
+;; It should help to specify a grammar for each pass to keep things clear.
+;;
+;;--------------------------------------------------------------------
 
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
@@ -1298,19 +1322,63 @@
 ;; the pre-processor passes before generating code.
 ;;----------------------------------------------------------
 
-(define (emit-program raw-expr)
-  (emit "# ~s" raw-expr)
-  (let ([anno-expr  (annotate-free-variables '() raw-expr)])
-    (emit "# == annotate ==>")
-    (emit "# ~s" anno-expr)
-    (let ([expr (transform-to-closures anno-expr)])
-      (emit "# == transform ==>~%")
-      (emit "# ~s~%" expr)
-      (cond
-       ;;[(letrec? expr) (emit-letrec expr)]
-       [(codes? expr)  (emit-codes expr)]
-       [else           (emit-scheme-entry '() expr)]))))
+(define (emit-program expr-0)
+  (emit "# ~s" expr-0)
+  (let ([expr-1 (transform-toplevel-defs expr-0)])
+    (emit "# == transform-toplevel-defs ==>")
+    (emit "# ~s" expr-1)
+    (let ([expr-2  (annotate-free-variables '() expr-1)])
+      (emit "# == annotate ==>")
+      (emit "# ~s" expr-2)
+      (let ([expr-3 (transform-to-closures expr-2)])
+	(emit "# == transform ==>~%")
+	(emit "# ~s~%" expr-3)
+	(cond
+	 ;;[(letrec? expr) (emit-letrec expr)]
+	 [(codes? expr-3)  (emit-codes expr-3)]
+	 [else           (emit-scheme-entry '() expr-3)])))))
 
+;;----------------------------------------------------------------
+;; transform-toplevel-defs transforms a top-level begin
+;; into a letrec collecting all embedded top-level defines
+;; as bindings.
+;;  (begin x ... (define f exp1) y ... (define g exp2) z ...)
+;;  =>
+;;  (letrec ([f exp1] [g exp2]) x ... y ... z ...)
+;;
+;; This pass should also interpret any defines as their lambda forms
+;;  (define (f x y) expr ...)
+;;  =>
+;;  (define f (lambda (x y) expr ...))
+;;
+;; We perform this transformation inside the normalize-def function
+;; right after we collect the definitions.
+;;----------------------------------------------------------------
+
+(define (transform-toplevel-defs expr)
+  (if (begin? expr)
+      (let ([defs (map normalize-def (filter define? (cdr expr)))]
+	    [body (filter (lambda (x) (not (define? x))) (cdr expr))])
+	(append
+	   (list 'letrec)
+	   (list [map (lambda (x) (cons (def-symbol x) (def-body x))) defs])
+	   body))
+      expr))
+
+(define (define? expr)
+  (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'define)))
+
+(define def-symbol cadr)
+(define def-body   cddr)
+
+(define (normalize-def def)
+  (if (pair? (def-symbol def))
+      (list 'define
+	    (car (def-symbol def))
+	    (append (list 'lambda (cdr (def-symbol def)) (def-body def))))
+      def))
+       
+;;-------------------------------------------------------------------
 
 
 (define (emit-scheme-entry env expr)

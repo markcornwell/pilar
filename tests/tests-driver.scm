@@ -46,8 +46,9 @@
   (execute)
     (format #t "at 3~%")
    (unless (string=? expected-output (get-string))
-     (error 'test "output mismatch for test ~s, expected ~s, got ~s"
-        test-id expected-output (get-string))))
+	   (error 'test
+		  (format "output mismatch for test ~s, expected ~s, got ~s"
+			  test-id expected-output (get-string)))))
 
 (define (test-one test-id test)
   (let ([expr (car test)]
@@ -130,8 +131,9 @@
    (build)
    (execute)
    (unless (string=? expected-output (get-string))
-     (error 'test "output mismatch for test ~s, expected ~s, got ~s"
-        test-id expected-output (get-string))))
+	   (error 'test
+		  (format "output mismatch for test ~s, expected ~s, got ~s"
+			  test-id expected-output (get-string)))))
 
 (define (emit . args)
   (apply fprintf (kompile-port) args)
