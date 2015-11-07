@@ -1291,6 +1291,13 @@
   (emit-immediate x)
   (emit "    ret"))
 
+;;----------------------------------------------------------
+;; Closure Transformation
+;;
+;; emit-program is the top level of the compiler; applies
+;; the pre-processor passes before generating code.
+;;----------------------------------------------------------
+
 (define (emit-program raw-expr)
   (emit "# ~s" raw-expr)
   (let ([anno-expr  (annotate-free-variables '() raw-expr)])
@@ -1303,6 +1310,8 @@
        ;;[(letrec? expr) (emit-letrec expr)]
        [(codes? expr)  (emit-codes expr)]
        [else           (emit-scheme-entry '() expr)]))))
+
+
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
