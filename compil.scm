@@ -59,9 +59,9 @@
 ; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 ; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 ; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
-; (load "tests/tests-2.2-req.scm")  ;; set! TBD
+(load "tests/tests-2.2-req.scm")  ;; set! TBD
 (load "tests/tests-2.1-req.scm")
-(load "tests/tests-1.9-req.scm")
+(load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
 (load "tests/tests-1.7-req.scm")   ;; more binary primitives
 (load "tests/tests-1.6-req.scm")   ;; let let*
@@ -109,6 +109,8 @@
 (define closure-tag   #b00000010) ; #x02
 
 (define nil-value    #b00111111) ; #x3F)
+(define unbound      #b00000111) ; #x07)  ;; not bound but also not free
+
 (define wordsize        4) ; bytes
 
 (define fixnum-bits (- (* wordsize 8) fxshift))
@@ -253,7 +255,11 @@
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
-  (emit "    or $~s, %al" bool-f))  
+  (emit "    or $~s, %al" bool-f))
+
+;;------------------------------------------
+;; fixnum - bitwise logical operations
+;;------------------------------------------
 
 (define-primitive (fxlognot si env arg)
   (emit-expr si env arg)
@@ -271,6 +277,10 @@
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
   (emit "    or ~s(%esp), %eax" si))
+
+;;-------------------------------------------
+;; fixnum - comparison fx< fx<= fx= fx>= fx>
+;;--------------------------------------------
 
 (define-primitive (fx= si env arg1 arg2)
   (emit-expr si env arg2)
@@ -326,6 +336,10 @@
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
+
+;;----------------------------------------
+;; fixnum - arithmetic  fx+ fx- fx*
+;;----------------------------------------
 
 (define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
@@ -501,7 +515,22 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
-; procedures and closures
+
+;;----------------------------------------------------
+;; set!
+;;----------------------------------------------------
+
+(define-primitive (set! si env var expr)  ;; THIS SHOULD WORK
+  (emit "# set!")
+  (emit-variable-loc env var)                  ;; eax <-- location of the var
+  (emit "movl %eax, ~s(%esp)" si)              ;; save location on the stack
+  (emit-expr (- si (* 2 wordsize)) env expr)   ;; eax <- evaluated expr
+  (emit "movl ~s(%esp), %ebx" si)              ;; ebx <- location 
+  (emit "movl %eax, 0(%ebx)"))                 ;; location needs no offset adjustment
+
+;;----------------------------------------------------
+;; Recongizing procedures and closures
+;;----------------------------------------------------
 
 (define-primitive (procedure? si env expr)
   (emit-expr si env expr)
@@ -615,21 +644,15 @@
 
 (define (next-stack-index si) (- si wordsize))
 
+;(define (let-body x) (cons 'begin (cddr x)))   ;; UGLY -- can we pre-process this?
 
-(define (let? x)
-  (and (pair? x)
-       (symbol? (car x))
-       (or (eq? (car x) 'let) (eq? (car x) 'letrec)))) ;; make letrec an alias for let
-
-(define (let-bindings x) (cadr x))
-;(define (let-body x) (caddr x))
-(define (let-body x) (cons 'begin (cddr x)))
 
 (define lhs car)
 (define rhs cadr)
 (define bind cons)
 (define (extend-env si env var) (cons (bind var si) env))
 
+#|
 (define (emit-let si env bindings body) ;; look at the version on p. 30
   (emit "# emit-let")
   (emit "#  si   = ~s" si)
@@ -663,6 +686,7 @@
            (f (next-stack-index si)
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
+|#
 
 ;;------------------------------------------------------------------
 ;; env is a list of dotted pairs
@@ -687,8 +711,27 @@
         (emit-stack-load i)])))
 
 (define (emit-tail-variable-ref env var)
-  (emit-variable-ref (lookup var env))
+  (emit-variable-ref env var)
   (emit "    ret"))
+
+(define (emit-variable-loc env var)
+  (let ([i (lookup var env)])
+    (cond
+     [(and (fixnum? i)(fx> i 0))  ;; positive -> frame offset
+        (emit-frame-loc i)]
+     [else
+      (emit-stack-loc i)])))      ;; negative or zero -> stack offset
+
+(define (emit-tail-variable-loc env var)
+  (emit-variable-loc env var)
+  (emit "    ret"))
+
+;;--------------------------
+;; stack access
+;;--------------------------
+
+(define (emit-stack-loc si)
+  (emit "   lea ~s(%esp), %eax" si))
 
 (define (emit-stack-save si)
   (emit "    movl %eax, ~s(%esp)" si))
@@ -696,17 +739,26 @@
 (define (emit-stack-load si)
   (emit "    movl ~s(%esp), %eax" si))
 
+;;----------------------------
+;; frame access
+;;----------------------------
+
+(define (emit-frame-loc ci)
+  (emit "   lea ~s(%edi), %eax" (- ci closure-tag)))
+
 (define (emit-frame-save ci)
   (emit "    movl %eax, ~s(%edi)" (- ci closure-tag)))
 
 (define (emit-frame-load ci)
   (emit "    movl ~s(%edi), %eax" (- ci closure-tag)))
 
-;;--------------------------------------------
+;;-----------------------------------------------------
+;; emit-let* rewrites let* into nested singleton let's
+;; This needs to be done sooner as part of preprocessing  <<--- ISSUE ---<<<
+;;-----------------------------------------------------
 
 (define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
 
-;; rewrite let* into nested singleton let's
 (define (emit-let* si env bindings body)
   (cond
    [(null? bindings) (emit-expr si env body)]
@@ -727,40 +779,47 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
+;;--------------------------------------------------------
+;; letrec no longer needs to emit lambdas as in earlier
+;; versions.  All of the lambdas will have be turned into
+;; closures supported by codes through closure conversion.
+;;
+;; letrec simply needs to 
+;;--------------------------------------------------------
+
+;(define (emit-letrec expr)
+;  (emit "# emit-letrec expr=~s" expr)
+;  (let* ([bindings (letrec-bindings expr)]
+;	 [lvars (map lhs bindings)]
+;	 [lambdas (map rhs bindings)]
+;	 [labels (unique-labels lvars)]
+;	 [env (make-initial-env lvars labels)])
+;    (emit "#  bindings=~s" bindings)
+;    (emit "#  lvars=~s" lvars)
+;    (emit "#  lambdas=~s" lambdas)
+;    (emit "#  labels=~s" labels)
+;    (emit "#  env=~s" env)
+;    (emit "#  ---- >>>>> emit-lambdas start ----")
+;    (for-each (emit-lambda env) lambdas labels)
+;    (emit "#  ---- <<<<< emit-lambdas end ------")
+;    (emit-scheme-entry env (letrec-body expr))))
+;
+
 ;;---------------------------------------------
 ;;                 Procedures
 ;;---------------------------------------------
-
-#|
-(define (letrec? expr)
-  (and (pair? expr) (eq? (car expr) 'letrec)))
-  
-(define letrec-bindings cadr)
-(define letrec-body caddr)
-
-(define (emit-letrec expr)
-  (emit "# emit-letrec expr=~s" expr)
-  (let* ([bindings (letrec-bindings expr)]
-	 [lvars (map lhs bindings)]
-	 [lambdas (map rhs bindings)]
-	 [labels (unique-labels lvars)]
-	 [env (make-initial-env lvars labels)])
-    (emit "#  bindings=~s" bindings)
-    (emit "#  lvars=~s" lvars)
-    (emit "#  lambdas=~s" lambdas)
-    (emit "#  labels=~s" labels)
-    (emit "#  env=~s" env)
-    (emit "#  ---- >>>>> emit-lambdas start ----")
-    (for-each (emit-lambda env) lambdas labels)
-    (emit "#  ---- <<<<< emit-lambdas end ------")
-    (emit-scheme-entry env (letrec-body expr))))
-|#
 
 (define (codes? expr)
   (and (pair? expr) (eq? (car expr) 'codes)))
 
 (define codes-bindings cadr)
 (define codes-body caddr)
+
+;;----------------------------------------------------------------
+;; emit-codes behaves like emit-letrec letrec but it assumes that
+;; all the bindings will be procedures.
+;; (Why not simply use letrec here?)
+;;----------------------------------------------------------------
 
 (define (emit-codes expr)
   (emit "# emit-codes expr=~s" expr)
@@ -795,6 +854,7 @@
 
 (define lambda-formals cadr)
 (define lambda-body  caddr)
+;(define (lambda-body expr) (cons 'begin (cddr expr)))
 
 (define empty? null?)
 
@@ -807,14 +867,13 @@
 	(cond
 	 [(empty? fmls)
 	  (emit-tail-expr si env body)
-	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
+	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return (??)
 	 [else
 	  (f (rest fmls)
 	     (- si wordsize)
 	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
 
 ;; (code (formals ...) (freevars ...) body)
-
 
 (define (code? expr)
   (and (pair? expr) (eq? (car expr) 'code)))
@@ -972,6 +1031,17 @@
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
+;;--------------------------------------------------------------
+;; letrec is like let except that it allocates all the variables
+;; before evaulating any of the bindings.  letrec is eliminated
+;; in preprocessing.
+;;--------------------------------------------------------------
+  
+(define (letrec? x)
+  (and (pair? x) (symbol? (car x)) (eq? (car x) 'letrec)))
+
+(define letrec-bindings cadr)
+(define letrec-body caddr)
 
 ;;----------------------------------------------------------------------
 ;;                              Closures
@@ -1039,7 +1109,7 @@
 ;;;    f) After return, the value of %esp is adjusted back by -si
 ;;;    g) The value of the closure pointer is restored.
 ;;;    The returned value is still in %eax.
-;;;
+;;;-------------------------------------------------------------------------
 
 (define (closure? expr)
    (and (pair? expr) (eq? (car expr) 'closure)))
@@ -1054,7 +1124,7 @@
 
 (define (emit-closure si env expr)   ;; <<<---- THIS IS WRONG
   
-  (define (emit-free-vars-init ci env vars)   ;; <<--- I think we need to initialize the free-variables via copy when we build the closure object
+  (define (emit-free-vars-init ci env vars) ;; <<--- I think we need to initialize the free-variables via copy when we build the closure object
     (unless (null? vars)
         (if (lookup (car vars) env)  ;; only initialize closure-variables that have a current value.
 	   (begin
@@ -1084,9 +1154,16 @@
     (emit "   add $~s, %eax     # closure tag "  closure-tag)
     (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
  
+;;--------------------------------------------------------------
+;;  Pre-processing transforms
+;;
+;;  We use a number of transforms as pre-processing passes before
+;;  passing the code to the code generation or emit stages.
+;;  
+;;--------------------------------------------------------------
 
 ;;--------------------------------------------------------------------
-;;             Free variable annotation & transformation
+;;   Free variable annotation & transformation
 ;;--------------------------------------------------------------------
 ;;
 ;; 1. Free variable analysis is performed.  Every lambda expression
@@ -1119,11 +1196,19 @@
 ;;
 ;;--------------------------------------------------------------------
 
+;;------------------------------------------------------------------------
+;; Free variable analysis is based on lambda forms, so other forms like
+;; let, let*, letrec must all be transformed to lambda forms before
+;; applying free variable analysis.
+;;------------------------------------------------------------------------
+
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
 
 (define lambda-formals cadr)
 (define lambda-body caddr)
+
+;; free variable analysis of lambda forms
 
 (define (annotate-free-variables bound-vars expr)
   (cond
@@ -1175,7 +1260,7 @@
   (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
-  (memq expr '(app begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
+  (memq expr '(app begin if let let* lambda letrec funcall)))  ;; <<<---- REVIEW THIS LIST
 
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
@@ -1229,8 +1314,8 @@
       (free-variables (merg (lambda-formals expr)
 			      bound-vars)
 		      (lambda-body expr))]
-   ;[(let? expr)
-   ; (free-variables (merg (let-bound-vars expr) bound-vars)
+  ;[(let? expr)
+  ; (free-variables (merg (let-bound-vars expr) bound-vars)
   ;		    (let-body expr))]
    
    [(pair? expr)
@@ -1252,7 +1337,6 @@
        (or (eq? (car expr) 'funcall) (eq? (car expr) 'app))))  ;; make app a synonym for funcall
 ;; NOTE: cleaner to do this substitution in a pre-processing pass.
 
-
 (define (begin? expr)
     (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin))) 
 
@@ -1271,7 +1355,8 @@
     [(funcall? expr)    (emit-funcall si env expr)]
    ; [(app? expr)        (emit-app si env expr)]
    ; [(lvar-app? expr)   (emit-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
-   ; [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
+					; [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
+   ; [(letrec? expr)     (emit-letrec si env (let-bindings expr) (let-body expr))]
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
@@ -1298,6 +1383,7 @@
     [(funcall? expr)    (emit-tail-funcall si env expr)] ;; NEW
    ; [(lvar-app? expr)   (emit-tail-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
+   ; [(letrec? expr)     (emit-tail-letrec si env (letrec-bindings expr) (letrec-body expr))]
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
     [(primcall? expr)   (emit-tail-primcall si env expr)]
@@ -1313,30 +1399,93 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-  (emit "    ret"))
+  (emit "    ret    # tail immediate ~s" x))
 
-;;----------------------------------------------------------
-;; Closure Transformation
-;;
-;; emit-program is the top level of the compiler; applies
-;; the pre-processor passes before generating code.
+
+;;-----------------------------------------------------------
+;; Emit-program is the top level of the compiler; applies
+;; the pre-processor passes to transform the source before
+;; generating code from the transformed source.
 ;;----------------------------------------------------------
 
 (define (emit-program expr-0)
   (emit "# ~s" expr-0)
+  
   (let ([expr-1 (transform-toplevel-defs expr-0)])
     (emit "# == transform-toplevel-defs ==>")
     (emit "# ~s" expr-1)
-    (let ([expr-2  (annotate-free-variables '() expr-1)])
-      (emit "# == annotate ==>")
+
+    (let ([expr-2 (transform-letrecs-to-lets expr-1)])
+      (emit "# == transform-letrecs-to-lets ==>")
       (emit "# ~s" expr-2)
-      (let ([expr-3 (transform-to-closures expr-2)])
-	(emit "# == transform ==>~%")
-	(emit "# ~s~%" expr-3)
-	(cond
-	 ;;[(letrec? expr) (emit-letrec expr)]
-	 [(codes? expr-3)  (emit-codes expr-3)]
-	 [else           (emit-scheme-entry '() expr-3)])))))
+    
+    (let ([expr-3 (transform-lets-to-lambdas expr-2)])
+      (emit "# == transform-lets-to-lambdas ==>")
+      (emit "# ~s" expr-3)
+
+      (let ([expr-4 (transform-variables-to-unique-names expr-3)])
+	(emit "# == transform-variables-to-unique-names ==>")
+	(emit "# ~s" expr-4)
+      
+	(let ([expr-5  (annotate-free-variables '() expr-4)])
+	  (emit "# == annotate ==>")
+	  (emit "# ~s" expr-5)
+	  
+	  (let ([expr-6 (transform-to-closures expr-5)])
+	    (emit "# == transform ==>~%")
+	    (emit "# ~s~%" expr-6)
+	    
+	    (cond
+	     ;;[(letrec? expr) (emit-letrec expr)]
+	     [(codes? expr-6)  (emit-codes expr-6)]
+	     [else           (emit-scheme-entry '() expr-6)]))))))))
+
+;;----------------------------------------------------------------
+;; Transform to give all variables unique names.  This will
+;; simplify transformations by eliminating variable capture.
+;; This is designed to apply to lambda forms
+;;----------------------------------------------------------------
+
+(define unique-rename
+  (let ((count 0))
+    (lambda (var)
+      (set! count (fx1+ count))
+      (string->symbol (string-append (symbol->string var)
+				    "."
+				     (number->string count))))))
+
+(define (extend-name-map old new name-map)
+  (append (map cons old new) name-map))
+
+(define (transform-variables-to-unique-names expr)
+  (assign-unique-names '() expr))
+
+(define (assign-unique-names name-map expr)
+  (cond
+   [(lambda? expr)
+    (let* ([formals (lambda-formals expr)]
+	  [body (lambda-body expr)]
+	  [new-formals (map unique-rename formals)])
+      (list 'lambda
+	    new-formals
+	    (assign-unique-names (extend-name-map formals new-formals name-map)
+				   body)))]
+   [(simple-constant? expr) expr]
+   [(special-form? expr) expr]
+   [(symbol? expr)
+    (let ([name-map-entry (assoc expr name-map)])
+      (if name-map-entry
+	  (cdr name-map-entry)
+	  expr))]
+   [(pair? expr)
+    (cons (assign-unique-names name-map (car expr))
+	  (assign-unique-names name-map (cdr expr)))]
+   [else
+    (error 'assign-unique-names (format "unrecognized form: ~s" expr))]
+  ))
+
+;; (define t1 '((lambda (x) ((lambda (x) (set! x 14)) #f) x) 12))
+;; (transform-variables-to-unique-names t1)
 
 ;;----------------------------------------------------------------
 ;; transform-toplevel-defs transforms a top-level begin
@@ -1377,7 +1526,114 @@
 	    (car (def-symbol def))
 	    (append (list 'lambda (cdr (def-symbol def)) (def-body def))))
       def))
-       
+
+;;-----------------------------------------------
+;; a transform that eliminates let
+;; (let ((a x)(b y)) body ...)
+;;   =>
+;; ((lambda (a b) body ... ) x y)
+;;-----------------------------------------------
+
+;; future extension: (let f (<bindings>) body)
+
+(define (let? x)
+  (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
+
+(define (let-bindings x) (cadr x))
+;(define (let-body x) (cddr x))
+(define (let-body x) (cddr x))
+
+(define (normalize-let-body body)
+  (cond
+   [(null? body) '()]
+   [(symbol? body) body]
+   [(and (pair? body) (eq? (length body) 1))
+     (car body)]
+   [else (cons 'begin body)]))
+    
+(define (transform-lets-to-lambdas expr)
+  (cond
+   [(null? expr) '()]
+   [(let? expr)
+    (let* ([bindings (let-bindings expr)]
+	   [formals (map car bindings)]
+	   [args (map cadr bindings)]
+	   [body (normalize-let-body (let-body expr))])
+      (cons
+          (list 'lambda
+	        formals
+	        (transform-lets-to-lambdas body))
+	  (transform-lets-to-lambdas args)))]
+   [(pair? expr)
+    (cons (transform-lets-to-lambdas (car expr))
+	  (transform-lets-to-lambdas (cdr expr)))]
+   [else expr]))
+
+
+;; (define t1 '(let ((a x)(b y)) e1 e2 ))   
+;; (transform-lets-to-lambdas t1)
+;;   => ((lambda (a b) (begin e1 e2)) x y)
+;; (define t2 '(let ((a x) (b y)) e1))
+;;   => ((lambda (a b) e1) x y)
+;; (define t3 '(letrec ((f (lambda () 5))) 7))
+;; (transform-lets-to-lambdas t3)
+
+;;--------------------------------------------------------------
+;; letrec is like let except that it allocates all the variables
+;; before evaulating any of the bindings.  letrec is eliminated
+;; in preprocessing by transforming letrec into let
+;;-------------------------------------------------------------------
+;; a transform that eliminates letrec 
+;;
+;; (letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12))
+;;  =>
+;; (let ((f #f) (g #f))
+;;    (set! f (lambda (x) (g x x)))
+;;    (set! g (lambda (x y) (fx+ x y)))
+;;    (f 12))
+;;-------------------------------------------------------------------
+
+(define (letrec? x)
+  (and (pair? x) (symbol? (car x)) (eq? (car x) 'letrec)))
+
+(define letrec-bindings cadr)
+(define letrec-body cddr)
+
+(define (transform-letrecs-to-lets expr)
+  (cond
+   [(null? expr) '()]
+   [(letrec? expr)
+    (let* ([bindings (letrec-bindings expr)]
+	   [formals (map car bindings)]
+	   [values (map cadr bindings)]
+	   [init-bindings (map (lambda (x) (list x #f)) formals)]
+	   [set-bindings (map (lambda (v x) (list 'set! v x)) formals values)] 
+	   [body (normalize-letrec-body (letrec-body expr))])
+      (if (null? bindings)
+	  body
+	  (append (list 'let init-bindings)
+		  set-bindings
+		  body)))]
+   [(pair? expr)
+    (cons (transform-letrecs-to-lets (car expr))
+	  (transform-letrecs-to-lets (cdr expr)))]
+   [else expr]))
+
+
+(define (normalize-letrec-body body)
+  (cond
+   [(null? body) '()]
+   [(symbol? body) body]
+   [(null? (cdr body)) (car body)]
+   [else (cons 'begin body)]))
+
+;; (define t1 '(letrec () 12))
+;; (transform-letrecs-to-lets t1)
+;; => (let () 12)
+;; (define t2 '(let () 12))
+;; (transform-lets-to-lambdas t2)
+;; (define t3 '(letrec ((f (lambda () 5))) 7))
+;; (transform-lets-to-lambdas t3)
 ;;-------------------------------------------------------------------
 
 

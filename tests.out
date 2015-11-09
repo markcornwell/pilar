@@ -1,200 +1,193 @@
 Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
-> Performing procedure? tests ...
-test 0:(procedure? (lambda (x) x)) ... ok
-test 1:(let ((f (lambda (x) x))) (procedure? f)) ... ok
-test 2:(procedure? (make-vector 0)) ... ok
-test 3:(procedure? (make-string 0)) ... ok
-test 4:(procedure? (cons 1 2)) ... ok
-test 5:(procedure? #\S) ... ok
-test 6:(procedure? ()) ... ok
-test 7:(procedure? #t) ... ok
-test 8:(procedure? #f) ... ok
-test 9:(string? (lambda (x) x)) ... ok
-test 10:(vector? (lambda (x) x)) ... ok
-test 11:(boolean? (lambda (x) x)) ... ok
-test 12:(null? (lambda (x) x)) ... ok
-test 13:(not (lambda (x) x)) ... ok
+> Performing set! tests ...
+test 0:(let ((x 12)) (set! x 13) x) ... ok
+test 1:(let ((x 12)) (set! x (fxadd1 x)) x) ... ok
+test 2:(let ((x 12)) (let ((x #f)) (set! x 14)) x) ... ok
+test 3:(let ((x 12)) (let ((y (let ((x #f)) (set! x 14)))) x)) ... ok
+test 4:(let ((f (lambda (x) (set! x (fxadd1 x)) x))) (f 12)) ... ok
+test 5:(let ((x 10)) (let ((f (lambda (x) (set! x (fxadd1 x)) x))) (cons x (f x)))) ... ok
+test 6:(let ((make-counter (lambda () (let ((counter -1)) (lambda () (set! counter (fxadd1 counter)) counter))))) (let ((c0 (make-counter)) (c1 (make-counter))) (c0) (cons (c0) (c1)))) ... ok
+Performing procedure? tests ...
+test 7:(procedure? (lambda (x) x)) ... ok
+test 8:(let ((f (lambda (x) x))) (procedure? f)) ... ok
+test 9:(procedure? (make-vector 0)) ... ok
+test 10:(procedure? (make-string 0)) ... ok
+test 11:(procedure? (cons 1 2)) ... ok
+test 12:(procedure? #\S) ... ok
+test 13:(procedure? ()) ... ok
+test 14:(procedure? #t) ... ok
+test 15:(procedure? #f) ... ok
+test 16:(string? (lambda (x) x)) ... ok
+test 17:(vector? (lambda (x) x)) ... ok
+test 18:(boolean? (lambda (x) x)) ... ok
+test 19:(null? (lambda (x) x)) ... ok
+test 20:(not (lambda (x) x)) ... ok
 Performing applying thunks tests ...
-test 14:(let ((f (lambda () 12))) (f)) ... ok
-test 15:(let ((f (lambda () (fx+ 12 13)))) (f)) ... ok
-test 16:(let ((f (lambda () 13))) (fx+ (f) (f))) ... ok
-test 17:(let ((f (lambda () (let ((g (lambda () (fx+ 2 3)))) (fx* (g) (g)))))) (fx+ (f) (f))) ... ok
-test 18:(let ((f (lambda () (let ((f (lambda () (fx+ 2 3)))) (fx* (f) (f)))))) (fx+ (f) (f))) ... ok
-test 19:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
+test 21:(let ((f (lambda () 12))) (f)) ... ok
+test 22:(let ((f (lambda () (fx+ 12 13)))) (f)) ... ok
+test 23:(let ((f (lambda () 13))) (fx+ (f) (f))) ... ok
+test 24:(let ((f (lambda () (let ((g (lambda () (fx+ 2 3)))) (fx* (g) (g)))))) (fx+ (f) (f))) ... ok
+test 25:(let ((f (lambda () (let ((f (lambda () (fx+ 2 3)))) (fx* (f) (f)))))) (fx+ (f) (f))) ... ok
+test 26:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
 Performing parameter passing tests ...
-test 20:(let ((f (lambda (x) x))) (f 12)) ... ok
-test 21:(let ((f (lambda (x y) (fx+ x y)))) (f 12 13)) ... ok
-test 22:(let ((f (lambda (x) (let ((g (lambda (x y) (fx+ x y)))) (g x 100))))) (f 1000)) ... ok
-test 23:(let ((f (lambda (g) (g 2 13)))) (f (lambda (n m) (fx* n m)))) ... ok
-test 24:(let ((f (lambda (g) (fx+ (g 10) (g 100))))) (f (lambda (x) (fx* x x)))) ... ok
-test 25:(let ((f (lambda (f n m) (if (fxzero? n) m (f f (fxsub1 n) (fx* n m)))))) (f f 5 1)) ... ok
-test 26:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ... ok
+test 27:(let ((f (lambda (x) x))) (f 12)) ... ok
+test 28:(let ((f (lambda (x y) (fx+ x y)))) (f 12 13)) ... ok
+test 29:(let ((f (lambda (x) (let ((g (lambda (x y) (fx+ x y)))) (g x 100))))) (f 1000)) ... ok
+test 30:(let ((f (lambda (g) (g 2 13)))) (f (lambda (n m) (fx* n m)))) ... ok
+test 31:(let ((f (lambda (g) (fx+ (g 10) (g 100))))) (f (lambda (x) (fx* x x)))) ... ok
+test 32:(let ((f (lambda (f n m) (if (fxzero? n) m (f f (fxsub1 n) (fx* n m)))))) (f f 5 1)) ... ok
+test 33:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ... ok
 Performing closures tests ...
-test 27:(let ((n 12)) (let ((f (lambda () n))) (f))) ... ok
-test 28:(let ((n 12)) (let ((f (lambda (m) (fx+ n m)))) (f 100))) ... ok
-test 29:(let ((f (lambda (f n m) (if (fxzero? n) m (f (fxsub1 n) (fx* n m)))))) (let ((g (lambda (g n m) (f (lambda (n m) (g g n m)) n m)))) (g g 5 1))) ... ok
-test 30:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f (fxsub1 n))))))) (let ((g (lambda (g n) (f (lambda (n) (g g n)) n)))) (g g 5))) ... ok
+test 34:(let ((n 12)) (let ((f (lambda () n))) (f))) ... ok
+test 35:(let ((n 12)) (let ((f (lambda (m) (fx+ n m)))) (f 100))) ... ok
+test 36:(let ((f (lambda (f n m) (if (fxzero? n) m (f (fxsub1 n) (fx* n m)))))) (let ((g (lambda (g n m) (f (lambda (n m) (g g n m)) n m)))) (g g 5 1))) ... ok
+test 37:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f (fxsub1 n))))))) (let ((g (lambda (g n) (f (lambda (n) (g g n)) n)))) (g g 5))) ... ok
 Performing begin/implicit-begin tests ...
-test 31:(begin 12) ... ok
-test 32:(begin 13 122) ... ok
-test 33:(begin 123 2343 #t) ... ok
-test 34:(let ((t (begin 12 (cons 1 2)))) (begin t t)) ... ok
-test 35:(let ((t (begin 13 (cons 1 2)))) (cons 1 t) t) ... ok
-test 36:(let ((t (cons 1 2))) (if (pair? t) (begin t) 12)) ... ok
+test 38:(begin 12) ... ok
+test 39:(begin 13 122) ... ok
+test 40:(begin 123 2343 #t) ... ok
+test 41:(let ((t (begin 12 (cons 1 2)))) (begin t t)) ... ok
+test 42:(let ((t (begin 13 (cons 1 2)))) (cons 1 t) t) ... ok
+test 43:(let ((t (cons 1 2))) (if (pair? t) (begin t) 12)) ... ok
 Performing set-car! set-cdr! tests ...
-test 37:(let ((x (cons 1 2))) (begin (set-cdr! x ()) x)) ... ok
-test 38:(let ((x (cons 1 2))) (set-cdr! x ()) x) ... ok
-test 39:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) x) ... ok
-test 40:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) y) ... ok
-test 41:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) x) ... ok
-test 42:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) y) ... ok
-test 43:(let ((x (let ((x (cons 1 2))) (set-car! x #t) (set-cdr! x #f) x))) (cons x x) x) ... ok
-test 44:(let ((x (cons 1 2))) (set-cdr! x x) (set-car! (cdr x) x) (cons (eq? x (car x)) (eq? x (cdr x)))) ... ok
-test 45:(let ((x #f)) (if (pair? x) (set-car! x 12) #f) x) ... ok
-test 46:(let ((x #f)) (if (pair? #f) (set-car! #f 12) #f) x) ... ok
+test 44:(let ((x (cons 1 2))) (begin (set-cdr! x ()) x)) ... ok
+test 45:(let ((x (cons 1 2))) (set-cdr! x ()) x) ... ok
+test 46:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) x) ... ok
+test 47:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) y) ... ok
+test 48:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) x) ... ok
+test 49:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) y) ... ok
+test 50:(let ((x (let ((x (cons 1 2))) (set-car! x #t) (set-cdr! x #f) x))) (cons x x) x) ... ok
+test 51:(let ((x (cons 1 2))) (set-cdr! x x) (set-car! (cdr x) x) (cons (eq? x (car x)) (eq? x (cdr x)))) ... ok
+test 52:(let ((x #f)) (if (pair? x) (set-car! x 12) #f) x) ... ok
+test 53:(let ((x #f)) (if (pair? #f) (set-car! #f 12) #f) x) ... ok
 Performing eq? tests ...
-test 47:(eq? 1 1) ... ok
-test 48:(eq? 1 2) ... ok
-test 49:(eq? #t 2) ... ok
-test 50:(eq? #t #t) ... ok
-test 51:(eq? () ()) ... ok
-test 52:(eq? (cons 1 2) (cons 1 2)) ... ok
-test 53:(let ((v (cons 1 2))) (eq? v v)) ... ok
+test 54:(eq? 1 1) ... ok
+test 55:(eq? 1 2) ... ok
+test 56:(eq? #t 2) ... ok
+test 57:(eq? #t #t) ... ok
+test 58:(eq? () ()) ... ok
+test 59:(eq? (cons 1 2) (cons 1 2)) ... ok
+test 60:(let ((v (cons 1 2))) (eq? v v)) ... ok
 Performing vectors tests ...
-test 54:(vector? (make-vector 0)) ... ok
-test 55:(vector-length (make-vector 12)) ... ok
-test 56:(vector? (cons 1 2)) ... ok
-test 57:(vector? 1287) ... ok
-test 58:(vector? ()) ... ok
-test 59:(vector? #t) ... ok
-test 60:(vector? #f) ... ok
-test 61:(pair? (make-vector 12)) ... ok
-test 62:(null? (make-vector 12)) ... ok
-test 63:(boolean? (make-vector 12)) ... ok
-test 64:(make-vector 0) ... ok
-test 65:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ... ok
-test 66:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) ... ok
-test 67:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ... ok
-test 68:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (eq? y (vector-ref v 0))) ... ok
-test 69:(cons 1 2) ... ok
-test 70:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (pair? w)) ... ok
-test 71:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (pair? w) (pair? (car w)))) ... ok
-test 72:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (cdr w)) ... ok
-test 73:(let ((w (let ((v (make-vector 1)) (y (cons 96 2))) y))) w) ... ok
-test 74:(let ((w (let ((v (make-vector 1)) (y (cons 97 2))) (cons y (eq? y 0)) y))) w) ... ok
-test 75:(let ((w (let ((v (make-vector 1)) (y (cons 97 3))) (vector-set! v 0 y) y))) w) ... ok
-test 76:(let ((w (let ((v (make-vector 1)) (y (cons 98 2))) (vector-set! v 0 y) (cons y (eq? y 0)) y))) w) ... ok
-test 77:(let ((w (let ((v (make-vector 1)) (y (cons 99 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (car w)) ... ok
-test 78:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (eq? (car (car w)) 1)) ... ok
-test 79:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (eq? (car (car w)) 1) (eq? (cdr (car w)) 2) (eq? (cdr w) #f))) ... ok
-test 80:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ... ok
-test 81:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y (vector-ref v 0)))) ... ok
-test 82:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector? v1))) ... ok
-test 83:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (and (vector? v0) (vector? v1)))) ... ok
-test 84:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (and (vector? v0) (vector? v1)))) ... ok
-test 85:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v0)) ... ok
-test 86:(vector-length (make-vector 1)) ... ok
-test 87:(let ((v0 (make-vector 2))) (vector-length v0)) ... ok
-test 88:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-length v0)) ... ok
-test 89:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))) ... ok
-test 90:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v1)) ... ok
-test 91:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (car (cons v0 v1)))) ... ok
-test 92:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cdr (cons v0 v1)))) ... ok
-test 93:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons v0 ())) ... ok
-test 94:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons #t v0)) ... ok
-test 95:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))) ... ok
-test 96:(let ((v0 (make-vector 3))) (let ((v1 (make-vector 3))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v0 2 150) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-set! v1 2 350) (cons v0 v1))) ... ok
-test 97:(let ((n 2)) (let ((v0 (make-vector n))) (let ((v1 (make-vector n))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1)))) ... ok
-test 98:(let ((n 3)) (let ((v0 (make-vector n))) (let ((v1 (make-vector (vector-length v0)))) (vector-set! v0 (fx- (vector-length v0) 3) 100) (vector-set! v0 (fx- (vector-length v1) 2) 200) (vector-set! v0 (fx- (vector-length v0) 1) 150) (vector-set! v1 (fx- (vector-length v1) 3) 300) (vector-set! v1 (fx- (vector-length v0) 2) 400) (vector-set! v1 (fx- (vector-length v1) 1) 350) (cons v0 v1)))) ... ok
-test 99:(let ((n 1)) (vector-set! (make-vector n) (fxsub1 n) (fx* n n)) n) ... ok
-test 100:(let ((n 1)) (let ((v (make-vector 1))) (vector-set! v (fxsub1 n) n) (vector-ref v (fxsub1 n)))) ... ok
-test 101:(let ((v0 (make-vector 1))) (vector-set! v0 0 1) (let ((v1 (make-vector 1))) (vector-set! v1 0 13) (vector-set! (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1))) (fxadd1 (vector-ref (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1)))))) (cons v0 v1))) ... ok
+test 61:(vector? (make-vector 0)) ... ok
+test 62:(vector-length (make-vector 12)) ... ok
+test 63:(vector? (cons 1 2)) ... ok
+test 64:(vector? 1287) ... ok
+test 65:(vector? ()) ... ok
+test 66:(vector? #t) ... ok
+test 67:(vector? #f) ... ok
+test 68:(pair? (make-vector 12)) ... ok
+test 69:(null? (make-vector 12)) ... ok
+test 70:(boolean? (make-vector 12)) ... ok
+test 71:(make-vector 0) ... ok
+test 72:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ... ok
+test 73:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) ... ok
+test 74:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ... ok
+test 75:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (eq? y (vector-ref v 0))) ... ok
+test 76:(cons 1 2) ... ok
+test 77:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (pair? w)) ... ok
+test 78:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (pair? w) (pair? (car w)))) ... ok
+test 79:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (cdr w)) ... ok
+test 80:(let ((w (let ((v (make-vector 1)) (y (cons 96 2))) y))) w) ... ok
+test 81:(let ((w (let ((v (make-vector 1)) (y (cons 97 2))) (cons y (eq? y 0)) y))) w) ... ok
+test 82:(let ((w (let ((v (make-vector 1)) (y (cons 97 3))) (vector-set! v 0 y) y))) w) ... ok
+test 83:(let ((w (let ((v (make-vector 1)) (y (cons 98 2))) (vector-set! v 0 y) (cons y (eq? y 0)) y))) w) ... ok
+test 84:(let ((w (let ((v (make-vector 1)) (y (cons 99 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (car w)) ... ok
+test 85:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (eq? (car (car w)) 1)) ... ok
+test 86:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (eq? (car (car w)) 1) (eq? (cdr (car w)) 2) (eq? (cdr w) #f))) ... ok
+test 87:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ... ok
+test 88:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y (vector-ref v 0)))) ... ok
+test 89:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector? v1))) ... ok
+test 90:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (and (vector? v0) (vector? v1)))) ... ok
+test 91:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (and (vector? v0) (vector? v1)))) ... ok
+test 92:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v0)) ... ok
+test 93:(vector-length (make-vector 1)) ... ok
+test 94:(let ((v0 (make-vector 2))) (vector-length v0)) ... ok
+test 95:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-length v0)) ... ok
+test 96:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))) ... ok
+test 97:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v1)) ... ok
+test 98:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (car (cons v0 v1)))) ... ok
+test 99:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cdr (cons v0 v1)))) ... ok
+test 100:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons v0 ())) ... ok
+test 101:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons #t v0)) ... ok
+test 102:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))) ... ok
+test 103:(let ((v0 (make-vector 3))) (let ((v1 (make-vector 3))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v0 2 150) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-set! v1 2 350) (cons v0 v1))) ... ok
+test 104:(let ((n 2)) (let ((v0 (make-vector n))) (let ((v1 (make-vector n))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1)))) ... ok
+test 105:(let ((n 3)) (let ((v0 (make-vector n))) (let ((v1 (make-vector (vector-length v0)))) (vector-set! v0 (fx- (vector-length v0) 3) 100) (vector-set! v0 (fx- (vector-length v1) 2) 200) (vector-set! v0 (fx- (vector-length v0) 1) 150) (vector-set! v1 (fx- (vector-length v1) 3) 300) (vector-set! v1 (fx- (vector-length v0) 2) 400) (vector-set! v1 (fx- (vector-length v1) 1) 350) (cons v0 v1)))) ... ok
+test 106:(let ((n 1)) (vector-set! (make-vector n) (fxsub1 n) (fx* n n)) n) ... ok
+test 107:(let ((n 1)) (let ((v (make-vector 1))) (vector-set! v (fxsub1 n) n) (vector-ref v (fxsub1 n)))) ... ok
+test 108:(let ((v0 (make-vector 1))) (vector-set! v0 0 1) (let ((v1 (make-vector 1))) (vector-set! v1 0 13) (vector-set! (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1))) (fxadd1 (vector-ref (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1)))))) (cons v0 v1))) ... ok
 Performing strings tests ...
-test 102:(make-string 0) ... ok
-test 103:(string? (make-string 0)) ... ok
-test 104:(let ((s (make-string 1))) (string-set! s 0 #\a) (string-ref s 0)) ... ok
-test 105:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-ref s 1)) ... ok
-test 106:(let ((s (make-string 3))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-ref s 2)) ... ok
-test 107:(let ((s (make-string 4))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-ref s 3)) ... ok
-test 108:(let ((s (make-string 5))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-set! s 4 #\e) (string-ref s 3)) ... ok
-test 109:(cons 1 2) ... ok
-test 110:(cons (make-string 0) ()) ... ok
-test 111:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (cons (string-ref s 0) (string-ref s 1))) ... ok
-test 112:(let ((i 0)) (let ((s (make-string 1))) (string-set! s i #\a) (string-ref s i))) ... ok
-test 113:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (string-ref s i))) ... ok
-test 114:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (cons (string-ref s i) (string-ref s j)))) ... ok
-test 115:(let ((i 0) (c #\a)) (let ((s (make-string 1))) (string-set! s i c) (string-ref s i))) ... ok
-test 116:(string-length (make-string 12)) ... ok
-test 117:(string? (make-vector 12)) ... ok
-test 118:(string? (cons 1 2)) ... ok
-test 119:(string? 1287) ... ok
-test 120:(string? ()) ... ok
-test 121:(string? #t) ... ok
-test 122:(string? #f) ... ok
-test 123:(pair? (make-string 12)) ... ok
-test 124:(null? (make-string 12)) ... ok
-test 125:(boolean? (make-string 12)) ... ok
-test 126:(vector? (make-string 12)) ... ok
-test 127:(make-string 0) ... ok
-test 128:(let ((v (make-string 2))) (string-set! v 0 #\t) (string-set! v 1 #\f) v) ... ok
-test 129:(let ((v (make-string 2))) (string-set! v 0 #\x) (string-set! v 1 #\x) (char=? (string-ref v 0) (string-ref v 1))) ... ok
-test 130:(let ((v0 (make-string 3))) (let ((v1 (make-string 3))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v0 2 #\c) (string-set! v1 0 #\d) (string-set! v1 1 #\e) (string-set! v1 2 #\f) (cons v0 v1))) ... ok
-test 131:(let ((n 2)) (let ((v0 (make-string n))) (let ((v1 (make-string n))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v1 0 #\c) (string-set! v1 1 #\d) (cons v0 v1)))) ... ok
-test 132:(let ((n 1)) (string-set! (make-string n) (fxsub1 n) (fixnum->char 34)) n) ... ok
-test 133:(let ((n 1)) (let ((v (make-string 1))) (string-set! v (fxsub1 n) (fixnum->char n)) (char->fixnum (string-ref v (fxsub1 n))))) ... ok
-test 134:(let ((v0 (make-string 1))) (string-set! v0 0 #\a) (let ((v1 (make-string 1))) (string-set! v1 0 #\A) (string-set! (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1))) (fixnum->char (fxadd1 (char->fixnum (string-ref (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1)))))))) (cons v0 v1))) ... ok
-test 135:(let ((s (make-string 1))) (string-set! s 0 #\") s) ... ok
-test 136:(let ((s (make-string 1))) (string-set! s 0 #\\) s) ... ok
+test 109:(make-string 0) ... ok
+test 110:(string? (make-string 0)) ... ok
+test 111:(let ((s (make-string 1))) (string-set! s 0 #\a) (string-ref s 0)) ... ok
+test 112:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-ref s 1)) ... ok
+test 113:(let ((s (make-string 3))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-ref s 2)) ... ok
+test 114:(let ((s (make-string 4))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-ref s 3)) ... ok
+test 115:(let ((s (make-string 5))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-set! s 4 #\e) (string-ref s 3)) ... ok
+test 116:(cons 1 2) ... ok
+test 117:(cons (make-string 0) ()) ... ok
+test 118:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (cons (string-ref s 0) (string-ref s 1))) ... ok
+test 119:(let ((i 0)) (let ((s (make-string 1))) (string-set! s i #\a) (string-ref s i))) ... ok
+test 120:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (string-ref s i))) ... ok
+test 121:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (cons (string-ref s i) (string-ref s j)))) ... ok
+test 122:(let ((i 0) (c #\a)) (let ((s (make-string 1))) (string-set! s i c) (string-ref s i))) ... ok
+test 123:(string-length (make-string 12)) ... ok
+test 124:(string? (make-vector 12)) ... ok
+test 125:(string? (cons 1 2)) ... ok
+test 126:(string? 1287) ... ok
+test 127:(string? ()) ... ok
+test 128:(string? #t) ... ok
+test 129:(string? #f) ... ok
+test 130:(pair? (make-string 12)) ... ok
+test 131:(null? (make-string 12)) ... ok
+test 132:(boolean? (make-string 12)) ... ok
+test 133:(vector? (make-string 12)) ... ok
+test 134:(make-string 0) ... ok
+test 135:(let ((v (make-string 2))) (string-set! v 0 #\t) (string-set! v 1 #\f) v) ... ok
+test 136:(let ((v (make-string 2))) (string-set! v 0 #\x) (string-set! v 1 #\x) (char=? (string-ref v 0) (string-ref v 1))) ... ok
+test 137:(let ((v0 (make-string 3))) (let ((v1 (make-string 3))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v0 2 #\c) (string-set! v1 0 #\d) (string-set! v1 1 #\e) (string-set! v1 2 #\f) (cons v0 v1))) ... ok
+test 138:(let ((n 2)) (let ((v0 (make-string n))) (let ((v1 (make-string n))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v1 0 #\c) (string-set! v1 1 #\d) (cons v0 v1)))) ... ok
+test 139:(let ((n 1)) (string-set! (make-string n) (fxsub1 n) (fixnum->char 34)) n) ... ok
+test 140:(let ((n 1)) (let ((v (make-string 1))) (string-set! v (fxsub1 n) (fixnum->char n)) (char->fixnum (string-ref v (fxsub1 n))))) ... ok
+test 141:(let ((v0 (make-string 1))) (string-set! v0 0 #\a) (let ((v1 (make-string 1))) (string-set! v1 0 #\A) (string-set! (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1))) (fixnum->char (fxadd1 (char->fixnum (string-ref (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1)))))))) (cons v0 v1))) ... ok
+test 142:(let ((s (make-string 1))) (string-set! s 0 #\") s) ... ok
+test 143:(let ((s (make-string 1))) (string-set! s 0 #\\) s) ... ok
 Performing cons tests ...
-test 137:(fxadd1 0) ... ok
-test 138:(pair? 12) ... ok
-test 139:(pair? #t) ... ok
-test 140:(pair? #f) ... ok
-test 141:(pair? ()) ... ok
-test 142:(cons 1 2) ... ok
-test 143:(pair? (cons 1 2)) ... ok
-test 144:(fixnum? (cons 12 43)) ... ok
-test 145:(boolean? (cons 12 43)) ... ok
-test 146:(null? (cons 12 43)) ... ok
-test 147:(not (cons 12 43)) ... ok
-test 148:(if (cons 12 43) 32 43) ... ok
-test 149:(car (cons 1 23)) ... ok
-test 150:(cdr (cons 43 123)) ... ok
-test 151:(cons #t #f) ... ok
-test 152:(car (cons #t #f)) ... ok
-test 153:(cons 1 ()) ... ok
-test 154:(cons 1 (cons 2 ())) ... ok
-test 155:(cons (cons 12 3) (cons 45 6)) ... ok
-test 156:(cons (cons 12 3) (cons #t #f)) ... ok
-test 157:(car (car (cons (cons 12 3) (cons #t #f)))) ... ok
-test 158:(cdr (car (cons (cons 12 3) (cons #t #f)))) ... ok
-test 159:(car (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
-test 160:(cdr (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
-test 161:(cons 1 (cons 2 (cons 3 ()))) ... ok
-test 162:(let ((x (let ((y (fx+ 1 2))) (fx* y y)))) (cons x (fx+ x x))) ... ok
-test 163:(let ((t0 (cons 1 2)) (t1 (cons 3 4))) (let ((a0 (car t0)) (a1 (car t1)) (d0 (cdr t0)) (d1 (cdr t1))) (let ((t0 (cons a0 d1)) (t1 (cons a1 d0))) (cons t0 t1)))) ... ok
-test 164:(let ((t (cons 1 2))) (let ((t t)) (let ((t t)) (let ((t t)) t)))) ... ok
-test 165:(let ((t (let ((t (let ((t (let ((t (cons 1 2))) t))) t))) t))) t) ... ok
-test 166:(let ((x ())) (let ((x (cons x x))) (let ((x (cons x x))) (let ((x (cons x x))) (cons x x))))) ... ok
-test 167:(cons (let ((x #t)) (let ((y (cons x x))) (cons x y))) (cons (let ((x #f)) (let ((y (cons x x))) (cons y x))) ())) ... ok
+test 144:(fxadd1 0) ... ok
+test 145:(pair? 12) ... ok
+test 146:(pair? #t) ... ok
+test 147:(pair? #f) ... ok
+test 148:(pair? ()) ... ok
+test 149:(cons 1 2) ... ok
+test 150:(pair? (cons 1 2)) ... ok
+test 151:(fixnum? (cons 12 43)) ... ok
+test 152:(boolean? (cons 12 43)) ... ok
+test 153:(null? (cons 12 43)) ... ok
+test 154:(not (cons 12 43)) ... ok
+test 155:(if (cons 12 43) 32 43) ... ok
+test 156:(car (cons 1 23)) ... ok
+test 157:(cdr (cons 43 123)) ... ok
+test 158:(cons #t #f) ... ok
+test 159:(car (cons #t #f)) ... ok
+test 160:(cons 1 ()) ... ok
+test 161:(cons 1 (cons 2 ())) ... ok
+test 162:(cons (cons 12 3) (cons 45 6)) ... ok
+test 163:(cons (cons 12 3) (cons #t #f)) ... ok
+test 164:(car (car (cons (cons 12 3) (cons #t #f)))) ... ok
+test 165:(cdr (car (cons (cons 12 3) (cons #t #f)))) ... ok
+test 166:(car (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
+test 167:(cdr (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
+test 168:(cons 1 (cons 2 (cons 3 ()))) ... ok
+test 169:(let ((x (let ((y (fx+ 1 2))) (fx* y y)))) (cons x (fx+ x x))) ... ok
+test 170:(let ((t0 (cons 1 2)) (t1 (cons 3 4))) (let ((a0 (car t0)) (a1 (car t1)) (d0 (cdr t0)) (d1 (cdr t1))) (let ((t0 (cons a0 d1)) (t1 (cons a1 d0))) (cons t0 t1)))) ... ok
+test 171:(let ((t (cons 1 2))) (let ((t t)) (let ((t t)) (let ((t t)) t)))) ... ok
+test 172:(let ((t (let ((t (let ((t (let ((t (cons 1 2))) t))) t))) t))) t) ... ok
+test 173:(let ((x ())) (let ((x (cons x x))) (let ((x (cons x x))) (let ((x (cons x x))) (cons x x))))) ... ok
+test 174:(cons (let ((x #t)) (let ((y (cons x x))) (cons x y))) (cons (let ((x #f)) (let ((y (cons x x))) (cons y x))) ())) ... ok
 Performing procedures tests ...
-test 168:(letrec () 12) ... ok
-test 169:(letrec () (let ((x 5)) (fx+ x x))) ... ok
-test 170:(letrec ((f (lambda () 5))) 7) ... ok
-test 171:(letrec ((f (lambda () 5))) (let ((x 12)) x)) ... ok
-test 172:(letrec ((f (lambda () 5))) (app f)) ... ok
-test 173:(letrec ((f (lambda () 5))) (f)) ... ok
-test 174:(letrec ((f (lambda () 5))) (let ((x (f))) x)) ... ok
-test 175:(letrec ((f (lambda () 5))) (fx+ 6 (app f))) ... ok
-test 176:(letrec ((f (lambda () 5))) (fx+ (app f) 6)) ... ok
-test 177:(letrec ((f (lambda () 5))) (fx+ (f) 6)) ... ok
-test 178:(letrec ((f (lambda () 5))) (fx- 20 (f))) ... ok
-test 179:(letrec ((f (lambda () 5))) (fx+ (f) (f))) ... ok
-test 180:(letrec ((f (lambda () (fx+ 5 7))) (g (lambda () 13))) (fx+ (f) (g))) ... ok
-test 181:(letrec ((f (lambda (x) (fx+ x 12)))) (f 13)) ... ok
-test 182:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f 10))) ... ok
-test 183:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f (f 0)))) ... ok
-test 184:(letrec ((f (lambda (x y) (fx+ x y))) (g (lambda (x) (fx+ x 12)))) (f 16 (f (g 0) (fx+ 1 (g 0))))) ... ok
-test 185:(letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12)) ...> 
+test 175:(letrec () 12) ... ok
+test 176:(letrec () (let ((x 5)) (fx+ x x))) ... ok
+test 177:(letrec ((f (lambda () 5))) 7) ...> 

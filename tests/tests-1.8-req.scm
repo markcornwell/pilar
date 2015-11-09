@@ -56,7 +56,7 @@
 (add-tests-with-string-output "procedures"
   [(letrec () 12) => "12\n"]
   [(letrec () (let ([x 5]) (fx+ x x))) => "10\n"]
-  [(letrec ([f (lambda () 5)]) 7) => "7\n"]
+  [(letrec ([f (lambda () 5)]) 7) => "7\n"]   ;; <<--- broken
   [(letrec ([f (lambda () 5)]) (let ([x 12]) x)) => "12\n"]
   [(letrec ([f (lambda () 5)]) (app f)) => "5\n"]
   [(letrec ([f (lambda () 5)]) (f)) => "5\n"]

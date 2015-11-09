@@ -23,7 +23,6 @@
 #define char_tag   0x000F
 #define char_shift  8
 
-
 #define pair_mask  0x0007
 #define pair_tag   0x0001
 
@@ -32,6 +31,8 @@
 
 #define str_mask   0x0007
 #define str_tag    0x0006
+
+#define unbound    0x0007
 
 /* All scheme values are of type ptrs */
 
@@ -68,8 +69,7 @@ static void print_ptr(ptr x) {
        printf("\"");
        print_string((string) (x - str_tag));
        printf("\"");
-     
-       
+           
    } else if((x & vect_mask) == vect_tag) {
        printf("#(");
        print_vector((vector) (x - vect_tag)); // zero out vect_tag  -8 = 1111...1000
@@ -79,15 +79,22 @@ static void print_ptr(ptr x) {
      printf("(");
      print_pairs((pair) (x - 1));
      printf(")");
+     
    } else if(x == bool_f) {
        printf("#f");
+       
    } else if(x == bool_t) {
        printf("#t");
+       
    } else if(x == nil) {
        printf("()");
-  } else {
+       
+   } else if(x == unbound) {
+     printf("#!unbound");
+     
+   } else {
        printf("#<unknown 0x%08x>", x);
-  }
+   }
 }
 
 static void print_string (string s) {
