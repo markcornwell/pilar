@@ -190,4 +190,19 @@ test 174:(cons (let ((x #t)) (let ((y (cons x x))) (cons x y))) (cons (let ((x #
 Performing procedures tests ...
 test 175:(letrec () 12) ... ok
 test 176:(letrec () (let ((x 5)) (fx+ x x))) ... ok
-test 177:(letrec ((f (lambda () 5))) 7) ...> 
+test 177:(letrec ((f (lambda () 5))) 7) ... ok
+test 178:(letrec ((f (lambda () 5))) (let ((x 12)) x)) ... ok
+test 179:(letrec ((f (lambda () 5))) (app f)) ... ok
+test 180:(letrec ((f (lambda () 5))) (f)) ... ok
+test 181:(letrec ((f (lambda () 5))) (let ((x (f))) x)) ... ok
+test 182:(letrec ((f (lambda () 5))) (fx+ 6 (app f))) ... ok
+test 183:(letrec ((f (lambda () 5))) (fx+ (app f) 6)) ... ok
+test 184:(letrec ((f (lambda () 5))) (fx+ (f) 6)) ... ok
+test 185:(letrec ((f (lambda () 5))) (fx- 20 (f))) ... ok
+test 186:(letrec ((f (lambda () 5))) (fx+ (f) (f))) ... ok
+test 187:(letrec ((f (lambda () (fx+ 5 7))) (g (lambda () 13))) (fx+ (f) (g))) ... ok
+test 188:(letrec ((f (lambda (x) (fx+ x 12)))) (f 13)) ... ok
+test 189:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f 10))) ... ok
+test 190:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f (f 0)))) ... ok
+test 191:(letrec ((f (lambda (x y) (fx+ x y))) (g (lambda (x) (fx+ x 12)))) (f 16 (f (g 0) (fx+ 1 (g 0))))) ... ok
+test 192:(letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12)) ...> 

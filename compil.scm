@@ -1601,7 +1601,7 @@
 
 (define (transform-letrecs-to-lets expr)
   (cond
-   [(null? expr) '()]
+   ;[(null? expr) '()]
    [(letrec? expr)
     (let* ([bindings (letrec-bindings expr)]
 	   [formals (map car bindings)]
@@ -1613,7 +1613,7 @@
 	  body
 	  (append (list 'let init-bindings)
 		  set-bindings
-		  body)))]
+		  (list 'begin body))))]
    [(pair? expr)
     (cons (transform-letrecs-to-lets (car expr))
 	  (transform-letrecs-to-lets (cdr expr)))]
