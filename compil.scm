@@ -40,22 +40,47 @@
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
-(load "tests/tests-2.1-req.scm")
-(load "tests/tests-1.9-req.scm")
-(load "tests/tests-1.8-req.scm")
-(load "tests/tests-1.7-req.scm")
-(load "tests/tests-1.6-req.scm")
-(load "tests/tests-1.5-req.scm")
-(load "tests/tests-1.4-req.scm")
-(load "tests/tests-1.3-req.scm")
-(load "tests/tests-1.2-req.scm")
-(load "tests/tests-1.1-req.scm")
+
+;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
+
+;; (load "tests/tests-5.6-req.scm")  ;; fxmodulo
+;; (load "tests/tests-5.3-req.scm")  ;; call/cc
+;; (load "tests/tests-5.2-req.scm")  ;; overflow
+;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
+;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
+;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
+;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+;; (load "tests/tests-3.4-req.scm")  ;; apply
+;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
+;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
+;; (load "tests/tests-3.1-req.scm")  ;; vector
+;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+;; (load "tests/tests-2.8-req.scm")  ;; symbols
+;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
+;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
+;; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
+
+;; (load "tests/tests-2.2-req.scm")  ;; set! TBD
+(load "tests/tests-2.1-req.scm")   ;; procedure
+(load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
+(load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
+(load "tests/tests-1.7-req.scm")   ;; more binary primitives
+(load "tests/tests-1.6-req.scm")   ;; let let*
+(load "tests/tests-1.5-req.scm")   ;; binary primitives if
+(load "tests/tests-1.4-req.scm")   ;; if and or
+(load "tests/tests-1.3-req.scm")   ;; unary primitives
+(load "tests/tests-1.2-req.scm")   ;; immediate constants
+(load "tests/tests-1.1-req.scm")   ;; integers
 
 ;; utility
 (define first car)
 (define second cadr)
 (define third caddr)
 (define rest cdr)
+
+;;---------------------------------------
+;;  Value Representation
+;;---------------------------------------
 
 (define fxshift         2)
 (define fxmask       #b00000011)   ; #x03
@@ -529,7 +554,7 @@
     L))))
 
 ;;-------------------------------------------
-;;               Conditionals
+;;          Conditionals
 ;;-------------------------------------------
 
 (define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))
@@ -561,7 +586,7 @@
     (emit-tail-expr si env (if-altern x))
     (emit "~a:" end-label)))
 
-(define (and? x) (and (pair? x) (eq? (car x) 'and)))
+(define (and? x) (and (pair? x)(symbol? (car x)) (eq? (car x) 'and)))
 
 (define (emit-and si env x)
   (cond
@@ -575,7 +600,7 @@
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) (cons 'and (cddr x)) #f))]))
 
-(define (or? x) (and (pair? x) (eq? (car x) 'or)))
+(define (or? x) (and (pair? x) (symbol? (car x)) (eq? (car x) 'or)))
 
 (define (emit-or si env x)
   (cond
@@ -595,11 +620,13 @@
 
 (define (next-stack-index si) (- si wordsize))
 
+;; (define (let? x)
+;;   (and (pair? x)
+;;        (symbol? (car x))
+;;        (or (eq? (car x) 'let) (eq? (car x) 'letrec)))) ;; make letrec an alias for let
 
 (define (let? x)
-  (and (pair? x)
-       (symbol? (car x))
-       (or (eq? (car x) 'let) (eq? (car x) 'letrec)))) ;; make letrec an alias for let
+  (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 
 (define (let-bindings x) (cadr x))
 ;(define (let-body x) (caddr x))
@@ -643,6 +670,97 @@
            (f (next-stack-index si)
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
+
+;;-------------------------------------------------------------------
+;; letrec is similar to let, but it must create all of the variables
+;; before evaluating any of the expr so any expr can reference any v
+;; in the list of bindings.  This supports mutual recursion.
+;;
+;;     (letrec ([v expr] ...) body)
+;;
+;; Consider
+;;
+;;   (letrec ([even? (lambda (x) (if (zero? x) #t (odd? (fx- x 1))))]
+;;            [odd?  (lambda (x) (if (zero? x) #f (even? (fx- x 1))))])
+;;      --body-- )
+;;
+;;-------------------------------------------------------------------
+
+(define (letrec? expr)
+  (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'letrec)))
+  
+(define letrec-bindings cadr)
+;(define letrec-body caddr)
+(define (letrec-body x) (cons 'begin (cddr x)))
+
+(define (emit-letrec si env bindings body) ;; compare with emit-let
+  (emit "# emit-let")
+  (emit "#  si   = ~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  bindings = ~s" bindings)
+  (emit "#  body = ~s" body)
+  (let f1 ((si si) (new-env env) (b* bindings))
+     (cond
+      [(null? b*) (set! env new-env)]
+      [else
+         (let ([b (car b*)])
+           (f1 (next-stack-index si)
+              (extend-env si new-env (lhs b))
+              (cdr b*)))]))
+  (let f2 ((si si) (b* bindings))
+     (cond
+       [(null? b*)  (emit-expr si env body)]
+       [else
+         (let ([b (car b*)])
+           (emit-expr si env (rhs b))
+           (emit-stack-save si)
+           (f2 (next-stack-index si)
+              (cdr b*)))])))
+
+;; emit-tail-letrec is exactly like emit-letrece except that it
+;; calls emit-tail-expr on the body instead of emit-expr.
+
+(define (emit-tail-letrec si env bindings body) ;; compare with emit-let
+  (emit "# emit-let")
+  (emit "#  si   = ~s" si)
+  (emit "#  env  = ~s" env)
+  (emit "#  bindings = ~s" bindings)
+  (emit "#  body = ~s" body)
+  (let f1 ((si si) (new-env env) (b* bindings))
+     (cond
+      [(null? b*) (set! env new-env)]
+       [else
+         (let ([b (car b*)])
+           (f1 (next-stack-index si)
+              (extend-env si new-env (lhs b))
+              (cdr b*)))]))
+  (let f2 ((si si) (b* bindings))
+     (cond
+       [(null? b*)  (emit-tail-expr si env body)] ;; <-- only difference
+       [else
+         (let ([b (car b*)])
+           (emit-expr si env (rhs b))
+           (emit-stack-save si)
+           (f2 (next-stack-index si)
+              (cdr b*)))])))
+
+;; (define (emit-letrec expr)
+;;   (emit "# emit-letrec expr=~s" expr)
+;;   (let* ([bindings (letrec-bindings expr)]
+;; 	 [lvars (map lhs bindings)]
+;; 	 [lambdas (map rhs bindings)]
+;; 	 [labels (unique-labels lvars)]
+;; 	 [env (make-initial-env lvars labels)])
+;;     (emit "#  bindings=~s" bindings)
+;;     (emit "#  lvars=~s" lvars)
+;;     (emit "#  lambdas=~s" lambdas)
+;;     (emit "#  labels=~s" labels)
+;;     (emit "#  env=~s" env)
+;;     (emit "#  ---- >>>>> emit-lambdas start ----")
+;;     (for-each (emit-lambda env) lambdas labels)
+;;     (emit "#  ---- <<<<< emit-lambdas end ------")
+;;     (emit-scheme-entry env (letrec-body expr))))
+
 
 ;;------------------------------------------------------------------
 ;; env is a list of dotted pairs
@@ -707,34 +825,11 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
+
 ;;---------------------------------------------
 ;;                 Procedures
 ;;---------------------------------------------
 
-#|
-(define (letrec? expr)
-  (and (pair? expr) (eq? (car expr) 'letrec)))
-  
-(define letrec-bindings cadr)
-(define letrec-body caddr)
-
-(define (emit-letrec expr)
-  (emit "# emit-letrec expr=~s" expr)
-  (let* ([bindings (letrec-bindings expr)]
-	 [lvars (map lhs bindings)]
-	 [lambdas (map rhs bindings)]
-	 [labels (unique-labels lvars)]
-	 [env (make-initial-env lvars labels)])
-    (emit "#  bindings=~s" bindings)
-    (emit "#  lvars=~s" lvars)
-    (emit "#  lambdas=~s" lambdas)
-    (emit "#  labels=~s" labels)
-    (emit "#  env=~s" env)
-    (emit "#  ---- >>>>> emit-lambdas start ----")
-    (for-each (emit-lambda env) lambdas labels)
-    (emit "#  ---- <<<<< emit-lambdas end ------")
-    (emit-scheme-entry env (letrec-body expr))))
-|#
 
 (define (codes? expr)
   (and (pair? expr) (eq? (car expr) 'codes)))
@@ -1093,8 +1188,6 @@
 ;;
 ;;--------------------------------------------------------------------
 
-
-
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
 
@@ -1205,9 +1298,9 @@
       (free-variables (merg (lambda-formals expr)
 			      bound-vars)
 		      (lambda-body expr))]
-   ;[(let? expr)
-   ; (free-variables (merg (let-bound-vars expr) bound-vars)
-  ;		    (let-body expr))]
+   [(let? expr)
+    (free-variables (merg (let-bound-vars expr) bound-vars)  ;; <<-- NEW 
+  		    (let-body expr))]
    
    [(pair? expr)
       (append (free-variables bound-vars (car expr))
@@ -1215,6 +1308,8 @@
    [else
     (error 'free-variables "unrecognized expr")]))
 
+(define (let-bound-vars expr)
+  (map car (let-bindings expr)))
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
@@ -1250,6 +1345,7 @@
    ; [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
+    [(letrec? expr)     (emit-letrec si env (letrec-bindings expr)(letrec-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
     [(if? expr)         (emit-if si env expr)]
     [(and? expr)        (emit-and si env expr)]
@@ -1276,13 +1372,14 @@
     [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
+    [(letrec? expr)     (emit-tail-letrec si env (letrec-bindings expr) (letrec-body expr))]
     [(primcall? expr)   (emit-tail-primcall si env expr)]
     [(if? expr)         (emit-tail-if si env expr)]
     [(and? expr)        (emit-tail-and si env expr)]
     [(or? expr)         (emit-tail-or si env expr)]
     [(pair? expr)       (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
     [else
-     (error "emit-expr" "unrecognized form:" expr)]))
+     (error "emit-tail-expr" "unrecognized form:" expr)]))
 
 (define (emit-immediate x)
   (emit "    movl $~s, %eax     # immed ~s" (immediate-rep x) x))
