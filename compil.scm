@@ -1116,7 +1116,7 @@
 ;;;    The returned value is still in %eax.
 
 (define (closure? expr)
-   (and (pair? expr) (eq? (car expr) 'closure)))
+   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'closure)))
 
 (define closure-lvar cadr)
 (define closure-vars cddr)
@@ -1203,6 +1203,15 @@
 				     (lambda-body expr)))
 	  (annotate-free-variables bound-vars
 				   (lambda-body expr)))]
+   [(letrec? expr)
+    (let* ([bindings (letrec-bindings expr)]
+	   [vars (map car bindings)]
+	   [exps (map cadr bindings)]
+	   [nbv (append vars bound-vars)]
+	   [new-exps (map (lambda (e) (annotate-free-variables nbv e)) exps)]
+	   [new-bindings (map list vars new-exps)]
+	   [new-body (annotate-free-variables nbv (letrec-body expr))])
+      (list 'letrec new-bindings new-body))]
    [(pair? expr)
      (cons (annotate-free-variables bound-vars (car expr))
 	   (annotate-free-variables bound-vars (cdr expr)))]
