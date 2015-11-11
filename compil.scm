@@ -22,21 +22,21 @@
 ;; (test-all)
 
 ;;-----------------------------------------------------
-;; Input Language:
+;; Code Generator Input Language:    TBD -- REVISE
 ;;
 ;;  <Program> -> <Expr>
 ;;            |  (letrec ([lvar <Lambda>] ...) <Expr>)
 ;;
 ;;  <Lambda>  -> (lamba (var ...) <Expr>)
 ;;
-;;  <Expr>    -> <Imm>
+;;  <Expr>    -> <Immediate>
 ;;            |  var
 ;;            | (if <Expr> <Expr> <Expr>)
 ;;            | (let ([var <Expr>] ...) <Expr> ...)
 ;;            | (app lvar <Expr> ...)
 ;;            | (prim <Expr>)
 ;;
-;;  <Imm>     -> fixnum | boolean | char | null
+;;  <Immediate>  -> fixnum | boolean | char | null
 ;;-----------------------------------------------------
 
 (load "tests-driver.scm")
@@ -72,7 +72,10 @@
 (load "tests/tests-1.2-req.scm")   ;; immediate constants
 (load "tests/tests-1.1-req.scm")   ;; integers
 
-;; utility
+;;--------------------------------------
+;;   Utility
+;;-------------------------------------
+
 (define first car)
 (define second cadr)
 (define third caddr)
@@ -209,10 +212,9 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-
 ;; not takes any kind of value and returns #t if
 ;; the object is #f, otherwise it returns #f
-;;
+
 (define-primitive (not si env arg)
     (emit-expr si env arg)
     (emit "    cmp $~s, %eax" bool-f)
@@ -518,9 +520,9 @@
   (emit "    sal $~s, %al" bool-bit);
   (emit "    or $~s, %al" bool-f))
   
-;;-------------------------------------------------------
-;;          Primitive Calls
-;;-------------------------------------------------------
+;;------------------------------------------
+;;             Primitive Calls
+;;------------------------------------------
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
@@ -554,7 +556,7 @@
     L))))
 
 ;;-------------------------------------------
-;;          Conditionals
+;;              Conditionals
 ;;-------------------------------------------
 
 (define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))
@@ -620,11 +622,6 @@
 
 (define (next-stack-index si) (- si wordsize))
 
-;; (define (let? x)
-;;   (and (pair? x)
-;;        (symbol? (car x))
-;;        (or (eq? (car x) 'let) (eq? (car x) 'letrec)))) ;; make letrec an alias for let
-
 (define (let? x)
   (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 
@@ -632,10 +629,18 @@
 ;(define (let-body x) (caddr x))
 (define (let-body x) (cons 'begin (cddr x)))
 
+;;--------------------------------------------
+;;                 Environment
+;;--------------------------------------------
+
 (define lhs car)
 (define rhs cadr)
 (define bind cons)
 (define (extend-env si env var) (cons (bind var si) env))
+
+;;--------------------------------------------
+;;   let
+;;--------------------------------------------
 
 (define (emit-let si env bindings body) ;; look at the version on p. 30
   (emit "# emit-let")
@@ -694,11 +699,12 @@
 (define (letrec-body x) (cons 'begin (cddr x)))
 
 (define (emit-letrec si env bindings body) ;; compare with emit-let
-  (emit "# emit-let")
+  (emit "# emit-letrec")
   (emit "#  si   = ~s" si)
   (emit "#  env  = ~s" env)
   (emit "#  bindings = ~s" bindings)
   (emit "#  body = ~s" body)
+  ;; first build the environment
   (let f1 ((si si) (new-env env) (b* bindings))
      (cond
       [(null? b*) (set! env new-env)]
@@ -707,6 +713,7 @@
            (f1 (next-stack-index si)
               (extend-env si new-env (lhs b))
               (cdr b*)))]))
+  ;; emit code for the exprs and then emit code for the body
   (let f2 ((si si) (b* bindings))
      (cond
        [(null? b*)  (emit-expr si env body)]
@@ -825,11 +832,9 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
-
 ;;---------------------------------------------
 ;;                 Procedures
 ;;---------------------------------------------
-
 
 (define (codes? expr)
   (and (pair? expr) (eq? (car expr) 'codes)))
@@ -889,7 +894,6 @@
 	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
 
 ;; (code (formals ...) (freevars ...) body)
-
 
 (define (code? expr)
   (and (pair? expr) (eq? (car expr) 'code)))

@@ -1,20 +1,9 @@
-(letrec ((f (lambda (x) (g x x)))
-         (g (lambda (x y) (fx+ x y))))
- (f 12))
-
+# (letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12))
 # == annotate ==>
-
-(letrec ((f (code (x) () (g x x)))
-         (g (code (x y) () (fx+ x y))))
- (begin (f 12)))
-
+# (letrec ((f (code (x) () (g x x))) (g (code (x y) () (fx+ x y)))) (begin (f 12)))
 # == transform ==>
 
-(codes ((f53 (code (x y) () (fx+ x y)))
-        (f52 (code (x) () (g x x))))
- (letrec ((f (closure f52))
-          (g (closure f53)))
-  (begin (f 12))))
+# (codes ((f53 (code (x y) () (fx+ x y))) (f52 (code (x) () (g x x)))) (letrec ((f (closure f52)) (g (closure f53))) (begin (f 12))))
 
 # emit-codes expr=(codes ((f53 (code (x y) () (fx+ x y))) (f52 (code (x) () (g x x)))) (letrec ((f (closure f52)) (g (closure f53))) (begin (f 12))))
 #  bindings=((f53 (code (x y) () (fx+ x y))) (f52 (code (x) () (g x x))))
