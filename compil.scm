@@ -33,11 +33,50 @@
 ;;            |  var
 ;;            | (if <Expr> <Expr> <Expr>)
 ;;            | (let ([var <Expr>] ...) <Expr> ...)
-;;            | (app lvar <Expr> ...)
+;;            | (app lvar <Expr> ...)   
 ;;            | (prim <Expr>)
 ;;
 ;;  <Immediate>  -> fixnum | boolean | char | null
 ;;-----------------------------------------------------
+
+;;-----------------------------------------------------
+;; Intermediate Language (IL):    REVISED
+;;
+;; Ref: (Dybig 1995) Compiler Construction Using Scheme, FPLE'95
+;;
+;;
+;;   <Expr>   -> <Imm>
+;;            |  <Ref>
+;;            |  (begin <Expr> <Expr>)
+;;            |  (if <Expr> <Expr> <Expr>)
+;;            |  (<Prim> <Expr> ...)          ;; takes the place of app
+;;            |  (<Expr> <Expr> ...)          ;; takes the place of funcall
+;;            |  (closure ( <Var> ...) (<Ref> ...) <Expr>)
+;;            |  (let ([<Var> <Expr>] ...) <Expr>)
+;;            |  (letrec ([<Var> <Expr>] ...) <Expr>)  ;; key for mutual recursion
+;;
+;;  <Ref>    ->  (free <num> <variable>) |
+;;            |  (bound <num> <variable>) | (local <variable>)
+;;
+;;  <Prim>   ->  symbols bound by define-primitive
+;;
+;;  <Immed>  ->  fixnum | boolean | char | null
+;;
+;;  <Var>    ->  symbols other than keywords
+;;
+;;  <Key>    ->  begin | if | closure | let | letrec
+;;
+;;
+;;  COMMENTS
+;;
+;;  - The closure form behaves like lambda, but lists its free variables explicitly.
+;;    When the closure executes it copies the free variables into a closure object
+;;    and returns that object.
+;;  - 
+;;-----------------------------------------------------
+
+
+
 
 (load "tests-driver.scm")
 
