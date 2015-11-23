@@ -76,8 +76,6 @@
 ;;-----------------------------------------------------
 
 
-
-
 (load "tests-driver.scm")
 
 ;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
@@ -178,7 +176,7 @@
       [(null? x) nil-value ]))
 
 ;;-----------------------------------------------------
-;;                      Primitives
+;;                Primitives
 ;;-----------------------------------------------------
 
 (define-syntax define-primitive
@@ -875,6 +873,7 @@
 ;;                 Procedures
 ;;---------------------------------------------
 
+
 (define (codes? expr)
   (and (pair? expr) (eq? (car expr) 'codes)))
 
@@ -1091,13 +1090,15 @@
     (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
 
 
+;;
+
 ;;----------------------------------------------------------------------
-;;                              Closures
+;;                         Closures 
 ;;----------------------------------------------------------------------
 
 ;;; one possible implementation strategy for procedures is via closure
 ;;; conversion.
-
+;;;
 ;;; Lambda does many things at the same time:
 ;;; 1) It creates a procedure object (ie. one that passes procedure?)
 ;;; 2) It contains both code (what to do when applied) and data (what
@@ -1157,6 +1158,8 @@
 ;;;    f) After return, the value of %esp is adjusted back by -si
 ;;;    g) The value of the closure pointer is restored.
 ;;;    The returned value is still in %eax.
+;;;-----------------------------------------------------------------------
+
 
 (define (closure? expr)
    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'closure)))
@@ -1203,7 +1206,7 @@
  
 
 ;;--------------------------------------------------------------------
-;;             Free variable annotation & transformation
+;;             Free variable annotation & transformation  NEW
 ;;--------------------------------------------------------------------
 ;;
 ;; 1. Free variable analysis is performed.  Every lambda expression
@@ -1217,17 +1220,9 @@
 ;; is transformed to
 ;;
 ;;  (let ((x 5))
-;;     (code (y) (x) (code () (x y) (+ x y))))
+;;     (closure (y) ((local x))
+;;         (closure () ((local x) (bound y 0)) (+ (free x) (free y))))
 ;;
-;;  The codes bind code names to code points.  Every code is
-;;  of the form  (code (formals ... ) (free-vars ...) body)
-;;
-;; 2. The code forms are transformed into closure forms and the
-;;    codes are colleted at the top.  The previous example yields:
-;;
-;;  (labels ([f0 (code () (x y) (+ x y))]
-;;           [f1 (code (y) (x) (closure f0 x y))])
-;;     (let ((x 5)) (closure f1 x)))
 ;;
 ;;--------------------------------------------------------------------
 
@@ -1362,6 +1357,8 @@
 
 (define (let-bound-vars expr)
   (map car (let-bindings expr)))
+
+
 
 ;;--------------------------------------------
 ;;           Expression Dispatcher
