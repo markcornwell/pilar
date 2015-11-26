@@ -1172,76 +1172,59 @@
 (define closure-freevars caddr)
 (define closure-body cdddr)
 
-(define (emit-closure si env expr)   ;; <<<---- THIS IS WRONG
-  
-  (define (emit-close-free-vars ci env vars) ;; <<- Initialize the free-variables via copy from the binding environment
-    (unless (null? vars)
-        (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
-	   (begin
-	     (emit-variable-ref env (car vars))                 ;; reference the value of the first variable
-	     (emit "   movl  %eax, ~s(%ebp)" ci)))              ;; copy that value to the closure cell
-	(emit-close-free-vars (+ wordsize ci) env (cdr vars))))  ;; recursively process remaining free vars
-  
-  (let* ([fmls (closure-formals expr)]
-	 [frev (closure-freevars expr)]
+(define (emit-close-free-vars ci env vars)
+  (unless (null? vars)
+	  (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
+	      (begin
+		(emit-variable-ref env (car vars))                 ;; reference the value of the first variable
+		(emit "   movl  %eax, ~s(%ebp)" ci)))              ;; copy that value to the closure cell
+	  (emit-close-free-vars (+ wordsize ci) env (cdr vars))))  ;; recursively process remaining free vars
+
+(define (emit-closure si env expr)   ;; <<<---- WORK IN PROGRESS
+  (emit "# emit-closure")
+  (emit "# si = ~s" si)
+  (emit "# env = ~s" env)
+  (emit "# expr = ~s" expr)  
+  (let* ([formals (closure-formals expr)]
+	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
-	 [cenv (extend-closure-env env frev)]
+	 [closed-env (extend-closure-env env freevars)]
 	 [entry-point (unique-label)]
 	 [exit-point (unique-label)]
-	 [size (* wordsize (+ 1 (length vars)))])
+	 [size (* wordsize (+ 1 (length freevars)))])
 
     ;; set the label field to L_yy
-    (emit "   movl $~a, 0(%ebp)  # closure label" entry-point)
+    ;;(emit "    movl $~a, 0(%ebp)  # closure label" entry-point)
+    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)
     
     ;; Copy the free vars values from the binding environment to the closure
-    (emit-close-free-vars wordsize env vars)
+    (emit-close-free-vars wordsize env freevars)
     
     ;; Return the tagged pointer to the heap allocated content
-    (emit "   movl %ebp, %eax    # return base ptr")
-    (emit "   add $~s, %eax      # closure tag"  closure-tag)
-    (emit "   add $~s, %ebp      # bump ebp" (align-to-8-bytes size))
+    (emit "    movl %ebp, %eax    # return base ptr")
+    (emit "    add $~s, %eax      # closure tag"  closure-tag)
+    (emit "    add $~s, %ebp      # bump ebp" (align-to-8-bytes size))
     
     ;; Jump around code for application of closure
-    (emit "   jmp $~s"  exit-point)
-    
+    (emit "    jmp ~a"  exit-point)
+    (emit "~a:" entry-point)
     ;; CLOSURE CODE HERE -- based on emit code
     ;; note that we use the closure environment here so free variable
     ;; references all resolve to the closure cells
     
-    (let f ([fmls fmls] [si (- wordsize)] [env cenv])
+    (let f ([fmls formals] [si (- wordsize)] [env closed-env])
       (cond
        [(empty? fmls)
 	(emit-tail-expr si env (cons ' begin body)) ;; implicit begin
-	(emit "    ret   # from closure")]  ;; <<--- Clearly every lambda needs a return
+	;(emit "    ret   # from closure")
+	] 
        [else
 	(f (rest fmls)
 	   (- si wordsize)
 	   (extend-env si env (first fmls)))]))
-
-    (emit "~s:" exit-point)    
+    (emit "    .align 4,0x90")
+    (emit "~a:" exit-point)    
     ))
-
-(define (emit-code env) 
-  (lambda (expr label)
-    (emit "# emit-code ~s" expr)
-    (emit-function-header label)  ;; <<--- ???
-    (let* ([fmls (code-formals expr)]
-	   [frev (code-freevars expr)]
-	   [body (code-body expr)]
-	   [env (extend-closure-env env frev)])
-      (emit "# fmls = ~s" fmls)
-      (emit "# frev = ~s" frev)
-      (emit "# body = ~s" body)
-      (emit "# env  = ~s"  env)
-      (let f ([fmls fmls] [si (- wordsize)] [env env])
-	(cond
-	 [(empty? fmls)
-	  (emit-tail-expr si env (cons ' begin body)) ;; implicit begin
-	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
-	 [else
-	  (f (rest fmls)
-	     (- si wordsize)
-	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
 
 (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
   (let* [(lvar (closure-lvar expr))
@@ -1513,7 +1496,7 @@
     (emit "# ~s" anno-expr)
    ;(let ([expr (transform-to-closures anno-expr)])
     (let ([expr anno-expr])
-      (emit "# == transform ==>~%")
+      (emit "# == null transform ==>~%")
       (emit "# ~s~%" expr)
       (cond
        ;[(letrec? expr) (emit-letrec expr)]
