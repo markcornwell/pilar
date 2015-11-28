@@ -76,18 +76,29 @@
   [(letrec ([f (lambda (x y) (fx+ x y))] 
             [g (lambda (x) (fx+ x 12))]) 
     (f 16 (f (g 0) (fx+ 1 (g 0))))) => "41\n"]
-
-  [(letrec ([f (lambda (x) (g x x))]   ;; <<<----- BROKE HERE
-            [g (lambda (x y) (fx+ x y))])
+  [(letrec ([g (lambda (x y) (fx+ x y))]
+	    [f (lambda (x) (g x x))])
      (f 12)) => "24\n"]
-  [(letrec ([f (lambda (x) 
-                 (if (fxzero? x)
-                     1
-                     (fx* x (f (fxsub1 x)))))])
-     (f 5)) => "120\n"]
-  [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
-            [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
-     (e 25)) => "#f\n"]
+
+;; border casese that pose special challenges
+  
+  ;; [(letrec ([f (lambda (x) (g x x))]   ;; <<<- Can't close unbound variables
+  ;;           [g (lambda (x y) (fx+ x y))])
+  ;;    (f 12)) => "24\n"]
+
+;; recursive call -- is this legal?
+  
+  ;; [(letrec ([f (lambda (x) 
+  ;;                (if (fxzero? x)
+  ;;                    1
+  ;;                    (fx* x (f (fxsub1 x)))))])
+  ;;    (f 5)) => "120\n"]
+
+;; mutually recursive calls inside a letrec.  Is this legal?
+  
+  ;; [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
+  ;;           [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
+  ;;    (e 25)) => "#f\n"]
      
 )
 
