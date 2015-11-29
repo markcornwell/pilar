@@ -1,7 +1,7 @@
 # -536870912
 # == vectorize-letrec ==>
 # -536870912
-# == annotate ==>
+# == close-free-variables ==>
 # -536870912
 # == null transform ==>
 
