@@ -75,31 +75,81 @@
 
   [(letrec ([f (lambda (x y) (fx+ x y))] 
             [g (lambda (x) (fx+ x 12))]) 
-    (f 16 (f (g 0) (fx+ 1 (g 0))))) => "41\n"]
+     (f 16 (f (g 0) (fx+ 1 (g 0))))) => "41\n"]
+  
   [(letrec ([g (lambda (x y) (fx+ x y))]
 	    [f (lambda (x) (g x x))])
      (f 12)) => "24\n"]
 
-;; border casese that pose special challenges
-  
-  ;; [(letrec ([f (lambda (x) (g x x))]   ;; <<<- Can't close unbound variables
-  ;;           [g (lambda (x y) (fx+ x y))])
-  ;;    (f 12)) => "24\n"]
+  ;; border casese that pose special challenges
 
-;; recursive call -- is this legal?
-  
-  ;; [(letrec ([f (lambda (x) 
-  ;;                (if (fxzero? x)
-  ;;                    1
-  ;;                    (fx* x (f (fxsub1 x)))))])
-  ;;    (f 5)) => "120\n"]
+   [(letrec ([f (lambda (x) (g x x))]   ;; <<<- Can't close over not-yet-bound g
+             [g (lambda (x y) (fx+ x y))])
+     (f 12)) => "24\n"]
 
-;; mutually recursive calls inside a letrec.  Is this legal?
+   ;;-------------------------------------------------------
+   ;; But why?  We should already know where the variable g will be allocated.
+   ;;
+   ;; This will rewrite into IL as
+   ;;
+   ;;  (letrec ([f (closure (x) (g) (g x x))]
+   ;;           [g (closure (x y) () (fx+ x y))])
+   ;;    (f 12))
+   ;;
+   ;; So clearly we can't copy the value of g into the the first closure
+   ;; since g will not have a value until we evaluate the second closure.
+   ;;
+   ;; Can we solve this with rewriting?
+   ;;
+   ;; Replace g with a vector.  Rewrite letrec as
+   ;;
+
+   [(let ([f (make-vector 1)] [g (make-vector 1)])
+         (vector-set! f 0 (closure (x) (g) ((vector-ref g 0) x x)))
+         (vector-set! g 0 (closure (x y) () (fx+ x y)))
+         ((vector-ref f 0) 12)) => "24\n"]
+   
+   ;; This test passes with our current implementation.  So all we need
+   ;; to do now is write up the transform.
+   ;;
+   ;;-------------------------------------------------------
+
+  ;; try the same tranform again
+
+  [(letrec ([f (lambda (x) 
+                 (if (fxzero? x)
+                     1
+                     (fx* x (f (fxsub1 x)))))])
+     (f 5)) => "120\n"]
+
+   ;; rewrites to
   
-  ;; [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
-  ;;           [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
-  ;;    (e 25)) => "#f\n"]
-     
+   [(let ([f (make-vector 1)])
+      (vector-set! f 0 (closure (x) (f) (if (fxzero? x)
+					   1
+					   (fx* x ((vector-ref f 0) (fxsub1 x))))))
+      ((vector-ref f 0) 5)) => "120\n"]
+   
+  ;; OMG!  This rewrite passed the test.  I am on to something!
+   
+  ;; mutually recursive calls inside a letrec.
+  
+  [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
+            [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
+     (e 25)) => "#f\n"]
+
+   [(let ([e (make-vector 1)] [o (make-vector 1)])
+      (vector-set! e 0 (closure (x) (o) (if (fxzero? x) #t ((vector-ref o 0) (fxsub1 x)))))
+      (vector-set! o 0 (closure (x) (e) (if (fxzero? x) #f ((vector-ref e 0) (fxsub1 x)))))
+      ((vector-ref e 0) 25)) => "#f\n"]
+
+   ;; and this rewrite works as well.
+   ;;
+   ;; The trick is that we use a unary vector as a holder for values that lets us delay
+   ;; the act of referencing the values.  Thus our closure does not copy the value, it copies
+   ;; a holder for the value, one that will get filled in before we look in the holder for the
+   ;; value.  Sounds complicated when you say it our loud, but it simple if you think about it.
+   ;;
 )
 
 (add-tests-with-string-output "deeply nested procedures"   ;; requires Proper Tail Calls

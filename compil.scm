@@ -53,13 +53,12 @@
 ;;            |  (<Expr> <Expr> ...)          ;; takes the place of funcall
 ;;            |  (closure ( <Var> ...) (<Ref> ...) <Expr>)
 ;;            |  (let ([<Var> <Expr>] ...) <Expr>)
-;;            |  (letrec ([<Var> <Expr>] ...) <Expr>)  ;; key for mutual recursion
 ;;
 ;;  <Ref>    ->  (free <num> <variable>)
 ;;            |  (bound <num> <variable>)
 ;;            |  (local <variable>)
 ;;
-;;  <Prim>   ->  symbols bound by define-primitive
+;;  <Prim>   ->  any symbol bound by define-primitive
 ;;
 ;;  <Immed>  ->  fixnum | boolean | char | null
 ;;
@@ -90,13 +89,12 @@
 ;;
 ;;   <Expr>   -> <Imm>
 ;;            |  <Var>
-;;            |  (begin <Expr> <Expr>)
+;;            |  (begin <Expr> ... )
 ;;            |  (if <Expr> <Expr> <Expr>)
 ;;            |  (<Prim> <Expr> ...)          ;; takes the place of app
 ;;            |  (<Expr> <Expr> ...)          ;; takes the place of funcall
 ;;            |  (closure (<Formals>) (<FreeVars>) <Expr>)
 ;;            |  (let ([<Var> <Expr>] ...) <Expr>)
-;;            |  (letrec ([<Var> <Expr>] ...) <Expr>)  ;; key for mutual recursion
 ;;
 ;;  <Formals>  -> <Var> ...
 ;;
@@ -705,8 +703,10 @@
   (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 
 (define (let-bindings x) (cadr x))
-;(define (let-body x) (caddr x))
-(define (let-body x) (cons 'begin (cddr x)))
+(define (let-body x)
+  (if (eq? (length x) 3)
+      (caddr x)
+      (cons 'begin (cddr x))))
 
 ;;--------------------------------------------
 ;;                 Environment
@@ -774,89 +774,11 @@
   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'letrec)))
   
 (define letrec-bindings cadr)
-;(define letrec-body caddr)
-(define (letrec-body x) (cons 'begin (cddr x)))
 
-(define (emit-letrec si env bindings body) ;; compare with emit-let
-  (emit "# emit-letrec")
-  (emit "#  si   = ~s" si)
-  (emit "#  env  = ~s" env)
-  (emit "#  bindings = ~s" bindings)
-  (emit "#  body = ~s" body)
-  ;; first build the environment
-  (let f1 ((si si) (new-env env) (b* bindings))
-     (cond
-      [(null? b*) (set! env new-env)]
-      [else
-         (let ([b (car b*)])
-           (f1 (next-stack-index si)
-              (extend-env si new-env (lhs b))
-              (cdr b*)))]))
-  ;; emit code for the exprs and then emit code for the body
-  (let f2 ((si si) (b* bindings))
-     (cond
-       [(null? b*)  (emit-expr si env body)]
-       [else
-         (let ([b (car b*)])
-           (emit-expr si env (rhs b))
-           (emit-stack-save si)
-           (f2 (next-stack-index si)
-              (cdr b*)))])))
-
-;; emit-tail-letrec is exactly like emit-letrece except that it
-;; calls emit-tail-expr on the body instead of emit-expr.
-
-(define (emit-tail-letrec si env bindings body) ;; compare with emit-let
-  (emit "# emit-let")
-  (emit "#  si   = ~s" si)
-  (emit "#  env  = ~s" env)
-  (emit "#  bindings = ~s" bindings)
-  (emit "#  body = ~s" body)
-  (let f1 ((si si) (new-env env) (b* bindings))
-     (cond
-      [(null? b*) (set! env new-env)]
-       [else
-         (let ([b (car b*)])
-           (f1 (next-stack-index si)
-              (extend-env si new-env (lhs b))
-              (cdr b*)))]))
-  (let f2 ((si si) (b* bindings))
-     (cond
-       [(null? b*)  (emit-tail-expr si env body)] ;; <-- only difference
-       [else
-         (let ([b (car b*)])
-           (emit-expr si env (rhs b))
-           (emit-stack-save si)
-           (f2 (next-stack-index si)
-              (cdr b*)))])))
-
-;;
-;; (define (emit-letrec expr)
-;;   (emit "# emit-letrec expr=~s" expr)
-;;   (let* ([bindings (letrec-bindings expr)]
-;; 	 [lvars (map lhs bindings)]
-;; 	 [lambdas (map rhs bindings)]
-;; 	 [labels (unique-labels lvars)]
-;; 	 [env (make-initial-env lvars labels)])
-;;     (emit "#  bindings=~s" bindings)
-;;     (emit "#  lvars=~s" lvars)
-;;     (emit "#  lambdas=~s" lambdas)
-;;     (emit "#  labels=~s" labels)
-;;     (emit "#  env=~s" env)
-;;     (emit "#  ---- >>>>> emit-lambdas start ----")
-;;     (for-each (emit-lambda env) lambdas labels)
-;;     (emit "#  ---- <<<<< emit-lambdas end ------")
-;;     (emit-scheme-entry env (letrec-body expr))))
-;;
-;;------------------------------------------------------------------
-;; env is a list of dotted pairs
-;; after adding procedure labels we have two kinds of bindings
-;; lvars bind to strings, vars bind to integers
-;; think this through
-;; - clearly emit-variable-ref should take only vars
-;; - variable? needs to distingush a var from an lvar
-;; - might be some advantage to having function label in environment
-;;------------------------------------------------------------------
+(define (letrec-body x)
+  (if (eq? (length x) 3)
+      (caddr x)
+      (cons 'begin (cddr x))))
 
 (define (lookup var env) ;; env is a list of dotted pairs
   (let ([pair (assoc var env)])
@@ -916,30 +838,6 @@
 ;;---------------------------------------------
 
 
-;; (define (codes? expr)
-;;   (and (pair? expr) (eq? (car expr) 'codes)))
-
-;; (define codes-bindings cadr)
-;; (define codes-body caddr)
-
-;; (define (emit-codes expr)
-;;   (emit "# emit-codes expr=~s" expr)
-;;   (let* ([bindings (codes-bindings expr)]
-;; 	 [lvars (map lhs bindings)]
-;; 	 [codes (map rhs bindings)]
-;; 	 [labels (unique-labels lvars)]
-;; 	 [env (make-initial-env lvars labels)])
-;;     (emit "#  bindings=~s" bindings)
-;;     (emit "#  lvars=~s" lvars)
-;;     (emit "#  codes=~s" codes)
-;;     (emit "#  labels=~s" labels)
-;;     (emit "#  env=~s" env)
-;;     (emit "#  ---- >>>>> emit-codes start ----")
-;;     (for-each (emit-code env) codes labels)
-;;     (emit "#  ---- <<<<< emit-codes end ------")
-;;     (emit-scheme-entry env (codes-body expr))))
-
-
 (define (unique-labels lvars)
     (define (assign-label v) (unique-label))
     (map assign-label lvars))
@@ -950,60 +848,7 @@
    [else (cons (cons (car lvars) (car labels))
 	       (make-initial-env (cdr lvars) (cdr labels)))])) 
 
-;; (define (lambda? expr)
-;;   (and (pair? expr) (eq? (car expr) 'lambda)))
-
-;; (define lambda-formals cadr)
-;; (define lambda-body  caddr)
-
 (define empty? null?)
-
-;; (define (emit-lambda env) 
-;;   (lambda (expr label)
-;;     (emit-function-header label)
-;;     (let ([fmls (lambda-formals expr)]
-;; 	  [body (lambda-body expr)])
-;;       (let f ([fmls fmls] [si (- wordsize)] [env env])
-;; 	(cond
-;; 	 [(empty? fmls)
-;; 	  (emit-tail-expr si env body)
-;; 	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
-;; 	 [else
-;; 	  (f (rest fmls)
-;; 	     (- si wordsize)
-;; 	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
-
-;; (code (formals ...) (freevars ...) body)
-
-;; (define (code? expr)
-;;   (and (pair? expr) (eq? (car expr) 'code)))
-
-;; (define code-formals cadr)
-;; (define code-freevars caddr)
-;; (define code-body cdddr)
-;(define (code-body expr) (cons 'begin (cdddr expr)))   ;; implicit begin
-
-;; (define (emit-code env) 
-;;   (lambda (expr label)
-;;     (emit "# emit-code ~s" expr)
-;;     (emit-function-header label)  ;; <<--- ???
-;;     (let* ([fmls (code-formals expr)]
-;; 	   [frev (code-freevars expr)]
-;; 	   [body (code-body expr)]
-;; 	   [env (extend-closure-env env frev)])
-;;       (emit "# fmls = ~s" fmls)
-;;       (emit "# frev = ~s" frev)
-;;       (emit "# body = ~s" body)
-;;       (emit "# env  = ~s"  env)
-;;       (let f ([fmls fmls] [si (- wordsize)] [env env])
-;; 	(cond
-;; 	 [(empty? fmls)
-;; 	  (emit-tail-expr si env (cons ' begin body)) ;; implicit begin
-;; 	  (emit "    ret   # from lambda")]  ;; <<--- Clearly every lambda needs a return
-;; 	 [else
-;; 	  (f (rest fmls)
-;; 	     (- si wordsize)
-;; 	     (extend-env si env (first fmls)))])))))  ;; <<---- order correct
 
 (define (extend-closure-env env frev)
   (let f ([frev frev] [ci wordsize] [env env])
@@ -1162,9 +1007,6 @@
 ;; singleton vectors to solve this. 
 ;;-------------------------------------------------------
 
-;; (define (code? expr)
-;;   (and (pair? expr) (eq? (car expr) 'code)))
-
 (define (closure? expr)
    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'closure)))
 
@@ -1264,7 +1106,6 @@
   (and (pair? expr) (eq? (car expr) 'lambda)))
 
 (define lambda-formals cadr)
-;(define lambda-body caddr)  ;; cddr?
 (define (lambda-body expr)
   (if (lambda? expr)
       (if (fx= (length expr) 3)
@@ -1383,7 +1224,7 @@
 
 
 ;;--------------------------------------------
-;;  set! elimination
+;;  set! elimination     TBD
 ;;--------------------------------------------
 ;;
 ;;  (lambda (x) (set! x e1) (fx+ x 1))
@@ -1404,6 +1245,37 @@
 ;;
 ;;--------------------------------------------
 
+
+;;--------------------------------------------
+;;       letrec elimination  -- IT WORKS!
+;;--------------------------------------------
+
+(define (vectorize-letrec exp)
+
+  (define (wrapper vars ee)
+    (cond
+     [(pair? ee) (cons (wrapper vars (car ee)) (wrapper vars (cdr ee)))]			  
+     [(and (symbol? ee) (memq ee vars)) (list 'vector-ref ee 0)]
+     [else ee]))
+  
+  (cond
+   [(letrec? exp)
+    (let* ([bindings (letrec-bindings exp)]
+	   [vars (map car bindings)]
+	   [exps (map cadr bindings)]
+	   [body (letrec-body exp)]
+	   [wrap (lambda (e) (wrapper vars e))])
+      (list 'let
+	    (map (lambda (v) (list v '(make-vector 1))) vars)
+	    (cons 'begin
+		  (map (lambda (v e) (list 'vector-set! v 0 e))
+		       vars
+		       (map wrap exps)))
+	    (wrap body)))]
+   [(pair? exp)
+    (cons (vectorize-letrec (car exp))
+	  (vectorize-letrec (cdr exp)))]
+   [else exp]))
 
 
 ;;--------------------------------------------
@@ -1484,29 +1356,17 @@
   (emit "    ret"))
 
 ;;----------------------------------------------------------
-;; Closure Transformation
-;;
 ;; emit-program is the top level of the compiler; applies
 ;; the pre-processor passes before generating code.
 ;;----------------------------------------------------------
 
-;; (define (emit-program raw-expr)
-;;   (emit "# ~s" raw-expr)
-;;   (let ([anno-expr  (annotate-free-variables '() raw-expr)])
-;;     (emit "# == annotate ==>")
-;;     (emit "# ~s" anno-expr)
-;;     (let ([expr (transform-to-closures anno-expr)])
-;;       (emit "# == transform ==>~%")
-;;       (emit "# ~s~%" expr)
-;;       (cond
-;;        ;;[(letrec? expr) (emit-letrec expr)]
-;;        [(codes? expr)  (emit-codes expr)]
-;;        [else           (emit-scheme-entry '() expr)]))))
-
 
 (define (emit-program raw-expr)
   (emit "# ~s" raw-expr)
-  (let ([anno-expr  (annotate-free-variables '() raw-expr)])
+  (let ([vl-expr (vectorize-letrec raw-expr)])
+    (emit "# == vectorize-letrec ==>")
+    (emit "# ~s" vl-expr)
+  (let ([anno-expr  (annotate-free-variables '() vl-expr)])
     (emit "# == annotate ==>")
     (emit "# ~s" anno-expr)
    ;(let ([expr (transform-to-closures anno-expr)])
@@ -1516,7 +1376,7 @@
       (cond
        ;[(letrec? expr) (emit-letrec expr)]
        ;[(codes? expr)  (emit-codes expr)]
-       [else           (emit-scheme-entry '() expr)]))))
+       [else           (emit-scheme-entry '() expr)])))))
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")

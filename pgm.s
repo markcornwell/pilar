@@ -1,33 +1,34 @@
-# (let ((x 12)) (set! x 13) x)
+# -536870912
+# == vectorize-letrec ==>
+# -536870912
 # == annotate ==>
-# (let ((x 12)) (begin (set! x 13) x))
+# -536870912
 # == null transform ==>
 
-# (let ((x 12)) (begin (set! x 13) x))
+# -536870912
 
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-# emit-let
-#  si   = -4
-#  env  = ()
-#  bindings = ((x 12))
-#  body = (begin (begin (set! x 13) x))
-    movl $48, %eax     # immed 12
-    movl %eax, -4(%esp)
-# emit-begin
-#   body=((begin (set! x 13) x))
-#   env=((x . -4))
-# emit-begin
-#   body=((set! x 13) x)
-#   env=((x . -4))
-# funcall
-#  si   =-8
-#  env  = ((x . -4))
-#  expr = (funcall set! x 13)
-    movl -4(%esp), %eax
-    mov %eax, -16(%esp)    # arg x
-    movl $52, %eax     # immed 13
-    mov %eax, -20(%esp)    # arg 13
-#  oper = set!
+    movl $-2147483648, %eax     # immed -536870912
+    ret
+    .text
+    .align 4,0x90
+    .globl _scheme_entry
+_scheme_entry:
+    movl 4(%esp), %ecx
+    movl %ebx, 4(%ecx)
+    movl %esi, 16(%ecx)
+    movl %edi, 20(%ecx)
+    movl %ebp, 24(%ecx)
+    movl %esp, 28(%ecx)
+    movl 12(%esp), %ebp
+    movl 8(%esp), %esp
+    call _L_scheme_entry
+    movl 4(%ecx), %ebx
+    movl 16(%ecx), %esi
+    movl 20(%ecx), %edi
+    movl 24(%ecx), %ebp
+    movl 28(%ecx), %esp
+    ret
