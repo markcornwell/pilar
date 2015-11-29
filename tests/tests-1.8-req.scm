@@ -153,15 +153,42 @@
 )
 
 (add-tests-with-string-output "deeply nested procedures"   ;; requires Proper Tail Calls
+
+;; Sum of first N integers
 			      
   [(letrec ([sum (lambda (n ac)
                    (if (fxzero? n)
                         ac
-                        (app sum (fxsub1 n) (fx+ n ac))))])
-    (sum 10000 0)) => "50005000\n"]
+                        (sum (fxsub1 n) (fx+ n ac))))])
+     (sum 10 0)) => "55\n"]
 
-  [(letrec ([e (lambda (x) (if (fxzero? x) #t (app o (fxsub1 x))))]
-            [o (lambda (x) (if (fxzero? x) #f (app e (fxsub1 x))))])
+  [(letrec ([sum (lambda (n ac)
+                   (if (fxzero? n)
+		       ac
+		       (sum (fxsub1 n) (fx+ n ac))))])
+     (sum 100 0)) => "5050\n"]
+
+  [(letrec ([sum (lambda (n ac)
+                   (if (fxzero? n)
+		       ac
+		       (sum (fxsub1 n) (fx+ n ac))))])
+     (sum 1000 0)) => "500500\n"]
+  
+			      
+  [(letrec ([sum (lambda (n ac)
+                   (if (fxzero? n)
+                        ac
+                        (sum (fxsub1 n) (fx+ n ac))))])
+     (sum 10000 0)) => "50005000\n"]
+
+  ;; Determining even or odd by subtracting 1 until you reach 0
+
+  [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
+            [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
+     (e 5)) => "#f\n"]  
+
+  [(letrec ([e (lambda (x) (if (fxzero? x) #t (o (fxsub1 x))))]
+            [o (lambda (x) (if (fxzero? x) #f (e (fxsub1 x))))])
      (e 5000000)) => "#t\n"]
 
   )
