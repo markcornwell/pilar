@@ -17,28 +17,8 @@
 ;; 1.1 Integers
 ;;
 ;; runs under petite chez scheme
-
 ;; petite compil.scm
-;; (test-all)
-
-;;-----------------------------------------------------
-;; Code Generator Input Language:    TBD -- REVISE
 ;;
-;;  <Program> -> <Expr>
-;;            |  (letrec ([lvar <Lambda>] ...) <Expr>)
-;;
-;;  <Lambda>  -> (lamba (var ...) <Expr>)
-;;
-;;  <Expr>    -> <Immediate>
-;;            |  var
-;;            | (if <Expr> <Expr> <Expr>)
-;;            | (let ([var <Expr>] ...) <Expr> ...)
-;;            | (app lvar <Expr> ...)   
-;;            | (prim <Expr>)
-;;
-;;  <Immediate>  -> fixnum | boolean | char | null
-;;-----------------------------------------------------
-
 ;;-----------------------------------------------------
 ;; Intermediate Language (IL):    DYBVIG's Version
 ;;
@@ -1166,7 +1146,7 @@
   (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
-  (memq expr '(app begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
+  (memq expr '(begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
 
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
@@ -1195,7 +1175,6 @@
 
 (define (symbol<=? a b)
   (or (symbol<? a b) (symbol=? a b)))
-
 
 (define (elim-dups lst)
   (elim-dups1 (sort lst) '()))
@@ -1287,40 +1266,32 @@
    [else exp]))
 
 ;;--------------------------------------------
-;;           Expression Dispatcher
+;;        Expression Dispatcher
 ;;--------------------------------------------
 
-;; (define (app? expr)
-;;   (and (pair? expr) (eq? (car expr) 'app)))
 
 (define (funcall? expr)
   (and (pair? expr)
-       (or (eq? (car expr) 'funcall) (eq? (car expr) 'app))))  ;; make app a synonym for funcall
-;; NOTE: cleaner to do this substitution in a pre-processing pass.
-
+       (or (eq? (car expr) 'funcall) (eq? (car expr) 'app))))
 
 (define (begin? expr)
-    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin))) 
+  (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin)))
 
 (define (emit-expr si env expr)
+  
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings  
-  ;; (define (lvar-app? expr)
-  ;;   (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
+
   (cond
     [(immediate? expr)  (emit-immediate expr)]
     [(variable? expr)   (emit-variable-ref env expr)]
     [(begin? expr)      (emit-begin si env (begin-body expr))]
     [(closure? expr)    (emit-closure si env expr)]
     [(funcall? expr)    (emit-funcall si env expr)]
-   ; [(app? expr)        (emit-app si env expr)]
-   ; [(lvar-app? expr)   (emit-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
-   ; [(lvar-app? expr)   (emit-app si env (cons 'app expr))]  ;; supply implicit app
     [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-let* si env (let-bindings expr) (let-body expr))]
-    [(letrec? expr)     (emit-letrec si env (letrec-bindings expr)(letrec-body expr))]
     [(primcall? expr)   (emit-primcall si env expr)]
     [(if? expr)         (emit-if si env expr)]
     [(and? expr)        (emit-and si env expr)]
@@ -1343,11 +1314,8 @@
     [(app? expr)        (emit-tail-app si env expr)]
     [(closure? expr)    (emit-tail-closure si env expr)] ;; NEW
     [(funcall? expr)    (emit-tail-funcall si env expr)] ;; NEW
-   ; [(lvar-app? expr)   (emit-tail-funcall si env (cons 'funcall expr))] ;; supply implicit funcall
-    [(lvar-app? expr)   (emit-tail-app si env (cons 'app expr))] ;; supply implicit app
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
-    [(letrec? expr)     (emit-tail-letrec si env (letrec-bindings expr) (letrec-body expr))]
     [(primcall? expr)   (emit-tail-primcall si env expr)]
     [(if? expr)         (emit-tail-if si env expr)]
     [(and? expr)        (emit-tail-and si env expr)]
