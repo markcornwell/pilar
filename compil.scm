@@ -96,6 +96,104 @@
 ;;  Trying to keep this version of the grammer aligned with the code in this file.
 ;;--------------------------------------------------------------------------------
 
+
+;;--------------------------------------------------------------------------------
+;;                                    Proper Tail Recursion
+;;--------------------------------------------------------------------------------
+;;
+;; Implementations of Scheme are required to be properly tail-recursive. Procedure
+;; calls that occur in certain syntactic contexts defined below are ‘tail calls’.
+;; A Scheme implementation is properly tail-recursive if it supports an unbounded
+;; number of active tail calls. 
+;;
+;; A tail call is a procedure call that occurs in a tail con- text. Tail contexts
+;; are defined inductively. Note that a tail context is always determined with
+;; respect to a particular lambda expression.
+;;
+;; * The last expression within the body of a lambda ex- pression, shown as
+;;   ⟨tail expression⟩ below, occurs in a tail context.
+;;
+;;    (lambda ⟨formals⟩ ⟨definition⟩* ⟨expression⟩* ⟨tail expression⟩)
+;;
+;; * If one of the following expressions is in a tail context, then the
+;;   subexpressions shown as ⟨tail expression⟩ are in a tail context. These were
+;;   derived from rules given in chapter 7 by replacing some occurrences of
+;;   ⟨expression⟩ with ⟨tail expression⟩. Only those rules that contain tail contexts
+;;   are shown here.
+;;
+;; (if ⟨expression⟩ ⟨tail expression⟩ ⟨tail expression⟩)
+;; (if ⟨expression⟩ ⟨tail expression⟩)
+;;
+;; (cond ⟨cond clause⟩+)
+;; (cond ⟨cond clause⟩* (else ⟨tail sequence⟩))
+;;
+;; (case ⟨expression⟩
+;;   ⟨case clause⟩+)
+;; (case ⟨expression⟩
+;;   ⟨case clause⟩*
+;;   (else ⟨tail sequence⟩))
+;;
+;; (and ⟨expression⟩* ⟨tail expression⟩)
+;; (or ⟨expression⟩* ⟨tail expression⟩)
+;;
+;; (let (⟨binding spec⟩*) ⟨tail body⟩)
+;; (let ⟨variable⟩ (⟨binding spec⟩*) ⟨tail body⟩)
+;; (let* (⟨binding spec⟩*) ⟨tail body⟩)
+;; (letrec (⟨binding spec⟩*) ⟨tail body⟩)
+;;
+;; (let-syntax (⟨syntax spec⟩*) ⟨tail body⟩)
+;; (letrec-syntax (⟨syntax spec⟩*) ⟨tail body⟩)
+;;
+;; (begin ⟨tail sequence⟩)
+;;
+;; (do (⟨iteration spec⟩*)
+;;     (⟨test⟩ ⟨tail sequence⟩)
+;;   ⟨expression⟩*)
+;;
+;; where
+;;
+;; ⟨cond clause⟩ −→ (⟨test⟩ ⟨tail sequence⟩)
+;; ⟨case clause⟩ −→ ((⟨datum⟩*) ⟨tail sequence⟩)
+;;
+;; ⟨tail body⟩ −→ ⟨definition⟩* ⟨tail sequence⟩
+;; ⟨tail sequence⟩ −→ ⟨expression⟩* ⟨tail expression⟩
+;;
+;; *  If a cond expression is in a tail context, and has a clause of the form
+;;    (⟨expression1⟩ => ⟨expression2⟩) then the (implied) call to the procedure
+;;    that results from the evaluation of ⟨expression2⟩ is in a tail context.
+;;    ⟨expression2⟩ itself is not in a tail context.
+;;
+;;--------------------------------------------------------------------------------
+
+;;--------------------------------------------------------------------------------
+;;                                  Proper Tail Calls
+;;--------------------------------------------------------------------------------
+;; The Scheme report requires that implementations be properly tail-recursive. By
+;; treating tail-calls properly, we guarantee that an un- bounded number of tail
+;; calls can be performed in constant space.
+;;
+;; So far, our compiler would compile tail-calls as regular calls followed by a
+;; return. A proper tail-call, on the other hand, must perform a jmp to the target
+;; of the call, using the same stack position of the caller itself.
+;;
+;; A very simple way of implementing tail-calls is as follows (illustrated in Figure 3):
+;;
+;; 1. All the arguments are evaluated and saved on the stack in the same way arguments
+;;    to nontail calls are evaluated.
+;;
+;; 2. The operator is evaluated and placed in the %edi register replacing the current
+;;    closure pointer.
+;;
+;; 3. The arguments are copied from their current position of the stack to the
+;;    positions adjacent to the return-point at the base of the stack.
+;; 
+;; 4. An indirect jmp, not call, through the address in the closure pointer is issued.
+;;
+;; This treatment of tail calls is the simplest way of achieving the objective of the
+;; requirement. Other methods for enhancing performance by minimizing the excessive
+;; copying are discussed later in Section 4.
+;;--------------------------------------------------------------------------------
+
 (load "tests-driver.scm")
 
 ;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
@@ -785,6 +883,9 @@
     (and pair (cdr pair))))
 
 (define (emit-variable-ref env var)
+  (emit "# emit-variable-ref")
+  (emit "# env=~s" env)
+  (emit "# var=~s" var)
   (let ([i (lookup var env)])
     (cond
      [(and (fixnum? i) (fx> i 0))
@@ -793,7 +894,9 @@
         (emit-stack-load i)])))
 
 (define (emit-tail-variable-ref env var)
-  (emit-variable-ref (lookup var env))
+  ;; (emit-variable-ref (lookup var env))
+  (emit "# emit-tail-variable-ref")
+  (emit-variable-ref env var)
   (emit "    ret"))
 
 ;;----------------------------------------------------
@@ -906,32 +1009,58 @@
   (emit "    movl ~s(%esp), %edi" si))   ;; restore closure frame pointer %edi
 
 
-(define (emit-tail-funcall si env expr) ;;  <<<-- FIX LATER; model on emit-tail-app
-  (define (emit-arguments si env args)
+;; (define (emit-tail-funcall si env expr) ;;  <<<-- FIX LATER; model on emit-tail-app
+;;   (define (emit-arguments si env args)
+;;     (unless (empty? args)
+;;         (emit-expr si env (first args))                    ;; evaluated arg in %eax
+;;         (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
+;;         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
+;;   (define (emit-shift-args argc si delta)
+;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
+;;     (unless (zero? argc)
+;; 	(emit "    mov ~a(%esp), %ebx  # shift arg" si )
+;; 	(emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
+;; 	(emit-shift-args (- argc 1) (- si wordsize) delta)))  
+;;   (define (emit-jmp si label)
+;;     (emit "    jmp ~a   # app  " label))
+
+;;   ;; evaluate the arguments leaving them on the stack
+;;   (emit-arguments (- si wordsize) (funcall-args expr))
+
+;;   ;; shift the evaluated arguments down to the expected parameter positions
+;;   (let ([argc (length (funcall-args expr))]
+;; 	[si (- si wordsize)]
+;; 	[delta (- -4 (- si wordsize))])
+;;     (emit-shift-args argc si delta))
+  
+;;   ;; jump to the start of the call -- it should have a label
+;;   (emit-jmp si (lookup (funcall-target expr) env)))
+
+(define (emit-tail-funcall si env expr)
+  
+  (define (emit-arguments si args)
     (unless (empty? args)
-        (emit-expr si env (first args))                    ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
-        (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
+        (emit-expr si env (first args))                ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)    # arg" si)    ;; save %eax as evaluated arg    
+        (emit-arguments (- si wordsize) (rest args))))
+  
   (define (emit-shift-args argc si delta)
     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
     (unless (zero? argc)
-	(emit "    mov ~a(%esp), %ebx  # shift arg" si )
-	(emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-	(emit-shift-args (- argc 1) (- si wordsize) delta)))  
-  (define (emit-jmp si label)
-    (emit "    jmp ~a   # app  " label))
+	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
+	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
+	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
 
-  ;; evaluate the arguments leaving them on the stack
+  (emit "# emit-tail-funcall")
+  
   (emit-arguments (- si wordsize) (funcall-args expr))
-
-  ;; shift the evaluated arguments down to the expected parameter positions
+  
   (let ([argc (length (funcall-args expr))]
-	[si (- si wordsize)]
-	[delta (- -4 (- si wordsize))])
+	   [si (- si wordsize)]
+	   [delta (- -8 (- si wordsize))]) ;; ?should this be -8?
     (emit-shift-args argc si delta))
   
-  ;; jump to the start of the call -- it should have a label
-  (emit-jmp si (lookup (funcall-target expr) env)))  
+  (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
 
   ;; (define (emit-adjust-base si)  ;; <<--- is this even used???
@@ -981,18 +1110,22 @@
   (cond
    [(null? body) '()]
    [(not (pair? body))
-     (error "begin" "begin body must be null or a pair" body)]
+    (error "begin" "begin body must be null or a pair" body)]
+ ;  [(eq? (length body) 1)
+ ;   (emit-tail-expr si env (car body))]  ;; last expr is tail-expr
    [else
      (emit-expr si env (car body))
      (emit-begin si env (cdr body))]))     ;; <<--- reuse si or bump it ???
 
-(define (emit-tail-begin si env body)
+(define (emit-tail-begin si env body)  ;; this is the body, not the expr
   (emit "# tail-begin body=~s" body)
   (cond
    [(null? body)
     (emit "    ret")]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
+   [(eq? (length body) 1)
+     (emit-tail-expr si env (car body))]  ;; last expr is tail-expr  
    [else
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
@@ -1089,6 +1222,7 @@
     ))
 
 (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
+  (emit "emit-tail-closure TBD")
   (let* [(lvar (closure-lvar expr))
 	 (vars (closure-vars expr))
 	 (size (* wordsize (+ 1 (length vars))))]
@@ -1293,7 +1427,6 @@
 ;;        Expression Dispatcher
 ;;--------------------------------------------
 
-
 (define (funcall? expr)
   (and (pair? expr)
        (or (eq? (car expr) 'funcall) (eq? (car expr) 'app))))
@@ -1307,7 +1440,7 @@
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings  
-
+  (emit "# emit-expr")
   (cond
     [(immediate? expr)  (emit-immediate expr)]
     [(variable? expr)   (emit-variable-ref env expr)]
@@ -1329,9 +1462,13 @@
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair))))))   ;; ignore lvar bindings
-  (define (lvar-app? expr)  ;; there used to be lvar applications; resurrect this to co-exist with closures??
-    (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
-(cond
+  ;; (define (lvar-app? expr)  ;; there used to be lvar applications; resurrect this to co-exist with closures??
+  ;;   (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
+  (emit "# emit-tail-expr")
+  (emit "# si=~s" si)
+  (emit "# env=~s" env)
+  (emit "# expr=~s" expr)
+  (cond
     [(immediate? expr)  (emit-tail-immediate expr)]
     [(variable? expr)   (emit-tail-variable-ref env expr)]
     [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
