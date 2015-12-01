@@ -88,17 +88,23 @@ _L_43:
 # env=((g . -8) (x . -4))
 # var=x
     movl -4(%esp), %eax
-    mov %eax, -16(%esp)    # arg
+    mov %eax, -20(%esp)    # arg
 # emit-expr
     movl $400, %eax     # immed 100
-    mov %eax, -20(%esp)    # arg
-# emit-shift-args:  argc=2   si=-16  delta=8
+    mov %eax, -24(%esp)    # arg
+# emit-expr
+# emit-variable-ref
+# env=((g . -8) (x . -4))
+# var=g
+    movl -8(%esp), %eax
+    movl %eax, %edi   # put funcall op into %edi
+# emit-shift-args:  argc=2   si=-16  delta=-20
     mov -16(%esp), %ebx  # shift arg
-    mov %ebx, -8(%esp)  # down to base
-# emit-shift-args:  argc=1   si=-20  delta=8
+    mov %ebx, -36(%esp)  # down to base
+# emit-shift-args:  argc=1   si=-20  delta=-20
     mov -20(%esp), %ebx  # shift arg
-    mov %ebx, -12(%esp)  # down to base
-# emit-shift-args:  argc=0   si=-24  delta=8
+    mov %ebx, -40(%esp)  # down to base
+# emit-shift-args:  argc=0   si=-24  delta=-20
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
 _L_41:
@@ -117,12 +123,12 @@ _L_41:
 # env=((f . -4))
 # var=f
     movl -4(%esp), %eax
-    movl %edi, -8(%esp)
-    movl %eax, %edi
+    movl %edi, -8(%esp)   # save old closure
+    movl %eax, %edi       # set current closure from procedure
     add $-8, %esp    # adjust base
-     call *-2(%edi)
+    call *-2(%edi)  # call thru closure ptr
     add $8, %esp    # adjust base
-    movl -8(%esp), %edi
+    movl -8(%esp), %edi #restore closure frame ptr
     ret
     .text
     .align 4,0x90
@@ -136,6 +142,7 @@ _scheme_entry:
     movl %esp, 28(%ecx)
     movl 12(%esp), %ebp
     movl 8(%esp), %esp
+    movl $0xffff, %edi
     call _L_scheme_entry
     movl 4(%ecx), %ebx
     movl 16(%ecx), %esi

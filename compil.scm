@@ -106,7 +106,7 @@
 ;; A Scheme implementation is properly tail-recursive if it supports an unbounded
 ;; number of active tail calls. 
 ;;
-;; A tail call is a procedure call that occurs in a tail con- text. Tail contexts
+;; A tail call is a procedure call that occurs in a tail context. Tail contexts
 ;; are defined inductively. Note that a tail context is always determined with
 ;; respect to a particular lambda expression.
 ;;
@@ -1001,12 +1001,12 @@
   (emit-arguments (- si 8) env (funcall-args expr)) ;; leaving room for 2 values
   (emit "#  oper = ~s" (funcall-oper expr))
   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
-  (emit "    movl %edi, ~s(%esp)" si)    ;; save old closure frame pointer
-  (emit "    movl %eax, %edi")           ;; funcall oper is in %eax; it will be a closure
+  (emit "    movl %edi, ~s(%esp)   # save old closure" si)  
+  (emit "    movl %eax, %edi       # set current closure from procedure")   
   (emit-adjust-base (+ si))              ;; the value of %esp is adjusted by si [?? why by si????]
-  (emit "     call *-2(%edi)")           ;; closure ptr will be in %eax since arg1 emitted last
+  (emit "    call *-2(%edi)  # call thru closure ptr") ;; closure ptr in %eax since arg1 emitted last
   (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
-  (emit "    movl ~s(%esp), %edi" si))   ;; restore closure frame pointer %edi
+  (emit "    movl ~s(%esp), %edi #restore closure frame ptr" si))
 
 
 ;; (define (emit-tail-funcall si env expr) ;;  <<<-- FIX LATER; model on emit-tail-app
@@ -1036,7 +1036,7 @@
 ;;   ;; jump to the start of the call -- it should have a label
 ;;   (emit-jmp si (lookup (funcall-target expr) env)))
 
-(define (emit-tail-funcall si env expr)
+(define (emit-tail-funcall si env expr)  ;; <-- ALL MESSED UP.  WHY TAIL CALL IF NOT A RECURSIVE CALL???
   
   (define (emit-arguments si args)
     (unless (empty? args)
@@ -1052,16 +1052,35 @@
 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
 
   (emit "# emit-tail-funcall")
-  
-  (emit-arguments (- si wordsize) (funcall-args expr))
-  
-  (let ([argc (length (funcall-args expr))]
-	   [si (- si wordsize)]
-	   [delta (- -8 (- si wordsize))]) ;; ?should this be -8?
-    (emit-shift-args argc si delta))
-  
-  (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
+  ;; emit the procedure object in old closure position on the stack
+  ;; ISSUE: Are be certain this is a procedure?  If it is variable, its binding
+  ;; should be a procedure object.  What if it is an integer?  We are currently
+  ;; not checking for any of this?
+  ;(emit-expr si env (funcall-oper expr))
+  
+  (emit-arguments (- si 8) (funcall-args expr)) 
+  ;(emit-arguments si (funcall-args expr))
+  
+  ;; emit the funcall operator
+  (emit-expr (- si 8 (* 4 (length (funcall-args expr))))
+	     env
+	     (funcall-oper expr))
+
+  ;; Copy the evaluated funcall operator into the %edi register
+  (emit "    movl %eax, %edi   # put funcall op into %edi")
+
+  ;; How far down to shift?  Given we emitted arg1 .. argN
+  ;; we know that arg1 is at si,  we want to move it to -8
+  ;; the position of arg1.  So the delta is (si-8) for
+  ;; any si.
+ 
+  (let ([argc (length (funcall-args expr))]
+	[si (- si 4)]
+	[delta (- si 8)])
+    (emit-shift-args argc si delta))
+
+  (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
   ;; (define (emit-adjust-base si)  ;; <<--- is this even used???
   ;;   (unless (eq? si 0)
@@ -1076,7 +1095,6 @@
   ;; (emit "    call -6(%edi)")             ;; an indirect call to label field of the closure is issued
   ;; (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [???]
   ;; (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
-
 
 ;;---------------------End  Funcall ----------------------
 
@@ -1111,11 +1129,9 @@
    [(null? body) '()]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
- ;  [(eq? (length body) 1)
- ;   (emit-tail-expr si env (car body))]  ;; last expr is tail-expr
    [else
      (emit-expr si env (car body))
-     (emit-begin si env (cdr body))]))     ;; <<--- reuse si or bump it ???
+     (emit-begin si env (cdr body))])) ;; <<--- reuse si, prev expr just there for side effects
 
 (define (emit-tail-begin si env body)  ;; this is the body, not the expr
   (emit "# tail-begin body=~s" body)
@@ -1125,7 +1141,7 @@
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
    [(eq? (length body) 1)
-     (emit-tail-expr si env (car body))]  ;; last expr is tail-expr  
+     (emit-tail-expr si env (car body))]  ;; last expr is a tail-expr ISSUE: BLOWS UP
    [else
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
@@ -1175,7 +1191,7 @@
 		(emit "   movl  %eax, ~s(%ebp)" ci)))              ;; copy that value to the closure cell
 	  (emit-close-free-vars (+ wordsize ci) env (cdr vars))))  ;; recursively process remaining free vars
 
-(define (emit-closure si env expr)   ;; <<<---- WORK IN PROGRESS
+(define (emit-closure si env expr)
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
@@ -1188,9 +1204,9 @@
 	 [exit-point (unique-label)]
 	 [size (* wordsize (+ 1 (length freevars)))])
 
-    ;; set the label field to L_yy
-    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)
-    
+    ;; Set the label field to L_yy
+    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)  ;; <-- blows up in here AT RUNTIME
+ 
     ;; Copy the free vars values from the binding environment to the closure
     (emit-close-free-vars wordsize env freevars)
     
@@ -1211,7 +1227,7 @@
       (cond
        [(empty? fmls)
 	(emit-tail-expr si env (cons ' begin body)) ;; implicity on-the-fly begin
-	;(emit "    ret   # from closure")
+	;(emit "    ret   # from closure") ;;  needed???
 	] 
        [else
 	(f (rest fmls)
@@ -1221,15 +1237,15 @@
     (emit "~a:" exit-point)    
     ))
 
-(define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
-  (emit "emit-tail-closure TBD")
-  (let* [(lvar (closure-lvar expr))
-	 (vars (closure-vars expr))
-	 (size (* wordsize (+ 1 (length vars))))]
-    (emit "   movl $~a, 0(%ebp) # store label" (lookup lvar env))
-    (emit "   movl %ebp, %eax   # return heap base ptr")
-    (emit "   add $~s, %eax     # closure tag "  closure-tag)
-    (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
+;; (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
+;;   (emit "emit-tail-closure TBD")
+;;   (let* [(lvar (closure-lvar expr))
+;; 	 (vars (closure-vars expr))
+;; 	 (size (* wordsize (+ 1 (length vars))))]
+;;     (emit "   movl $~a, 0(%ebp) # store label" (lookup lvar env))
+;;     (emit "   movl %ebp, %eax   # return heap base ptr")
+;;     (emit "   add $~s, %eax     # closure tag "  closure-tag)
+;;     (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
  
 ;;--------------------------------------------------------------------
 ;;    Free variables and transforming lambda forms to closure forms
@@ -1279,15 +1295,6 @@
 	   [nbv (append vars bound-vars)]
 	   [new-body (close-free-variables nbv (let-body expr))])
       (list 'let new-bindings new-body))]
-   [(letrec? expr)
-    (let* ([bindings (letrec-bindings expr)]
-	   [vars (map car bindings)]
-	   [exps (map cadr bindings)]
-	   [nbv (append vars bound-vars)]
-	   [new-exps (map (lambda (e) (close-free-variables nbv e)) exps)]
-	   [new-bindings (map list vars new-exps)]
-	   [new-body (close-free-variables nbv (letrec-body expr))])
-      (list 'letrec new-bindings new-body))]
    [(pair? expr)
      (cons (close-free-variables bound-vars (car expr))
 	   (close-free-variables bound-vars (cdr expr)))]
@@ -1522,6 +1529,7 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
+  (emit "    movl $0xffff, %edi")   ;; sentinal in current closure
   (emit "    call _L_scheme_entry")
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
