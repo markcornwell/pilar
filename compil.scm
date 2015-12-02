@@ -695,9 +695,12 @@
     (apply (primitive-emitter prim) si env args)))
 
 (define (emit-tail-primcall si env x)
+  (emit "# tail primcall")
   (let ([prim (car x)] [args (cdr x)])
     (check-primcall-args prim args)
     (apply (primitive-emitter prim) si env args)
+    ;; return
+    (emit "    movl -4(%esp), %edi # tail primcall")
     (emit "    ret")))
 
 (define (check-primcall-args prim args)
@@ -804,6 +807,9 @@
 (define rhs cadr)
 (define bind cons)
 (define (extend-env si env var) (cons (bind var si) env))
+(define (lookup var env)   ;; env is a list of dotted pairs
+  (let ([pair (assoc var env)])
+    (and pair (cdr pair))))
 
 ;;--------------------------------------------
 ;;   (let ((v E) ...) E)
@@ -878,10 +884,6 @@
       (caddr x)
       (cons 'begin (cddr x))))
 
-(define (lookup var env)   ;; env is a list of dotted pairs
-  (let ([pair (assoc var env)])
-    (and pair (cdr pair))))
-
 (define (emit-variable-ref env var)
   (emit "# emit-variable-ref")
   (emit "# env=~s" env)
@@ -897,6 +899,7 @@
   ;; (emit-variable-ref (lookup var env))
   (emit "# emit-tail-variable-ref")
   (emit-variable-ref env var)
+  (emit "    movl -4(%esp), %edi")
   (emit "    ret"))
 
 ;;----------------------------------------------------
@@ -907,16 +910,16 @@
 ;;----------------------------------------------------
 
 (define (emit-stack-save si)
-  (emit "    movl %eax, ~s(%esp)" si))
+  (emit "    movl %eax, ~s(%esp)  # stack save" si))
 
 (define (emit-stack-load si)
-  (emit "    movl ~s(%esp), %eax" si))
+  (emit "    movl ~s(%esp), %eax  # stack load" si))
 
 (define (emit-frame-save ci)
-  (emit "    movl %eax, ~s(%edi)" (- ci closure-tag)))
+  (emit "    movl %eax, ~s(%edi)  # frame save" (- ci closure-tag)))
 
 (define (emit-frame-load ci)
-  (emit "    movl ~s(%edi), %eax" (- ci closure-tag)))
+  (emit "    movl ~s(%edi), %eax  # frame load" (- ci closure-tag)))
 
 ;;-----------------------------------------------------------
 ;; let* is written in an on-the-fly code transformation style
@@ -932,7 +935,6 @@
 
 (define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
 
-;; rewrite let* into nested singleton let's
 (define (emit-let* si env bindings body)
   (cond
    [(null? bindings) (emit-expr si env body)]
@@ -953,9 +955,9 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
-;;---------------------------------------------
-;;                 Procedures
-;;---------------------------------------------
+;;-----------------------------------------------------
+;;                     Procedures
+;;-----------------------------------------------------
 
 (define (unique-labels lvars)
     (define (assign-label v) (unique-label))
@@ -988,9 +990,9 @@
 (define (emit-funcall si env expr)
   (define (emit-arguments si env args)
     (unless (empty? args)
-        (emit-expr si env (first args))                                 ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))     ;; save %eax as evaluated arg
-        (emit-arguments (- si wordsize) env (rest args))))              ;; recursively emit the rest
+        (emit-expr si env (first args))                              ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))  ;; save %eax as evaluated arg
+        (emit-arguments (- si wordsize) env (rest args))))           ;; recursively emit the rest
   (define (emit-adjust-base si)
     (unless (eq? si 0)
 	    (emit "    add $~s, %esp    # adjust base" si ))) 
@@ -1003,121 +1005,35 @@
   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
   (emit "    movl %edi, ~s(%esp)   # save old closure" si)  
   (emit "    movl %eax, %edi       # set current closure from procedure")   
-  (emit-adjust-base (+ si))              ;; the value of %esp is adjusted by si [?? why by si????]
-  (emit "    call *-2(%edi)  # call thru closure ptr") ;; closure ptr in %eax since arg1 emitted last
-  (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
-  (emit "    movl ~s(%esp), %edi #restore closure frame ptr" si))
+  (emit-adjust-base (+ si))        ;; the value of %esp is adjusted by si
+  (emit "    call *-2(%edi)        # call thru closure ptr") ;; closure ptr in %eax since arg1 emitted last
+  (emit-adjust-base (- si))   ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
+  (emit "    movl ~s(%esp), %edi   #restore closure frame ptr" si))
 
-
-;; (define (emit-tail-funcall si env expr) ;;  <<<-- FIX LATER; model on emit-tail-app
-;;   (define (emit-arguments si env args)
-;;     (unless (empty? args)
-;;         (emit-expr si env (first args))                    ;; evaluated arg in %eax
-;;         (emit "    mov %eax, ~s(%esp)    # arg" si)        ;; save %eax as evaluated arg
-;;         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
-;;   (define (emit-shift-args argc si delta)
-;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
-;;     (unless (zero? argc)
-;; 	(emit "    mov ~a(%esp), %ebx  # shift arg" si )
-;; 	(emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-;; 	(emit-shift-args (- argc 1) (- si wordsize) delta)))  
-;;   (define (emit-jmp si label)
-;;     (emit "    jmp ~a   # app  " label))
-
-;;   ;; evaluate the arguments leaving them on the stack
-;;   (emit-arguments (- si wordsize) (funcall-args expr))
-
-;;   ;; shift the evaluated arguments down to the expected parameter positions
-;;   (let ([argc (length (funcall-args expr))]
-;; 	[si (- si wordsize)]
-;; 	[delta (- -4 (- si wordsize))])
-;;     (emit-shift-args argc si delta))
-  
-;;   ;; jump to the start of the call -- it should have a label
-;;   (emit-jmp si (lookup (funcall-target expr) env)))
-
-(define (emit-tail-funcall si env expr)  ;; <-- ALL MESSED UP.  WHY TAIL CALL IF NOT A RECURSIVE CALL???
-  
+(define (emit-tail-funcall si env expr) 
   (define (emit-arguments si args)
     (unless (empty? args)
         (emit-expr si env (first args))                ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg" si)    ;; save %eax as evaluated arg    
-        (emit-arguments (- si wordsize) (rest args))))
-  
+        (emit "    mov %eax, ~s(%esp)    # arg " si)   ;; save %eax as evaluated arg    
+        (emit-arguments (- si wordsize) (rest args)))) 
   (define (emit-shift-args argc si delta)
     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
     (unless (zero? argc)
 	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
-
-  (emit "# emit-tail-funcall")
-
-  ;; emit the procedure object in old closure position on the stack
-  ;; ISSUE: Are be certain this is a procedure?  If it is variable, its binding
-  ;; should be a procedure object.  What if it is an integer?  We are currently
-  ;; not checking for any of this?
-  ;(emit-expr si env (funcall-oper expr))
-  
-  (emit-arguments (- si 8) (funcall-args expr)) 
-  ;(emit-arguments si (funcall-args expr))
-  
-  ;; emit the funcall operator
-  (emit-expr (- si 8 (* 4 (length (funcall-args expr))))
+  (emit "# emit-tail-funcall")  
+  (emit-arguments (+ si -8) (funcall-args expr)) 
+  (emit-expr (+ si -8 (* -4 (length (funcall-args expr))))
 	     env
 	     (funcall-oper expr))
-
-  ;; Copy the evaluated funcall operator into the %edi register
-  (emit "    movl %eax, %edi   # put funcall op into %edi")
-
-  ;; How far down to shift?  Given we emitted arg1 .. argN
-  ;; we know that arg1 is at si,  we want to move it to -8
-  ;; the position of arg1.  So the delta is (si-8) for
-  ;; any si.
- 
-  (let ([argc (length (funcall-args expr))]
-	[si (- si 4)]
-	[delta (- si 8)])
-    (emit-shift-args argc si delta))
-
+  (emit "    movl %eax, %edi  # put funcall op into %edi")
+  (emit-shift-args (length (funcall-args expr)) (+ si -8) (- si))
   (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
-  ;; (define (emit-adjust-base si)  ;; <<--- is this even used???
-  ;;   (unless (eq? si 0)
-  ;; 	    (emit "    add $~s, %esp    # adjust base" si )))
-  ;; (emit "# tail-funcall")
-  ;; (emit "#  si   =~s" si)
-  ;; (emit "#  env  = ~s" env)
-  ;; (emit "#  expr = ~s" expr)
-  ;; (emit-arguments (- si (* 2 wordsize)) env (funcall-args expr))  ;; leaving room for 2 values
-  ;; (emit "    movl %edi, ~s(%esp)" si)    ;; save value of current closure pointer on stack
-  ;; (emit-adjust-base (+ si))              ;; the value of %esp is adjusted by si [???]
-  ;; (emit "    call -6(%edi)")             ;; an indirect call to label field of the closure is issued
-  ;; (emit-adjust-base (- si))              ;; after return the value of %esp is adjusted back by -si  [???]
-  ;; (emit "    movl ~s(%esp), %edi" si))   ;; the value of the closure pointer is restored.  %edi
-
-;;---------------------End  Funcall ----------------------
-
-;; (define (emit-tail-app si env expr)
-;;   (define (emit-arguments si args)
-;;     (unless (empty? args)
-;;         (emit-expr si env (first args))                ;; evaluated arg in %eax
-;; 	(emit "    mov %eax, ~s(%esp)    # arg" si)    ;; save %eax as evaluated arg    
-;; 	(emit-arguments (- si wordsize) (rest args))))
-;;   (define (emit-shift-args argc si delta)
-;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
-;;     (unless (zero? argc)
-;; 	(emit "    mov ~a(%esp), %ebx  # shift arg" si )
-;; 	(emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-;; 	(emit-shift-args (- argc 1) (- si wordsize) delta)))
-;;   (define (emit-jmp si label)
-;;     (emit "    jmp ~a   # app  " label))
-;;   (emit-arguments (- si wordsize) (call-args expr))
-;;   (let ([argc (length (call-args expr))]
-;; 	[si (- si wordsize)]
-;; 	[delta (- -4 (- si wordsize))])
-;;      (emit-shift-args argc si delta))
-;;   (emit-jmp si (lookup (call-target expr) env)))
+;;----------------------------------------------------
+;;                    (begin E E ... )
+;;-----------------------------------------------------
 
 (define begin-body cdr)
 
@@ -1137,14 +1053,21 @@
   (emit "# tail-begin body=~s" body)
   (cond
    [(null? body)
-    (emit "    ret")]
+     (emit "    movl -4(%esp), %edi  # restore closure env")
+     (emit "    ret                  # return thru stack")]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
-   [(eq? (length body) 1)
-     (emit-tail-expr si env (car body))]  ;; last expr is a tail-expr ISSUE: BLOWS UP
+  ; [(eq? (length body) 1)
+  ;   (emit-tail-expr si env (car body))]  ISSUE: BLOWS UP  <<<----<<<  WHY????
    [else
     (emit-expr si env (car body))
-    (emit-tail-begin si env (cdr body))])) ;; <<--- reuse si or bump it ???
+    (emit-tail-begin si env (cdr body))]))
+
+;;------------------------------------------------------
+
+;; (define (emit-return)
+;;   (emit "    movl -4(%esp), %edi  # restore closure env")
+;;   (emit "    ret"))
 
 (define (align-to-8-bytes i)
     (if (zero? (remainder i 8))
@@ -1219,15 +1142,16 @@
     (emit "    jmp ~a"  exit-point)
     (emit "~a:" entry-point)
     
-    ;; emit closure body
+    ;; --- emit closure body ---
     ;; note that we use the closed environment so free variable
     ;; references all resolve to the closure cells
     
     (let f ([fmls formals] [si (- wordsize)] [env closed-env])
       (cond
        [(empty? fmls)
-	(emit-tail-expr si env (cons ' begin body)) ;; implicity on-the-fly begin
-	;(emit "    ret   # from closure") ;;  needed???
+	(emit-tail-expr si env (cons 'begin body)) ;; implicity on-the-fly begin
+	;;(emit-expr si env (cons 'begin body))  ;; disables proper tail calls   ***DEBUG***
+	;(emit "    ret   # from closure") ;;  needed???  don't think so
 	] 
        [else
 	(f (rest fmls)
@@ -1237,7 +1161,9 @@
     (emit "~a:" exit-point)    
     ))
 
-;; (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER
+;; IS emit tail closure important ???
+
+;; (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER ---<<<  ???
 ;;   (emit "emit-tail-closure TBD")
 ;;   (let* [(lvar (closure-lvar expr))
 ;; 	 (vars (closure-vars expr))
@@ -1267,7 +1193,9 @@
 ;;
 ;;--------------------------------------------------------------------
 
-;; (lambda (formals ...) body)
+;;-------------------------------------------------------------------
+;;                (lambda (formals ...) body)
+;;-------------------------------------------------------------------
 
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
@@ -1311,7 +1239,7 @@
   (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
-  (memq expr '(begin if let lambda letrec)))  ;; <<<---- REVIEW THIS LIST
+  (memq expr '(begin if let lambda letrec closure)))  ;; <<<---- REVIEW (Use property list?)
 
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
@@ -1377,9 +1305,9 @@
 (define (let-bound-vars expr)
   (map car (let-bindings expr)))
 
-;;--------------------------------------------
-;;  set! elimination     TBD
-;;--------------------------------------------
+;;--------------------------------------------------------
+;;         set! elimination     TBD
+;;--------------------------------------------------------
 ;;
 ;;  (lambda (x) (set! x e1) (fx+ x 1))
 ;;  =>
@@ -1397,11 +1325,11 @@
 ;;            (vector-set! x t))
 ;;            (vector-set! x (foo e1))
 ;;
-;;--------------------------------------------
+;;---------------------------------------------------------
 
-;;--------------------------------------------
-;;       letrec elimination  -- IT WORKS!
-;;--------------------------------------------
+;;----------------------------------------------------------
+;;             letrec elimination  -- IT WORKS!
+;;----------------------------------------------------------
 
 (define (vectorize-letrec exp)
 
@@ -1430,9 +1358,9 @@
 	  (vectorize-letrec (cdr exp)))]
    [else exp]))
 
-;;--------------------------------------------
-;;        Expression Dispatcher
-;;--------------------------------------------
+;;-------------------------------------------------------
+;;                   Expression Dispatcher
+;;-------------------------------------------------------
 
 (define (funcall? expr)
   (and (pair? expr)
@@ -1479,7 +1407,7 @@
     [(immediate? expr)  (emit-tail-immediate expr)]
     [(variable? expr)   (emit-tail-variable-ref env expr)]
     [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
-    [(closure? expr)    (emit-tail-closure si env expr)] 
+    [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
     [(funcall? expr)    (emit-tail-funcall si env expr)]
     [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
     [(let*? expr)       (emit-tail-let* si env (let-bindings expr) (let-body expr))]
@@ -1496,7 +1424,8 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-  (emit "    ret"))
+  (emit "    movl -4(%esp), %edi  # restore closure env")
+  (emit "    ret                  # tail return"))
 
 ;;----------------------------------------------------------
 ;; emit-program is the top level of the compiler; applies
@@ -1529,7 +1458,7 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
-  (emit "    movl $0xffff, %edi")   ;; sentinal in current closure
+  (emit "    movl $0x0, %edi")     ;; sentinal in current closure
   (emit "    call _L_scheme_entry")
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")

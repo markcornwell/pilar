@@ -40,6 +40,17 @@
 (add-tests-with-string-output "parameter passing"
  [(let ([f (lambda (x) x)]) (f 12)) => "12\n"]
  [(let ([f (lambda (x y) (fx+ x y))]) (f 12 13)) => "25\n"]
+
+ [(let ([f (lambda (z)
+             (let ([g (lambda (x y) (fx+ x y))])
+               (g z 100)))])
+    (f 1002)) => "1102\n"] 
+ 
+ [(let ([f (lambda (x)
+             (let ([g (lambda (x y) (fx+ x y))])
+               (g x 100)))])
+    (f 1001)) => "1101\n"] 
+ 
  [(let ([f (lambda (x)
              (let ([g (lambda (x y) (fx+ x y))])
                (g x 100)))])
