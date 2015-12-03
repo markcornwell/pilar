@@ -293,6 +293,20 @@
       [(char? x) (logor (ash (char->integer x) cshift) ctag) ]
       [(null? x) nil-value ]))
 
+
+;;-----------------------------------------------------
+;;               Special Symbols
+;;-----------------------------------------------------
+
+;; (define-syntax define-special
+;;   (syntax rules ()
+;;      [(_ (sym ...)  (putprop 'sym '*is-special* #t)])))
+	   
+
+;; (define (special? x)
+;;   (and (symbol? x) (getprop '*is-special*)))
+
+
 ;;-----------------------------------------------------
 ;;                Primitives
 ;;-----------------------------------------------------
@@ -308,7 +322,7 @@
 		(lambda (si env arg* ...) b b* ...)))]))
 
 ;;------------------------------------------------------
-;;                Unary Primitives
+;;              Unary Primitives
 ;;------------------------------------------------------
 
 (define-primitive (fxadd1 si env arg)
@@ -806,10 +820,20 @@
 (define lhs car)
 (define rhs cadr)
 (define bind cons)
-(define (extend-env si env var) (cons (bind var si) env))
+
+(define (extend-env si env var)
+  (cons (bind var si) env))
+
 (define (lookup var env)   ;; env is a list of dotted pairs
   (let ([pair (assoc var env)])
     (and pair (cdr pair))))
+
+
+
+
+
+;; Have I isolated the environment representation enough to
+;; change it here?
 
 ;;--------------------------------------------
 ;;   (let ((v E) ...) E)
@@ -891,9 +915,9 @@
   (let ([i (lookup var env)])
     (cond
      [(and (fixnum? i) (fx> i 0))
-        (emit-frame-load i)]
+        (emit-frame-load i var)]
      [else
-        (emit-stack-load i)])))
+        (emit-stack-load i var)])))
 
 (define (emit-tail-variable-ref env var)
   ;; (emit-variable-ref (lookup var env))
@@ -912,14 +936,14 @@
 (define (emit-stack-save si)
   (emit "    movl %eax, ~s(%esp)  # stack save" si))
 
-(define (emit-stack-load si)
-  (emit "    movl ~s(%esp), %eax  # stack load" si))
+(define (emit-stack-load si var)
+  (emit "    movl ~s(%esp), %eax  # stack load ~a" si var))
 
 (define (emit-frame-save ci)
   (emit "    movl %eax, ~s(%edi)  # frame save" (- ci closure-tag)))
 
 (define (emit-frame-load ci)
-  (emit "    movl ~s(%edi), %eax  # frame load" (- ci closure-tag)))
+  (emit "    movl ~s(%edi), %eax  # frame load ~a" (- ci closure-tag) var))
 
 ;;-----------------------------------------------------------
 ;; let* is written in an on-the-fly code transformation style
@@ -971,17 +995,10 @@
 
 (define empty? null?)
 
-(define (extend-closure-env env frev)
-  (let f ([frev frev] [ci wordsize] [env env])
-    (cond
-     [(empty? frev) env]
-     [else
-      (f (rest frev)
-	 (+ ci wordsize)
-	 (extend-env ci env (first frev)))])))
+
 
 ;;--------------------------------------------------------
-;;     (funcall f arg* ...)
+;;                (funcall f arg* ...)
 ;;--------------------------------------------------------
 
 (define funcall-args cddr)
@@ -1057,8 +1074,8 @@
      (emit "    ret                  # return thru stack")]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
-  ; [(eq? (length body) 1)
-  ;   (emit-tail-expr si env (car body))]  ISSUE: BLOWS UP  <<<----<<<  WHY????
+   [(eq? (length body) 1)
+     (emit-tail-expr si env (car body))] ;; ISSUE: BLOWS UP  <<<----<<<  WHY????
    [else
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))]))
@@ -1081,16 +1098,15 @@
 ;;
 ;;   (closure (formal ...) (freevar ...) body)
 ;;
-;; Basically a closure will look like
+;; Basically a closure code will look like
 ;;
 ;;   Alloc heap space for label + free variables
 ;;   Set the label field to L_yy
 ;;   Initialize the free vars from the binding environment
-;;   Return the tagged pointer to the heap allocated closure 
+;;   Return the tagged pointer to the heap allocated closure
 ;;   Jmp L_zz
 ;;   L_yy:
 ;;   Closure body code (Gets all free vars from the closure!!!)
-;;   ret
 ;;   L_zz
 ;;
 ;; Consider that set! will not work since a variable introduced
@@ -1114,6 +1130,24 @@
 		(emit "   movl  %eax, ~s(%ebp)" ci)))              ;; copy that value to the closure cell
 	  (emit-close-free-vars (+ wordsize ci) env (cdr vars))))  ;; recursively process remaining free vars
 
+(define (extend-closure-env env frev)
+  (let f ([frev frev] [ci wordsize] [env env])
+    (cond
+     [(empty? frev) env]
+     [else
+      (f (rest frev)
+	 (+ ci wordsize)
+	 (extend-env ci env (first frev)))])))
+
+(define (extend-formals-env env fmsl)
+   (let f ([fmls fmsl] [ci (* -2 wordsize)] [env env])
+    (cond
+     [(empty? fmls) env]
+     [else
+      (f (rest fmls)
+	 (- ci wordsize)
+	 (extend-env ci env (first fmls)))]))) 
+
 (define (emit-closure si env expr)
   (emit "# emit-closure")
   (emit "# si = ~s" si)
@@ -1122,14 +1156,21 @@
   (let* ([formals (closure-formals expr)]
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
-	 [closed-env (extend-closure-env env freevars)]
+	 ;;[closed-env (extend-closure-env env freevars)]  ;; <<-- DOES NOT LOOK RIGHT?  Why all of env?
+	 ;; should not closed-env be just the formals and the freevars, and nothing from outside?
+	 ;; [formals-env (extend-formals-env '() formals)]
+	 ;; [closed-env (extend-closure-env formals-env freevars)]
+
+	 [closed-env (extend-closure-env '() freevars)]
 	 [entry-point (unique-label)]
 	 [exit-point (unique-label)]
 	 [size (* wordsize (+ 1 (length freevars)))])
-
+    
+    ;; --- emit closure object
+    
     ;; Set the label field to L_yy
-    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)  ;; <-- blows up in here AT RUNTIME
- 
+    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)
+    
     ;; Copy the free vars values from the binding environment to the closure
     (emit-close-free-vars wordsize env freevars)
     
@@ -1138,20 +1179,20 @@
     (emit "    add $~s, %eax      # closure tag"  closure-tag)
     (emit "    add $~s, %ebp      # bump ebp" (align-to-8-bytes size))
     
-    ;; Jump around code for application of closure
+    ;; Jump around code for closure body
     (emit "    jmp ~a"  exit-point)
     (emit "~a:" entry-point)
     
     ;; --- emit closure body ---
     ;; note that we use the closed environment so free variable
-    ;; references all resolve to the closure cells
+    ;; references all resolve to the cells in the closure object
     
     (let f ([fmls formals] [si (- wordsize)] [env closed-env])
       (cond
        [(empty? fmls)
 	(emit-tail-expr si env (cons 'begin body)) ;; implicity on-the-fly begin
 	;;(emit-expr si env (cons 'begin body))  ;; disables proper tail calls   ***DEBUG***
-	;(emit "    ret   # from closure") ;;  needed???  don't think so
+	;;(emit "    ret   # from closure") ;;  needed???  don't think so
 	] 
        [else
 	(f (rest fmls)
@@ -1207,6 +1248,31 @@
 	  (cons 'begin (cddr expr)))
       (error 'lambda-body "ill-formed lambda expression")))
 
+;;# emit-closure
+;;# si = -4
+;;# env = ()# expr = (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
+
+;; # emit-tail-expr
+;; # si=-8
+;; # env=((z . -4) (z . -8))               #### WHY TWO z VALUE OFFSETS??? Should only be one!! ########
+;; # expr=(begin (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))    ### UGLY BEGIN ###
+;; # tail-begin body=((let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
+;; # emit-tail-expr
+;; # si=-8
+;; # env=((z . -4) (z . -8))               #### WE GOT TWO z OFFSETS AGAIN ######
+;; # expr=(let ((g (closure (x y) () (fx+ x y)))) (g z 100))
+;; # emit-tail-let
+;; #  si   = -8
+;; #  env  = ((z . -4) (z . -8))           #### WTF ??
+;; #  bindings = ((g (closure (x y) () (fx+ x y))))
+;; #  body = (g z 100)
+;; # emit-expr
+;; # emit-closure
+;; # si = -8
+;; # env = ((z . -4) (z . -8))            ##### WTF ???
+;; # expr = (closure (x y) () (fx+ x y))
+
+
 (define (close-free-variables bound-vars expr)
   (cond
    [(lambda? expr)
@@ -1218,7 +1284,7 @@
     (let* ([bindings (let-bindings expr)]
 	   [vars (map car bindings)]
 	   [exps (map cadr bindings)]
-           [new-exps (map (lambda (e) (close-free-variables bound-vars e)) exps)]
+           [new-exps (map (lambda (e) (close-free-variables bound-vars e)) exps)] ;;; <<--- SUSPECT <<<<
 	   [new-bindings (map list vars new-exps)]
 	   [nbv (append vars bound-vars)]
 	   [new-body (close-free-variables nbv (let-body expr))])
@@ -1370,7 +1436,6 @@
   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'begin)))
 
 (define (emit-expr si env expr)
-  
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
@@ -1397,8 +1462,6 @@
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
 	   (and pair (fixnum? (cdr pair))))))   ;; ignore lvar bindings
-  ;; (define (lvar-app? expr)  ;; there used to be lvar applications; resurrect this to co-exist with closures??
-  ;;   (and (pair? expr) (symbol? (car expr)) (string? (lookup (car expr) env))))
   (emit "# emit-tail-expr")
   (emit "# si=~s" si)
   (emit "# env=~s" env)
@@ -1458,7 +1521,7 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
-  (emit "    movl $0x0, %edi")     ;; sentinal in current closure
+  (emit "    movl $0x0, %edi")      ;; sentinal in current closure
   (emit "    call _L_scheme_entry")
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")

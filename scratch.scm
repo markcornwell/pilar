@@ -1,3 +1,7 @@
+test 21:(let ((f (lambda (x y) (fx+ x y)))) (f 12 13)) ... ok
+test 22:(let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002)) ...Exception in test: output mismatch for test ~s, expected ~s, got ~s with irritants (22 "1102\n" "2004\n")
+> 
+yahweh:pilar mark$ cat pgm.s
 # (let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002))
 # == vectorize-letrec ==>
 # (let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002))
@@ -152,3 +156,4 @@ _scheme_entry:
     movl 24(%ecx), %ebp
     movl 28(%ecx), %esp
     ret
+yahweh:pilar mark$ 
