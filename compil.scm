@@ -830,8 +830,6 @@
 
 
 
-
-
 ;; Have I isolated the environment representation enough to
 ;; change it here?
 
@@ -995,8 +993,6 @@
 
 (define empty? null?)
 
-
-
 ;;--------------------------------------------------------
 ;;                (funcall f arg* ...)
 ;;--------------------------------------------------------
@@ -1040,12 +1036,12 @@
 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
   (emit "# emit-tail-funcall")  
-  (emit-arguments (+ si -8) (funcall-args expr)) 
-  (emit-expr (+ si -8 (* -4 (length (funcall-args expr))))
+  (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values
+  (emit-expr (- si 8 (* 4 (length (funcall-args expr))))
 	     env
 	     (funcall-oper expr))
   (emit "    movl %eax, %edi  # put funcall op into %edi")
-  (emit-shift-args (length (funcall-args expr)) (+ si -8) (- si))
+  (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
   (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
 ;;----------------------------------------------------
@@ -1187,7 +1183,7 @@
     ;; note that we use the closed environment so free variable
     ;; references all resolve to the cells in the closure object
     
-    (let f ([fmls formals] [si (- wordsize)] [env closed-env])
+    (let f ([fmls formals] [si (- (* 2 wordsize))] [env closed-env])  ;; WAS THIS IT???
       (cond
        [(empty? fmls)
 	(emit-tail-expr si env (cons 'begin body)) ;; implicity on-the-fly begin
@@ -1510,7 +1506,8 @@
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
-  (emit-expr (- wordsize) env expr)
+; (emit-expr (- wordsize) env expr)
+  (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)

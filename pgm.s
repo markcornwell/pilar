@@ -1,11 +1,11 @@
-# (let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002))
+# (let ((f (lambda (x) x))) (f 12))
 # == vectorize-letrec ==>
-# (let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002))
+# (let ((f (lambda (x) x))) (f 12))
 # == close-free-variables ==>
-# (let ((f (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100))))) (f 1002))
+# (let ((f (closure (x) () x))) (f 12))
 # == null transform ==>
 
-# (let ((f (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100))))) (f 1002))
+# (let ((f (closure (x) () x))) (f 12))
 
     .text
     .align 4,0x90
@@ -13,124 +13,60 @@
 _L_scheme_entry:
 # emit-expr
 # emit-let
-#  si   = -4
-#  env  = ()
-#  bindings = ((f (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))))
-#  body = (f 1002)
-# emit-expr
-# emit-closure
-# si = -4
-# env = ()
-# expr = (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
-    movl $_L_40, 0(%ebp)  # closure label
-    movl %ebp, %eax    # return base ptr
-    add $2, %eax      # closure tag
-    add $8, %ebp      # bump ebp
-    jmp _L_41
-_L_40:
-# emit-tail-expr
-# si=-8
-# env=((z . -4))
-# expr=(begin (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
-# tail-begin body=((let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
-# emit-tail-expr
-# si=-8
-# env=((z . -4))
-# expr=(let ((g (closure (x y) () (fx+ x y)))) (g z 100))
-# emit-tail-let
 #  si   = -8
-#  env  = ((z . -4))
-#  bindings = ((g (closure (x y) () (fx+ x y))))
-#  body = (g z 100)
+#  env  = ()
+#  bindings = ((f (closure (x) () x)))
+#  body = (f 12)
 # emit-expr
 # emit-closure
 # si = -8
-# env = ((z . -4))
-# expr = (closure (x y) () (fx+ x y))
-    movl $_L_42, 0(%ebp)  # closure label
+# env = ()
+# expr = (closure (x) () x)
+    movl $_L_36, 0(%ebp)  # closure label
     movl %ebp, %eax    # return base ptr
     add $2, %eax      # closure tag
     add $8, %ebp      # bump ebp
-    jmp _L_43
-_L_42:
+    jmp _L_37
+_L_36:
 # emit-tail-expr
 # si=-12
-# env=((y . -8) (x . -4))
-# expr=(begin (fx+ x y))
-# tail-begin body=((fx+ x y))
+# env=((x . -8))
+# expr=(begin x)
+# tail-begin body=(x)
 # emit-tail-expr
 # si=-12
-# env=((y . -8) (x . -4))
-# expr=(fx+ x y)
-# tail primcall
-# emit-expr
+# env=((x . -8))
+# expr=x
+# emit-tail-variable-ref
 # emit-variable-ref
-# env=((y . -8) (x . -4))
-# var=y
-    movl -8(%esp), %eax  # stack load y
-    movl %eax, -12(%esp)  # fx+ push arg1
-# emit-expr
-# emit-variable-ref
-# env=((y . -8) (x . -4))
+# env=((x . -8))
 # var=x
-    movl -4(%esp), %eax  # stack load x
-    addl -12(%esp), %eax  # fx+ arg1 arg2
-    movl -4(%esp), %edi # tail primcall
+    movl -8(%esp), %eax  # stack load x
+    movl -4(%esp), %edi
     ret
     .align 4,0x90
-_L_43:
+_L_37:
     movl %eax, -8(%esp)  # stack save
-# emit-tail-expr
-# si=-12
-# env=((g . -8) (z . -4))
-# expr=(g z 100)
-# emit-tail-funcall
-# emit-expr
-# emit-variable-ref
-# env=((g . -8) (z . -4))
-# var=z
-    movl -4(%esp), %eax  # stack load z
-    mov %eax, -20(%esp)    # arg 
-# emit-expr
-    movl $400, %eax     # immed 100
-    mov %eax, -24(%esp)    # arg 
-# emit-expr
-# emit-variable-ref
-# env=((g . -8) (z . -4))
-# var=g
-    movl -8(%esp), %eax  # stack load g
-    movl %eax, %edi  # put funcall op into %edi
-# emit-shift-args:  argc=2   si=-20  delta=12
-    mov -20(%esp), %ebx  # shift arg
-    mov %ebx, -8(%esp)  # down to base
-# emit-shift-args:  argc=1   si=-24  delta=12
-    mov -24(%esp), %ebx  # shift arg
-    mov %ebx, -12(%esp)  # down to base
-# emit-shift-args:  argc=0   si=-28  delta=12
-    jmp *-2(%edi)  # tail-funcall
-    .align 4,0x90
-_L_41:
-    movl %eax, -4(%esp)  # stack save
 # emit-expr
 # funcall
-#  si   =-8
-#  env  = ((f . -4))
-#  expr = (funcall f 1002)
+#  si   =-12
+#  env  = ((f . -8))
+#  expr = (funcall f 12)
 # emit-expr
-    movl $4008, %eax     # immed 1002
-    mov %eax, -16(%esp)    # arg 1002
+    movl $48, %eax     # immed 12
+    mov %eax, -20(%esp)    # arg 12
 #  oper = f
 # emit-expr
 # emit-variable-ref
-# env=((f . -4))
+# env=((f . -8))
 # var=f
-    movl -4(%esp), %eax  # stack load f
-    movl %edi, -8(%esp)   # save old closure
+    movl -8(%esp), %eax  # stack load f
+    movl %edi, -12(%esp)   # save old closure
     movl %eax, %edi       # set current closure from procedure
-    add $-8, %esp    # adjust base
+    add $-12, %esp    # adjust base
     call *-2(%edi)        # call thru closure ptr
-    add $8, %esp    # adjust base
-    movl -8(%esp), %edi   #restore closure frame ptr
+    add $12, %esp    # adjust base
+    movl -12(%esp), %edi   #restore closure frame ptr
     ret
     .text
     .align 4,0x90
