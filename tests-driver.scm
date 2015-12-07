@@ -19,13 +19,15 @@
 	  p)))
 
 (define (run-compil expr)
-  (let ([p (open-output-file "pgm.s" 'replace)])
+  (let ([p (open-output-file "pgm.s" 'replace)]) 
+ ; (let ([p (open-output-file "pgm1.s" 'replace)])  ;; DEBUG
     (parameterize ([compil-port p])
        (compil-program expr))
     (close-output-port p)))
 
 (define (build)
-  (unless (zero? (system "as -arch i386 pgm.s -o pgm.o"))
+  (unless (zero? (system "as -arch i386 pgm.s -o pgm.o"))  
+  ;(unless (zero? (system "as -arch i386 pgm1.s -o pgm.o"))  ;; DEBUG
      (error 'build "produced program failed assembly"))
   (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o -o stst"))
      (error 'build "produced program failed to link")))
@@ -66,8 +68,11 @@
    (build)
    (execute)
    (unless (string=? expected-output (get-string))
-     (error 'test "output mismatch for test ~s, expected ~s, got ~s"
-        test-id expected-output (get-string))))
+        (error 'test
+	       (format "output mismatch for test ~s, expected ~s, got ~s"
+		       test-id
+		       expected-output
+		       (get-string)))))
 
 (define (get-string)
   (with-output-to-string

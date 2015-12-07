@@ -1,72 +1,18 @@
-# (let ((f (lambda (x) x))) (f 12))
+# -536870912
 # == vectorize-letrec ==>
-# (let ((f (lambda (x) x))) (f 12))
+# -536870912
 # == close-free-variables ==>
-# (let ((f (closure (x) () x))) (f 12))
+# -536870912
 # == null transform ==>
 
-# (let ((f (closure (x) () x))) (f 12))
+# -536870912
 
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
 # emit-expr
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ((f (closure (x) () x)))
-#  body = (f 12)
-# emit-expr
-# emit-closure
-# si = -8
-# env = ()
-# expr = (closure (x) () x)
-    movl $_L_36, 0(%ebp)  # closure label
-    movl %ebp, %eax    # return base ptr
-    add $2, %eax      # closure tag
-    add $8, %ebp      # bump ebp
-    jmp _L_37
-_L_36:
-# emit-tail-expr
-# si=-12
-# env=((x . -8))
-# expr=(begin x)
-# tail-begin body=(x)
-# emit-tail-expr
-# si=-12
-# env=((x . -8))
-# expr=x
-# emit-tail-variable-ref
-# emit-variable-ref
-# env=((x . -8))
-# var=x
-    movl -8(%esp), %eax  # stack load x
-    movl -4(%esp), %edi
-    ret
-    .align 4,0x90
-_L_37:
-    movl %eax, -8(%esp)  # stack save
-# emit-expr
-# funcall
-#  si   =-12
-#  env  = ((f . -8))
-#  expr = (funcall f 12)
-# emit-expr
-    movl $48, %eax     # immed 12
-    mov %eax, -20(%esp)    # arg 12
-#  oper = f
-# emit-expr
-# emit-variable-ref
-# env=((f . -8))
-# var=f
-    movl -8(%esp), %eax  # stack load f
-    movl %edi, -12(%esp)   # save old closure
-    movl %eax, %edi       # set current closure from procedure
-    add $-12, %esp    # adjust base
-    call *-2(%edi)        # call thru closure ptr
-    add $12, %esp    # adjust base
-    movl -12(%esp), %edi   #restore closure frame ptr
+    movl $-2147483648, %eax     # immed -536870912
     ret
     .text
     .align 4,0x90
@@ -80,7 +26,6 @@ _scheme_entry:
     movl %esp, 28(%ecx)
     movl 12(%esp), %ebp
     movl 8(%esp), %esp
-    movl $0x0, %edi
     call _L_scheme_entry
     movl 4(%ecx), %ebx
     movl 16(%ecx), %esi

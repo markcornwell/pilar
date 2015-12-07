@@ -1,6 +1,14 @@
-;; compil.scm
-;; Pilar: A Scheme Compiler
-;; Mark Cornwell
+;;-----------------------------------------------------
+;;
+;;  Pilar: A Scheme Compiler
+;;  by Mark Cornwell
+;;
+;;  Copyright (C) 2015, All Rights Reserved
+;;;
+;;-----------------------------------------------------
+;;   Think first, then try.
+;;                              -- The Little Schemer.
+;;-----------------------------------------------------
 ;;
 ;; 2.1 Closure
 ;; 1.9.3  String
@@ -16,8 +24,8 @@
 ;; 1.2 Immediate Constants
 ;; 1.1 Integers
 ;;
-;; runs under petite chez scheme
-;; petite compil.scm
+;; Runs under petite chez scheme
+;; See makefile for details.
 ;;
 ;;-----------------------------------------------------
 ;; Intermediate Language (IL):    DYBVIG's Version
@@ -713,9 +721,10 @@
   (let ([prim (car x)] [args (cdr x)])
     (check-primcall-args prim args)
     (apply (primitive-emitter prim) si env args)
-    ;; return
-    (emit "    movl -4(%esp), %edi # tail primcall")
-    (emit "    ret")))
+    (emit "#return from tail ~a" x)
+  ;  (emit "    movl -4(%esp), %edi")
+    (emit "    ret")
+  ))
 
 (define (check-primcall-args prim args)
     (= (length args) (getprop prim '*arg-count*)))
@@ -798,7 +807,7 @@
 ;; (let ((v E) ...) E)
 ;;
 ;; If multiple expressions are in the let-body we wrap a begin around
-;; them on-the-fly to normalize them into the above form.
+;; them on-the-fly to normalize them into the above form. (STOP DOING THIS)
 ;;
 ;; (let ((v E) ...) E E ...) => (let ((v E) ...) (begin E E ...))
 ;;
@@ -808,10 +817,15 @@
   (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 
 (define (let-bindings x) (cadr x))
+
 (define (let-body x)
-  (if (eq? (length x) 3)
-      (caddr x)
-      (cons 'begin (cddr x))))
+  (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin))
+       (cons 'begin (cddr x))))
+
+;; (define (let-body x)
+;;   (if (eq? (length x) 3)
+;;       (caddr x)
+;;       (cons 'begin (cddr x))))
 
 ;;------------------------------------------------------------------
 ;;                       Environment
@@ -901,9 +915,13 @@
   
 (define letrec-bindings cadr)
 
+;; (define (letrec-body x)
+;;   (if (eq? (length x) 3)
+;;       (caddr x)
+;;       (cons 'begin (cddr x))))
+
 (define (letrec-body x)
-  (if (eq? (length x) 3)
-      (caddr x)
+  (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin)) 
       (cons 'begin (cddr x))))
 
 (define (emit-variable-ref env var)
@@ -915,14 +933,19 @@
      [(and (fixnum? i) (fx> i 0))
         (emit-frame-load i var)]
      [else
-        (emit-stack-load i var)])))
+      (emit-stack-load i var)]))
+  (emit "# end emit-variable-ref"))
 
+;; should never needed since we always wrap tail expr in a begin
 (define (emit-tail-variable-ref env var)
-  ;; (emit-variable-ref (lookup var env))
+  ;(emit-variable-ref (lookup var env))
   (emit "# emit-tail-variable-ref")
   (emit-variable-ref env var)
-  (emit "    movl -4(%esp), %edi")
-  (emit "    ret"))
+  ;; restore
+;  (emit "    movl -4(%esp), %edi")
+  (emit "    ret")
+  (emit "# end emit-tail-variable ref")
+  )
 
 ;;----------------------------------------------------
 ;; Stack/closure save and load abstracted slightly.
@@ -940,7 +963,7 @@
 (define (emit-frame-save ci)
   (emit "    movl %eax, ~s(%edi)  # frame save" (- ci closure-tag)))
 
-(define (emit-frame-load ci)
+(define (emit-frame-load ci var)
   (emit "    movl ~s(%edi), %eax  # frame load ~a" (- ci closure-tag) var))
 
 ;;-----------------------------------------------------------
@@ -977,9 +1000,9 @@
 	       (list (car bindings))
 	       (list 'let* (cdr bindings) body)))]))
 
-;;-----------------------------------------------------
-;;                     Procedures
-;;-----------------------------------------------------
+;;-------------------------------------------------------------------------------
+;;                                     Procedures
+;;-------------------------------------------------------------------------------
 
 (define (unique-labels lvars)
     (define (assign-label v) (unique-label))
@@ -993,35 +1016,111 @@
 
 (define empty? null?)
 
-;;--------------------------------------------------------
-;;                (funcall f arg* ...)
-;;--------------------------------------------------------
+;;-------------------------------------------------------------------------------------------------------
+;;      Procedure Call           (funcall f arg* ...)
+;;-------------------------------------------------------------------------------------------------------
+;;  
+;;     +--  +------------+         si           +--    +------------+
+;;     |    |   arg 3    |         |            |      |   arg 3    |                (si - 20) -> si' - 16
+;;     |    +------------+         V            |      +------------+
+;; outgoing |   arg 2    |  %esp - 32        incoming  |   arg 2    |  %esp - 12     (si - 16) -> si' - 12
+;; args     +------------+                   args      +------------+
+;;     |    |   arg 1    |  %esp - 28           |      |   arg 1    |  %esp - 8      (si - 12) -> si' - 8
+;;     +--  +------------+                      +--    +------------+
+;;          |            |  %esp - 24                  |  old edi   |  %esp - 4      (si - 8)  -> si' - 4
+;;          +------------+                             +------------+
+;;          |            |  %esp - 20        base -->  |  old eip   |  %esp          (si + 4)  -> si'
+;;     +--  +------------+                             +------------+
+;;     |    |  local 3   |  %esp - 16    +---------->
+;;     |    +------------+               |
+;;  locals  |  local 2   |  %esp - 12    |          (B)  Callee's view
+;;     |    +------------+               |
+;;     |    |  local 1   |  %esp - 8     si        old eip = return point
+;;     +--  +------------+               |         old edi = saved closure ptr
+;;          |  closure   |  %esp - 4     |         Note that args/locals
+;;          +------------+               |         start at %esp - 8
+;; base --> |  old eip   |  %esp    <----+
+;;          +------------+                         si = offset to top stack elt when funcall happens
+;;           high address                               (in this example -16)  
+;;                       
+;;        (A) Caller's view                        si-8 = amount to shift the stack base
+;;                                                 
+;;
+;;  Note: The old edi will be the same as the content of the edi register normally
+;;        The caller restores the frame's edi upon return by loading closure from esp-4
+;;        The callee simply returns and does not mess with the closure slot 
+;;-----------------------------------------------------------------------------------------------------------
 
 (define funcall-args cddr)
 (define funcall-oper cadr)
 
+;;------------------------------------------------------------------------------------------
+;;   Invariants
+;;
+;;  esp - si - 12     next frame arg 1
+;;  esp - si - 8      next frame closure
+;;  esp - si - 4      next frame return
+;;  esp - si          points to the top local
+;;  esp - 4 - 4N - i  local var i...
+;;  esp - 4 - 4N      local argN
+;;  esp - 8           local arg 1 (optional)
+;;  esp - 4           closure pointer   |  use this to restore ecp when callee returns
+;;  esp - 0           return pointer    |  when the frame goes away
+;;
+;;------------------------------------------------------------------------------------------
+
 (define (emit-funcall si env expr)
+  
   (define (emit-arguments si env args)
     (unless (empty? args)
         (emit-expr si env (first args))                              ;; evaluated arg in %eax
         (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))  ;; save %eax as evaluated arg
         (emit-arguments (- si wordsize) env (rest args))))           ;; recursively emit the rest
-  (define (emit-adjust-base si)
-    (unless (eq? si 0)
-	    (emit "    add $~s, %esp    # adjust base" si ))) 
+  
+  (define (emit-adjust-base delta-si)
+    (unless (eq? delta-si 0)
+	    (emit "    add $~s, %esp    # adjust base" delta-si)))
+  
   (emit "# funcall")
-  (emit "#  si   =~s" si)
-  (emit "#  env  = ~s" env)
-  (emit "#  expr = ~s" expr)
-  (emit-arguments (- si 8) env (funcall-args expr)) ;; leaving room for 2 values
-  (emit "#  oper = ~s" (funcall-oper expr))
-  (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
-  (emit "    movl %edi, ~s(%esp)   # save old closure" si)  
-  (emit "    movl %eax, %edi       # set current closure from procedure")   
-  (emit-adjust-base (+ si))        ;; the value of %esp is adjusted by si
+  (emit "#    si   =~s" si)
+  (emit "#    env  = ~s" env)
+  (emit "#    expr = ~s" expr)
+
+  ;; Evaluate the funcall-oper and stash it esp+si+8
+  ;; this becomes the next frame's closure slot
+  (emit-expr (- si 8) env (funcall-oper expr))
+  (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
+
+  ;; evaluate the arguments ar1 ... argN and push on stack
+  (emit-arguments (- si 12) env (funcall-args expr)) 
+
+  ;; Load new fram closure into edi
+  (emit "    movl ~s(%esp), %edi   # load new closure to %edi" (- si 8))
+
+  (emit-adjust-base si)        ;; the value of %esp is adjusted by si
+
+  ;;--------------------------------------------------------------
+  ;; This is the only place call appears in the entire compiler.
+  ;; Call acts just like.
+  ;;
+  ;;     add $-4, %esp        # bump stack ptr
+  ;;     movl $cont, 0(%esp)  # save return point
+  ;;     jmp *-2(%esp)        # jump to the label  
+  ;;  cont:
+  ;;
+  ;; which is less esoteric than understanding call
+  ;;--------------------------------------------------------------
+
+  ;; call is going to bump %esp by 4 and save return there.
+  
   (emit "    call *-2(%edi)        # call thru closure ptr") ;; closure ptr in %eax since arg1 emitted last
-  (emit-adjust-base (- si))   ;; after return the value of %esp is adjusted back by -si  [?? why by -si????]
-  (emit "    movl ~s(%esp), %edi   #restore closure frame ptr" si))
+  
+  (emit-adjust-base (- si))        ;; after return the value of %esp is adjusted back
+  (emit "    movl -4(%esp), %edi   # restore closure frame ptr")  ;; the callee restores this!
+  )
+
+  
+;;--------------
 
 (define (emit-tail-funcall si env expr) 
   (define (emit-arguments si args)
@@ -1035,12 +1134,23 @@
 	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
-  (emit "# emit-tail-funcall")  
+  
+  (emit "# emit-tail-funcall")
+  (emit "#    si   =~s" si)
+  (emit "#    env  = ~s" env)
+  (emit "#    expr = ~s" expr)
+  
   (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values
-  (emit-expr (- si 8 (* 4 (length (funcall-args expr))))
-	     env
-	     (funcall-oper expr))
-  (emit "    movl %eax, %edi  # put funcall op into %edi")
+  
+  (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
+  
+  ;; no need to save old closure or a return since we are not comming back
+  ;; we just reuse the current stack frame
+
+  ;; not need to save old closure, but we do set the current closure register
+  (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
+
+  ;; now we shift the outgoing arguments down to where incomming arguments would be
   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
   (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
@@ -1066,7 +1176,7 @@
   (emit "# tail-begin body=~s" body)
   (cond
    [(null? body)
-     (emit "    movl -4(%esp), %edi  # restore closure env")
+    ; (emit "    movl -4(%esp), %edi  # restore closure env")
      (emit "    ret                  # return thru stack")]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
@@ -1268,7 +1378,6 @@
 ;; # env = ((z . -4) (z . -8))            ##### WTF ???
 ;; # expr = (closure (x y) () (fx+ x y))
 
-
 (define (close-free-variables bound-vars expr)
   (cond
    [(lambda? expr)
@@ -1390,7 +1499,10 @@
 ;;---------------------------------------------------------
 
 ;;----------------------------------------------------------
-;;             letrec elimination  -- IT WORKS!
+;;  vectorize-letrec
+;;
+;; (capture the test case that motivated this)
+;;
 ;;----------------------------------------------------------
 
 (define (vectorize-letrec exp)
@@ -1483,7 +1595,7 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-  (emit "    movl -4(%esp), %edi  # restore closure env")
+;  (emit "    movl -4(%esp), %edi  # restore closure env")
   (emit "    ret                  # tail return"))
 
 ;;----------------------------------------------------------
@@ -1518,15 +1630,15 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
-  (emit "    movl $0x0, %edi")      ;; sentinal in current closure
-  (emit "    call _L_scheme_entry")
+ ; (emit "    movl $0x0F0F, %edi")      ;; sentinal in current closure
+  (emit "    call _L_scheme_entry") 
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
   (emit "    movl 20(%ecx), %edi")
   (emit "    movl 24(%ecx), %ebp")
   (emit "    movl 28(%ecx), %esp")
   (emit "    ret"))  
-
+ 
 (define (emit-function-header entry)
   (emit "    .text")
   (emit "    .align 4,0x90")
