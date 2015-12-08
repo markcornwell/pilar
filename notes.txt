@@ -1,0 +1,80 @@
+Notes
+
+Debugger Cheat Sheet
+
+lldb ./stst
+process launch --stop-at-entry
+breakpoint set --name  scheme_entry
+dis
+run
+
+
+register read eax    - current return value
+register read esp    - current stack pointer
+register read ebp    - current heap pointer
+
+memory read 0x36000                        - read the base of the heap
+memory read 0x36000 0x36100         - read a bigger section of the heap
+
+dis -s 0x02c91
+
+
+
+
+Examples
+
+
+
+(lldb) memory read 0x36000
+0x00036000: 91 2c 00 00 00 00 00 00 00 00 00 00 00 00 00 00  .,..............
+0x00036010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+(lldb) dis -s 0x2c91
+stst`L_36:
+    0x2c91 <+0>:  movl   -0x8(%esp), %eax
+    0x2c95 <+4>:  movl   -0x4(%esp), %edi
+    0x2c99 <+8>:  retl   
+    0x2c9a <+9>:  nopw   (%eax,%eax)
+
+stst`L_37:
+->  0x2ca0 <+0>:  movl   %eax, -0x8(%esp)
+    0x2ca4 <+4>:  movl   $0x30, %eax
+    0x2ca9 <+9>:  movl   %eax, -0x14(%esp)
+    0x2cad <+13>: movl   -0x8(%esp), %eax
+
+Note little endian:  91 2c 00 00  -->  0x2c91
+    
+(lldb) memory read 0x33fe0
+0x00033fe0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00033ff0: 00 00 00 00 02 60 03 00 00 00 00 00 f0 2c 00 00  .....`......?,..
+            0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+  
+Take apart the stack frames as follows:
+
+0x00033fe0: 00 00 00 00 | 00 00 00 00 | 00 00 00 00 | 00 00 00 00  ................
+0x00033ff0: 00 00 00 00 | 02 60 03 00 | 00 00 00 00 | f0 2c 00 00  .....`......?,..
+            0  1  2  3    4  5  6  7    8  9  a  b    c  d  e  f
+
+
+(lldb) memory read 0x33fe0
+0x00033fe0: 00 00 00 00 | 00 00 00 00 | 30 00 00 00 | 00 00 00 00  ........0.......
+0x00033ff0: 00 00 00 00 | 02 60 03 00 | 00 00 00 00 | f0 2c 00 00  .....`......?,..
+            0  1  2  3    4  5  6  7    8  9  a  b    c  d  e  f
+
+(lldb) memory read 0x33fe0
+0x00033fe0: 00 00 00 00 | 00 00 00 00 | 30 00 00 00 | bd 2c 00 00  ........0...?,..
+0x00033ff0: 00 00 00 00 | 02 60 03 00 | 00 00 00 00 | f0 2c 00 00  .....`......?,..
+            0  1  2  3    4  5  6  7    8  9  a  b    c  d  e  f
+	    
+	    Yields a picture of the stack:
+
+   esp-20    0x00000030	  $12  
+   esp-16    0x00002cbd   retaddr  <-- esp
+   esp-12   
+   esp-8     0x00036002      
+   esp-4       -0-  
+   esp ->    0x00002cf0
+
+
+	    
+
+	    
