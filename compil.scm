@@ -1,15 +1,23 @@
-;;-----------------------------------------------------
+;;--------------------------------------------------------------------------
 ;;
-;;  Pilar: A Scheme Compiler
-;;  by Mark Cornwell
+;;                            Pilar: A Scheme Compiler
+;;                              by Mark Cornwell
 ;;
-;;  Copyright (C) 2015, All Rights Reserved
-;;;
-;;-----------------------------------------------------
+;;
+;;                    Copyright (C) 2015, All Rights Reserved
+;;
+;;--------------------------------------------------------------------------
 ;;   Think first, then try.
 ;;                              -- The Little Schemer.
-;;-----------------------------------------------------
+;;--------------------------------------------------------------------------
 ;;
+;;  REFERENCES
+;;
+;; (Ghuloum 2006) Abdulaziz Ghuloum, An Incremental Approach to Compiler
+;;                Development, Proceedings of the 2006 Scheme and Functional
+;;                Programming Workshop, University of Chicago Technical Report
+;;                TR-2006-06
+;; 
 ;; 2.1 Closure
 ;; 1.9.3  String
 ;; 1.9.2  Vector
@@ -235,9 +243,9 @@
 (load "tests/tests-1.2-req.scm")   ;; immediate constants
 (load "tests/tests-1.1-req.scm")   ;; integers
 
-;;--------------------------------------
-;;   Utility
-;;-------------------------------------
+;;---------------------------------------------------
+;;  Enhances readability for some people.
+;;---------------------------------------------------
 
 (define first car)
 (define second cadr)
@@ -311,8 +319,8 @@
 ;;      [(_ (sym ...)  (putprop 'sym '*is-special* #t)])))
 	   
 
-;; (define (special? x)
-;;   (and (symbol? x) (getprop '*is-special*)))
+;; (define (special-symbol? x)
+;;   (and (special-symbol? x) (getprop '*is-special*)))
 
 
 ;;-----------------------------------------------------
@@ -329,26 +337,9 @@
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
-;;------------------------------------------------------
-;;              Unary Primitives
-;;------------------------------------------------------
-
-(define-primitive (fxadd1 si env arg)
-  (emit-expr si env arg)
-  (emit "     addl $~s, %eax" (immediate-rep 1)))
-
-(define-primitive (fxsub1 si env arg)
-    (emit-expr si env arg)
-    (emit "    addl $~s, %eax" (immediate-rep -1)))
-
-(define-primitive (fxzero? si env arg)
-    (emit-expr si env arg)
-    (emit "    cmp $0, %eax")
-    ;; convert the cc to a boolean
-    (emit "    sete %al")
-    (emit "    movzbl %al, %eax")
-    (emit "    sal $~s, %al" bool-bit)
-    (emit "    or $~s, %al" bool-f))
+;;-----------------------------------------
+;;             Conversions
+;;-----------------------------------------
 
 (define-primitive (fixnum->char si env arg)
   (emit-expr si env arg)
@@ -359,6 +350,10 @@
     (emit-expr si env arg)
     (emit "   shrl $~s, %eax" cshift)
     (emit "   shll $~s, %eax" fxshift))
+
+;;------------------------------------------
+;;           Disjoint Types
+;;------------------------------------------
 
 (define-primitive (null? si env arg)
     (emit-expr si env arg)
@@ -389,22 +384,24 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-;; not takes any kind of value and returns #t if
-;; the object is #f, otherwise it returns #f
-
-(define-primitive (not si env arg)
+(define-primitive (boolean? si env arg)
     (emit-expr si env arg)
-    (emit "    cmp $~s, %eax" bool-f)
+    (emit "    and $~s, %eax" bmask)
+    (emit "    cmp $~s, %eax" btag)
     ;; convert the cc to a boolean
     (emit "    sete %al")
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-(define-primitive (boolean? si env arg)
+;;------------------------------------------------
+;; not takes any kind of value and returns #t if
+;; the object is #f, otherwise it returns #f
+;;------------------------------------------------
+
+(define-primitive (not si env arg)
     (emit-expr si env arg)
-    (emit "    and $~s, %eax" bmask)
-    (emit "    cmp $~s, %eax" btag)
+    (emit "    cmp $~s, %eax" bool-f)
     ;; convert the cc to a boolean
     (emit "    sete %al")
     (emit "    movzbl %al, %eax")
@@ -437,7 +434,11 @@
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
-  (emit "    or $~s, %al" bool-f))  
+  (emit "    or $~s, %al" bool-f))
+
+;;--------------------------------------
+;;  bitwise logical fixnum operations
+;;--------------------------------------
 
 (define-primitive (fxlognot si env arg)
   (emit-expr si env arg)
@@ -455,6 +456,27 @@
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
   (emit "    or ~s(%esp), %eax" si))
+
+;;--------------------------------------
+;;            Fixnum Arithmetic
+;;--------------------------------------
+
+(define-primitive (fxadd1 si env arg)
+  (emit-expr si env arg)
+  (emit "     addl $~s, %eax" (immediate-rep 1)))
+
+(define-primitive (fxsub1 si env arg)
+    (emit-expr si env arg)
+    (emit "    addl $~s, %eax" (immediate-rep -1)))
+
+(define-primitive (fxzero? si env arg)
+    (emit-expr si env arg)
+    (emit "    cmp $0, %eax")
+    ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
 
 (define-primitive (fx= si env arg1 arg2)
   (emit-expr si env arg2)
@@ -822,11 +844,6 @@
   (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin))
        (cons 'begin (cddr x))))
 
-;; (define (let-body x)
-;;   (if (eq? (length x) 3)
-;;       (caddr x)
-;;       (cons 'begin (cddr x))))
-
 ;;------------------------------------------------------------------
 ;;                       Environment
 ;;------------------------------------------------------------------
@@ -842,10 +859,8 @@
   (let ([pair (assoc var env)])
     (and pair (cdr pair))))
 
-
-
 ;; Have I isolated the environment representation enough to
-;; change it here?
+;; change it here?  Probably not.
 
 ;;--------------------------------------------
 ;;   (let ((v E) ...) E)
@@ -914,11 +929,6 @@
   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'letrec)))
   
 (define letrec-bindings cadr)
-
-;; (define (letrec-body x)
-;;   (if (eq? (length x) 3)
-;;       (caddr x)
-;;       (cons 'begin (cddr x))))
 
 (define (letrec-body x)
   (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin)) 
@@ -1060,11 +1070,11 @@
 ;;  esp - si - 12     next frame arg 1
 ;;  esp - si - 8      next frame closure
 ;;  esp - si - 4      next frame return
-;;  esp - si          points to the top local
-;;  esp - 4 - 4N - i  local var i...
-;;  esp - 4 - 4N      local argN
-;;  esp - 8           local arg 1 (optional)
-;;  esp - 4           closure pointer   |  use this to restore ecp when callee returns
+;;  esp - si          points to the top local frame element
+;;  esp - 4 - 4N - i  local var i... (optional)
+;;  esp - 4 - 4N      local argN     (optional)
+;;  esp - 8           local arg 1    (optional)
+;;  esp - 4           closure pointer   |  used to restore ecp when callee returns
 ;;  esp - 0           return pointer    |  when the frame goes away
 ;;
 ;;------------------------------------------------------------------------------------------
@@ -1170,13 +1180,12 @@
     (error "begin" "begin body must be null or a pair" body)]
    [else
      (emit-expr si env (car body))
-     (emit-begin si env (cdr body))])) ;; <<--- reuse si, prev expr just there for side effects
+     (emit-begin si env (cdr body))]))
 
 (define (emit-tail-begin si env body)  ;; this is the body, not the expr
   (emit "# tail-begin body=~s" body)
   (cond
    [(null? body)
-    ; (emit "    movl -4(%esp), %edi  # restore closure env")
      (emit "    ret                  # return thru stack")]
    [(not (pair? body))
     (error "begin" "begin body must be null or a pair" body)]
@@ -1188,14 +1197,6 @@
 
 ;;------------------------------------------------------
 
-;; (define (emit-return)
-;;   (emit "    movl -4(%esp), %edi  # restore closure env")
-;;   (emit "    ret"))
-
-(define (align-to-8-bytes i)
-    (if (zero? (remainder i 8))
-	i
-	(+ i (- 8 (remainder i 8)))))
 
 ;;------------------------------------------------------------------
 ;;                              Closures
@@ -1254,7 +1255,11 @@
 	 (- ci wordsize)
 	 (extend-env ci env (first fmls)))]))) 
 
-(define (emit-closure si env expr)
+(define (emit-closure si env expr)  
+  (define (align-to-8-bytes i)
+    (if (zero? (remainder i 8))
+	i
+	(+ i (- 8 (remainder i 8))))) 
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
@@ -1354,30 +1359,6 @@
 	  (cons 'begin (cddr expr)))
       (error 'lambda-body "ill-formed lambda expression")))
 
-;;# emit-closure
-;;# si = -4
-;;# env = ()# expr = (closure (z) () (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
-
-;; # emit-tail-expr
-;; # si=-8
-;; # env=((z . -4) (z . -8))               #### WHY TWO z VALUE OFFSETS??? Should only be one!! ########
-;; # expr=(begin (let ((g (closure (x y) () (fx+ x y)))) (g z 100)))    ### UGLY BEGIN ###
-;; # tail-begin body=((let ((g (closure (x y) () (fx+ x y)))) (g z 100)))
-;; # emit-tail-expr
-;; # si=-8
-;; # env=((z . -4) (z . -8))               #### WE GOT TWO z OFFSETS AGAIN ######
-;; # expr=(let ((g (closure (x y) () (fx+ x y)))) (g z 100))
-;; # emit-tail-let
-;; #  si   = -8
-;; #  env  = ((z . -4) (z . -8))           #### WTF ??
-;; #  bindings = ((g (closure (x y) () (fx+ x y))))
-;; #  body = (g z 100)
-;; # emit-expr
-;; # emit-closure
-;; # si = -8
-;; # env = ((z . -4) (z . -8))            ##### WTF ???
-;; # expr = (closure (x y) () (fx+ x y))
-
 (define (close-free-variables bound-vars expr)
   (cond
    [(lambda? expr)
@@ -1389,7 +1370,7 @@
     (let* ([bindings (let-bindings expr)]
 	   [vars (map car bindings)]
 	   [exps (map cadr bindings)]
-           [new-exps (map (lambda (e) (close-free-variables bound-vars e)) exps)] ;;; <<--- SUSPECT <<<<
+           [new-exps (map (lambda (e) (close-free-variables bound-vars e)) exps)]
 	   [new-bindings (map list vars new-exps)]
 	   [nbv (append vars bound-vars)]
 	   [new-body (close-free-variables nbv (let-body expr))])
@@ -1547,7 +1528,7 @@
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
-	   (and pair (fixnum? (cdr pair)))))) ;; ignore lvar bindings  
+	   (and pair (fixnum? (cdr pair)))))) 
   (emit "# emit-expr")
   (cond
     [(immediate? expr)  (emit-immediate expr)]
@@ -1569,7 +1550,7 @@
   (define (variable? expr)
     (and (symbol? expr)
 	 (let ([pair (assoc expr env)])
-	   (and pair (fixnum? (cdr pair))))))   ;; ignore lvar bindings
+	   (and pair (fixnum? (cdr pair))))))
   (emit "# emit-tail-expr")
   (emit "# si=~s" si)
   (emit "# env=~s" env)
@@ -1595,7 +1576,6 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-;  (emit "    movl -4(%esp), %edi  # restore closure env")
   (emit "    ret                  # tail return"))
 
 ;;----------------------------------------------------------
@@ -1618,7 +1598,6 @@
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
-; (emit-expr (- wordsize) env expr)
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
@@ -1630,7 +1609,6 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
- ; (emit "    movl $0x0F0F, %edi")      ;; sentinal in current closure
   (emit "    call _L_scheme_entry") 
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
