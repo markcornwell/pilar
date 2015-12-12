@@ -1,3 +1,10 @@
+(add-tests-with-string-output "vector constructor"
+   [(let ((v (vector 11)))
+      (vector-length v)) => "1\n"]
+
+   [(let ((v (vector 12)))
+      (vector-ref v 0)) => "12\n"]
+)
 
 (add-tests-with-string-output "set!"
   [(let ([x 12])

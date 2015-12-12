@@ -232,7 +232,7 @@
 ;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 ;; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
 
-;; (load "tests/tests-2.2-req.scm")  ;; set! TBD
+(load "tests/tests-2.2-req.scm")   ;; set! TBD
 (load "tests/tests-2.1-req.scm")   ;; procedure
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
@@ -722,7 +722,7 @@
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
 (define-primitive (vector si env x)
-  (emit "   movl $1,0(ebp)")        ;; set vector lenth to 1
+  (emit "   movl $1,0(%ebp)")        ;; set vector lenth to 1
   (emit-expr si env x)              ;; evaluate the argument
   (emit "   movl %eax, 4(%ebp)")    ;; save the value in vector
   (emit "   movl %ebp, %eax")       ;; get the address of the vector
@@ -1474,7 +1474,7 @@
   (or (boolean? expr) (null? expr) (fixnum? expr) (char? expr) (string? expr)))
 
 (define (special-form? expr)
-  (memq expr '(begin if let lambda letrec closure)))  ;; <<<---- REVIEW (Use property list?)
+  (memq expr '(begin if let lambda letrec closure)))  ;; <<<-- REVIEW (Use property list?)
 
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
@@ -1617,7 +1617,7 @@
 ;;----------------------------------------------------------------------
 
 (define (set!? expr)
-    (and (pair? exp) (symbol? (car expr)) (eq? (car expr) 'set!)))
+    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'set!)))
 
 (define (set!-var expr)
     (if (symbol? (cadr expr))
@@ -1626,6 +1626,8 @@
 
 (define set!-expr caddr)
 
+;; (set! z '(let ((x 12)) (set! x 13) x))
+
 (define-transform (eliminate-set! expr)
   (eliminate-assignment expr))
 
@@ -1633,18 +1635,24 @@
 ;; made global for debugging purposes
 
    (define (settable-vars expr)
+      (settable-vars1 expr '()))
+
+   (define (settable-vars1 expr vlst)
      (cond
-      [(not (pair? expr)) '()]
-      [(set!? expr) (cons (set!-var expr)
-			       (settable-vars (set!-expr expr)))]
-      [else (append (settable-vars (car expr))
-		    (settable-vars (cdr expr)))]))
+      [(set!? expr) (settable-vars1 (set!-expr expr)
+				    (cons (set!-var expr) vlst))]
+      [(pair? expr) (settable-vars1 (car expr)
+				    (settable-vars1 (cdr expr) vlst))]
+      [else vlst]))
+
    (define (vectorize-bindings svars bindings)
           (cond
                [(null? bindings) '()]
                [(memq (caar bindings) svars)
-	  	    (cons (list (caar bindings) (list vector (cadr bindings)))
-			  (vectorize-bindings svars (cdr bindings)))]
+		(cons (list (caar bindings)
+			    (list 'vector
+				  (cadar bindings)))
+		      (vectorize-bindings svars (cdr bindings)))]
                [else (cons (car bindings)
 			   (vectorize-bindings svars (cdr bindings)))]))
    (define (vectorize-body svars expr)
@@ -1655,6 +1663,8 @@
                                                (vectorize-body svars (cdr expr)))]
                [else expr]))
 
+;; (eliminate-assignment '(let ((x 12)) (set! x 13) x))
+
 (define (eliminate-assignment expr)
 
    (cond
@@ -1664,7 +1674,8 @@
 		   [body (let-body expr)]
 		   [svars (settable-vars expr)]
 		   [new-bindings (vectorize-bindings svars bindings)]
-		   [new-body (vectorize-body svars body)])
+		   [new-body (vectorize-body svars body)])		      
+
                 (list 'let new-bindings new-body))]
        [(lambda? expr)
 	     (let* ([vars (lambda-formals expr)]

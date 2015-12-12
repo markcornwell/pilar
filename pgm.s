@@ -1,16 +1,59 @@
-# -536870912
+# (let ((v (vector 11))) (vector-length v))
 # == vectorize-letrec  ==>
-# -536870912
+# (let ((v (vector 11))) (vector-length v))
 # == eliminate-set!  ==>
-# -536870912
+# (let ((v (vector 11))) (begin (vector-length v)))
 # == close-free-variables  ==>
-# -536870912
+# (let ((v (vector 11))) (begin (begin (vector-length v))))
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
 # emit-expr
-    movl $-2147483648, %eax     # immed -536870912
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((v (vector 11)))
+#  body = (begin (begin (begin (vector-length v))))
+# emit-expr
+   movl $1,0(%ebp)
+# emit-expr
+    movl $44, %eax     # immed 11
+   movl %eax, 4(%ebp)
+   movl %ebp, %eax
+    orl  $5, %eax
+   addl $-8, %ebp
+    movl %eax, -8(%esp)  # stack save
+# emit-expr
+# emit-begin
+#   body=((begin (begin (vector-length v))))
+#   env=((v . -8))
+# emit-expr
+# emit-begin
+#   body=((begin (vector-length v)))
+#   env=((v . -8))
+# emit-expr
+# emit-begin
+#   body=((vector-length v))
+#   env=((v . -8))
+# emit-expr
+# emit-expr
+# emit-variable-ref
+# env=((v . -8))
+# var=v
+    movl -8(%esp), %eax  # stack load v
+# end emit-variable-ref
+andl $-8, %eax
+movl 0(%eax), %eax
+# emit-begin
+#   body=()
+#   env=((v . -8))
+# emit-begin
+#   body=()
+#   env=((v . -8))
+# emit-begin
+#   body=()
+#   env=((v . -8))
     ret
     .text
     .align 4,0x90
