@@ -325,7 +325,7 @@
 
 
 ;;-----------------------------------------------------
-;;                Primitives
+;;    Macros to define Primitives and Transforms
 ;;-----------------------------------------------------
 
 (define-syntax define-primitive
@@ -338,8 +338,18 @@
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
+(define-syntax define-transform
+  (syntax-rules ()
+    [(_ (transform-name v) b b* ... )
+     (begin
+       (putprop 'transform-name '*is-transform* #t)
+       (putprop 'transform-name '*name-string* (symbol->string 'transform-name))
+       (putprop 'transform-name '*procedure*
+		(lambda (v) b b* ... ))
+       (set! transform-name (getprop 'transform-name '*procedure*)))]))
+
 ;;-----------------------------------------
-;;             Conversions
+;;            Conversions between Types
 ;;-----------------------------------------
 
 (define-primitive (fixnum->char si env arg)
@@ -410,7 +420,7 @@
     (emit "    or $~s, %al" bool-f))
 
 ;;---------------------------------------
-;;        Binary Primitives
+;;                   Equality
 ;;---------------------------------------
 
 (define-primitive (eq? si env arg1 arg2)
@@ -428,18 +438,22 @@
 (define-primitive (char=? si env c1 c2)
   (emit "# char= c1=~s c2=~s" c1 c2)
   (emit-expr si env c1)                ;; eax = c1
-  (emit "    movb %ah, ~s(%esp)" si)  ;; save c1
+  (emit "    movb %ah, ~s(%esp)" si)   ;; save c1
   (emit-expr (- si wordsize) env c2)   ;; eax = c2
-  (emit "    cmp %ah, ~s(%esp)" si)   ;; compare c1 c2
+  (emit "    cmp %ah, ~s(%esp)" si)    ;; compare c1 c2
   ;; convert the cc to a boolean
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-;;--------------------------------------
-;;  bitwise logical fixnum operations
-;;--------------------------------------
+;;----------------------------------------
+;;    Bitwise logical fixnum operations
+;;
+;;   (fxlognot N)
+;;   (fxlogand N N)
+;;   (fxlogor N N)
+;;----------------------------------------
 
 (define-primitive (fxlognot si env arg)
   (emit-expr si env arg)
@@ -458,9 +472,18 @@
   (emit-expr (- si wordsize) env arg1)
   (emit "    or ~s(%esp), %eax" si))
 
-;;--------------------------------------
-;;            Fixnum Arithmetic
-;;--------------------------------------
+;;----------------------------------------------------
+;;                  Fixnum Arithmetic
+;;----------------------------------------------------
+;;
+;;  (fxzero? N)     (fxadd1 N)
+;;  (fx= N N)       (fxsub1 N)
+;;  (fx< N N)
+;;  (fx<= N N)      (fx+ N N)
+;;  (fx> N N)       (fx- N N)
+;;  (fx>= N N)      (fx* N N)
+;;
+;;-----------------------------------------------------
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
@@ -469,6 +492,8 @@
 (define-primitive (fxsub1 si env arg)
     (emit-expr si env arg)
     (emit "    addl $~s, %eax" (immediate-rep -1)))
+
+;;---------------------------------------
 
 (define-primitive (fxzero? si env arg)
     (emit-expr si env arg)
@@ -534,6 +559,8 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
+;;---------------------------------------
+
 (define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
   (emit "    movl %eax, ~s(%esp)  # fx+ push arg1" si)
@@ -553,9 +580,25 @@
   (emit-expr (- si wordsize) env arg1)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
-;;-------------------------------------------
-;;                 Pairs
-;;-------------------------------------------
+;;-----------------------------------------------------------------
+;;                              Pairs
+;;-----------------------------------------------------------------
+;;  (cons X Y)             (set-car! V X)
+;;  (car V)                (set-cdr! V Y)
+;;  (cdr V)
+;;-----------------------------------------------------------------
+;; Pairs are allocated in the heap.  They are always aligned on an
+;; 8-byte boundary. Nicely compact since pairs are 8-bytes anyway.
+;; Pairs are often called cons-nodes when talking about their
+;; representation.
+;;
+;;                           +--------------+
+;;     (V - pair-tag) -----> |     car      | 0    
+;;                           +----------------+
+;;                           |     cdr      | 4
+;;                           +--------------+
+;;
+;;-----------------------------------------------------------------
 
 (define-primitive (pair? si env arg)
   (emit-expr si env arg)
@@ -601,9 +644,33 @@
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
   (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
 
-;;-------------------------------------------
-;;                 Vectors
-;;-------------------------------------------
+;;----------------------------------------------------------------------
+;;                              Vectors
+;;----------------------------------------------------------------------
+;;  Vectors are allocated in the heap.  They start with a length field
+;;  followed by the elements of the vector.  Note the tag for the vector
+;;  lives in the pointer to it.  Vectors are 8-byte aligned in the heap.
+;;           
+;;          +----------------+
+;;   -----> |       len      | 0    
+;;          +----------------+
+;;          |      elt 0     | 4
+;;          +----------------+
+;;          |      elt 1     | 8
+;;          +----------------+
+;;          |      ...       |
+;;          +----------------+
+;;          |      elt N     | 4*(N+1)
+;;          +----------------+
+;;
+;;  (vector? V)           returns #f iff v is not a vector
+;;  (make-vector N)       returns a new vector of size N
+;;  (vector-length v)     the size of the vector
+;;  (vector-set! V N E)   sets (vector-ref V N) to E
+;;  (vector-ref V N)      most recent value set by vector-set!
+;;  (vector E)            new vector of length 1 with (vector-ref v 1) => E
+;;
+;;----------------------------------------------------------------------
 
 (define-primitive (vector? si env arg)
   (emit-expr si env arg)
@@ -654,9 +721,17 @@
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
-;;-------------------------------------------------------
-;;                     Strings
-;;-------------------------------------------------------
+(define-primitive (vector si env x)
+  (emit "   movl $1,0(ebp)")        ;; set vector lenth to 1
+  (emit-expr si env x)              ;; evaluate the argument
+  (emit "   movl %eax, 4(%ebp)")    ;; save the value in vector
+  (emit "   movl %ebp, %eax")       ;; get the address of the vector
+  (emit "    orl  $~s, %eax" vector-tag)   ;; set the vector tag in the lower 3 bits
+  (emit "   addl $-8, %ebp"))       ;; increment ebp to next 8-byte aligned addr
+
+;;-------------------------------------------------------------------------------
+;;                                      Strings
+;;-------------------------------------------------------------------------------
 
 (define-primitive (make-string si env len)
    (emit "# make-string len=~s" len)
@@ -720,9 +795,9 @@
   (emit "    sal $~s, %al" bool-bit);
   (emit "    or $~s, %al" bool-f))
   
-;;------------------------------------------
-;;             Primitive Calls
-;;------------------------------------------
+;;-------------------------------------------------------------------------------
+;;                                Primitive Calls
+;;-------------------------------------------------------------------------------
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
@@ -759,9 +834,9 @@
     (set! count (add1 count))
     L))))
 
-;;-------------------------------------------
-;;              Conditionals
-;;-------------------------------------------
+;;--------------------------------------------------------------
+;;                         Conditionals
+;;---------------------------------------------------------------
 
 (define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))
 (define (if-test x) (cadr x))
@@ -947,7 +1022,9 @@
       (emit-stack-load i var)]))
   (emit "# end emit-variable-ref"))
 
-;; should never needed since we always wrap tail expr in a begin
+;; should never be needed since we always wrap tail expr inside a begin
+;; even if it is a singleton.
+
 (define (emit-tail-variable-ref env var)
   ;(emit-variable-ref (lookup var env))
   (emit "# emit-tail-variable-ref")
@@ -1012,7 +1089,7 @@
 	       (list 'let* (cdr bindings) body)))]))
 
 ;;-------------------------------------------------------------------------------
-;;                                     Procedures
+;;                                Procedures
 ;;-------------------------------------------------------------------------------
 
 (define (unique-labels lvars)
@@ -1049,7 +1126,7 @@
 ;;     |    |  local 1   |  %esp - 8     si        old eip = return point
 ;;     +--  +------------+               |         old edi = saved closure ptr
 ;;          |  closure   |  %esp - 4     |         Note that args/locals
-;;          +------------+               |         start at %esp - 8
+;;          +------------+               |           start at %esp - 8
 ;; base --> |  old eip   |  %esp    <----+
 ;;          +------------+                         si = offset to top stack elt when funcall happens
 ;;           high address                               (in this example -16)  
@@ -1111,7 +1188,7 @@
   (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
   ;;--------------------------------------------------------------
-  ;; This is the only place call appears in the entire compiler.
+  ;; This is the only place "call" appears in the entire compiler.
   ;; Call acts just like.
   ;;
   ;;     add $-4, %esp        # bump stack ptr
@@ -1120,6 +1197,9 @@
   ;;  cont:
   ;;
   ;; which is less esoteric than understanding call
+  ;;
+  ;; CAUTION: call is going to bump %esp before saving indirect
+  ;;          through it.
   ;;--------------------------------------------------------------
 
   ;; call is going to bump %esp by 4 and save return there.
@@ -1165,9 +1245,9 @@
   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
   (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
-;;----------------------------------------------------
-;;                    (begin E E ... )
-;;-----------------------------------------------------
+;;------------------------------------------------------------------
+;;    (begin E E* ... )
+;;------------------------------------------------------------------
 
 (define begin-body cdr)
 
@@ -1196,17 +1276,15 @@
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))]))
 
-;;------------------------------------------------------
-
-
 ;;------------------------------------------------------------------
 ;;                              Closures
 ;;------------------------------------------------------------------
-;; emit-closure compiles the form
+;; A closure is the result of making the free variables in a lambda
+;; expression explicit.
 ;;
 ;;   (closure (formal ...) (freevar ...) body)
 ;;
-;; Basically a closure code will look like
+;; Basically the closure will compile to code like the following
 ;;
 ;;   Alloc heap space for label + free variables
 ;;   Set the label field to L_yy
@@ -1346,6 +1424,7 @@
 ;;
 ;;--------------------------------------------------------------------
 
+
 ;;-------------------------------------------------------------------
 ;;                (lambda (formals ...) body)
 ;;-------------------------------------------------------------------
@@ -1360,25 +1439,28 @@
 	  (cons 'begin (cddr expr)))
       (error 'lambda-body "ill-formed lambda expression")))
 
-(define (close-free-variables bound-vars expr)
+(define-transform (close-free-variables expr)
+   (close-free '() expr))
+
+(define (close-free bound-vars expr)
   (cond
    [(lambda? expr)
     (let* ([formals (lambda-formals expr)]
 	   [freevars (free-variables formals (lambda-body expr))]
-	   [body (close-free-variables formals (lambda-body expr))])
+	   [body (close-free formals (lambda-body expr))])
       (list 'closure formals freevars body))]
    [(let? expr)
     (let* ([bindings (let-bindings expr)]
 	   [vars (map car bindings)]
 	   [exps (map cadr bindings)]
-           [new-exps (map (lambda (e) (close-free-variables bound-vars e)) exps)]
+           [new-exps (map (lambda (e) (close-free bound-vars e)) exps)]
 	   [new-bindings (map list vars new-exps)]
 	   [nbv (append vars bound-vars)]
-	   [new-body (close-free-variables nbv (let-body expr))])
+	   [new-body (close-free nbv (let-body expr))])
       (list 'let new-bindings new-body))]
    [(pair? expr)
-     (cons (close-free-variables bound-vars (car expr))
-	   (close-free-variables bound-vars (cdr expr)))]
+     (cons (close-free bound-vars (car expr))
+	   (close-free bound-vars (cdr expr)))]
    [else expr]))
 
 (define unique-lvar
@@ -1466,14 +1548,7 @@
 ;;
 ;;----------------------------------------------------------
 
-(define (vectorize-letrec exp)
-
-  (define (wrapper vars ee)
-    (cond
-     [(pair? ee) (cons (wrapper vars (car ee)) (wrapper vars (cdr ee)))]			  
-     [(and (symbol? ee) (memq ee vars)) (list 'vector-ref ee 0)]
-     [else ee]))
-  
+(define-transform (vectorize-letrec exp)
   (cond
    [(letrec? exp)
     (let* ([bindings (letrec-bindings exp)]
@@ -1493,8 +1568,15 @@
 	  (vectorize-letrec (cdr exp)))]
    [else exp]))
 
+
+(define (wrapper vars ee)
+  (cond
+   [(pair? ee) (cons (wrapper vars (car ee)) (wrapper vars (cdr ee)))]			  
+   [(and (symbol? ee) (memq ee vars)) (list 'vector-ref ee 0)]
+   [else ee]))
+
 ;;------------------------------------------------------------------------
-;;                                 Assignment
+;;                    Assignment Elimination
 ;;------------------------------------------------------------------------
 ;; Let's examine how our compiler treats variables. At the source
 ;; level, variables are introduced either by let or by lambda. By
@@ -1516,62 +1598,85 @@
 ;; rewritten as an assignment to the memory location holding x (via
 ;; vector-set!) and references to x are rewritten as references to
 ;; the location of x (via vector-ref).
-;; The following example illustrates assignment conversion when
-;; applied to a program containing one assignable variable c:
-
-;; (let ((f (lambda (c)
-;;             (cons (lambda (v) (set! c v))
-;;                   (lambda () c)))))
-;;  (let ((p (f 0)))
-;;    ((car p) 12)
-;;    ((cdr p))))
-;; =>
-;; (let ((f (lambda (t0)
-;;            (let ((c (make-vector 1)) 
-;;               (cond (lambda (v) (vector-set! c 0 v))
-;;                     (lambda () (vector-ref c 0)))))
-;;    (let ((p (f 0)))
-;;      ((car p) 12)
-;;      ((cdr p))))  
-;;
-;; =>
-;; (let ((f (lambda (t0)
-;;            (let ((c (vector t0)))
-;;              (cons  (lambda (v) (vector-set! c 0 v))
-;;                     (lambda () (vector-ref c 0)))))))
-;;    (let ((p (f 0)))
-;;      ((car p) 12)
-;;      ((cdr p))))
-;;
 ;;-----------------------------------------------------------------------
+;; As an example the following program
+;;
+;;    (lambda (x y)
+;;      (begin
+;;        (set! x 3)
+;;        (fx+ x y)))
+;;
+;; is transformed into
+;;
+;;    (lambda (x y)
+;;      ((lambda (x )
+;; 	(begin
+;; 	  (vector-set! x 0 3)
+;; 	  (fx+ (vector-ref x 0) y)))
+;;       (vector x )))
+;;----------------------------------------------------------------------
 
-(define set-variable cadr)
-(define set-expr caddr)
+(define (set!? expr)
+    (and (pair? exp) (symbol? (car expr)) (eq? (car expr) 'set!)))
 
-(define (targets expr) ;; all v in a (set! v expr) subexpression of expr
-  (cond
-   [(and (pair? expr)
-	 (symbol? (car expr))
-	 (eq? (car expr) 'set!))
-    (cons (set-variable expr)
-  	  (targets (set-expr caddr)))]
-   [(pair? expr)
-    (append (set-targets (car expr))
-	    (set-targets (cdr expr)))]
-   [else '()]))
+(define (set!-var expr)
+    (if (symbol? (cadr expr))
+         (cadr expr)
+         (error 'set! "non-variable given as first arg to set!")))
 
-(define (vectorize-assignment expr) ;; Assumes all variables have unique names
+(define set!-expr caddr)
 
-  (define 
-  
-  (cond
-   [(let? expr)
-    (let* ([vars (map car (let-bindings expr))]
-	   [body (let-body expr)]
-	   [tgts (targets body)]
-    TBD))
+(define-transform (eliminate-set! expr)
+  (eliminate-assignment expr))
 
-   
+;; these can be made local to eliminate assignment
+;; made global for debugging purposes
+
+   (define (settable-vars expr)
+     (cond
+      [(not (pair? expr)) '()]
+      [(set!? expr) (cons (set!-var expr)
+			       (settable-vars (set!-expr expr)))]
+      [else (append (settable-vars (car expr))
+		    (settable-vars (cdr expr)))]))
+   (define (vectorize-bindings svars bindings)
+          (cond
+               [(null? bindings) '()]
+               [(memq (caar bindings) svars)
+	  	    (cons (list (caar bindings) (list vector (cadr bindings)))
+			  (vectorize-bindings svars (cdr bindings)))]
+               [else (cons (car bindings)
+			   (vectorize-bindings svars (cdr bindings)))]))
+   (define (vectorize-body svars expr)
+          (cond
+               [(set!? expr) (list 'vector-set! (set!-var expr) '0 (eliminate-assignment (set!-expr expr)))]
+               [(and (symbol? expr) (memq expr svars)) (list 'vector-ref expr '0)]
+               [(pair? expr)(cons (vectorize-body svars (car expr))
+                                               (vectorize-body svars (cdr expr)))]
+               [else expr]))
+
+(define (eliminate-assignment expr)
+
+   (cond
+       [(let? expr)
+            (let* ([bindings (let-bindings expr)]
+		   [vars (map car bindings)]
+		   [body (let-body expr)]
+		   [svars (settable-vars expr)]
+		   [new-bindings (vectorize-bindings svars bindings)]
+		   [new-body (vectorize-body svars body)])
+                (list 'let new-bindings new-body))]
+       [(lambda? expr)
+	     (let* ([vars (lambda-formals expr)]
+		    [body (lambda-body expr)]
+		    [svars (settable-vars body)]
+		    [new-body (vectorize-body svars body)])
+                 (list 'lambda vars new-body))]
+       [(pair? expr)
+	      (cons (eliminate-assignment (car expr))
+		    (eliminate-assignment (cdr expr)))]
+       [else expr]))
+
 ;;-------------------------------------------------------
 ;;                   Expression Dispatcher
 ;;-------------------------------------------------------
@@ -1637,24 +1742,6 @@
   (emit-immediate x)
   (emit "    ret                  # tail return"))
 
-;;----------------------------------------------------------
-;; emit-program is the top level of the compiler; applies
-;; the pre-processor passes before generating code.
-;;----------------------------------------------------------
-
-(define (emit-program raw-expr)
-  (emit "# ~s" raw-expr)
-  (let ([vl-expr (vectorize-letrec raw-expr)])
-    (emit "# == vectorize-letrec ==>")
-    (emit "# ~s" vl-expr)
-  (let ([anno-expr  (close-free-variables '() vl-expr)])
-    (emit "# == close-free-variables ==>")
-    (emit "# ~s" anno-expr)
-    (let ([expr anno-expr])
-      (emit "# == null transform ==>~%")
-      (emit "# ~s~%" expr)
-      (emit-scheme-entry '() expr)))))
-
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
   (emit-expr (- (* 2 wordsize)) env expr)
@@ -1681,5 +1768,44 @@
   (emit "    .align 4,0x90")
   (emit "    .globl ~a" entry)
   (emit "~a:" entry))
+
+;;--------------------------------------------------------------------------------------
+;;                           Program Transformation Passes
+;;--------------------------------------------------------------------------------------
+;; The first passes of the compiler are a series of source to source
+;; transformations.  Theses transformations convert the source language
+;; into a simpler source language processed by the code generator.
+;;
+;; The order of the passes is important.  The original source
+;; language goes through the following transformations before it
+;; hits the code generator.
+;;
+;;  vectorize-letrec      ~  letrec is replaced by let with vars transformed to vectors
+;;  eliminate-set!        ~  settable variables are rewritten boxed as vectors
+;;  close-free-variables  ~  free variable analysis rewrites lambdas as closure forms
+;;
+;;
+;; emit-program works with the macro define-transform defined near the top of this file.
+;; Stuff we need to know about the transform hangs off the property list of the
+;; transform.  Makes code to compose lots of tranforms cleaner -- especially when we
+;; need look at the intermediate results for debugging.
+;;--------------------------------------------------------------------------------------
+
+(define *transform-list*  ;; transforms get applied in the order listed here
+  (list 'vectorize-letrec
+	'eliminate-set!
+	'close-free-variables))
+
+(define (emit-program expr)
+  (emit "# ~s" expr)
+  (for-each
+   (lambda (tf)
+     (unless (getprop tf '*is-transform*)
+	 (error 'emit-program (format "undefined transform: ~s" tf)))
+     (emit "# == ~a  ==>" (getprop tf '*name-string*))
+     (set! expr ((getprop tf '*procedure*) expr))
+     (emit "# ~s" expr))
+   *transform-list*)
+  (emit-scheme-entry '() expr))
 
 (define compil-program emit-program)
