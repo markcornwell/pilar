@@ -1,22 +1,27 @@
 ;;--------------------------------------------------------------------------
 ;;
 ;;                            Pilar: A Scheme Compiler
-;;                              by Mark Cornwell
+;;
+;;                                      by
+;;
+;;                                 Mark Cornwell
 ;;
 ;;
 ;;                    Copyright (C) 2015, All Rights Reserved
 ;;
 ;;--------------------------------------------------------------------------
-;;   Think first, then try.
+;;            Think first, then try.
 ;;                              -- The Little Schemer.
 ;;--------------------------------------------------------------------------
 ;;
 ;;  REFERENCES
 ;;
 ;; (Ghuloum 2006) Abdulaziz Ghuloum, An Incremental Approach to Compiler
-;;                Development, Proceedings of the 2006 Scheme and Functional
-;;                Programming Workshop, University of Chicago Technical Report
-;;                TR-2006-06
+;;       Development, Proceedings of the 2006 Scheme and Functional
+;;       Programming Workshop, University of Chicago Technical Report
+;;       TR-2006-06.
+;;
+;; 
 ;; 
 ;; 2.1 Closure
 ;; 1.9.3  String
@@ -110,9 +115,7 @@
 ;;  expanding them with inline substitution.
 ;;
 ;;  Trying to keep this version of the grammer aligned with the code in this file.
-;;--------------------------------------------------------------------------------
-
-
+;;
 ;;--------------------------------------------------------------------------------
 ;;                                    Proper Tail Recursion
 ;;--------------------------------------------------------------------------------
@@ -180,8 +183,6 @@
 ;;    ⟨expression2⟩ itself is not in a tail context.
 ;;
 ;;--------------------------------------------------------------------------------
-
-;;--------------------------------------------------------------------------------
 ;;                                  Proper Tail Calls
 ;;--------------------------------------------------------------------------------
 ;; The Scheme report requires that implementations be properly tail-recursive. By
@@ -243,18 +244,18 @@
 (load "tests/tests-1.2-req.scm")   ;; immediate constants
 (load "tests/tests-1.1-req.scm")   ;; integers
 
-;;---------------------------------------------------
-;;  Enhances readability for some people.
-;;---------------------------------------------------
+;;---------------------------------------------------------------------
+;;                    Aliases to help readability
+;;---------------------------------------------------------------------
 
 (define first car)
 (define second cadr)
 (define third caddr)
 (define rest cdr)
 
-;;---------------------------------------
-;;  Value Representation
-;;---------------------------------------
+;;---------------------------------------------------------------------
+;;                       Value Representation
+;;---------------------------------------------------------------------
 
 (define fxshift         2)
 (define fxmask       #b00000011)   ; #x03
@@ -1457,27 +1458,6 @@
 (define (let-bound-vars expr)
   (map car (let-bindings expr)))
 
-;;--------------------------------------------------------
-;;         set! elimination     TBD
-;;--------------------------------------------------------
-;;
-;;  (lambda (x) (set! x e1) (fx+ x 1))
-;;  =>
-;;  (lambda (x)
-;;     (let (x (make-vector 1))
-;;        (vector-set x 0 e1)
-;;        (fx+ (vector-ref x 0) 1)))
-;;
-;;
-;;  (let ((x e1)) (set! x (foo e1)))
-;;  =>
-;;  (let ((x e1))
-;;     (let ((t e1))
-;;         (let ((x (make-vector 1)))
-;;            (vector-set! x t))
-;;            (vector-set! x (foo e1))
-;;
-;;---------------------------------------------------------
 
 ;;----------------------------------------------------------
 ;;  vectorize-letrec
@@ -1513,6 +1493,85 @@
 	  (vectorize-letrec (cdr exp)))]
    [else exp]))
 
+;;------------------------------------------------------------------------
+;;                                 Assignment
+;;------------------------------------------------------------------------
+;; Let's examine how our compiler treats variables. At the source
+;; level, variables are introduced either by let or by lambda. By
+;; the time we get to code generation, a third kind (free-variables) is
+;; there as well. When a lambda closes over a reference to a variable,
+;; we copied the value of the variable into a field in the closure. If
+;; more than one closure references the variable, each gets its own
+;; copy of the value. If the variable is assignable, then all references
+;; and assignments occurring in the code must reference/assign to the
+;; same location that holds the value of the the variable. Therefore,
+;; every assignable variable must be given one unique location to hold
+;; its value.
+;;
+;; The way we treat assignment is by making the locations of
+;; assignable variables explicit. These locations cannot in general be
+;; stack-allocated due to the indefinite extent of Schemeís closures.
+;; So, for every assignable variable, we allocate space on the heap (a
+;; vector of size 1) to hold its value. An assignment to a variable x is
+;; rewritten as an assignment to the memory location holding x (via
+;; vector-set!) and references to x are rewritten as references to
+;; the location of x (via vector-ref).
+;; The following example illustrates assignment conversion when
+;; applied to a program containing one assignable variable c:
+
+;; (let ((f (lambda (c)
+;;             (cons (lambda (v) (set! c v))
+;;                   (lambda () c)))))
+;;  (let ((p (f 0)))
+;;    ((car p) 12)
+;;    ((cdr p))))
+;; =>
+;; (let ((f (lambda (t0)
+;;            (let ((c (make-vector 1)) 
+;;               (cond (lambda (v) (vector-set! c 0 v))
+;;                     (lambda () (vector-ref c 0)))))
+;;    (let ((p (f 0)))
+;;      ((car p) 12)
+;;      ((cdr p))))  
+;;
+;; =>
+;; (let ((f (lambda (t0)
+;;            (let ((c (vector t0)))
+;;              (cons  (lambda (v) (vector-set! c 0 v))
+;;                     (lambda () (vector-ref c 0)))))))
+;;    (let ((p (f 0)))
+;;      ((car p) 12)
+;;      ((cdr p))))
+;;
+;;-----------------------------------------------------------------------
+
+(define set-variable cadr)
+(define set-expr caddr)
+
+(define (targets expr) ;; all v in a (set! v expr) subexpression of expr
+  (cond
+   [(and (pair? expr)
+	 (symbol? (car expr))
+	 (eq? (car expr) 'set!))
+    (cons (set-variable expr)
+  	  (targets (set-expr caddr)))]
+   [(pair? expr)
+    (append (set-targets (car expr))
+	    (set-targets (cdr expr)))]
+   [else '()]))
+
+(define (vectorize-assignment expr) ;; Assumes all variables have unique names
+
+  (define 
+  
+  (cond
+   [(let? expr)
+    (let* ([vars (map car (let-bindings expr))]
+	   [body (let-body expr)]
+	   [tgts (targets body)]
+    TBD))
+
+   
 ;;-------------------------------------------------------
 ;;                   Expression Dispatcher
 ;;-------------------------------------------------------
