@@ -698,7 +698,7 @@
   (emit "    addl %esi, %ebp"))            ;; advance alloc ptr
 
 (define-primitive (vector-length si env v)
-  (emit-expr si env v) ;; eax <- vector + 5
+  (emit-expr si env v)                ;; eax <- vector + 5
   (emit "andl $-8, %eax")             ;; clear 3-bit tag to select 8-byte aligned value
   (emit "movl 0(%eax), %eax")         ;; follow pointer to get length
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
@@ -721,13 +721,22 @@
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
+;; (define-primitive (vector si env x)
+;;   (emit-expr si env x)                    ;; evaluate the argument
+;;   (emit "   movl $13, 0(%ebp)")            ;; vector length 1 ecodes to 8*1 + vector-tag(=5) = 13
+;;   (emit "   movl %eax, 4(%ebp)")          ;; save the value in vector
+;;   (emit "   movl %ebp, %eax")             ;; get the address of the vector
+;;   (emit "   orl  $~s, %eax" vector-tag)   ;; set the vector tag in the lower 3 bits
+;;   (emit "   addl $8, %ebp"))              ;; increment ebp to next 8-byte aligned addr
+
 (define-primitive (vector si env x)
-  (emit "   movl $1,0(%ebp)")        ;; set vector lenth to 1
-  (emit-expr si env x)              ;; evaluate the argument
-  (emit "   movl %eax, 4(%ebp)")    ;; save the value in vector
-  (emit "   movl %ebp, %eax")       ;; get the address of the vector
-  (emit "    orl  $~s, %eax" vector-tag)   ;; set the vector tag in the lower 3 bits
-  (emit "   addl $-8, %ebp"))       ;; increment ebp to next 8-byte aligned addr
+  (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
+  (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector+5
+  (emit-expr (- si wordsize) env x)      ;; eax <- evaluated x
+  (emit "    movl  %eax, %ebx")          ;; ebx <- evaluated x
+  (emit "    movl ~s(%esp), %eax" si)       ;; eax <- the vector+5
+  (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object; offset -1 = tag(-5) + lenfield_size(4)
+  
 
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings

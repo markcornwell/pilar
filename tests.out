@@ -2,4 +2,11 @@ Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
 > Performing vector constructor tests ...
-test 0:(let ((v (vector 11))) (vector-length v)) ...> 
+test 0:(vector-length (vector 10)) ... ok
+test 1:(let ((v (vector 11))) (vector-length v)) ... ok
+test 2:(let ((v (vector 12))) (vector-ref v 0)) ... ok
+test 3:(let ((v (vector 13))) (vector-set! v 0 99) (vector-ref v 0)) ... ok
+test 4:(let ((v (vector 14))) (vector-set! v 0 #t) (vector-ref v 0)) ... ok
+Performing set! tests ...
+test 5:(let ((x 12)) (set! x 13) x) ... ok
+test 6:(let ((x 12)) (set! x (fxadd1 x)) x) ...> 
