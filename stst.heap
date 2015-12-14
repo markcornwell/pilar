@@ -1,12 +1,9 @@
 heap       0x36000
 stack top  0x24000
 stack base 0x34000
-print_ptr 36009
-print_pairs 0x36008 (car=0  cdr=0)
-print_ptr 0
-print_ptr 0
-@ 0x36000  00 00 00 04  4
-@ 0x36004  00 03 60 09  9
+print_ptr bffffc38
+@ 0x36000  00 00 00 00  0
+@ 0x36004  00 00 00 00  0
 @ 0x36008  00 00 00 00  0
 @ 0x3600c  00 00 00 00  0
 @ 0x36010  00 00 00 00  0
@@ -15,7 +12,7 @@ print_ptr 0
 @ 0x3601c  00 00 00 00  0
 @ 0x36020  00 00 00 00  0
 @ 0x36024  00 00 00 00  0
-value = 36009
+value = bffffc38
 int    4
 long   4
 ptr    4

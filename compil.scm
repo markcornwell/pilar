@@ -16,13 +16,15 @@
 ;;
 ;;  REFERENCES
 ;;
+;; (R5RS) 
+;;
 ;; (Ghuloum 2006) Abdulaziz Ghuloum, An Incremental Approach to Compiler
 ;;       Development, Proceedings of the 2006 Scheme and Functional
 ;;       Programming Workshop, University of Chicago Technical Report
 ;;       TR-2006-06.
 ;;
 ;; 
-;; 
+;;-------------------------------------------------------------------------- 
 ;; 2.1 Closure
 ;; 1.9.3  String
 ;; 1.9.2  Vector
@@ -211,6 +213,11 @@
 ;; copying are discussed later in Section 4.
 ;;--------------------------------------------------------------------------------
 
+
+;;--------------------------------------------------------------------------------
+;;                          REGRESSION  TEST
+;;--------------------------------------------------------------------------------
+
 (load "tests-driver.scm")
 
 ;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
@@ -232,7 +239,7 @@
 ;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 ;; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
 
-(load "tests/tests-2.2-req.scm")   ;; set! TBD
+;(load "tests/tests-2.2-req.scm")   ;; set! TBD
 (load "tests/tests-2.1-req.scm")   ;; procedure
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
@@ -251,11 +258,31 @@
 (define first car)
 (define second cadr)
 (define third caddr)
+(define fourth cadddr)
 (define rest cdr)
+
+;;---------------------------------------------------------------------
+;;                     PART I  -- CODE GENERATION
+;;----------------------------------------------------------------------
+
+
 
 ;;---------------------------------------------------------------------
 ;;                       Value Representation
 ;;---------------------------------------------------------------------
+;;
+;;  All values are represented in a 'datum' of 32-bits.  Low order bits
+;;  are reserved for a tag unique to the type.  Some types (e.g. fixnum,
+;;  character, boolean) have their values encoded in the datum itself.
+;;  have their values represented in the datum itself.  For others
+;;  (pair, vector, string, closure) the datum holds a pointer to heap
+;;  allocated objects.
+;;
+;;  Type tags are of varying length. But each type is a type specific
+;;  mask defined so that testing for membership in the type is a simple
+;;  mask and compare.  As specified by the Scheme standard (R5RS) types
+;;  are disjoint.  Each datum belongs to exactly one type.
+;;--------------------------------------------------------------------
 
 (define fxshift         2)
 (define fxmask       #b00000011)   ; #x03
@@ -311,22 +338,29 @@
       [(null? x) nil-value ]))
 
 
-;;-----------------------------------------------------
-;;               Special Symbols
-;;-----------------------------------------------------
-
+;;---------------------------------------------------------
+;;                 Special Symbols
+;;---------------------------------------------------------
+;;
 ;; (define-syntax define-special
 ;;   (syntax rules ()
-;;      [(_ (sym ...)  (putprop 'sym '*is-special* #t)])))
-	   
-
+;;      [(_ (sym ...)  (putprop 'sym '*is-special* #t)])))	   
+;;
 ;; (define (special-symbol? x)
 ;;   (and (special-symbol? x) (getprop '*is-special*)))
+;;----------------------------------------------------------
 
 
-;;-----------------------------------------------------
-;;    Macros to define Primitives and Transforms
-;;-----------------------------------------------------
+
+;;----------------------------------------------------------
+;;           Macros to define Primitives
+;;----------------------------------------------------------
+;; Primitives are represented as properties of their function
+;; symbol. This includes information such as the number of
+;; parameters and procedure to emit code for the primitive.
+;; 'primcall' relies on this information to generate code
+;; for primitive calls.
+;;----------------------------------------------------------
 
 (define-syntax define-primitive
   (syntax-rules ()
@@ -338,19 +372,9 @@
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
-(define-syntax define-transform
-  (syntax-rules ()
-    [(_ (transform-name v) b b* ... )
-     (begin
-       (putprop 'transform-name '*is-transform* #t)
-       (putprop 'transform-name '*name-string* (symbol->string 'transform-name))
-       (putprop 'transform-name '*procedure*
-		(lambda (v) b b* ... ))
-       (set! transform-name (getprop 'transform-name '*procedure*)))]))
-
-;;-----------------------------------------
-;;            Conversions between Types
-;;-----------------------------------------
+;;-------------------------------------------------------
+;;         Conversions between Types
+;;-------------------------------------------------------
 
 (define-primitive (fixnum->char si env arg)
   (emit-expr si env arg)
@@ -650,6 +674,15 @@
 ;;  Vectors are allocated in the heap.  They start with a length field
 ;;  followed by the elements of the vector.  Note the tag for the vector
 ;;  lives in the pointer to it.  Vectors are 8-byte aligned in the heap.
+;;
+;;  Question: Do we interpret the len as the lisp datum or the x86 number?
+;;  Answer: Treat len as a scheme datum, specifically a fixnum value.
+;;  Our fixnum has the lower 2 bits set to 0.  So we map the
+;;  fixnum to it's interpretation by shifting right 2 bits, or equivalently
+;;  multiplying by 4.  But 4 happens to be the number of bytes used by each
+;;  32 bit datum.  So the fixnum datum can be used directly to indicate
+;;  the length in bytes, or divided by 4 to indicate the number of elements
+;;  in the vector.  Cool, yes?
 ;;           
 ;;          +----------------+
 ;;   -----> |       len      | 0    
@@ -741,6 +774,11 @@
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings
 ;;-------------------------------------------------------------------------------
+;;
+;;
+;;
+;;
+;;
 
 (define-primitive (make-string si env len)
    (emit "# make-string len=~s" len)
@@ -805,7 +843,7 @@
   (emit "    or $~s, %al" bool-f))
   
 ;;-------------------------------------------------------------------------------
-;;                                Primitive Calls
+;;                         Processing Primitive Calls
 ;;-------------------------------------------------------------------------------
 
 (define (primitive? x)
@@ -904,15 +942,16 @@
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
 
-;;-----------------------------------------------------------------
-;;                        Local Variables
-;;-----------------------------------------------------------------
+;;---------------------------------------------------------------------------
+;;                            Local Variables
+;;---------------------------------------------------------------------------
 ;;
 ;; Local variables are introduced with let.  They are allocated on
 ;; the stack relative to the stack pointer %esp.
 ;;
 ;; (let ((v E) ...) E)
 ;;
+;; NOTE -- IN PROCESS OF MOVING THIS IN PRE-PROCESSING
 ;; If multiple expressions are in the let-body we wrap a begin around
 ;; them on-the-fly to normalize them into the above form. (STOP DOING THIS)
 ;;
@@ -923,11 +962,15 @@
 (define (let? x)
   (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 
-(define (let-bindings x) (cadr x))
+;; (define (let-bindings x) (cadr x))
 
-(define (let-body x)
-  (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin))
-       (cons 'begin (cddr x))))
+(define let-bindings second)
+
+;; (define (let-body x)
+;;   (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin))
+;; 	  (cons 'begin (cddr x))))
+
+(define let-body third)
 
 ;;------------------------------------------------------------------
 ;;                       Environment
@@ -945,7 +988,8 @@
     (and pair (cdr pair))))
 
 ;; Have I isolated the environment representation enough to
-;; change it here?  Probably not.
+;; change it here?  Probably not.  It might be helpful to do so.
+;; 
 
 ;;--------------------------------------------
 ;;   (let ((v E) ...) E)
@@ -1013,11 +1057,14 @@
 (define (letrec? expr)
   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'letrec)))
   
-(define letrec-bindings cadr)
+;; (define letrec-bindings cadr)
 
-(define (letrec-body x)
-  (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin)) 
-      (cons 'begin (cddr x))))
+;; (define (letrec-body x)
+;;   (unless (and (pair? (cddr x)) (eq? (caddr x) 'begin)) 
+;; 	  (cons 'begin (cddr x))))
+
+(define letrec-bindings second)
+(define letrec-body third)
 
 (define (emit-variable-ref env var)
   (emit "# emit-variable-ref")
@@ -1401,8 +1448,220 @@
     (emit "~a:" exit-point)    
     ))
 
-;; IS emit tail closure important ???
+;;---------------------------------------------------------------------------
+;;                   PART II - SOURCE CODE TRANSFORMATIONS
+;;---------------------------------------------------------------------------
+;;
+;; The first passes of the compiler are a series of source to source
+;; transformations.  Theses transformations convert the source language
+;; into a far more normalized language processed by the code generator.
+;;
+;; The order of the passes is important.
+;;
+;; emit-program works with the macro define-transform defined near the top of this file.
+;; Stuff we need to know about the transform hangs off the property list of the
+;; transform.  Makes code to compose lots of tranforms cleaner -- especially when we
+;; need look at the intermediate results for debugging.
+;;--------------------------------------------------------------------------------------
 
+(define *transform-list*       ;; transforms get applied in the order below
+  (list 'eliminate-multi-element-body        ;; add implicit begin where needed
+	'eliminate-variable-name-shadowing   ;; rename variables to eliminate shadowing
+	'vectorize-letrec      ;; letrec is replaced by let with vars transformed to vectors
+	'eliminate-set!        ;; settable variables are rewritten boxed as vectors
+	'close-free-variables  ;; free variable analysis rewrites lambdas as closure forms
+	))
+
+(define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
+  (emit "# ~s" expr)
+  (for-each
+   (lambda (tf)
+     (unless (getprop tf '*is-transform*)
+	 (error 'emit-program (format "undefined transform: ~s" tf)))
+     (emit "# == ~a  ==>" (getprop tf '*name-string*))
+     (set! expr ((getprop tf '*procedure*) expr))
+     (emit "# ~s" expr))
+   *transform-list*)
+  (emit-scheme-entry '() expr))
+
+(define compil-program emit-program)  ;; connects emit-program to test driver
+
+
+(define-syntax define-transform
+  (syntax-rules ()
+    [(_ (transform-name v) b b* ... )
+     (begin
+       (putprop 'transform-name '*is-transform* #t)
+       (putprop 'transform-name '*name-string* (symbol->string 'transform-name))
+       (putprop 'transform-name '*procedure*
+		(lambda (v) b b* ... ))
+       (set! transform-name (getprop 'transform-name '*procedure*)))]))
+
+
+;;---------------------------------------------------------------------------
+;;                        Eliminate-multi-element-body
+;;---------------------------------------------------------------------------
+;;
+;; Normalize let and lambda expressions to wrap multi element body in a begin
+;;
+;;  (let ((v E) ...) E E* ...)  =>  (let ((v E) ...) (begin E E* ...))
+;;  (let* ((v E) ...) E E* ...)  =>  (let* ((v E) ...) (begin E E* ...))
+;;  (letrec ((v E) ...) E E* ...)  =>  (letrec ((v E) ...) (begin E E* ...))
+;;  (let* ((v E) ...) E E* ...)  =>  (let* ((v E) ...) (begin E E* ...))
+;;  (lambda (v ...) E E* ...)  => (lambda (v* .... ) (begin E E* ...))
+;;
+;; Puts all let and lambda in form where body is a single element
+;;
+;;  (let ((v E) ...) E)
+;;  (lambda (v ...) E)
+;;---------------------------------------------------------------------------
+
+(define-transform (eliminate-multi-element-body expr)
+  (cond
+   [(or (let? expr) (letrec? expr) (let*? expr))
+    (let* ([letform (car expr)]
+	   [bindings (let-bindings expr)]
+	   [vars (map car bindings)]
+	   [exprs (map cadr bindings)]
+	   [new-exprs (map eliminate-multi-element-body exprs)]
+	   [long-body (cddr expr)]
+	   [new-body (if (fx> (length long-body) 1)
+			 (eliminate-multi-element-body (cons 'begin long-body))
+		         (eliminate-multi-element-body (car long-body)))]
+           [new-bindings (map list vars new-exprs)])
+      (list letform new-bindings new-body))]
+   [(lambda? expr)
+    (let* ([formals (lambda-formals expr)]
+	   [long-body (cddr expr)]
+	   [new-body (if (fx> (length long-body) 1)
+			 (cons 'begin long-body)
+			 (car long-body))])
+      (list 'lambda formals new-body))]      
+   [(pair? expr)
+    (cons (eliminate-multi-element-body (car expr))
+	  (eliminate-multi-element-body (cdr expr)))]
+   [else expr]))
+
+;;---------------------------------------------------------------------------
+;;                     Eliminate variable name shadowing
+;;---------------------------------------------------------------------------
+;; Other transforms are made simpler if we give variables unique names
+;; elimating the compexities of shadowing.  Otherwise we would have to keep
+;; track of an environment in every transform that recursively descended into
+;; the code just to keep the variables straight.  This way we recur tracking
+;; a list bound variables and when instances of shadowing are found we substitue
+;; new unique names that eliminate any shadowing.
+;;
+;; This will be done after eliminate-multi-element-body so we can assume
+;; singleton body on let and lamba forms.
+;;
+;; Variable are intoduced by let, let*, letrec, and lambda. Pay careful
+;; attention to the difference in variable scope rules for each of these forms.
+;; They matter!  See (R5RS) for details.
+;;--------------------------------------------------------------------------- 
+
+(define *global-names* '())
+
+(define-transform (eliminate-variable-name-shadowing expr)
+  (uniquely-rename-variables *global-names* expr))
+
+(define (find-name-collision vars bound-vars)
+  (cond
+   [(null? vars) #f]
+   [(null? bound-vars) #f]
+   [(memq (car vars) bound-vars) (car vars)]
+   [else (find-name-collision (cdr vars) bound-vars)]))
+
+(define unique-rename
+  (let ([count 0])
+    (lambda (old-name)
+      (let ([name (format "~a$~a" old-name count)])
+    (set! count (add1 count))
+    (string->symbol name)))))
+
+(define (remove-name-conflict old-name expr)
+  (let ([new-name (unique-rename old-name)])
+    (rename-variable old-name new-name expr)))
+
+(define (rename-variable old-name new-name expr)
+  (cond
+   [(null? expr) '()]
+   [(eq? expr old-name) new-name]
+   [(pair? expr)
+    (cons (rename-variable old-name new-name (car expr))
+	  (rename-variable old-name new-name (cdr expr)))]
+   [else expr]))
+
+(define (uniquely-rename-variables-in-let*-bindings bound-vars vars exprs)
+  (if (null? vars)
+      '()
+      (cons (list (car vars)
+		  (uniquely-rename-variables bound-vars (car exprs)))
+	    (uniquely-reanme-variables-in-let*-bindings (cons (car vars) bound-vars)
+							(cdr vars)
+							(cdr exprs)))))
+
+(define (rename-let-formal name-conflict let-expr)
+  (let* ([bindings (let-bindings let-expr)]
+	 [vars (map first bindings)]
+	 [exprs (map second bindings)]
+	 [body (let-body let-expr)]
+	 [new-name (unique-rename name-conflict)]
+	 [new-vars (rename-variable name-conflict new-name vars)]
+	 [new-body (rename-variable name-conflict new-name body)]
+	 [new-bindings (map list new-vars exprs)])
+  (list 'let new-bindings new-body)))
+	    
+(define (uniquely-rename-variables bound-vars expr)
+  (cond
+   [(lambda? expr)
+    (let* ([formals (lambda-formals expr)]
+	   [body (lambda-body expr)]
+	   [name-conflict (find-name-collision formals bound-vars)])
+      (if name-conflict
+	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
+	  (list 'lambda formals (uniquely-rename-variables (append formals bound-vars) body))))]
+   [(letrec? expr)
+    (let* ([bindings (letrec-bindings expr)]
+	   [vars (map first bindings)]
+	   [exprs (map second bindings)]
+	   [body (letrec-body expr)]
+	   [name-conflict (find-name-collision vars bound-vars)])
+      (if name-conflict
+	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
+	  (list 'letrec
+		(map list vars (uniquely-rename-variables (append vars bound-vars) exprs))
+		(uniquely-rename-variables (append vars bound-vars) body))))]
+   [(let? expr)
+    (let* ([bindings (let-bindings expr)]
+	   [vars (map first bindings)]
+	   [exprs (map second bindings)]
+	   [body (let-body expr)]
+	   [name-conflict (find-name-collision vars bound-vars)])
+      (if name-conflict
+	  (uniquely-rename-variables bound-vars (rename-let-formal name-conflict expr)) ;;
+	  (list 'let
+		(map list vars (uniquely-rename-variables bound-vars exprs))
+		(uniquely-rename-variables (append vars bound-vars) body))))]
+   [(let*? expr)
+    (let* ([bindings (let-bindings expr)]
+	   [vars (map first bindings)]
+	   [exprs (map second bindings)]
+	   [body (let*-body expr)]
+	   [name-conflict (find-name-collision vars bound-vars)])
+      (if name-conflict
+	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
+	  (list 'let*
+		(uniquely-rename-variables-in-let*-bindings bound-vars vars exprs)
+		(uniquely-rename-variables (append vars bound-vars) body))))]
+   [(pair? expr)
+    (cons (uniquely-rename-variables bound-vars (car expr))
+	  (uniquely-rename-variables bound-vars (cdr expr)))]
+   [else expr]))
+
+;;------------------------------------------------------------------
+;; IS emit tail closure important ???
+;;
 ;; (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER ---<<<  ???
 ;;   (emit "emit-tail-closure TBD")
 ;;   (let* [(lvar (closure-lvar expr))
@@ -1413,9 +1672,11 @@
 ;;     (emit "   add $~s, %eax     # closure tag "  closure-tag)
 ;;     (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
  
-;;--------------------------------------------------------------------
-;;    Free variables and transforming lambda forms to closure forms
-;;--------------------------------------------------------------------
+;;-------------------------------------------------------------------
+;;                    Close-free-variables      
+;;-------------------------------------------------------------------
+;; Free variables and transforming lambda forms to closure forms
+;;
 ;; Every lambda expression appearing in the source program is rewritten
 ;; as a closure annotated with the set of free variables.  Free variables
 ;; are any variables referenced in the body of the lambda that are
@@ -1432,11 +1693,6 @@
 ;;         (closure () (x y) (fx+ x y))))
 ;;
 ;;--------------------------------------------------------------------
-
-
-;;-------------------------------------------------------------------
-;;                (lambda (formals ...) body)
-;;-------------------------------------------------------------------
 
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
@@ -1549,7 +1805,6 @@
 (define (let-bound-vars expr)
   (map car (let-bindings expr)))
 
-
 ;;----------------------------------------------------------
 ;;  vectorize-letrec
 ;;
@@ -1557,7 +1812,10 @@
 ;;
 ;;----------------------------------------------------------
 
-(define-transform (vectorize-letrec exp)
+;; ISSUE: Rewrite this.  There is not begin.
+;; Test case: (set! z '(letrec () 12)) (vectorize-letrec z)
+
+(define-transform (vectorize-letrec exp) ;;  <<<---- BROKEN
   (cond
    [(letrec? exp)
     (let* ([bindings (letrec-bindings exp)]
@@ -1567,7 +1825,7 @@
 	   [wrap (lambda (e) (wrapper vars e))])
       (list 'let
 	    (map (lambda (v) (list v '(make-vector 1))) vars)
-	    (cons 'begin
+	    (cons 'begin  ;; <--- get rid of begin
 		  (map (lambda (v e) (list 'vector-set! v 0 e))
 		       vars
 		       (map wrap exps)))
@@ -1577,11 +1835,13 @@
 	  (vectorize-letrec (cdr exp)))]
    [else exp]))
 
-
 (define (wrapper vars ee)
   (cond
-   [(pair? ee) (cons (wrapper vars (car ee)) (wrapper vars (cdr ee)))]			  
-   [(and (symbol? ee) (memq ee vars)) (list 'vector-ref ee 0)]
+   [(pair? ee)
+    (cons (wrapper vars (car ee))
+	  (wrapper vars (cdr ee)))]			  
+   [(and (symbol? ee) (memq ee vars))
+    (list 'vector-ref ee 0)]
    [else ee]))
 
 ;;------------------------------------------------------------------------
@@ -1666,16 +1926,21 @@
 			   (vectorize-bindings svars (cdr bindings)))]))
    (define (vectorize-body svars expr)
           (cond
-               [(set!? expr) (list 'vector-set! (set!-var expr) '0 (eliminate-assignment (set!-expr expr)))]
-               [(and (symbol? expr) (memq expr svars)) (list 'vector-ref expr '0)]
-               [(pair? expr)(cons (vectorize-body svars (car expr))
-                                               (vectorize-body svars (cdr expr)))]
-               [else expr]))
+	   [(set!? expr)
+	    (list 'vector-set!
+		  (set!-var expr)
+		  '0
+		  (vectorize-body svars (set!-expr expr)))]
+	   [(and (symbol? expr) (memq expr svars))
+	    (list 'vector-ref expr '0)]
+	   [(pair? expr)
+	    (cons (vectorize-body svars (car expr))
+		  (vectorize-body svars (cdr expr)))]
+	   [else expr]))
 
 ;; (eliminate-assignment '(let ((x 12)) (set! x 13) x))
 
 (define (eliminate-assignment expr)
-
    (cond
        [(let? expr)
             (let* ([bindings (let-bindings expr)]
@@ -1789,43 +2054,4 @@
   (emit "    .globl ~a" entry)
   (emit "~a:" entry))
 
-;;--------------------------------------------------------------------------------------
-;;                           Program Transformation Passes
-;;--------------------------------------------------------------------------------------
-;; The first passes of the compiler are a series of source to source
-;; transformations.  Theses transformations convert the source language
-;; into a simpler source language processed by the code generator.
-;;
-;; The order of the passes is important.  The original source
-;; language goes through the following transformations before it
-;; hits the code generator.
-;;
-;;  vectorize-letrec      ~  letrec is replaced by let with vars transformed to vectors
-;;  eliminate-set!        ~  settable variables are rewritten boxed as vectors
-;;  close-free-variables  ~  free variable analysis rewrites lambdas as closure forms
-;;
-;;
-;; emit-program works with the macro define-transform defined near the top of this file.
-;; Stuff we need to know about the transform hangs off the property list of the
-;; transform.  Makes code to compose lots of tranforms cleaner -- especially when we
-;; need look at the intermediate results for debugging.
-;;--------------------------------------------------------------------------------------
 
-(define *transform-list*  ;; transforms get applied in the order listed here
-  (list 'vectorize-letrec
-	'eliminate-set!
-	'close-free-variables))
-
-(define (emit-program expr)
-  (emit "# ~s" expr)
-  (for-each
-   (lambda (tf)
-     (unless (getprop tf '*is-transform*)
-	 (error 'emit-program (format "undefined transform: ~s" tf)))
-     (emit "# == ~a  ==>" (getprop tf '*name-string*))
-     (set! expr ((getprop tf '*procedure*) expr))
-     (emit "# ~s" expr))
-   *transform-list*)
-  (emit-scheme-entry '() expr))
-
-(define compil-program emit-program)

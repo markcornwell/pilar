@@ -1,10 +1,14 @@
-# (let ((x 12)) (set! x (fxadd1 x)) x)
+# (letrec () 12)
+# == eliminate-multi-element-body  ==>
+# (letrec () 12)
+# == eliminate-variable-name-shadowing  ==>
+# (letrec () 12)
 # == vectorize-letrec  ==>
-# (let ((x 12)) (set! x (fxadd1 x)) x)
+# (let () (begin) 12)
 # == eliminate-set!  ==>
-# (let ((x (vector 12))) (begin (vector-set! x 0 (fxadd1 x)) (vector-ref x 0)))
+# (let () (begin))
 # == close-free-variables  ==>
-# (let ((x (vector 12))) (begin (begin (vector-set! x 0 (fxadd1 x)) (vector-ref x 0))))
+# (let () (begin))
     .text
     .align 4,0x90
     .globl _L_scheme_entry
@@ -13,86 +17,12 @@ _L_scheme_entry:
 # emit-let
 #  si   = -8
 #  env  = ()
-#  bindings = ((x (vector 12)))
-#  body = (begin (begin (begin (vector-set! x 0 (fxadd1 x)) (vector-ref x 0))))
+#  bindings = ()
+#  body = (begin)
 # emit-expr
-# emit-expr
-# make-vector 1
-# emit-expr
-    movl $4, %eax     # immed 1
-    movl %eax, %esi
-    movl %eax, 0(%ebp)
-    movl %ebp, %eax
-    orl  $5, %eax
-    addl $4, %esi
-    addl $4, %esi
-    andl $-8, %esi
-    addl %esi, %ebp
-    movl %eax, -8(%esp)
-# emit-expr
-    movl $48, %eax     # immed 12
-    movl  %eax, %ebx
-    movl -8(%esp), %eax
-    movl %ebx, -1(%eax)
-    movl %eax, -8(%esp)  # stack save
-# emit-expr
-# emit-begin
-#   body=((begin (begin (vector-set! x 0 (fxadd1 x)) (vector-ref x 0))))
-#   env=((x . -8))
-# emit-expr
-# emit-begin
-#   body=((begin (vector-set! x 0 (fxadd1 x)) (vector-ref x 0)))
-#   env=((x . -8))
-# emit-expr
-# emit-begin
-#   body=((vector-set! x 0 (fxadd1 x)) (vector-ref x 0))
-#   env=((x . -8))
-# emit-expr
-# emit-expr
-# emit-variable-ref
-# env=((x . -8))
-# var=x
-    movl -8(%esp), %eax  # stack load x
-# end emit-variable-ref
-    movl %eax, -12(%esp)
-# emit-expr
-    movl $0, %eax     # immed 0
-    movl %eax, -16(%esp)
-# emit-expr
-# emit-expr
-# emit-variable-ref
-# env=((x . -8))
-# var=x
-    movl -8(%esp), %eax  # stack load x
-# end emit-variable-ref
-     addl $4, %eax
-    movl -12(%esp), %ebx
-    movl -16(%esp), %esi
-    movl %eax, -1(%ebx,%esi)
-# emit-begin
-#   body=((vector-ref x 0))
-#   env=((x . -8))
-# emit-expr
-# emit-expr
-# emit-variable-ref
-# env=((x . -8))
-# var=x
-    movl -8(%esp), %eax  # stack load x
-# end emit-variable-ref
-    movl %eax, -12(%esp)
-# emit-expr
-    movl $0, %eax     # immed 0
-    movl -12(%esp), %esi
-    movl -1(%eax,%esi), %eax
 # emit-begin
 #   body=()
-#   env=((x . -8))
-# emit-begin
-#   body=()
-#   env=((x . -8))
-# emit-begin
-#   body=()
-#   env=((x . -8))
+#   env=()
     ret
     .text
     .align 4,0x90
