@@ -1,28 +1,22 @@
-# (letrec () 12)
+# -536870912
 # == eliminate-multi-element-body  ==>
-# (letrec () 12)
+# -536870912
+# == eliminate-let*  ==>
+# -536870912
 # == eliminate-variable-name-shadowing  ==>
-# (letrec () 12)
+# -536870912
 # == vectorize-letrec  ==>
-# (let () (begin) 12)
+# -536870912
 # == eliminate-set!  ==>
-# (let () (begin))
+# -536870912
 # == close-free-variables  ==>
-# (let () (begin))
+# -536870912
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
 # emit-expr
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ()
-#  body = (begin)
-# emit-expr
-# emit-begin
-#   body=()
-#   env=()
+    movl $-2147483648, %eax     # immed -536870912
     ret
     .text
     .align 4,0x90
