@@ -116,6 +116,15 @@
 (load "tests/tests-1.1-req.scm")   ;; integers
 
 
+;;---------------------------------------------------------------------
+;;                        Some aliases to help readability
+;;---------------------------------------------------------------------
+
+(define first car)
+(define second cadr)
+(define third caddr)
+(define fourth cadddr)
+(define rest cdr)
 
 ;;-------------------------------------------------------------------------------------
 ;;                           PART I - SOURCE CODE TRANSFORMATIONS
@@ -508,13 +517,16 @@
 ;; letrec forms are eliminated by rewriting them as let forms.
 ;; Recall the scope rules for letrec.  Each of the E1 ... Ek
 ;; below needs to be evaluated in an environment in which all
-;; of the v1...vK are bound.  This means that code being generated
-;; for E1 may need to refer to the variable allocated for vk.
-;; The answer is to rewrite the letrec into a let form that
+;; of the v1...vK exist and are in scope.  This means that
+;; code being generated for any Ei may need to generate code
+;; that references any of the vi.
+;;
+;; Our answer is to rewrite the letrec into a let form that
 ;; allocates all of the v1...vK before generating code for any
-;; of the E1...Ek.  So we covert all of the v1...vk to vectors
-;; that put a box around their value.  Then all the references
-;; to these v1...vk are replaced with vector references.
+;; of the E1...Ek.  We bind all of the v1...vk to vectors
+;; that put a box around their value.  Then we replace all
+;; the references to these v1...vk are replaced with vector
+;; references.
 ;;
 ;;  (letrec ((v1 E1) ... (vk Ek) E)
 ;;
@@ -682,20 +694,13 @@
 		    (eliminate-assignment (cdr expr)))]
        [else expr]))
 
-;;---------------------------------------------------------------------
-;;                        Some aliases to help readability
-;;---------------------------------------------------------------------
 
-(define first car)
-(define second cadr)
-(define third caddr)
-(define fourth cadddr)
-(define rest cdr)
 
 ;;------------------------------------------------------------------------------
-;;                          PART II  -- CODE GENERATION
+;;                              PART II  -- CODE GENERATION
 ;;------------------------------------------------------------------------------
-
+;;
+;;
 
 
 
