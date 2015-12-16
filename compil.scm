@@ -77,7 +77,7 @@
 ;;   P  ->  any primitive function
 ;;   V  ->  variable
 ;;
-;;                              Figure 1
+;;                                     Figure 1
 ;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
@@ -94,7 +94,8 @@
 ;;   P  ->  any primitive function
 ;;   V  ->  variable
 ;;
-;;                             Figure 2
+;;                                    Figure 2
+;;
 ;;--------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
@@ -139,7 +140,7 @@
 ;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 ;; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
 
-;(load "tests/tests-2.2-req.scm")   ;; set! TBD
+(load "tests/tests-2.2-req.scm")   ;; set! TBD
 (load "tests/tests-2.1-req.scm")   ;; procedure
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
@@ -152,9 +153,9 @@
 (load "tests/tests-1.1-req.scm")   ;; integers
 
 
-;;---------------------------------------------------------------------
+;;-------------------------------------------------------------------------------------
 ;;                        Some aliases to help readability
-;;---------------------------------------------------------------------
+;;-------------------------------------------------------------------------------------
 
 (define first car)
 (define second cadr)
@@ -162,9 +163,9 @@
 (define fourth cadddr)
 (define rest cdr)
 
-;;-------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------
 ;;                           PART I - SOURCE CODE TRANSFORMATIONS
-;;---------------------------------------------------------------------------------------
+;;--------------------------------------------------------------------------------------
 ;;
 ;; The first passes of the compiler are a series of source to source
 ;; transformations.  Theses transformations convert the source language
@@ -635,19 +636,21 @@
 ;;-----------------------------------------------------------------------
 ;; As an example the following program
 ;;
-;;    (lambda (x y)
-;;      (begin
-;;        (set! x 3)
-;;        (fx+ x y)))
+;; (let ((f (lambda (x)
+;; 	   (begin
+;; 	     (set! x (fxadd1 x))
+;; 	     x))))
+;;   (f 12))
 ;;
 ;; is transformed into
 ;;
-;;    (lambda (x y)
-;;      ((lambda (x )
-;; 	(begin
-;; 	  (vector-set! x 0 3)
-;; 	  (fx+ (vector-ref x 0) y)))
-;;       (vector x )))
+;; (let ((f (lambda (t0)
+;; 	   (let (x (vector t0))
+;; 	     (begin
+;; 	       (vector-set! x 0 (fxadd1 (vector-ref x 0)))
+;; 	       (vector-ref x 0)))))
+;;   (f 12))
+;;
 ;;----------------------------------------------------------------------
 
 (define (set!? expr)
@@ -662,75 +665,59 @@
 
 ;; (set! z '(let ((x 12)) (set! x 13) x))
 
-(define-transform (eliminate-set! expr)  ;; This should NOT rewrite local vars in binding list are vector-ref
-  (eliminate-assignment expr))
+(define-transform (eliminate-set! expr)
+  (vectorize (settable-vars expr '()) expr))
 
-;; these can be made local to eliminate assignment
-;; made global for debugging purposes
-
-   (define (settable-vars expr)
-      (settable-vars1 expr '()))
-
-   (define (settable-vars1 expr vlst)
-     (cond
-      [(set!? expr) (settable-vars1 (set!-expr expr)
-				    (cons (set!-var expr) vlst))]
-      [(pair? expr) (settable-vars1 (car expr)
-				    (settable-vars1 (cdr expr) vlst))]
-      [else vlst]))
-
-   (define (vectorize-bindings svars bindings)
-          (cond
-               [(null? bindings) '()]
-               [(memq (first (car bindings)) svars)
-		(cons (list (first (car bindings))
-			    (list 'vector
-				  (second (car bindings))))
-		      (vectorize-bindings svars (cdr bindings)))]
-               [else (cons (car bindings)
-			   (vectorize-bindings svars (cdr bindings)))]))
-
-   (define (vectorize-body svars expr) 
-          (cond
-	   [(set!? expr)
-	    (list 'vector-set!
-		  (set!-var expr)
-		  '0
-		  (vectorize-body svars (set!-expr expr)))]
-	   [(and (symbol? expr) (memq expr svars))   ;; <<---- too strong -- needs to avoid vars in bindings lists
-	    (list 'vector-ref expr '0)]
-	   [(pair? expr)
-	    (cons (vectorize-body svars (car expr))
-		  (vectorize-body svars (cdr expr)))]
-	   [else expr]))
-
-;; (eliminate-assignment '(let ((x 12)) (set! x 13) x))
-
-(define (eliminate-assignment expr)
-   (cond
-       [(let? expr)
-            (let* ([bindings (let-bindings expr)]
-		  ; [vars (map first bindings)]
-		  ; [exprs (map second bindings)]
-		   [body (let-body expr)]
-		   [svars (settable-vars expr)]
-		   ;[new-exprs (vectorize-bindings svars bindings)]
-		   [new-bindings (vectorize-bindings svars bindings)]
-		   [new-body (vectorize-body svars body)])		      
-
-                (list 'let new-bindings new-body))]
-       [(lambda? expr)
-	     (let* ([vars (lambda-formals expr)]
-		    [body (lambda-body expr)]
-		    [svars (settable-vars body)]
-		    [new-body (vectorize-body svars body)])
-                 (list 'lambda vars new-body))]
-       [(pair? expr)
-	      (cons (eliminate-assignment (car expr))
-		    (eliminate-assignment (cdr expr)))]
-       [else expr]))
+(define (settable-vars expr vlst)
+  (cond
+   [(set!? expr) (settable-vars (set!-expr expr)
+				(cons (set!-var expr) vlst))]
+   [(pair? expr) (settable-vars (car expr)
+				(settable-vars (cdr expr) vlst))]
+   [else vlst]))
 
 
+(define (vectorize svars expr) ;references to svars into vector-ref, set! to vector-set!
+  (cond
+   [(set!? expr)
+    (list 'vector-set!
+	  (set!-var expr)
+	  '0
+	  (vectorize svars (set!-expr expr)))]
+   [(let? expr)
+    (let* ([bindings (let-bindings expr)]
+	   [vars (map first bindings)]
+	   [exprs (map second bindings)]
+	   [body (let-body expr)]
+	   [new-body (vectorize svars body)]
+	   [new-exprs (vectorize svars exprs)]
+	   [new-bindings (map (lambda (v e) (if (memq v svars)
+						(list v (list 'vector e))
+						(list v e)))
+			      vars
+			      new-exprs)])
+      (list 'let new-bindings new-body))]
+   [(lambda? expr)
+    (let* ([formals (lambda-formals expr)]
+	   [new-formals (map (lambda (v) (if (memq v svars)
+					     (unique-rename v)
+					     v))
+			     formals)]
+	   [new-let-bindings (map (lambda (v nf) (if (memq v svars)
+						     (list v (list 'vector nf))
+						     (list v v)))
+				  formals
+				  new-formals)]
+	   [body (lambda-body expr)]
+	   [new-body (vectorize svars body)])
+      (list
+       'lambda new-formals (list 'let new-let-bindings new-body)))]
+   [(and (symbol? expr) (memq expr svars)) 
+    (list 'vector-ref expr '0)]
+   [(pair? expr)
+    (cons (vectorize svars (car expr))
+	  (vectorize svars (cdr expr)))]
+   [else expr]))
 
 ;;------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
