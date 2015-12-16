@@ -1,17 +1,19 @@
-;;--------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
-;;                            Pilar: A Scheme Compiler
+;;                                 Pilar: A Scheme Compiler
 ;;
-;;                                      by
+;;                                           by
 ;;
-;;                                 Mark Cornwell
+;;                                      Mark Cornwell
 ;;
 ;;
-;;                    Copyright (C) 2015, All Rights Reserved
+;;                        Copyright (C) 2015, All Rights Reserved
 ;;
-;;--------------------------------------------------------------------------
-;;            Think first, then try.     -- The Little Schemer.
-;;--------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
+;;                   Think first, then try.     -- The Little Schemer.
+;;-----------------------------------------------------------------------------------
+;;
+;; Runs under petite chez scheme.  See makefile for details.
 ;;
 ;;  REFERENCES
 ;;
@@ -22,8 +24,82 @@
 ;;       Programming Workshop, University of Chicago Technical Report
 ;;       TR-2006-06.
 ;;
-;; 
-;;-------------------------------------------------------------------------- 
+;;
+;;  OVERVIEW
+;;
+;;  This compiler translates programs expressed in the Source Language (fig 1)
+;;  into assembly code that can be run through a conventional assembler and linked
+;;  with a runtime to execute on an x86 processor.
+;;
+;;  Our source language is a subset of Scheme as defined in the 5th Revised Report
+;;  on the Algorithmic Language Scheme (R5RS).  It includes,
+;;
+;;      Immediate Constants    -3  42  #f  () ...
+;;      Variables               a  foo FUBAR ...
+;;      Primitives              eq?  fx+  logor make-vector vector-set!  string-ref 
+;;      Expressions             42    (fx- 1 43)    ((lambda (x) (fx+ 1 x)) 41)
+;;
+;;  The language supports functions as first class objects.  Functions that are
+;;  created dynamically, can be assigned to variables and passed as arguments to
+;;  other functions.  Free variables that appear in functions thus created are
+;;  maintained by forming closures to hold their variables so they will have
+;;  indefinite extent.  Thus both upward and downward funargs are supported.
+;;  All variables are bound using lexical (or static) scope.
+;;
+;;  This translation is divided into two stages. Stage I is a series of source to
+;;  source transformations that simplify the SL expressions into an equivalent
+;;  expression in IL, a scheme-like intermediate language designed to simplify
+;;  code generation.  Stage II takes this IL and generates x86 assembly by recursive
+;;  descent.
+;;
+;;              +---------------+         +-----------+           +-----------+
+;;              |    Source     |         |  Code     |           |   GNU     |
+;;   Pilar   -->|   to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;     SL       |  Transforms   |         |           |    ASM    |           |
+;;              +---------------+         +-----------+           +-----------+
+;;                  Stage  I                Stage II
+;;
+;;---------------------------------------------------------------------------------- 
+;;  Pilar Source Language (SL) -- Used by the Human Programmer
+;;
+;;   E -> I | V | P
+;;     |  (begin E ...)
+;;     |  (if E E E)
+;;     |  (P E ...)
+;;     |  (E E ...)
+;;     |  (lambda (V ...) E E* ...)
+;;     |  (let ((V E) ...) E E* ...)
+;;     |  (letrec ((V E) ...) E E* ...)
+;;     |  (let* ((V E) ...) E E* ...)
+;;     |  (set! V E)
+;;
+;;   I  ->  fixnum | boolean | char | ()
+;;   P  ->  any primitive function
+;;   V  ->  variable
+;;
+;;                              Figure 1
+;;
+;;------------------------------------------------------------------------------
+;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
+;;
+;;   E   ->  I | V | P
+;;       |  (begin E ... )
+;;       |  (if E E E)
+;;       |  (P E E* ...)        
+;;       |  (E E E* ...)        
+;;       |  (closure (V ...) (V...) E)
+;;       |  (let ((V E) ...) E)
+;;
+;;   I  ->  fixnum | boolean | char | ()
+;;   P  ->  any primitive function
+;;   V  ->  variable
+;;
+;;                             Figure 2
+;;--------------------------------------------------------------------------------
+;;  Feature List - The compiler is being developed itteratively by extending the
+;;  following feature list.  The numbers correspond to sections in Ghuloum's
+;;  paper (Ghuloum 2006)
+;;
 ;; 2.1 Closure
 ;; 1.9.3  String
 ;; 1.9.2  Vector
@@ -37,46 +113,6 @@
 ;; 1.3 Unary Primitives
 ;; 1.2 Immediate Constants
 ;; 1.1 Integers
-;;
-;; Runs under petite chez scheme
-;; See makefile for details.
-;;
-;;-----------------------------------------------------
-;; Intermediate Language (IL):    PILAR Version
-;;
-;;  Ref: (Dybig 1995) Compiler Construction Using Scheme, FPLE'95
-;;
-;;
-;;   <Expr>   -> <Imm>
-;;            |  <Var>
-;;            |  (begin <Expr> ... )
-;;            |  (if <Expr> <Expr> <Expr>)
-;;            |  (<Prim> <Expr> ...)          ;; takes the place of app
-;;            |  (<Expr> <Expr> ...)          ;; takes the place of funcall
-;;            |  (closure (<Formals>) (<FreeVars>) <Expr>)
-;;            |  (let ([<Var> <Expr>] ...) <Expr>)
-;;
-;;  <Formals>  -> <Var> ...
-;;
-;;  <FreeVars> -> <Var> ...
-;;
-;;  <Prim>   ->  symbols bound by define-primitive
-;;
-;;  <Immed>  ->  fixnum | boolean | char | null
-;;
-;;  <Var>    ->  symbols other than keywords
-;;
-;;  <Key>    ->  begin | if | closure | let | letrec
-;;
-;; NOTES
-;;
-;;  Similar to Dybig but we keep variable reference in the environment instead of
-;;  expanding them with inline substitution.
-;;
-;;  Trying to keep this version of the grammer aligned with the code in this file.
-;;
-;;--------------------------------------------------------------------------------
-
 
 ;;--------------------------------------------------------------------------------
 ;;                          REGRESSION  TEST
@@ -278,9 +314,9 @@
 ;;
 ;; Variable are intoduced by let, let*, letrec, and lambda. Pay careful
 ;; attention to the difference in variable scope rules for each of these forms.
-;; They matter!  See (R5RS) for details.
+;; See (R5RS) for details.
 ;;
-;; Consider
+;; Example
 ;;
 ;; (let* ((x 1))                |      (let* ((x 1))
 ;;    (let* ((x (fx+ x 1))      |         (let* ((x$1 (fx+ x 1))
