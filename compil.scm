@@ -59,8 +59,8 @@
 ;;              +---------------+         +-----------+           +-----------+
 ;;                  Stage  I                Stage II
 ;;
-;;---------------------------------------------------------------------------------- 
-;;  Pilar Source Language (SL) -- Used by the Human Programmer
+;;-----------------------------------------------------------------------------------
+;; Pilar Source Language (SL) -- Used by the Human Programmer
 ;;
 ;;   E -> I | V | P
 ;;     |  (begin E ...)
@@ -79,7 +79,7 @@
 ;;
 ;;                                     Figure 1
 ;;
-;;------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
 ;;   E   ->  I | V | P
@@ -96,7 +96,7 @@
 ;;
 ;;                                    Figure 2
 ;;
-;;--------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
 ;;  paper (Ghuloum 2006)
@@ -115,9 +115,9 @@
 ;; 1.2 Immediate Constants
 ;; 1.1 Integers
 
-;;--------------------------------------------------------------------------------
-;;                          REGRESSION  TEST
-;;--------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
+;;                                 REGRESSION  TEST
+;;-----------------------------------------------------------------------------------
 
 (load "tests-driver.scm")
 
@@ -152,10 +152,9 @@
 (load "tests/tests-1.2-req.scm")   ;; immediate constants
 (load "tests/tests-1.1-req.scm")   ;; integers
 
-
-;;-------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                        Some aliases to help readability
-;;-------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define first car)
 (define second cadr)
@@ -163,9 +162,9 @@
 (define fourth cadddr)
 (define rest cdr)
 
-;;--------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------------
 ;;                           PART I - SOURCE CODE TRANSFORMATIONS
-;;--------------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------------
 ;;
 ;; The first passes of the compiler are a series of source to source
 ;; transformations.  Theses transformations convert the source language
@@ -177,7 +176,7 @@
 ;; Stuff we need to know about the transform hangs off the property list of the
 ;; transform.  Makes code to compose lots of tranforms cleaner -- especially when we
 ;; need look at the intermediate results for debugging.
-;;--------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define *transform-list*                     ;; all transforms get applied in the order below
   (list 'eliminate-multi-element-body        ;; add implicit begin to make bodies a single expression
@@ -213,9 +212,9 @@
 		(lambda (v) b b* ... ))
        (set! transform-name (getprop 'transform-name '*procedure*)))]))
 
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                        Eliminate-multi-element-body
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;; Normalize let and lambda expressions to wrap multi element body in a begin
 ;;
@@ -229,7 +228,7 @@
 ;;
 ;;  (let ((v E) ...) E)
 ;;  (lambda (v ...) E)
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-transform (eliminate-multi-element-body expr)
   (cond
@@ -257,9 +256,9 @@
 	  (eliminate-multi-element-body (cdr expr)))]
    [else expr]))
 
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                     Eliminate-let*
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;  Every let* form can be transformed to an equivalent for of nested let forms
 ;;
 ;;  For example,
@@ -276,7 +275,7 @@
 ;;
 ;;  (let* () E) ==[eliminate-let*]==> E
 ;; 
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (let*? x)
   (and (pair? x) (eq? (car x) 'let*)))
@@ -300,9 +299,9 @@
 	  (eliminate-let* (cdr expr)))]
    [else expr]))
 
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                     Eliminate variable name shadowing
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Other transforms are made simpler if we give variables unique names
 ;; elimating the compexities of shadowing.  Otherwise we would have to keep
 ;; track of an environment in every transform that recursively descended into
@@ -324,7 +323,7 @@
 ;; 	     (y (fx+ x 1)))     |                (y (fx+ x$1 1)))
 ;;      y))                     |           y))
 ;;
-;;--------------------------------------------------------------------------- 
+;;-----------------------------------------------------------------------------------
 
 (define *global-names* '())
 
@@ -415,9 +414,9 @@
 	  (uniquely-rename-variables bound-vars (cdr expr)))]
    [else expr]))
 
-;;-------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                        Close-free-variables      
-;;-------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Free variables and transforming lambda forms to closure forms
 ;;
 ;; Every lambda expression appearing in the source program is rewritten
@@ -435,7 +434,7 @@
 ;;     (closure (y) (x)
 ;;         (closure () (x y) (fx+ x y))))
 ;;
-;;--------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (lambda? expr)
   (and (pair? expr) (eq? (car expr) 'lambda)))
@@ -548,9 +547,9 @@
 (define (let-bound-vars expr)
   (map car (let-bindings expr)))
 
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                       vectorize-letrec
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; letrec forms are eliminated by rewriting them as let forms.
 ;; Recall the scope rules for letrec.  Each of the E1 ... Ek
 ;; below needs to be evaluated in an environment in which all
@@ -576,7 +575,7 @@
 ;;          (vector-set! vk 0 Ek[vi->(vector-ref vi))
 ;;          E[vi->(vector-ref vi)]))
 ;;
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 ;; ISSUE: Rewrite this.  There is not begin.
 ;; Test case: (set! z '(letrec () 12)) (vectorize-letrec z)
@@ -610,9 +609,9 @@
     (list 'vector-ref ee 0)]
    [else ee]))
 
-;;------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                           Assignment
-;;------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Let's examine how our compiler treats variables. At the source
 ;; level, variables are introduced either by let or by lambda. By
 ;; the time we get to code generation, a third kind (free-variables) is
@@ -633,7 +632,7 @@
 ;; rewritten as an assignment to the memory location holding x (via
 ;; vector-set!) and references to x are rewritten as references to
 ;; the location of x (via vector-ref).
-;;-----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; As an example the following program
 ;;
 ;; (let ((f (lambda (x)
@@ -651,7 +650,7 @@
 ;; 	       (vector-ref x 0)))))
 ;;   (f 12))
 ;;
-;;----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (set!? expr)
     (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'set!)))
@@ -719,18 +718,18 @@
 	  (vectorize svars (cdr expr)))]
    [else expr]))
 
-;;------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
-;;------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;;
 
 
 
 
-;;--------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                                    Proper Tail Recursion
-;;--------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;; Implementations of Scheme are required to be properly tail-recursive. Procedure
 ;; calls that occur in certain syntactic contexts defined below are ‘tail calls’.
@@ -761,7 +760,7 @@
 ;; This treatment of tail calls is the simplest way of achieving the objective of the
 ;; requirement. Other methods for enhancing performance by minimizing the excessive
 ;; copying are discussed later in Section 4.
-;;---------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (funcall? expr)
   (and (pair? expr)
@@ -850,9 +849,9 @@
   (emit "    .globl ~a" entry)
   (emit "~a:" entry))
 
-;;---------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
-;;---------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;;  All values are represented in a 'datum' of 32-bits.  Low order bits
 ;;  are reserved for a tag unique to the type.  Some types (e.g. fixnum,
@@ -865,7 +864,7 @@
 ;;  mask defined so that testing for membership in the type is a simple
 ;;  mask and compare.  As specified by the Scheme standard (R5RS) types
 ;;  are disjoint.  Each datum belongs to exactly one type.
-;;--------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define fxshift         2)
 (define fxmask       #b00000011)   ; #x03
@@ -921,9 +920,9 @@
       [(null? x) nil-value ]))
 
 
-;;---------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                 Special Symbols
-;;---------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;; (define-syntax define-special
 ;;   (syntax rules ()
@@ -931,19 +930,19 @@
 ;;
 ;; (define (special-symbol? x)
 ;;   (and (special-symbol? x) (getprop '*is-special*)))
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 
 
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;           Macros to define Primitives
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Primitives are represented as properties of their function
 ;; symbol. This includes information such as the number of
 ;; parameters and procedure to emit code for the primitive.
 ;; 'primcall' relies on this information to generate code
 ;; for primitive calls.
-;;----------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-syntax define-primitive
   (syntax-rules ()
@@ -955,9 +954,9 @@
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
-;;-------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;         Conversions between Types
-;;-------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (fixnum->char si env arg)
   (emit-expr si env arg)
@@ -969,9 +968,9 @@
     (emit "   shrl $~s, %eax" cshift)
     (emit "   shll $~s, %eax" fxshift))
 
-;;------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;           Disjoint Types
-;;------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (null? si env arg)
     (emit-expr si env arg)
@@ -1026,9 +1025,9 @@
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
 
-;;---------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                   Equality
-;;---------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (eq? si env arg1 arg2)
   (emit "# eq? arg1=~s arg2=~s" arg1 arg2)
@@ -1079,9 +1078,9 @@
   (emit-expr (- si wordsize) env arg1)
   (emit "    or ~s(%esp), %eax" si))
 
-;;----------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                  Fixnum Arithmetic
-;;----------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;;  (fxzero? N)     (fxadd1 N)
 ;;  (fx= N N)       (fxsub1 N)
@@ -1090,7 +1089,7 @@
 ;;  (fx> N N)       (fx- N N)
 ;;  (fx>= N N)      (fx* N N)
 ;;
-;;-----------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
@@ -1100,7 +1099,7 @@
     (emit-expr si env arg)
     (emit "    addl $~s, %eax" (immediate-rep -1)))
 
-;;---------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (fxzero? si env arg)
     (emit-expr si env arg)
@@ -1166,7 +1165,7 @@
   (emit "    sal $~s, %al" bool-bit)
   (emit "    or $~s, %al" bool-f))
 
-;;---------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
@@ -1187,13 +1186,13 @@
   (emit-expr (- si wordsize) env arg1)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
-;;-----------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                              Pairs
-;;-----------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;  (cons X Y)             (set-car! V X)
 ;;  (car V)                (set-cdr! V Y)
 ;;  (cdr V)
-;;-----------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Pairs are allocated in the heap.  They are always aligned on an
 ;; 8-byte boundary. Nicely compact since pairs are 8-bytes anyway.
 ;; Pairs are often called cons-nodes when talking about their
@@ -1205,7 +1204,7 @@
 ;;                           |     cdr      | 4
 ;;                           +--------------+
 ;;
-;;-----------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (pair? si env arg)
   (emit-expr si env arg)
@@ -1251,9 +1250,9 @@
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
   (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
 
-;;----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                              Vectors
-;;----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;  Vectors are allocated in the heap.  They start with a length field
 ;;  followed by the elements of the vector.  Note the tag for the vector
 ;;  lives in the pointer to it.  Vectors are 8-byte aligned in the heap.
@@ -1286,7 +1285,7 @@
 ;;  (vector-ref V N)      most recent value set by vector-set!
 ;;  (vector E)            new vector of length 1 with (vector-ref v 1) => E
 ;;
-;;----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (vector? si env arg)
   (emit-expr si env arg)
@@ -1336,14 +1335,6 @@
   (emit-expr (- si wordsize) env k)      ;; eax <- k
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
-
-;; (define-primitive (vector si env x)
-;;   (emit-expr si env x)                    ;; evaluate the argument
-;;   (emit "   movl $13, 0(%ebp)")            ;; vector length 1 ecodes to 8*1 + vector-tag(=5) = 13
-;;   (emit "   movl %eax, 4(%ebp)")          ;; save the value in vector
-;;   (emit "   movl %ebp, %eax")             ;; get the address of the vector
-;;   (emit "   orl  $~s, %eax" vector-tag)   ;; set the vector tag in the lower 3 bits
-;;   (emit "   addl $8, %ebp"))              ;; increment ebp to next 8-byte aligned addr
 
 (define-primitive (vector si env x)
   (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
@@ -1425,9 +1416,9 @@
   (emit "    sal $~s, %al" bool-bit);
   (emit "    or $~s, %al" bool-f))
   
-;;-------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                         Processing Primitive Calls
-;;-------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (primitive? x)
   (and (symbol? x) (getprop x '*is-prim*)))
@@ -1464,9 +1455,9 @@
     (set! count (add1 count))
     L))))
 
-;;--------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                         Conditionals
-;;---------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))
 (define (if-test x) (cadr x))
@@ -1525,9 +1516,9 @@
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
    [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
 
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                            Local Variables
-;;---------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;
 ;; Local variables are introduced with let.  They are allocated on
 ;; the stack relative to the stack pointer %esp.
@@ -1540,16 +1531,16 @@
 ;;
 ;; (let ((v E) ...) E E ...) => (let ((v E) ...) (begin E E ...))
 ;;
-;;------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (let? x)
   (and (pair? x) (symbol? (car x)) (eq? (car x) 'let)))
 (define let-bindings second)
 (define let-body third)
 
-;;------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                          Environment
-;;------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define lhs car)
 (define rhs cadr)
@@ -1566,9 +1557,9 @@
 ;; change it here?  Probably not.  It might be helpful to do so.
 ;; 
 
-;;--------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;   (let ((v E) ...) E)
-;;--------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (next-stack-index si) (- si wordsize))
 
@@ -1606,7 +1597,7 @@
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
 
-;;-------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; letrec is similar to let, but it must create all of the variables
 ;; before evaluating any of the E so any E can reference any of the v
 ;; in the list of bindings.  Has to support mutual recursion.
@@ -1627,7 +1618,7 @@
 ;; 
 ;; Later will look at how to optimize this away the cases when the
 ;; full generality is not needed.
-;;----------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (letrec? expr)
   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'letrec)))
@@ -1659,12 +1650,12 @@
   (emit "# end emit-tail-variable ref")
   )
 
-;;----------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; Stack/closure save and load abstracted slightly.
 ;; These are used occasionally here and there.
 ;; Did not commit to use these abstractions everywhere.
 ;; Not sure whether they clarify or obscure.
-;;----------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (emit-stack-save si)
   (emit "    movl %eax, ~s(%esp)  # stack save" si))
@@ -1678,9 +1669,9 @@
 (define (emit-frame-load ci var)
   (emit "    movl ~s(%edi), %eax  # frame load ~a" (- ci closure-tag) var))
 
-;;-------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;                                Procedures
-;;-------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (unique-labels lvars)
     (define (assign-label v) (unique-label))
@@ -1732,7 +1723,7 @@
 (define funcall-args cddr)
 (define funcall-oper cadr)
 
-;;------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;   Invariants
 ;;
 ;;  esp - si - 12     next frame arg 1
@@ -1745,7 +1736,7 @@
 ;;  esp - 4           closure pointer   |  used to restore ecp when callee returns
 ;;  esp - 0           return pointer    |  when the frame goes away
 ;;
-;;------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define (emit-funcall si env expr)
   
@@ -1777,7 +1768,7 @@
 
   (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
-  ;;--------------------------------------------------------------
+  ;;---------------------------------------------------------------------------------
   ;; This is the only place "call" appears in the entire compiler.
   ;; Call acts just like.
   ;;
@@ -1790,7 +1781,7 @@
   ;;
   ;; CAUTION: call is going to bump %esp before saving indirect
   ;;          through it.
-  ;;--------------------------------------------------------------
+  ;;---------------------------------------------------------------------------------
 
   ;; call is going to bump %esp by 4 and save return there.
   
@@ -1835,9 +1826,9 @@
   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
   (emit "    jmp *-2(%edi)  # tail-funcall"))       ;; jump to closure entry point
 
-;;------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;;      (begin E E* ... )
-;;------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 
 (define begin-body cdr)
 
@@ -1866,11 +1857,11 @@
     (emit-expr si env (car body))
     (emit-tail-begin si env (cdr body))]))
 
-;;------------------------------------------------------------------
-;;                              Closures
-;;------------------------------------------------------------------
-;; A closure is the result of making the free variables in a lambda
-;; expression explicit.
+;;-----------------------------------------------------------------------------------
+;;                                      Closures
+;;-----------------------------------------------------------------------------------
+;; A closure is the result of making the free variables in a lambda expression
+;; explicit.
 ;;
 ;;   (closure (formal ...) (freevar ...) body)
 ;;
@@ -1885,11 +1876,10 @@
 ;;   Closure body code (Gets all free vars from the closure!!!)
 ;;   L_zz
 ;;
-;; Consider that set! will not work since a variable introduced
-;; by let or lambda might be stored both in the closure and on
-;; the stack.  Use Dybvig's rewrite to replace any such variables
-;; with singleton vectors to solve this. 
-;;------------------------------------------------------------------
+;; Consider that set! will not work since a variable introduced by let or lambda
+;; might be stored both in the closure and on the stack.  Use Dybvig's rewrite to
+;; replace any such variables with singleton vectors to solve this. 
+;;-----------------------------------------------------------------------------------
 
 (define (closure? expr)
    (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'closure)))
@@ -1976,18 +1966,7 @@
     (emit "~a:" exit-point)    
     ))
 
-
-;;------------------------------------------------------------------
-;; IS emit tail closure important ???
-;;
-;; (define (emit-tail-closure si env expr)   ;;  <<<---- FIX LATER ---<<<  ???
-;;   (emit "emit-tail-closure TBD")
-;;   (let* [(lvar (closure-lvar expr))
-;; 	 (vars (closure-vars expr))
-;; 	 (size (* wordsize (+ 1 (length vars))))]
-;;     (emit "   movl $~a, 0(%ebp) # store label" (lookup lvar env))
-;;     (emit "   movl %ebp, %eax   # return heap base ptr")
-;;     (emit "   add $~s, %eax     # closure tag "  closure-tag)
-;;     (emit "   add $~s, %ebp     # bump base aligned 8 bytes" (align-to-8-bytes size))))
-
+(define (emit-tail-closure si env expr)
+  (emit-closure si env expr)
+  (emit "   ret"))
 
