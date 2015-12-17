@@ -1,12 +1,16 @@
 # -536870912
-# == vectorize-letrec ==>
+# == eliminate-multi-element-body  ==>
 # -536870912
-# == close-free-variables ==>
+# == eliminate-let*  ==>
 # -536870912
-# == null transform ==>
-
+# == eliminate-variable-name-shadowing  ==>
 # -536870912
-
+# == vectorize-letrec  ==>
+# -536870912
+# == eliminate-set!  ==>
+# -536870912
+# == close-free-variables  ==>
+# -536870912
     .text
     .align 4,0x90
     .globl _L_scheme_entry
