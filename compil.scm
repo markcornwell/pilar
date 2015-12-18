@@ -137,11 +137,10 @@
 ;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
 ;; (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
-;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 
+(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
-
-(load "tests/tests-2.2-req.scm")   ;; set! TBD
+(load "tests/tests-2.2-req.scm")   ;; set!
 (load "tests/tests-2.1-req.scm")   ;; procedure
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
