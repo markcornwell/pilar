@@ -2,6 +2,8 @@
 ;; Pilar: A Scheme Compiler
 ;; Mark Cornwell
 ;;
+;;  Search on TBD to find outstanding issues
+;;
 ;; 2.1 Closure
 ;; 1.9.3  String
 ;; 1.9.2  Vector
@@ -59,8 +61,8 @@
 ; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 ; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 ; (load "tests/tests-2.3-req.scm")  ;; complex constants - TBD
-(load "tests/tests-2.2-req.scm")  ;; set! TBD
-(load "tests/tests-2.1-req.scm")
+;(load "tests/tests-2.2-req.scm")  ;; set! TBD
+;(load "tests/tests-2.1-req.scm")
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
 (load "tests/tests-1.7-req.scm")   ;; more binary primitives
@@ -644,7 +646,7 @@
 
 (define (next-stack-index si) (- si wordsize))
 
-;(define (let-body x) (cons 'begin (cddr x)))   ;; UGLY -- can we pre-process this?
+(define (let-body x) (cons 'begin (cddr x)))   ;; UGLY -- can we pre-process this?
 
 
 (define lhs car)
@@ -652,7 +654,6 @@
 (define bind cons)
 (define (extend-env si env var) (cons (bind var si) env))
 
-#|
 (define (emit-let si env bindings body) ;; look at the version on p. 30
   (emit "# emit-let")
   (emit "#  si   = ~s" si)
@@ -686,7 +687,6 @@
            (f (next-stack-index si)
               (extend-env si new-env (lhs b))
               (cdr b*)))])))
-|#
 
 ;;------------------------------------------------------------------
 ;; env is a list of dotted pairs
@@ -754,7 +754,7 @@
 
 ;;-----------------------------------------------------
 ;; emit-let* rewrites let* into nested singleton let's
-;; This needs to be done sooner as part of preprocessing  <<--- ISSUE ---<<<
+;; This needs to be done sooner as part of preprocessing  <<--- ISSUE TBD ---<<<
 ;;-----------------------------------------------------
 
 (define (let*? x) (and (pair? x) (eq? (car x) 'let*)))
@@ -818,7 +818,7 @@
 ;;----------------------------------------------------------------
 ;; emit-codes behaves like emit-letrec letrec but it assumes that
 ;; all the bindings will be procedures.
-;; (Why not simply use letrec here?)
+;; (Could we simply use letrec instead?)
 ;;----------------------------------------------------------------
 
 (define (emit-codes expr)
@@ -1314,9 +1314,9 @@
       (free-variables (merg (lambda-formals expr)
 			      bound-vars)
 		      (lambda-body expr))]
-  ;[(let? expr)
-  ; (free-variables (merg (let-bound-vars expr) bound-vars)
-  ;		    (let-body expr))]
+   [(let? expr)
+    (free-variables (merg (let-bound-vars expr) bound-vars)
+  		    (let-body expr))]
    
    [(pair? expr)
       (append (free-variables bound-vars (car expr))
@@ -1408,6 +1408,8 @@
 ;; generating code from the transformed source.
 ;;----------------------------------------------------------
 
+
+
 (define (emit-program expr-0)
   (emit "# ~s" expr-0)
   
@@ -1419,15 +1421,15 @@
       (emit "# == transform-letrecs-to-lets ==>")
       (emit "# ~s" expr-2)
     
-    (let ([expr-3 (transform-lets-to-lambdas expr-2)])
-      (emit "# == transform-lets-to-lambdas ==>")
-      (emit "# ~s" expr-3)
+    ;; (let ([expr-3 (transform-lets-to-lambdas expr-2)])
+    ;;   (emit "# == transform-lets-to-lambdas ==>")
+    ;;   (emit "# ~s" expr-3)
 
-      (let ([expr-4 (transform-variables-to-unique-names expr-3)])
-	(emit "# == transform-variables-to-unique-names ==>")
-	(emit "# ~s" expr-4)
+      ;; (let ([expr-4 (transform-variables-to-unique-names expr-2)])
+      ;; 	(emit "# == transform-variables-to-unique-names ==>")
+      ;; 	(emit "# ~s" expr-4)
       
-	(let ([expr-5  (annotate-free-variables '() expr-4)])
+	(let ([expr-5  (annotate-free-variables '() expr-2)])
 	  (emit "# == annotate ==>")
 	  (emit "# ~s" expr-5)
 	  
@@ -1438,7 +1440,7 @@
 	    (cond
 	     ;;[(letrec? expr) (emit-letrec expr)]
 	     [(codes? expr-6)  (emit-codes expr-6)]
-	     [else           (emit-scheme-entry '() expr-6)]))))))))
+	     [else           (emit-scheme-entry '() expr-6)]))))))
 
 ;;----------------------------------------------------------------
 ;; Transform to give all variables unique names.  This will
@@ -1469,7 +1471,8 @@
       (list 'lambda
 	    new-formals
 	    (assign-unique-names (extend-name-map formals new-formals name-map)
-				   body)))]
+				 body)))]
+   ;; ISSUE:  THIS NEEDS TO HANDLE (let ...)
    [(simple-constant? expr) expr]
    [(special-form? expr) expr]
    [(symbol? expr)
@@ -1487,7 +1490,8 @@
 ;; (define t1 '((lambda (x) ((lambda (x) (set! x 14)) #f) x) 12))
 ;; (transform-variables-to-unique-names t1)
 
-;;----------------------------------------------------------------
+
+;;-------------------------------------------------------------
 ;; transform-toplevel-defs transforms a top-level begin
 ;; into a letrec collecting all embedded top-level defines
 ;; as bindings.
@@ -1532,6 +1536,13 @@
 ;; (let ((a x)(b y)) body ...)
 ;;   =>
 ;; ((lambda (a b) body ... ) x y)
+;;
+;;  Was going to use transform instead of emit-let,
+;;  but decided that emit-let is actually simpler.
+;;  Too many nested lambdas become unreadable and
+;;  hamper debugging.
+;;
+;;   UNUSED
 ;;-----------------------------------------------
 
 ;; future extension: (let f (<bindings>) body)
@@ -1543,31 +1554,32 @@
 ;(define (let-body x) (cddr x))
 (define (let-body x) (cddr x))
 
-(define (normalize-let-body body)
-  (cond
-   [(null? body) '()]
-   [(symbol? body) body]
-   [(and (pair? body) (eq? (length body) 1))
-     (car body)]
-   [else (cons 'begin body)]))
+
+;; (define (normalize-let-body body)
+;;   (cond
+;;    [(null? body) '()]
+;;    [(symbol? body) body]
+;;    [(and (pair? body) (eq? (length body) 1))
+;;      (car body)]
+;;    [else (cons 'begin body)]))
     
-(define (transform-lets-to-lambdas expr)
-  (cond
-   [(null? expr) '()]
-   [(let? expr)
-    (let* ([bindings (let-bindings expr)]
-	   [formals (map car bindings)]
-	   [args (map cadr bindings)]
-	   [body (normalize-let-body (let-body expr))])
-      (cons
-          (list 'lambda
-	        formals
-	        (transform-lets-to-lambdas body))
-	  (transform-lets-to-lambdas args)))]
-   [(pair? expr)
-    (cons (transform-lets-to-lambdas (car expr))
-	  (transform-lets-to-lambdas (cdr expr)))]
-   [else expr]))
+;; (define (transform-lets-to-lambdas expr)
+;;   (cond
+;;    [(null? expr) '()]
+;;    [(let? expr)
+;;     (let* ([bindings (let-bindings expr)]
+;; 	   [formals (map car bindings)]
+;; 	   [args (map cadr bindings)]
+;; 	   [body (normalize-let-body (let-body expr))])
+;;       (cons
+;;           (list 'lambda
+;; 	        formals
+;; 	        (transform-lets-to-lambdas body))
+;; 	  (transform-lets-to-lambdas args)))]
+;;    [(pair? expr)
+;;     (cons (transform-lets-to-lambdas (car expr))
+;; 	  (transform-lets-to-lambdas (cdr expr)))]
+;;    [else expr]))
 
 
 ;; (define t1 '(let ((a x)(b y)) e1 e2 ))   
@@ -1601,9 +1613,9 @@
 
 (define (transform-letrecs-to-lets expr)
   (cond
-   ;[(null? expr) '()]
-   [(letrec? expr)
-    (let* ([bindings (letrec-bindings expr)]
+    [(null? expr) '()]
+    [(letrec? expr)
+     (let* ([bindings (letrec-bindings expr)];
 	   [formals (map car bindings)]
 	   [values (map cadr bindings)]
 	   [init-bindings (map (lambda (x) (list x #f)) formals)]
