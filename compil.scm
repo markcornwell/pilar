@@ -139,7 +139,7 @@
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 ;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 
-(load "tests/tests-2.3-req.scm")   ;; complex constants - TBD
+(load "tests/tests-2.3-req.scm")   ;; complex constants
 
 (load "tests/tests-2.2-req.scm")   ;; set! TBD
 (load "tests/tests-2.1-req.scm")   ;; procedure
@@ -576,7 +576,7 @@
 ;; ISSUE: Rewrite this.  There is not begin.
 ;; Test case: (set! z '(letrec () 12)) (vectorize-letrec z)
 
-(define-transform (vectorize-letrec exp) ;;  <<<---- BROKEN
+(define-transform (vectorize-letrec exp)
   (cond
    [(letrec? exp)
     (let* ([bindings (letrec-bindings exp)]
@@ -1728,15 +1728,9 @@
       (emit-stack-load i var)]))
   (emit "# end emit-variable-ref"))
 
-;; should never be needed since we always wrap tail expr inside a begin
-;; even if it is a singleton.
-
 (define (emit-tail-variable-ref env var)
-  ;(emit-variable-ref (lookup var env))
   (emit "# emit-tail-variable-ref")
   (emit-variable-ref env var)
-  ;; restore
-;  (emit "    movl -4(%esp), %edi")
   (emit "    ret")
   (emit "# end emit-tail-variable ref")
   )
