@@ -11,6 +11,8 @@
 # -536870912
 # == close-free-variables  ==>
 # -536870912
+# == eliminate-quote  ==>
+# -536870912
     .text
     .align 4,0x90
     .globl _L_scheme_entry
