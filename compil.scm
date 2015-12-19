@@ -188,6 +188,7 @@
 	'close-free-variables                ;; do free variable analysis, rewrite lambdas as closures
 	'eliminate-quote                     ;; eliminate complex constants
 	'eliminate-when/unless               ;; when/unless translate to corresponding if expressions
+	'expand-cond                         ;; rewrite cond as if
 	))
 
 (define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
@@ -871,6 +872,44 @@
    [(pair? exp)
     (cons (eliminate-when/unless (car exp))
 	  (eliminate-when/unless (cdr exp)))]
+   [else exp]))
+
+
+;;-----------------------------------------------------------------------------------
+;;  expand-cond
+;;-----------------------------------------------------------------------------------
+;;  T(cond)           => #f
+;;  T(cond [else E])  => T[E]
+;;  T(cond [B E])     => (if T[B] T[E] #f)
+;;  T(cond [B E] ...) => (if T[B] T[E] (cond T[...]))
+;;  T(X . Y)          => (T[X] . T[Y])
+;;  T[a]              => a
+;;-----------------------------------------------------------------------------------
+
+(define (cond? exp)
+  (and (pair? exp) (eq? (car exp) 'cond)))
+(define cond-clause-list cdr)
+(define cond-clause second)
+(define (else? exp)
+  (and (pair? exp) (eq? (car exp) 'else)))
+
+
+
+(define-transform (expand-cond exp)
+  (cond
+   [(cond? exp)
+    (let* ([clause (cond-clause exp)]
+	   [B (first clause)]
+	   [E (second clause)])
+      (cond
+       [(null? (cond-clause-list expr)) #f]
+       [(else? clause) (expand-cond E)]
+       [else (list 'if (expand-cond (first (cond-clause expr)))
+		   (expand-cond (second (cond-clause expr)))
+		   (expand-cond (list 'cond (third expr))))]))]
+   [(pair? exp)
+    (cond (expand-cond (car exp))
+	  (expand-cond (cdr exp)))]
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
