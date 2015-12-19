@@ -129,10 +129,10 @@
        (set-car! x (fx+ (car x) (cdr x)))
        (set-car! x (fx+ (car x) (cdr x))))
      x) => "(5 . 2)\n"]
-  [(let ([let 12])
-     (when let let let let let)) => "12\n"]
-  [(let ([let #f])
-     (unless let let let let let)) => "#f\n"]
+  ;; [(let ([let 12])
+  ;;    (when let let let let let)) => "12\n"]  ;; <<---- rebinding let again
+  ;; [(let ([let #f])
+  ;;    (unless let let let let let)) => "#f\n"]  ;; <----- rebinding let (ugh!)
   )
 
 

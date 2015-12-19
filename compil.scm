@@ -187,6 +187,7 @@
 	'eliminate-set!                      ;; rewrite settable variables as vectors
 	'close-free-variables                ;; do free variable analysis, rewrite lambdas as closures
 	'eliminate-quote                     ;; eliminate complex constants
+	'eliminate-when/unless               ;; when/unless translate to corresponding if expressions
 	))
 
 (define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
@@ -642,39 +643,7 @@
     (cons (vectorize-T ui (car exp))
 	  (vectorize-T ui (cdr exp)))]
    [else exp]))
-   
 
-;; (define-transform (vectorize-letrec exp)
-;;   (cond
-;;    [(letrec? exp)
-;;     (let* ([bindings (letrec-bindings exp)]
-;; 	   [vars (map car bindings)]
-;; 	   [exps (map cadr bindings)]
-;; 	   [body (letrec-body exp)]
-;; 	   [wrap (lambda (e) (wrapper vars e))]
-;; 	   [new-bindings (map (lambda (v) (list v (list 'make-vector 1))) vars)]
-;; 	   [new-vector-sets (map (lambda (v e) (list 'vector-set! v 0 e))
-;; 				  vars
-;; 				  (map wrap exps))]
-;; 	   [new-body (wrap body)])
-;;       (list 'let
-;; 	    new-bindings
-;; 	    (list 'begin
-;; 		  (cons 'begin new-vector-sets)
-;; 		  new-body)))]
-;;    [(pair? exp)
-;;     (cons (vectorize-letrec (car exp))
-;; 	  (vectorize-letrec (cdr exp)))]
-;;    [else exp]))
-
-;; (define (wrapper vars ee)
-;;   (cond
-;;    [(pair? ee)
-;;     (cons (wrapper vars (car ee))
-;; 	  (wrapper vars (cdr ee)))]			  
-;;    [(and (symbol? ee) (memq ee vars))
-;;     (list 'vector-ref ee 0)]
-;;    [else ee]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment
@@ -868,17 +837,41 @@
   ; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
    [else exp]))
 
-
 ;;-----------------------------------------------------------------------------------
 ;;  eliminate-when/unless
 ;;-----------------------------------------------------------------------------------
-;;  T(when E ...)   =>  (if T[E] (begin T[...]))
-;;  T(unless E ...) =>  (if (not T[E]) (begin T[...]))
+;;  T(when E ...)   =>  (if T[E] (begin T[...]) #f)
+;;  T(unless E ...) =>  (if (not T[E]) (begin T[...]) #f)
+;;  T(X . Y)        =>  (T[X] . T[Y])
+;;  T(a)            =>  a
 ;;-----------------------------------------------------------------------------------
 
+(define (when? exp)
+  (and (pair? exp) (eq? (car exp) 'when)))
+(define when-test second)
+(define when-body cddr)
 
+(define (unless? exp)
+  (and (pair? exp) (eq? (car exp) 'unless)))
+(define unless-test second)
+(define unless-body cddr)
 
-
+(define-transform (eliminate-when/unless exp)
+  (cond
+   [(when? exp)
+    (list 'if
+	  (eliminate-when/unless (when-test exp))
+	  (cons 'begin (eliminate-when/unless (when-body exp)))
+	  #f)]
+   [(unless? exp)
+    (list 'if
+	  (list 'not (eliminate-when/unless (unless-test exp)))
+	  (cons 'begin (eliminate-when/unless (unless-body exp)))
+	  #f)]
+   [(pair? exp)
+    (cons (eliminate-when/unless (car exp))
+	  (eliminate-when/unless (cdr exp)))]
+   [else exp]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
@@ -1014,7 +1007,6 @@
 ;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
 ;;-----------------------------------------------------------------------------------
-;;
 ;;  All values are represented in a 'datum' of 32-bits.  Low order bits are reserved
 ;;  for a tag unique to the type.  Some types (e.g. fixnum, character, boolean) have
 ;;  their values encoded in the datum itself. have their values represented in the
@@ -1723,7 +1715,6 @@
 ;;-----------------------------------------------------------------------------------
 ;;                          Environment
 ;;-----------------------------------------------------------------------------------
-;;
 ;; We keep bindings in an environment.  Bindings assoicate variables with information
 ;; on where they are stored.  Typically this is an offset either in the heap with
 ;; respect to the current closure pointer, or in the stack as an offset from the

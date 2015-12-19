@@ -29,4 +29,9 @@ test 22:(let ((if 12)) (and if 17)) ... ok
 test 23:(let ((t 1)) (and (begin (set! t (fxadd1 t)) t) t)) ... ok
 test 24:(let ((t 1)) (or (begin (set! t (fxadd1 t)) t) t)) ... ok
 Performing when/unless tests ...
-test 25:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x)))) x) ...> 
+test 25:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 26:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x))) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 27:(let ((x (cons 1 2))) (unless (fixnum? x) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 28:(let ((x (cons 1 2))) (unless (fixnum? x) (set-car! x (fx+ (car x) (cdr x))) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+Performing cond tests ...
+test 29:(cond (1 2) (else 3)) ...> 

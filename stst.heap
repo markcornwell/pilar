@@ -1,8 +1,11 @@
 heap       0x36000
 stack top  0x24000
 stack base 0x34000
+print_ptr 36001
+print_pairs 0x36000 (car=14  cdr=8)
+print_ptr 14
 print_ptr 8
-@ 0x36000  00 00 00 04  4
+@ 0x36000  00 00 00 14  20
 @ 0x36004  00 00 00 08  8
 @ 0x36008  00 00 00 00  0
 @ 0x3600c  00 00 00 00  0
@@ -12,7 +15,7 @@ print_ptr 8
 @ 0x3601c  00 00 00 00  0
 @ 0x36020  00 00 00 00  0
 @ 0x36024  00 00 00 00  0
-value = 8
+value = 36001
 int    4
 long   4
 ptr    4
