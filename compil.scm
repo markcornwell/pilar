@@ -65,6 +65,7 @@
 ;;   E -> I | V | P
 ;;     |  (begin E ...)
 ;;     |  (if E E E)
+;;     |  (cond (E E) ...)
 ;;     |  (P E ...)
 ;;     |  (E E ...)
 ;;     |  (lambda (V ...) E E* ...)
@@ -182,13 +183,13 @@
 (define *transform-list*                     ;; all transforms get applied in the order below
   (list 'eliminate-multi-element-body        ;; add implicit begin to make bodies a single expression
 	'eliminate-let*                      ;; transform all let* to nested lets	
-	'eliminate-variable-name-shadowing   ;; rename variables to make names unique
+	'eliminate-shadowing                 ;; rename variables to make names unique
 	'vectorize-letrec                    ;; rewrite letrec as let with vars transformed to vectors
 	'eliminate-set!                      ;; rewrite settable variables as vectors
 	'close-free-variables                ;; do free variable analysis, rewrite lambdas as closures
 	'eliminate-quote                     ;; eliminate complex constants
 	'eliminate-when/unless               ;; when/unless translate to corresponding if expressions
-	'expand-cond                         ;; rewrite cond as if
+	'eliminate-cond                      ;; rewrite cond as if
 	))
 
 (define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
@@ -332,7 +333,7 @@
 
 (define *global-names* '())
 
-(define-transform (eliminate-variable-name-shadowing expr)
+(define-transform (eliminate-shadowing expr)
   (uniquely-rename-variables *global-names* expr))
 
 (define (find-name-collision vars bound-vars)
@@ -876,9 +877,10 @@
 
 
 ;;-----------------------------------------------------------------------------------
-;;  expand-cond
+;;  eliminate-cond
 ;;-----------------------------------------------------------------------------------
 ;;  T(cond)           => #f
+;;  T(cond (B))       => error
 ;;  T(cond [else E])  => T[E]
 ;;  T(cond [B E])     => (if T[B] T[E] #f)
 ;;  T(cond [B E] ...) => (if T[B] T[E] (cond T[...]))
@@ -888,23 +890,25 @@
 
 (define (cond? exp)
   (and (pair? exp) (eq? (car exp) 'cond)))
-(define cond-clause-list cdr)
+(define (clause? exp) (and (pair? exp) (not (null? (cdr exp)))))
 (define cond-clause second)
 (define (else? exp)
   (and (pair? exp) (eq? (car exp) 'else)))
 
-(define-transform (expand-cond exp)
+(define-transform (eliminate-cond exp)
   (cond
    [(cond? exp)
     (cond
-       [(null? (cdr exp)) #f]
-       [(else? (cond-clause exp)) (expand-cond (second (cond-clause exp)))]
-       [else (list 'if (expand-cond (first (cond-clause exp)))
-		       (expand-cond (second (cond-clause exp)))
-		       (expand-cond (cons 'cond (cddr exp))))])]
+        [(null? (cdr exp)) #f]
+	[(not (clause? (second exp)))
+	 (error 'cond (format "bad cond clause: ~s" (second exp)))]
+	[(else? (cond-clause exp)) (eliminate-cond (second (cond-clause exp)))]
+	[else (list 'if (eliminate-cond (first (cond-clause exp)))
+		    (eliminate-cond (second (cond-clause exp)))
+		    (eliminate-cond (cons 'cond (cddr exp))))])]
    [(pair? exp)
-    (cons (expand-cond (car exp))
-	  (expand-cond (cdr exp)))]
+    (cons (eliminate-cond (car exp))
+	  (eliminate-cond (cdr exp)))]
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
