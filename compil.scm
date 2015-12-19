@@ -870,6 +870,17 @@
 
 
 ;;-----------------------------------------------------------------------------------
+;;  eliminate-when/unless
+;;-----------------------------------------------------------------------------------
+;;  T(when E ...)   =>  (if T[E] (begin T[...]))
+;;  T(unless E ...) =>  (if (not T[E]) (begin T[...]))
+;;-----------------------------------------------------------------------------------
+
+
+
+
+
+;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 
@@ -1642,6 +1653,16 @@
     (emit-tail-expr si env (if-altern x))
     (emit "~a:" end-label)))
 
+;;-----------------------------------------------------------------------------------
+;;  (and) => #t
+;;  (and E) => E
+;;  (and E ...) => (if E (and ...) #f)
+;;  
+;;  (or) => #f
+;;  (or E) => E
+;;  (or E ...) => (let ((z E1)) (if z z (or ...)))
+;;-----------------------------------------------------------------------------------
+
 (define (and? x) (and (pair? x)(symbol? (car x)) (eq? (car x) 'and)))
 
 (define (emit-and si env x)
@@ -1658,17 +1679,24 @@
 
 (define (or? x) (and (pair? x) (symbol? (car x)) (eq? (car x) 'or)))
 
+;; emit-or is TRICKY;; Be careful not to evaluate (cadr x) twice. A mistake
+;; when evaluating (cadr x) has side effects.
+
 (define (emit-or si env x)
   (cond
    [(eq? (length x) 1) (emit-expr si env #f)]
    [(eq? (length x) 2) (emit-expr si env (cadr x))]
-   [else (emit-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-expr si env (let ([z (unique-rename 'z)])
+	     		      (list 'let (list (list z (cadr x)))
+					  (list 'if z z (cons 'or (cddr x))))))]))
 
 (define (emit-tail-or si env x)
   (cond
    [(eq? (length x) 1) (emit-tail-expr si env #f)]
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
-   [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-tail-expr si env (let ([z (unique-rename 'z)])
+				  (list 'let (list (list z (cadr x)))
+					  (list 'if z z (cons 'or (cddr x))))))]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                            Local Variables

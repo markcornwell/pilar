@@ -22,4 +22,11 @@ test 15:(and #f ((lambda (x) (x x)) (lambda (x) (x x)))) ... ok
 test 16:(or) ... ok
 test 17:(or #t) ... ok
 test 18:(or 5) ... ok
-test 19:(or 1 2 3) ...> 
+test 19:(or 1 2 3) ... ok
+test 20:(or (cons 1 2) ((lambda (x) (x x)) (lambda (x) (x x)))) ... ok
+test 21:(let ((if 12)) (or if 17)) ... ok
+test 22:(let ((if 12)) (and if 17)) ... ok
+test 23:(let ((t 1)) (and (begin (set! t (fxadd1 t)) t) t)) ... ok
+test 24:(let ((t 1)) (or (begin (set! t (fxadd1 t)) t) t)) ... ok
+Performing when/unless tests ...
+test 25:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x)))) x) ...> 
