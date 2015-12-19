@@ -893,22 +893,17 @@
 (define (else? exp)
   (and (pair? exp) (eq? (car exp) 'else)))
 
-
-
 (define-transform (expand-cond exp)
   (cond
    [(cond? exp)
-    (let* ([clause (cond-clause exp)]
-	   [B (first clause)]
-	   [E (second clause)])
-      (cond
-       [(null? (cond-clause-list expr)) #f]
-       [(else? clause) (expand-cond E)]
-       [else (list 'if (expand-cond (first (cond-clause expr)))
-		   (expand-cond (second (cond-clause expr)))
-		   (expand-cond (list 'cond (third expr))))]))]
+    (cond
+       [(null? (cdr exp)) #f]
+       [(else? (cond-clause exp)) (expand-cond (second (cond-clause exp)))]
+       [else (list 'if (expand-cond (first (cond-clause exp)))
+		       (expand-cond (second (cond-clause exp)))
+		       (expand-cond (cons 'cond (cddr exp))))])]
    [(pair? exp)
-    (cond (expand-cond (car exp))
+    (cons (expand-cond (car exp))
 	  (expand-cond (cdr exp)))]
    [else exp]))
 

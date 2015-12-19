@@ -1,24 +1,18 @@
-# (letrec () 12)
+# (cond (1) (else 13))
 # == eliminate-multi-element-body  ==>
-# (letrec () 12)
+# (cond (1) (else 13))
 # == eliminate-let*  ==>
-# (letrec () 12)
+# (cond (1) (else 13))
 # == eliminate-variable-name-shadowing  ==>
-# (letrec () 12)
+# (cond (1) (else 13))
 # == vectorize-letrec  ==>
-# (let () (begin (begin) 12))
+# (cond (1) (else 13))
 # == eliminate-set!  ==>
-# (let () (begin (begin) 12))
+# (cond (1) (else 13))
 # == close-free-variables  ==>
-# (let () (begin (begin) 12))
+# (cond (1) (else 13))
 # == eliminate-quote  ==>
-# (let () (begin (begin) 12))
+# (cond (1) (else 13))
 # == eliminate-when/unless  ==>
-# (let () (begin (begin) 12))
+# (cond (1) (else 13))
 # == expand-cond  ==>
-# let
-    .text
-    .align 4,0x90
-    .globl _L_scheme_entry
-_L_scheme_entry:
-# emit-expr
