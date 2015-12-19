@@ -65,6 +65,7 @@
 ;;   E -> I | V | P
 ;;     |  (begin E ...)
 ;;     |  (if E E E)
+;;     |  (cond (E E) ...)
 ;;     |  (P E ...)
 ;;     |  (E E ...)
 ;;     |  (lambda (V ...) E E* ...)
@@ -137,11 +138,10 @@
 ;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
 ;; (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
-;; (load "tests/tests-2.4-req.scm")  ;; letrec letrec* and/or when/unless cond
 
+(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
-
-(load "tests/tests-2.2-req.scm")   ;; set! TBD
+(load "tests/tests-2.2-req.scm")   ;; set!
 (load "tests/tests-2.1-req.scm")   ;; procedure
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
@@ -183,11 +183,13 @@
 (define *transform-list*                     ;; all transforms get applied in the order below
   (list 'eliminate-multi-element-body        ;; add implicit begin to make bodies a single expression
 	'eliminate-let*                      ;; transform all let* to nested lets	
-	'eliminate-variable-name-shadowing   ;; rename variables to make names unique
+	'eliminate-shadowing                 ;; rename variables to make names unique
 	'vectorize-letrec                    ;; rewrite letrec as let with vars transformed to vectors
 	'eliminate-set!                      ;; rewrite settable variables as vectors
 	'close-free-variables                ;; do free variable analysis, rewrite lambdas as closures
 	'eliminate-quote                     ;; eliminate complex constants
+	'eliminate-when/unless               ;; when/unless translate to corresponding if expressions
+	'eliminate-cond                      ;; rewrite cond as if
 	))
 
 (define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
@@ -331,7 +333,7 @@
 
 (define *global-names* '())
 
-(define-transform (eliminate-variable-name-shadowing expr)
+(define-transform (eliminate-shadowing expr)
   (uniquely-rename-variables *global-names* expr))
 
 (define (find-name-collision vars bound-vars)
@@ -568,42 +570,82 @@
 ;;      (begin
 ;;          (vector-set! v1 0 E1[vi->(vector-ref vi)]
 ;;          ...
-;;          (vector-set! vk 0 Ek[vi->(vector-ref vi))
+;;          (vector-set! vk 0 Ek[vi->(vector-ref vi)]
 ;;          E[vi->(vector-ref vi)]))
 ;;
 ;;-----------------------------------------------------------------------------------
 
-;; ISSUE: Rewrite this.  There is not begin.
-;; Test case: (set! z '(letrec () 12)) (vectorize-letrec z)
+;; ISSUE: Rewrite this.
+;;
+;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
+;; (set! z2 '(letrec ((f (letrec ((g (lambda (x) (fx* x 2)))) (lambda (n) (g (fx* n 2)))))) (f 12)))
+;; (set~ z3 '(letrec ((f 12) (g (lambda (n) (set! f n)))) (begin (g 130) f)))
+;;
+;; ISSUE: what happens when we set! variables in the letrec?  They will have become vectors.
+;; should we turn (set! v E) to (vector-set v E) for any v in vars.  I think so.
+;;
+;; Thus our rewrite E[vi->(vector-ref vi)]  need some nuance so that
+;; E[(set! vi E)->(vector-set! vi E[...])] take precedence when it applies.
+;;
+;;  E.g.
+;;
+;;      T(ui)[(letrec ((vi Ei) ....) E)] =>  (let ((vi (make-vector 1)) ...)
+;;                                             (begin
+;;                                                (begin (vector-set! vi T(vi+ui)[Ei]) ...)
+;;                                                 T(vi+ui)[E])))
+;; 
+;;      T(vi)[(set! v E)]                => (vector-set! v T(vi)[E])  if v in vi
+;;                                       => (set! v T(vi)[E])         o/w
+;;
+;;      T(vi)[v]                         => (vector-ref vi 0)       if v in vi
+;;      T(vi)[vj]                        => v                       o/w
+;;
+;;      T(vi)[(x . y)]                   => (T(vi)[x] . T(vi)[y])
+;;
+;;      T(vi)[a]                         => a
+;;
+;;
+;; After using the above notation to clarify my thinking, re-implemented vectorize
+;; from scratch and it worked the first time.  Good notation helps you think!
+;;-----------------------------------------------------------------------------------
 
 (define-transform (vectorize-letrec exp)
+  (vectorize-T '() exp))
+
+(define (vectorize-T ui exp)
   (cond
    [(letrec? exp)
-    (let* ([bindings (letrec-bindings exp)]
-	   [vars (map car bindings)]
-	   [exps (map cadr bindings)]
-	   [body (letrec-body exp)]
-	   [wrap (lambda (e) (wrapper vars e))])
-      (list 'let
-	    (map (lambda (v) (list v '(make-vector 1))) vars)
-	    (list 'begin 
-		  (map (lambda (v e) (list 'vector-set! v 0 e))
-		       vars
-		       (map wrap exps))
-		  (wrap body))))]
+    (let* ([vi (map first (letrec-bindings exp))]
+	   [Ei (map second (letrec-bindings exp))]
+	   [E (letrec-body exp)]
+	   [vi+ui (append vi ui)]
+	   [new-let-bindings (map (lambda (v)
+				    (list v '(make-vector 1)))
+				  vi)]
+	   [new-vector-sets (map (lambda (v e)
+				   (list 'vector-set! v 0 (vectorize-T vi+ui e)))
+				 vi
+				 Ei)]
+	   [new-inner-body (vectorize-T vi+ui E)])
+      (list 'let new-let-bindings
+	    (list 'begin
+		  (cons 'begin new-vector-sets)
+		  new-inner-body)))]
+   [(set!? exp)
+    (let* ([v (set!-var exp)]
+	   [E (set!-expr exp)])
+      (if (memq v ui)
+	  (list 'vector-set! v 0 (vectorize-T ui E))
+	  (list 'set! v (vectorize-T ui E))))]
+   [(symbol? exp)
+    (if (memq exp ui)
+	(list 'vector-ref exp 0)
+	exp)]
    [(pair? exp)
-    (cons (vectorize-letrec (car exp))
-	  (vectorize-letrec (cdr exp)))]
+    (cons (vectorize-T ui (car exp))
+	  (vectorize-T ui (cdr exp)))]
    [else exp]))
 
-(define (wrapper vars ee)
-  (cond
-   [(pair? ee)
-    (cons (wrapper vars (car ee))
-	  (wrapper vars (cdr ee)))]			  
-   [(and (symbol? ee) (memq ee vars))
-    (list 'vector-ref ee 0)]
-   [else ee]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment
@@ -797,6 +839,77 @@
   ; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
    [else exp]))
 
+;;-----------------------------------------------------------------------------------
+;;  eliminate-when/unless
+;;-----------------------------------------------------------------------------------
+;;  T(when E ...)   =>  (if T[E] (begin T[...]) #f)
+;;  T(unless E ...) =>  (if (not T[E]) (begin T[...]) #f)
+;;  T(X . Y)        =>  (T[X] . T[Y])
+;;  T(a)            =>  a
+;;-----------------------------------------------------------------------------------
+
+(define (when? exp)
+  (and (pair? exp) (eq? (car exp) 'when)))
+(define when-test second)
+(define when-body cddr)
+
+(define (unless? exp)
+  (and (pair? exp) (eq? (car exp) 'unless)))
+(define unless-test second)
+(define unless-body cddr)
+
+(define-transform (eliminate-when/unless exp)
+  (cond
+   [(when? exp)
+    (list 'if
+	  (eliminate-when/unless (when-test exp))
+	  (cons 'begin (eliminate-when/unless (when-body exp)))
+	  #f)]
+   [(unless? exp)
+    (list 'if
+	  (list 'not (eliminate-when/unless (unless-test exp)))
+	  (cons 'begin (eliminate-when/unless (unless-body exp)))
+	  #f)]
+   [(pair? exp)
+    (cons (eliminate-when/unless (car exp))
+	  (eliminate-when/unless (cdr exp)))]
+   [else exp]))
+
+
+;;-----------------------------------------------------------------------------------
+;;  eliminate-cond
+;;-----------------------------------------------------------------------------------
+;;  T(cond)           => #f
+;;  T(cond (B))       => error
+;;  T(cond [else E])  => T[E]
+;;  T(cond [B E])     => (if T[B] T[E] #f)
+;;  T(cond [B E] ...) => (if T[B] T[E] (cond T[...]))
+;;  T(X . Y)          => (T[X] . T[Y])
+;;  T[a]              => a
+;;-----------------------------------------------------------------------------------
+
+(define (cond? exp)
+  (and (pair? exp) (eq? (car exp) 'cond)))
+(define (clause? exp) (and (pair? exp) (not (null? (cdr exp)))))
+(define cond-clause second)
+(define (else? exp)
+  (and (pair? exp) (eq? (car exp) 'else)))
+
+(define-transform (eliminate-cond exp)
+  (cond
+   [(cond? exp)
+    (cond
+        [(null? (cdr exp)) #f]
+	[(not (clause? (second exp)))
+	 (error 'cond (format "bad cond clause: ~s" (second exp)))]
+	[(else? (cond-clause exp)) (eliminate-cond (second (cond-clause exp)))]
+	[else (list 'if (eliminate-cond (first (cond-clause exp)))
+		    (eliminate-cond (second (cond-clause exp)))
+		    (eliminate-cond (cons 'cond (cddr exp))))])]
+   [(pair? exp)
+    (cons (eliminate-cond (car exp))
+	  (eliminate-cond (cdr exp)))]
+   [else exp]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
@@ -932,7 +1045,6 @@
 ;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
 ;;-----------------------------------------------------------------------------------
-;;
 ;;  All values are represented in a 'datum' of 32-bits.  Low order bits are reserved
 ;;  for a tag unique to the type.  Some types (e.g. fixnum, character, boolean) have
 ;;  their values encoded in the datum itself. have their values represented in the
@@ -1571,6 +1683,16 @@
     (emit-tail-expr si env (if-altern x))
     (emit "~a:" end-label)))
 
+;;-----------------------------------------------------------------------------------
+;;  (and) => #t
+;;  (and E) => E
+;;  (and E ...) => (if E (and ...) #f)
+;;  
+;;  (or) => #f
+;;  (or E) => E
+;;  (or E ...) => (let ((z E1)) (if z z (or ...)))
+;;-----------------------------------------------------------------------------------
+
 (define (and? x) (and (pair? x)(symbol? (car x)) (eq? (car x) 'and)))
 
 (define (emit-and si env x)
@@ -1587,17 +1709,24 @@
 
 (define (or? x) (and (pair? x) (symbol? (car x)) (eq? (car x) 'or)))
 
+;; emit-or is TRICKY;; Be careful not to evaluate (cadr x) twice. A mistake
+;; when evaluating (cadr x) has side effects.
+
 (define (emit-or si env x)
   (cond
    [(eq? (length x) 1) (emit-expr si env #f)]
    [(eq? (length x) 2) (emit-expr si env (cadr x))]
-   [else (emit-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-expr si env (let ([z (unique-rename 'z)])
+	     		      (list 'let (list (list z (cadr x)))
+					  (list 'if z z (cons 'or (cddr x))))))]))
 
 (define (emit-tail-or si env x)
   (cond
    [(eq? (length x) 1) (emit-tail-expr si env #f)]
    [(eq? (length x) 2) (emit-tail-expr si env (cadr x))]
-   [else (emit-tail-expr si env (list 'if (cadr x) #t (cons 'or (cddr x))))]))
+   [else (emit-tail-expr si env (let ([z (unique-rename 'z)])
+				  (list 'let (list (list z (cadr x)))
+					  (list 'if z z (cons 'or (cddr x))))))]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                            Local Variables
@@ -1624,7 +1753,6 @@
 ;;-----------------------------------------------------------------------------------
 ;;                          Environment
 ;;-----------------------------------------------------------------------------------
-;;
 ;; We keep bindings in an environment.  Bindings assoicate variables with information
 ;; on where they are stored.  Typically this is an offset either in the heap with
 ;; respect to the current closure pointer, or in the stack as an offset from the

@@ -3,7 +3,7 @@
 # -536870912
 # == eliminate-let*  ==>
 # -536870912
-# == eliminate-variable-name-shadowing  ==>
+# == eliminate-shadowing  ==>
 # -536870912
 # == vectorize-letrec  ==>
 # -536870912
@@ -12,6 +12,10 @@
 # == close-free-variables  ==>
 # -536870912
 # == eliminate-quote  ==>
+# -536870912
+# == eliminate-when/unless  ==>
+# -536870912
+# == eliminate-cond  ==>
 # -536870912
     .text
     .align 4,0x90
