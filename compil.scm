@@ -567,42 +567,114 @@
 ;;      (begin
 ;;          (vector-set! v1 0 E1[vi->(vector-ref vi)]
 ;;          ...
-;;          (vector-set! vk 0 Ek[vi->(vector-ref vi))
+;;          (vector-set! vk 0 Ek[vi->(vector-ref vi)]
 ;;          E[vi->(vector-ref vi)]))
 ;;
 ;;-----------------------------------------------------------------------------------
 
-;; ISSUE: Rewrite this.  There is not begin.
-;; Test case: (set! z '(letrec () 12)) (vectorize-letrec z)
+;; ISSUE: Rewrite this.
+;;
+;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
+;; (set! z2 '(letrec ((f (letrec ((g (lambda (x) (fx* x 2)))) (lambda (n) (g (fx* n 2)))))) (f 12)))
+;; (set~ z3 '(letrec ((f 12) (g (lambda (n) (set! f n)))) (begin (g 130) f)))
+;;
+;; ISSUE: what happens when we set! variables in the letrec?  They will have become vectors.
+;; should we turn (set! v E) to (vector-set v E) for any v in vars.  I think so.
+;;
+;; Thus our rewrite E[vi->(vector-ref vi)]  need some nuance so that
+;; E[(set! vi E)->(vector-set! vi E[...])] take precedence when it applies.
+;;
+;;  E.g.
+;;
+;;      T(ui)[(letrec ((vi Ei) ....) E)] =>  (let ((vi (make-vector 1)) ...)
+;;                                             (begin
+;;                                                (begin (vector-set! vi T(vi+ui)[Ei]) ...)
+;;                                                 T(vi+ui)[E])))
+;; 
+;;      T(vi)[(set! v E)]                => (vector-set! v T(vi)[E])  if v in vi
+;;                                       => (set! v T(vi)[E])         o/w
+;;
+;;      T(vi)[v]                         => (vector-ref vi 0)       if v in vi
+;;      T(vi)[vj]                        => v                       o/w
+;;
+;;      T(vi)[(x . y)]                   => (T(vi)[x] . T(vi)[y])
+;;
+;;      T(vi)[a]                         => a
+;;
+;;
+;; After using the above notation to clarify my thinking, re-implemented vectorize
+;; from scratch and it worked the first time.  Good notation helps you think!
+;;-----------------------------------------------------------------------------------
 
 (define-transform (vectorize-letrec exp)
+  (vectorize-T '() exp))
+
+(define (vectorize-T ui exp)
   (cond
    [(letrec? exp)
-    (let* ([bindings (letrec-bindings exp)]
-	   [vars (map car bindings)]
-	   [exps (map cadr bindings)]
-	   [body (letrec-body exp)]
-	   [wrap (lambda (e) (wrapper vars e))])
-      (list 'let
-	    (map (lambda (v) (list v '(make-vector 1))) vars)
-	    (list 'begin 
-		  (map (lambda (v e) (list 'vector-set! v 0 e))
-		       vars
-		       (map wrap exps))
-		  (wrap body))))]
+    (let* ([vi (map first (letrec-bindings exp))]
+	   [Ei (map second (letrec-bindings exp))]
+	   [E (letrec-body exp)]
+	   [vi+ui (append vi ui)]
+	   [new-let-bindings (map (lambda (v)
+				    (list v '(make-vector 1)))
+				  vi)]
+	   [new-vector-sets (map (lambda (v e)
+				   (list 'vector-set! v 0 (vectorize-T vi+ui e)))
+				 vi
+				 Ei)]
+	   [new-inner-body (vectorize-T vi+ui E)])
+      (list 'let new-let-bindings
+	    (list 'begin
+		  (cons 'begin new-vector-sets)
+		  new-inner-body)))]
+   [(set!? exp)
+    (let* ([v (set!-var exp)]
+	   [E (set!-expr exp)])
+      (if (memq v ui)
+	  (list 'vector-set! v 0 (vectorize-T ui E))
+	  (list 'set! v (vectorize-T ui E))))]
+   [(symbol? exp)
+    (if (memq exp ui)
+	(list 'vector-ref exp 0)
+	exp)]
    [(pair? exp)
-    (cons (vectorize-letrec (car exp))
-	  (vectorize-letrec (cdr exp)))]
+    (cons (vectorize-T ui (car exp))
+	  (vectorize-T ui (cdr exp)))]
    [else exp]))
+   
 
-(define (wrapper vars ee)
-  (cond
-   [(pair? ee)
-    (cons (wrapper vars (car ee))
-	  (wrapper vars (cdr ee)))]			  
-   [(and (symbol? ee) (memq ee vars))
-    (list 'vector-ref ee 0)]
-   [else ee]))
+;; (define-transform (vectorize-letrec exp)
+;;   (cond
+;;    [(letrec? exp)
+;;     (let* ([bindings (letrec-bindings exp)]
+;; 	   [vars (map car bindings)]
+;; 	   [exps (map cadr bindings)]
+;; 	   [body (letrec-body exp)]
+;; 	   [wrap (lambda (e) (wrapper vars e))]
+;; 	   [new-bindings (map (lambda (v) (list v (list 'make-vector 1))) vars)]
+;; 	   [new-vector-sets (map (lambda (v e) (list 'vector-set! v 0 e))
+;; 				  vars
+;; 				  (map wrap exps))]
+;; 	   [new-body (wrap body)])
+;;       (list 'let
+;; 	    new-bindings
+;; 	    (list 'begin
+;; 		  (cons 'begin new-vector-sets)
+;; 		  new-body)))]
+;;    [(pair? exp)
+;;     (cons (vectorize-letrec (car exp))
+;; 	  (vectorize-letrec (cdr exp)))]
+;;    [else exp]))
+
+;; (define (wrapper vars ee)
+;;   (cond
+;;    [(pair? ee)
+;;     (cons (wrapper vars (car ee))
+;; 	  (wrapper vars (cdr ee)))]			  
+;;    [(and (symbol? ee) (memq ee vars))
+;;     (list 'vector-ref ee 0)]
+;;    [else ee]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment

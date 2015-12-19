@@ -1,90 +1,47 @@
-# (letrec ((f 12)) f)
+# (or 1 2 3)
 # == eliminate-multi-element-body  ==>
-# (letrec ((f 12)) f)
+# (or 1 2 3)
 # == eliminate-let*  ==>
-# (letrec ((f 12)) f)
+# (or 1 2 3)
 # == eliminate-variable-name-shadowing  ==>
-# (letrec ((f 12)) f)
+# (or 1 2 3)
 # == vectorize-letrec  ==>
-# (let ((f (make-vector 1))) (begin ((vector-set! f 0 12)) (vector-ref f 0)))
+# (or 1 2 3)
 # == eliminate-set!  ==>
-# (let ((f (make-vector 1))) (begin ((vector-set! f 0 12)) (vector-ref f 0)))
+# (or 1 2 3)
 # == close-free-variables  ==>
-# (let ((f (make-vector 1))) (begin ((vector-set! f 0 12)) (vector-ref f 0)))
+# (or 1 2 3)
 # == eliminate-quote  ==>
-# (let ((f (make-vector 1))) (begin ((vector-set! f 0 12)) (vector-ref f 0)))
+# (or 1 2 3)
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
 # emit-expr
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ((f (make-vector 1)))
-#  body = (begin ((vector-set! f 0 12)) (vector-ref f 0))
 # emit-expr
-# make-vector 1
 # emit-expr
     movl $4, %eax     # immed 1
-    movl %eax, %esi
-    movl %eax, 0(%ebp)
-    movl %ebp, %eax
-    orl  $5, %eax
-    addl $4, %esi
-    addl $4, %esi
-    andl $-8, %esi
-    addl %esi, %ebp
-    movl %eax, -8(%esp)  # stack save
+    cmp $47, %al
+    je _L_42
 # emit-expr
-# emit-begin
-#   body=(((vector-set! f 0 12)) (vector-ref f 0))
-#   env=((f . -8))
-# emit-expr
-# funcall
-#    si   =-12
-#    env  = ((f . -8))
-#    expr = (funcall (vector-set! f 0 12))
+    movl $111, %eax     # immed #t
+    jmp _L_43
+_L_42:
 # emit-expr
 # emit-expr
-# emit-variable-ref
-# env=((f . -8))
-# var=f
-    movl -8(%esp), %eax  # stack load f
-# end emit-variable-ref
-    movl %eax, -20(%esp)
 # emit-expr
-    movl $0, %eax     # immed 0
-    movl %eax, -24(%esp)
+    movl $8, %eax     # immed 2
+    cmp $47, %al
+    je _L_44
 # emit-expr
-    movl $48, %eax     # immed 12
-    movl -20(%esp), %ebx
-    movl -24(%esp), %esi
-    movl %eax, -1(%ebx,%esi)
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp    # adjust base
-    call *-2(%edi)        # call thru closure ptr
-    add $12, %esp    # adjust base
-    movl -4(%esp), %edi   # restore closure frame ptr
-# emit-begin
-#   body=((vector-ref f 0))
-#   env=((f . -8))
+    movl $111, %eax     # immed #t
+    jmp _L_45
+_L_44:
 # emit-expr
 # emit-expr
-# emit-variable-ref
-# env=((f . -8))
-# var=f
-    movl -8(%esp), %eax  # stack load f
-# end emit-variable-ref
-    movl %eax, -12(%esp)
-# emit-expr
-    movl $0, %eax     # immed 0
-    movl -12(%esp), %esi
-    movl -1(%eax,%esi), %eax
-# emit-begin
-#   body=()
-#   env=((f . -8))
+    movl $12, %eax     # immed 3
+_L_45:
+_L_43:
     ret
     .text
     .align 4,0x90
