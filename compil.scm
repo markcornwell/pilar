@@ -52,12 +52,12 @@
 ;;  code generation.  Stage II takes this IL and generates x86 assembly by recursive
 ;;  descent.
 ;;
-;;              +---------------+         +-----------+           +-----------+
-;;              |    Source     |         |  Code     |           |   GNU     |
-;;   Source  -->|   to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
-;;     SL       |  Transforms   |         |           |    ASM    |           |
-;;              +---------------+         +-----------+           +-----------+
-;;                  Stage  I                Stage II
+;;              +--------------+         +-----------+           +-----------+
+;;              |   Source     |         |  Code     |           |   GNU     |
+;;   Source  -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;     SL       |  Transforms  |         |           |    ASM    |           |
+;;              +--------------+         +-----------+           +-----------+
+;;                 Stage  I                Stage II
 ;;
 ;;-----------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
@@ -136,7 +136,7 @@
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
 ;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
-;; (load "tests/tests-2.8-req.scm")  ;; symbols
+(load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
@@ -1017,6 +1017,8 @@
 
 (define (emit-scheme-entry env expr)
   (emit-function-header "_L_scheme_entry")
+  ;; initialization stuff would go here
+  (emit-init (- (* 2 wordsize)) env)
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
@@ -1089,6 +1091,14 @@
 (define closure-mask  #b00000111) ; #x07
 (define closure-tag   #b00000010) ; #x02
 
+(define symbol-shift    3)
+(define symbol-mask   #b00000111) ; #x07     ;; Symbols are under construction
+(define symbol-tag    #b00000011) ; #x03     ;; Still thinking it through
+(define size-symbol     8)
+(define string-offset   0)
+(define value-offset    4)
+
+
 (define nil-value    #b00111111) ; #x3F)
 (define wordsize        4) ; bytes
 
@@ -1143,6 +1153,8 @@
     (emit-expr si env arg)
     (emit "   shrl $~s, %eax" cshift)
     (emit "   shll $~s, %eax" fxshift))
+
+;; symbol->string and string->symbol will go here I expect
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Disjoint Types
@@ -1438,17 +1450,17 @@
 ;;  directly to indicate the length in bytes, or divided by 4 to indicate the number
 ;;  of elements in the vector.  Cool, yes?
 ;;           
-;;          +----------------+
-;;   -----> |       len      | 0    
-;;          +----------------+
-;;          |      elt 0     | 4
-;;          +----------------+
-;;          |      elt 1     | 8
-;;          +----------------+
-;;          |      ...       |
-;;          +----------------+
-;;          |      elt N     | 4*(N+1)
-;;          +----------------+
+;;          +-------------+
+;;   -----> |    len      | 0    
+;;          +-------------+
+;;          |   elt 0     | 4
+;;          +-------------+
+;;          |   elt 1     | 8
+;;          +-------------+
+;;          |   ...       |
+;;          +-------------+
+;;          |   elt N     | 4*(N+1)
+;;          +-------------+
 ;;
 ;;  (vector? V)           returns #f iff v is not a vector
 ;;  (make-vector N)       returns a new vector of size N
@@ -1580,7 +1592,7 @@
 
 
 ;;-----------------------------------------------------------------------------------
-;; A satisfying implementation of string literals using assember directives.
+;; A simple implementation of string literals using assember directives.
 ;;-----------------------------------------------------------------------------------
 
 (define (emit-string-literal s)
@@ -1600,7 +1612,104 @@
   (emit-string-literal s)
   (emit "    ret"))
 
-; procedures and closures
+;;-----------------------------------------------------------------------------------
+;;                 Symbols, Libraries, and Separate Compilation
+;;-----------------------------------------------------------------------------------
+;; Symbols are similar to pairs in having two fields a string and a value
+;; Symbols are allocated in the heap.  They are always aligned on an 8-byte boundary.
+;; Nicely compact since pairs are 8-bytes anyway.  
+;;
+;;                           +--------------+
+;;    (Ptr - symbol-tag) --> |    string    | 0  
+;;                           +--------------+
+;;                           |    value     | 4 
+;;                           +--------------+
+;;
+;;   (primitive-ref x)
+;;   (primitive-set! x v)
+;;
+;;   (make-symbol <string> <value>)
+;;   (symbol->string <symbol>)
+;;   (string->symbol <string>)
+;;
+;;-----------------------------------------------------------------------------------
+
+
+;; Where do we put the list of symbols? We will declare some storage in the text
+;; segment that will store the head of the list of symbols.
+
+;; (define (emit-init env)
+;;   (let ([end (unique-lable)])
+;;     (emit "   jmp ~a" end)
+;;     (emit-global "globals")
+;;     (emit "~a:" end)))
+
+(define (emit-init si env)
+  (emit-init-data)
+  (emit-expr si env
+	     '(symbols-set! (cons (make-symbol "nil" ())
+				  ()))))
+
+(define (emit-global name value)
+  (emit "    .text")
+  (emit "    .align 4,0x90")
+  (emit "    .globl ~a" name)
+  (emit "~a:" name)
+  (emit "    .int ~a" value))
+
+(define (emit-init-data)
+  (emit "    .data")
+  (emit "    .align 4,0x90")
+  (emit "    .globl gsym")
+  (emit "gsym:")
+  (emit "    .int ~a" nil-value)
+  (emit "    .text"))
+
+(define-primitive (symbols si env)
+  (emit "    movl $gsym, %eax")
+  (emit "    movl 0(%eax), %eax"))
+
+(define-primitive (symbols-set! si env exp)
+  (emit-expr si env exp)
+  (emit "    movl %eax, gsym"))
+
+(define-primitive (symbol? si env arg)
+  (emit-expr si env arg)
+  (emit "    and $~s, %al" symbol-mask)
+  (emit "    cmp $~s, %al" symbol-tag)
+  (emit "    sete %al")
+  (emit "    movzbl %al, %eax")
+  (emit "    sal $~s, %al" bool-bit)
+  (emit "    or $~s, %al" bool-f))
+
+;; (define-primitive (cons si env arg1 arg2)
+;;   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
+;;   (emit-expr si env arg1)                     ;; evaluate arg1
+;;   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
+;;   (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2
+;;   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
+;;   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
+;;   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
+;;   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
+;;   (emit "    or   $~s, %al" pair-tag)         ;; or in the pair tag
+;;   (emit "    add  $~s, %ebp" size-pair)       ;; bump heap ptr
+;;   (emit "# cons end"))   
+
+(define-primitive (make-symbol si env arg1 arg2)
+  (emit "# make-symbol arg1=~s arg2=~s" arg1 arg2);
+  (emit-expr si env arg1)                        ;; evaluate arg1
+  (emit "    movl %eax, ~s(%esp)" si)            ;; save value of arg1
+  (emit-expr (- si wordsize) env arg2)           ;; evaluate arg2
+  (emit "    movl %eax, ~s(%ebp)" value-offset) ;; arg2 -> value
+  (emit "    movl ~s(%esp), %eax" si)            ;; get value of arg1
+  (emit "    movl %eax, ~s(%ebp)" string-offset)  ;; arg1 -> string
+  (emit "    movl %ebp, %eax")                   ;; get ptr to symbol record
+  (emit "    or   $~s, %al" symbol-tag)          ;; or in the symbol tag
+  (emit "    add  $~s, %ebp" size-symbol)        ;; bump heap ptr
+  (emit "# make-symbol end"))
+
+;;-----------------------------------------------------------------------------------
+;; procedures and closures
 
 (define-primitive (procedure? si env expr)
   (emit-expr si env expr)
@@ -1651,7 +1760,7 @@
     L))))
 
 ;;-----------------------------------------------------------------------------------
-;;                         Conditionals
+;;                                  Conditionals
 ;;-----------------------------------------------------------------------------------
 
 (define (if? x) (and (pair? x) (eq? (car x) 'if) (eq? 4 (length x))))

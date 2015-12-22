@@ -27,11 +27,16 @@
 #define pair_mask  0x0007
 #define pair_tag   0x0001
 
+#define symbol_mask 0x0007
+#define symbol_tag  0x0003
+
 #define vect_mask  0x0007
 #define vect_tag   0x0005
 
 #define str_mask   0x0007
 #define str_tag    0x0006
+
+
 
 /* All scheme values are of type ptrs */
 
@@ -39,10 +44,12 @@ typedef unsigned int ptr;                        // 4 bytes  ??? not right ???
 typedef struct { ptr car; ptr cdr;   } *pair;    // 8-byte aligned
 typedef struct { ptr len; ptr elt[]; } *vector;  // 8-byte aligned
 typedef struct { ptr len; char ch[]; } *string;  // 4 byte aligned
+typedef struct { ptr str; ptr val;   } *symbol;  // 8-byte-aligned
 
 static void print_pairs (pair p);
 static void print_vector (vector v);
 static void print_string (string s);
+static void print_symbol (symbol y);
 
 static void print_ptr(ptr x) {
   
@@ -50,6 +57,9 @@ static void print_ptr(ptr x) {
    
    if ((x & fx_mask) == fx_tag) {
        printf("%d", ((int) x) >> fx_shift);
+
+   } else if((x & symbol_mask) == symbol_tag) {
+     print_symbol((symbol) (x - symbol_tag));
        
    } else if((x & char_mask) == char_tag) {
        if (((int) x >> char_shift) == '\t'){
@@ -103,6 +113,11 @@ static void print_string (string s) {
     }
     printf("%c",s->ch[i]);      // need to handle escapes
   }
+}
+
+static void print_symbol (symbol y) {
+  string s = (string) ((int) (y->str) - str_tag);
+  print_string(s);
 }
 
 static void print_pairs (pair p) {

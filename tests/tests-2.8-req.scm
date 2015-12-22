@@ -1,4 +1,9 @@
 
+(add-tests-with-string-output "symbols list"
+ [(symbols) => "(nil)\n"]
+ [(make-symbol "foo" "baz") => "foo\n"]
+ )
+
 (add-tests-with-string-output "symbols"
  [(symbol? 'foo) => "#t\n"]
  [(symbol? '()) => "#f\n"]
@@ -19,5 +24,4 @@
  ['(foo bar baz) => "(foo bar baz)\n"]
  ['(foo foo foo foo foo foo foo foo foo foo foo) 
   => "(foo foo foo foo foo foo foo foo foo foo foo)\n"]
- 
 )
