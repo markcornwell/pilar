@@ -832,7 +832,8 @@
     (let ([body (quote-body expr)])
       (cond
        [(or (boolean? body) (fixnum? body) (char? body)) body]
-       [(null? body) '()]
+      ; [(null? body) '()]
+       [(null? body) body]
        [(pair? body) (expand-list body)]
        [(string? body) body]))]
    [(pair? expr)
@@ -1032,12 +1033,10 @@
   (emit-immediate x)
   (emit "    ret                  # tail return"))
 
-(define (emit-scheme-entry env expr)
+(define (emit-scheme-entry env expr) 
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
-  ;; initialization stuff would go here
-  (emit "# emit-init")  
-  (emit-init (- (* 2 wordsize)) env)
+  (emit-init (- (* 2 wordsize)) env)  
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
@@ -1548,7 +1547,7 @@
   (emit "    movl ~s(%esp), %eax" si)    ;; eax <- the vector+5
   (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object;
                                          ;; offset -1 = tag(-5) + lenfield_size(4)
-  
+
 
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings
@@ -1631,8 +1630,6 @@
   (emit-string-literal s)
   (emit "    ret"))
 
-
-
 ;;-----------------------------------------------------------------------------------
 ;;                                   Label
 ;;-----------------------------------------------------------------------------------
@@ -1712,45 +1709,65 @@
 ;;   (primitive-ref x)
 ;;   (primitive-set! x v)
 ;;
-
-
 ;;
 ;;-----------------------------------------------------------------------------------
 
 
-;; Where do we put the list of symbols? We will declare some storage in the text
-;; segment that will store the head of the list of symbols.
+;; Here we initialize a list of symbols.  The list is a conventional list of cons nodes
+;; Where the car of each node will hold a symbol.
+;;
+;;            +-----------+
+;;   pair --->|  *  | nil | 
+;;            +--|--------+
+;;               |
+;;               V symbol
+;;            +-----------+
+;;            |  *  | nil |  
+;;            +--|--------+         
+;;               |
+;;               V string
+;;            +-----+-----+----+----+
+;;            |  3  |  n  |  i |  l |
+;;            +-----+-----+----+----+  
+;;
+;; Important to note that the type tags are encoded in the pointers.  So we have to
+;; correct for the tags when turning them into addresses, usually by subtracting the
+;; tag value from the pointer.
 
-;; (define (emit-init env)
-;;   (let ([end (unique-lable)])
-;;     (emit "   jmp ~a" end)
-;;     (emit-global "globals")
-;;     (emit "~a:" end)))
+
+;; looks to me like assembler does not lay things in memory as I thought it would
+;; (define (emit-static-init si env)
+;;   (emit "    .data")
+;;   (emit "    .align 8,0x90")
+;;   (emit "nil_string:")
+;;   (emit "    .int 3*4")
+;;   (emit "    .ascii \"nil\"")
+;;   (emit "    .align 8,0x90") 
+;;   (emit "nil_symbol:")
+;;   (emit "    .int nil_string + ~a" string-tag)
+;;   (emit "    .int ~a" nil-value)
+;;   (emit "    .globl symbols_list")
+;;   (emit "    .align 8,0x90")
+;;   (emit "symbols_list:") 
+;;   (emit "    .int nil_symbol + ~a" symbol-tag)
+;;   (emit "    .int ~a" nil-value)   
+;;   (emit "    .text"))
+
+;; go back to dynamic initialization
 
 (define (emit-init si env)
-  (emit-init-data)
-  ;; (emit-expr si env
-  ;; 	     '(cons (symbols-set! (make-symbol "nil" '())) '()))
-  )
-
-(define (emit-global name value)
-  (emit "    .text")
-  (emit "    .align 4,0x90")
-  (emit "    .globl ~a" name)
-  (emit "~a:" name)
-  (emit "    .int ~a" value))
-
-(define (emit-init-data)
   (emit "    .data")
-  (emit "    .align 4,0x90")
-  (emit "    .globl gsym")
-  (emit "gsym:")
-  (emit "    .int ~a" nil-value)
-  (emit "    .text"))
+  (emit "    .globl symbols  # symbol list as a datum ")
+  (emit "    .align 8")
+  (emit "symbols:")
+  (emit "    .int 0xFF       # to be patched")
+  (emit "    .text")
+  (emit-expr si env '(cons (make-symbol "nil" ()) ()))
+  (emit "    movl %eax, symbols"))
 
+;; (symbols) => a list of all interned symbols
 (define-primitive (symbols si env)
-  (emit "    movl $gsym, %eax")
-  (emit "    movl 0(%eax), %eax"))
+  (emit "    movl symbols, %eax"))
 
 (define-primitive (symbols-set! si env exp)
   (emit-expr si env exp)
@@ -1763,7 +1780,7 @@
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
-  (emit "    or $~s, %al" bool-f)) 
+  (emit "    orl $~s, %al" bool-f)) 
 
 (define-primitive (make-symbol si env arg1 arg2)
   (emit "# make-symbol arg1=~s arg2=~s" arg1 arg2);
@@ -1774,7 +1791,7 @@
   (emit "    movl ~s(%esp), %eax" si)            ;; get value of arg1
   (emit "    movl %eax, ~s(%ebp)" string-offset)  ;; arg1 -> string
   (emit "    movl %ebp, %eax")                   ;; get ptr to symbol record
-  (emit "    or   $~s, %al" symbol-tag)          ;; or in the symbol tag
+  (emit "    orl  $~s, %eax" symbol-tag)         ;; or in the symbol tag
   (emit "    add  $~s, %ebp" size-symbol)        ;; bump heap ptr
   (emit "# make-symbol end"))
 

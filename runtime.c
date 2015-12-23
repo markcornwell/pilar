@@ -36,9 +36,7 @@
 #define str_mask   0x0007
 #define str_tag    0x0006
 
-
-
-/* All scheme values are of type ptrs */
+/* All scheme values are of type ptr */
 
 typedef unsigned int ptr;                        // 4 bytes  ??? not right ???
 typedef struct { ptr car; ptr cdr;   } *pair;    // 8-byte aligned
@@ -78,8 +76,7 @@ static void print_ptr(ptr x) {
        printf("\"");
        print_string((string) (x - str_tag));
        printf("\"");
-     
-       
+
    } else if((x & vect_mask) == vect_tag) {
        printf("#(");
        print_vector((vector) (x - vect_tag)); // zero out vect_tag  -8 = 1111...1000

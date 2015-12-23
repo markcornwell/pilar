@@ -1,53 +1,67 @@
-# -536870912
+# (symbol? (quote foo))
 # == eliminate-multi-element-body  ==>
-# -536870912
+# (symbol? (quote foo))
 # == eliminate-let*  ==>
-# -536870912
+# (symbol? (quote foo))
 # == eliminate-shadowing  ==>
-# -536870912
+# (symbol? (quote foo))
 # == vectorize-letrec  ==>
-# -536870912
+# (symbol? (quote foo))
 # == eliminate-set!  ==>
-# -536870912
+# (symbol? (quote foo))
 # == close-free-variables  ==>
-# -536870912
+# (symbol? (quote foo))
 # == eliminate-quote  ==>
-# -536870912
+# (symbol? #<void>)
 # == eliminate-when/unless  ==>
-# -536870912
+# (symbol? #<void>)
 # == eliminate-cond  ==>
-# -536870912
+# (symbol? #<void>)
 # emit-scheme-entry
     .text
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-# emit-init
     .data
-    .align 4,0x90
-    .globl gsym
-gsym:
-    .int 63
+    .globl symbols  # symbol list as a datum 
+    .align 8
+symbols:
+    .int 0xFF       # to be patched
     .text
-# emit-expr -536870912
-    movl $-2147483648, %eax     # immed -536870912
-    ret
-    .text
-    .align 4,0x90
-    .globl _scheme_entry
-_scheme_entry:
-    movl 4(%esp), %ecx
-    movl %ebx, 4(%ecx)
-    movl %esi, 16(%ecx)
-    movl %edi, 20(%ecx)
-    movl %ebp, 24(%ecx)
-    movl %esp, 28(%ecx)
-    movl 12(%esp), %ebp
-    movl 8(%esp), %esp
-    call _L_scheme_entry
-    movl 4(%ecx), %ebx
-    movl 16(%ecx), %esi
-    movl 20(%ecx), %edi
-    movl 24(%ecx), %ebp
-    movl 28(%ecx), %esp
-    ret
+# emit-expr (cons (make-symbol "nil" ()) ())
+# cons arg1=(make-symbol "nil" ()) arg2=()
+# emit-expr (make-symbol "nil" ())
+# make-symbol arg1="nil" arg2=()
+# emit-expr "nil"
+# string literal
+    jmp _L_9
+    .align 8,0x90
+_L_8 :
+    .int 12
+    .ascii "nil"
+_L_9:
+    movl $_L_8, %eax
+    orl $6, %eax
+    movl %eax, -8(%esp)
+# emit-expr ()
+    movl $63, %eax     # immed ()
+    movl %eax, 4(%ebp)
+    movl -8(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    orl  $3, %eax
+    add  $8, %ebp
+# make-symbol end
+    movl %eax, -8(%esp)
+# emit-expr ()
+    movl $63, %eax     # immed ()
+    movl %eax, 4(%ebp)
+    movl -8(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl %eax, symbols
+# emit-expr (symbol? #<void>)
+# emit-expr #<void>
