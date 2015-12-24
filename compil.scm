@@ -830,9 +830,8 @@
    [(quote? expr)
     (let ([body (quote-body expr)])
       (cond
-       [(or (boolean? body) (fixnum? body) (char? body)) body]
-      ; [(null? body) '()]
-       [(null? body) body]
+       [(or (boolean? body) (fixnum? body) (char? body) (null? body)) body]
+       [(symbol? body) (list 'string->symbol (symbol->string body))]  ;; requires string->symbol
        [(pair? body) (expand-list body)]
        [(string? body) body]))]
    [(pair? expr)
@@ -1075,6 +1074,9 @@
 ;;  specified by the Scheme standard (R5RS) types are disjoint.  Each datum belongs
 ;;  to exactly one type.
 ;;-----------------------------------------------------------------------------------
+
+
+;;  Constants
 
 (define fxshift         2)
 (define fxmask       #b00000011)   ; #x03
@@ -1452,6 +1454,8 @@
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
   (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
 
+
+
 ;;-----------------------------------------------------------------------------------
 ;;                              Vectors
 ;;-----------------------------------------------------------------------------------
@@ -1607,9 +1611,39 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
+;;------------------------------------------
+;; looking for a simple way to do string=?
+;; this gets blasted out as an inline
+;; should become a callable subroutine
+;;------------------------------------------
 
-
-
+(define-primitive (string=? si env arg1 arg2)
+  (let ([false (unique-label)]
+	[true (unique-label)]
+	[repeat (unique-label)]
+	[done (unique-label)])
+    (emit-expr si env arg1)
+    (emit "    movl %eax, ~s(%esp)" si)   ;; save arg1
+    (emit-expr (- si 4) env arg2)         ;; eax <- arg2[len]
+    (emit "    movl ~a(%esp),%ebx" si)    ;; ebx <- arg1[len]
+    (emit "    cmp %eax,%ebx")            ;; len1 =? len2
+    (emit "    jne ~a" false)             ;; if len differs return false
+    (emit "    movl %eax,%ecx")           ;; use ecx as counter
+    (emit "    sar $~a, %ecx" fxshift)     ;; eliminate tag
+    (emit "    add $4, %eax")             ;; eax -> arg1[0]
+    (emit "    add $4, %ebx")             ;; ebx -> arg2[0]
+    (emit "~a:" repeat)                   ;; repeat  
+    (emit "    movb 0(%eax),%dl")         ;;   
+    (emit "    cmpb 0(%ebx),%dl")         ;;    arg1[i] =? arg2[i]
+    (emit "    jne ~a" false)             ;;    if not return false
+    (emit "    inc %esi")                 ;;    esi++
+    (emit "    loop ~a" repeat)           ;; until (--ecx == 0)
+    (emit "~a:" true)                     
+    (emit "    movl $~a, %eax" bool-t)     ;; return true
+    (emit "    jmp ~a" done)
+    (emit "~a:" false)
+    (emit "    movl $~a, %eax" bool-f)     ;; return false
+    (emit "~a:" done)))
 
 ;;-----------------------------------------------------------------------------------
 ;; A simple implementation of string literals using assember directives.

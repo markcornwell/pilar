@@ -1,22 +1,22 @@
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == eliminate-multi-element-body  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == eliminate-let*  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == eliminate-shadowing  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == vectorize-letrec  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == eliminate-set!  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == close-free-variables  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
+# (symbol? (quote foo))
 # == eliminate-quote  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ()))) (else (f str (cdr symlist)))))
+# (symbol? (string->symbol "foo"))
 # == eliminate-when/unless  ==>
-# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ()))) (else (f str (cdr symlist)))))
+# (symbol? (string->symbol "foo"))
 # == eliminate-cond  ==>
-# (let ((symlist (symbols))) (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist)))))
+# (symbol? (string->symbol "foo"))
 # emit-scheme-entry
     .text
     .align 4,0x90
@@ -34,13 +34,13 @@ symbols:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_27
+    jmp _L_127
     .align 8,0x90
-_L_26 :
+_L_126 :
     .int 12
     .ascii "nil"
-_L_27:
-    movl $_L_26, %eax
+_L_127:
+    movl $_L_126, %eax
     orl $6, %eax
     movl %eax, -8(%esp)
 # emit-expr ()
@@ -63,19 +63,10 @@ _L_27:
     add  $8, %ebp
 # cons end
     movl %eax, symbols
-# emit-expr (let ((symlist (symbols))) (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist)))))
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ((symlist (symbols)))
-#  body = (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist))))
-# emit-expr (symbols)
-    movl symbols, %eax
-    movl %eax, -8(%esp)  # stack save
-# emit-expr (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist))))
-# emit-expr (string=? str (symbol->string (car (symlist))))
+# emit-expr (symbol? (string->symbol "foo"))
+# emit-expr (string->symbol "foo")
 # funcall
-#    si   =-12
-#    env  = ((symlist . -8))
-#    expr = (funcall string=? str (symbol->string (car (symlist))))
-# emit-expr string=?
+#    si   =-8
+#    env  = ()
+#    expr = (funcall string->symbol "foo")
+# emit-expr string->symbol

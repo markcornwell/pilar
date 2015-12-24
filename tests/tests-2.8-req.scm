@@ -5,23 +5,108 @@
  [(symbol? (make-symbol "foo" "bar")) => "#t\n"]
  [(symbol->string (make-symbol "foo" "bar")) => "\"foo\"\n"]
  [(symbol-value (make-symbol "foo" "bar")) => "\"bar\"\n"]
+		    
+ [(letrec ((s= (lambda (s1 i s2 j)         ;; This WORKS !!!
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))))
+    (s= "foo" 0 "foo" 0)) => "#t\n"]
+
+ [(letrec ([s= (lambda (s1 i s2 j)          ;; This WORKS !!!
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))]
+	   [ss= (lambda (s1 s2) (s= s1 0 s2 0))])
+    (ss= "foo" "foo")) => "#t\n"]
+
+ [(letrec ([s= (lambda (s1 i s2 j)          ;; This WORKS !!!
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))]
+	   [ss= (lambda (s1 s2) (s= s1 0 s2 0))])
+    (ss= "foo" "fo")) => "#f\n"]
+
+ [(letrec ([s= (lambda (s1 i s2 j)          ;; This WORKS !!!
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))]
+	   [ss= (lambda (s1 s2) (s= s1 0 s2 0))])
+    (ss= "" "")) => "#t\n"]
+
+  [(letrec ([s= (lambda (s1 i s2 j)          ;; This WORKS !!!
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))]
+	   [ss= (lambda (s1 s2) (s= s1 0 s2 0))])
+     (ss= "" "fubar")) => "#f\n"]
+
+    [(letrec ([s= (lambda (s1 i s2 j)          ;; This version fixes some bugs in the prior test
+		 (let ([l1 (string-length s1)]
+		       [l2 (string-length s2)])
+		 (if (not (fx= l1 l2))
+		     #f
+		     (if (fx= i l1)
+			 #t
+			 (if (fx= (string-ref s1 i)
+				  (string-ref s2 j))
+			     (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			     #f)))))]
+	      [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
+	      [s2sym1 (lambda (str symlist)
+			(if (ss= str (symbol->string (car symlist)))
+			    (car symlist)
+			    (if (null? (cdr symlist))
+				(begin
+				  (set-cdr! symlist (cons (make-symbol str #f) ()))
+				  (car (cdr symlist)))
+				(s2sym1 str (cdr symlist)))))]
+	      [s2sym (lambda (str) (s2sym1 str (symbols)))])    ;; this does a string->symbol
+			    
+    (s2sym "fubar")) => "fubar\n"]  ;; we could emit s2sym as part of init and build a closure
  
- [(let ((symlist (symbols)))
-    (cond
-     [(string=? str (symbol->string (car (symlist))))
-      (car symlist)]
-     [(null? (cdr symlist))
-      (set-cdr! symlist (make-symbol "foo" '()))] ;; should be #<void> not '()
-     [else (f str (cdr symlist))])) => "foo\n"]
+ ;; [(string=? "foo" "foo") => "#t\n"]
+ ;; [(string=? "foo" "baz") => "#f\n"]
+ ;; [(string=? "foo" "fo")  =>  "#f\n"]
+ ;; [(string=? "foo" "for") => "#f\n"]
+ ;; [(string=? "" "for")    => "#f\n"] 
+ ;; [(string=? "foo" "")    => "#f\n"]
+ ;; [(string=? "" "")       => "#t\n"]
  
- [(letrec ([f (lambda (str symlist)
-		(cond
-		 [(string=? str (symbol->string (car symlist)))
-		  (car symlist)]
-		 [(null? (cdr symlist))
-		  (set-cdr! symlist (make-symbol str '()))] ;; should be #<void> not '()
-		 [else (f str (cdr symlist))]))])
-      (make-symbol "intern" (lambda (s) (f s (symbols))))) => "intern\n"]
  )
 
 (add-tests-with-string-output "symbols"
