@@ -204,6 +204,17 @@
    *transform-list*)
   (emit-scheme-entry '() expr))
 
+(define (apply-transforms expr)   ;; CLEAN UP emit program and emit library program
+  (for-each
+   (lambda (tf)
+     (unless (getprop tf '*is-transform*)
+	 (error 'emit-program (format "undefined transform: ~s" tf)))
+     (emit "# == ~a  ==>" (getprop tf '*name-string*))
+     (set! expr ((getprop tf '*procedure*) expr))
+     (emit "# ~s" expr))
+   *transform-list*)
+  expr)
+
 (define compil-program emit-program) ;; hook to the test driver which calls compil-program
 
 (define (emit-library-program expr)  ;; like emit program, but no scheme entry
@@ -1173,8 +1184,6 @@
     (emit "   shrl $~s, %eax" cshift)
     (emit "   shll $~s, %eax" fxshift))
 
-;; symbol->string and string->symbol will go here I expect
-
 ;;-----------------------------------------------------------------------------------
 ;;                              Disjoint Types
 ;;-----------------------------------------------------------------------------------
@@ -1691,7 +1700,7 @@
 (define label-bindings second)
 (define label-expr third)
 
-(define (emit-label si env exp)
+(define (emit-label si env exp)                            ;;  UNUSED ???
   (let* ([labels (map first (label-bindings exp))]
 	 [exprs (map second (label-bindings exp))])
     (map (lambda (gl x)
@@ -1796,15 +1805,49 @@
 (define (emit-init si env)
   (emit "          .data")
   (emit "          .globl symbols  # symbol list as a datum ")
-  (emit "          .globl sym2str")
+  (emit "          .globl s2symr")
   (emit "          .align 8")
   (emit "symbols:")
   (emit "          .int 0xFF  # holds (symbols)")
-  (emit "sym2str:")
+  (emit "s2sym:")
   (emit "          .int 0xFF  # to be patched")
   (emit "          .text")
   (emit-expr si env '(cons (make-symbol "nil" ()) ()))
-  (emit "    movl %eax, symbols"))
+  (emit "    movl %eax, symbols")
+  (emit-expr si env (apply-transforms s2sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
+  (emit "    movl %eax, s2sym")
+  )
+
+(define s2sym
+  '(letrec
+     ([s= (lambda (s1 i s2 j) 
+	    (let ([l1 (string-length s1)]
+		  [l2 (string-length s2)])
+	      (if (not (fx= l1 l2))
+		  #f
+		  (if (fx= i l1)
+		      #t
+		      (if (fx= (string-ref s1 i)
+			       (string-ref s2 j))
+			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
+			  #f)))))]
+      [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
+      [s2sym1 (lambda (str symlist)
+		(if (ss= str (symbol->string (car symlist)))
+		    (car symlist)
+		    (if (null? (cdr symlist))
+			(begin
+			  (set-cdr! symlist (cons (make-symbol str #f) ()))
+			  (car (cdr symlist)))
+			(s2sym1 str (cdr symlist)))))]
+      [s2sym (lambda (str) (s2sym1 str (symbols)))])
+     s2sym))
+
+(define-primitive (string->symbol si env exp)
+  (emit-funcall si env (list 'funcall '(_s2sym) exp)))
+
+(define-primitive (_s2sym si env)
+  (emit "    movl s2sym, %eax"))
 
 ;; (symbols) => a list of all interned symbols
 (define-primitive (symbols si env)
@@ -1812,7 +1855,7 @@
 
 (define-primitive (symbols-set! si env exp)
   (emit-expr si env exp)
-  (emit "    movl %eax, gsym"))
+  (emit "    movl %eax, symbols"))
 
 (define-primitive (symbol? si env arg)
   (emit-expr si env arg)
@@ -1828,9 +1871,9 @@
   (emit-expr si env arg1)                        ;; evaluate arg1
   (emit "    movl %eax, ~s(%esp)" si)            ;; save value of arg1
   (emit-expr (- si wordsize) env arg2)           ;; evaluate arg2
-  (emit "    movl %eax, ~s(%ebp)" value-offset) ;; arg2 -> value
+  (emit "    movl %eax, ~s(%ebp)" value-offset)  ;; arg2 -> value
   (emit "    movl ~s(%esp), %eax" si)            ;; get value of arg1
-  (emit "    movl %eax, ~s(%ebp)" string-offset)  ;; arg1 -> string
+  (emit "    movl %eax, ~s(%ebp)" string-offset) ;; arg1 -> string
   (emit "    movl %ebp, %eax")                   ;; get ptr to symbol record
   (emit "    orl  $~s, %eax" symbol-tag)         ;; or in the symbol tag
   (emit "    add  $~s, %ebp" size-symbol)        ;; bump heap ptr
@@ -1855,7 +1898,7 @@
    
 ;;-----------------------------------------------------------------------------------
 ;; procedures and closures
-
+;;-----------------------------------------------------------------------------------
 (define-primitive (procedure? si env expr)
   (emit-expr si env expr)
   (emit "    and $~s, %al" closure-mask)
@@ -2167,10 +2210,10 @@
 ;;          +------------+                             +------------+
 ;;          |            |  %esp - 20        base -->  |  old eip   |  %esp          (si + 4)  -> si'
 ;;     +--  +------------+                             +------------+
-;;     |    |  local 3   |  %esp - 16    +---------->
-;;     |    +------------+               |
-;;  locals  |  local 2   |  %esp - 12    |          (B)  Callee's view
-;;     |    +------------+               |
+;;     |    |  local 3   |  %esp - 16    +---------->                              (C) How callee's frame
+;;     |    +------------+               |                                             looks to caller
+;;  locals  |  local 2   |  %esp - 12    |          (B)  Callee's view                 with respect to si
+;;     |    +------------+               |                                               
 ;;     |    |  local 1   |  %esp - 8     si        old eip = return point
 ;;     +--  +------------+               |         old edi = saved closure ptr
 ;;          |  closure   |  %esp - 4     |         Note that args/locals
@@ -2184,11 +2227,10 @@
 ;;
 ;;  Note: The old edi will be the same as the content of the edi register normally
 ;;        The caller restores the frame's edi upon return by loading closure from esp-4
-;;        The callee simply returns and does not mess with the closure slot 
+;;        The callee simply returns and does not mess with the closure slot
+;;
+;;                                              figure 3
 ;;-----------------------------------------------------------------------------------------------------------
-
-(define funcall-args cddr)
-(define funcall-oper cadr)
 
 ;;-----------------------------------------------------------------------------------
 ;;   Invariants
@@ -2204,6 +2246,10 @@
 ;;  esp - 0           return pointer    |  when the frame goes away
 ;;
 ;;-----------------------------------------------------------------------------------
+
+(define funcall-args cddr)
+(define funcall-oper cadr)
+
 
 (define (emit-funcall si env expr)
   
@@ -2223,7 +2269,7 @@
   (emit "#    expr = ~s" expr)
 
   ;; Evaluate the funcall-oper and stash it esp+si+8
-  ;; this becomes the next frame's closure slot
+  ;; This becomes the next frame's closure slot.  See figure 3. (B)(C)
   (emit-expr (- si 8) env (funcall-oper expr))
   (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
 
@@ -2288,42 +2334,15 @@
 
 (define begin-body cdr)
 
-;; (define (emit-begin si env body)
-;;   (emit "# emit-begin")
-;;   (emit "#   body=~s" body)
-;;   (emit "#   env=~s" env)
-;;   (cond
-;;    [(null? body) '()]
-;;    [(not (pair? body))
-;;     (error "begin" "begin body must be null or a pair" body)]
-;;    [else
-;;      (emit-expr si env (car body))
-;;      (emit-begin si env (cdr body))]))
-
 (define (emit-begin si env expr)
   (emit "# emit-begin")
   (emit "#   expr=~s" expr)
   (emit "#   env=~s" env)
   (cond
    [(null? (begin-body expr)) '()]
-  ; [(not (pair? (begin-body expr)))
-  ;  (error 'begin (format "begin body must be null or a pair: ~s" expr))]
    [else
      (emit-expr si env (car (begin-body expr)))
      (emit-expr si env (cons 'begin (cdr (begin-body expr))))]))
-
-;; (define (emit-tail-begin si env body)  ;; this is the body, not the expr
-;;   (emit "# tail-begin body=~s" body)
-;;   (cond
-;;    [(null? body)
-;;      (emit "    ret                  # return thru stack")]
-;;    [(not (pair? body))
-;;     (error "begin" "begin body must be null or a pair" body)]
-;;    [(eq? (length body) 1)
-;;      (emit-tail-expr si env (car body))]
-;;    [else
-;;     (emit-expr si env (car body))
-;;     (emit-tail-begin si env (cdr body))]))
 
 (define (emit-tail-begin si env expr)  ;; this is the body, not the expr
   (emit "# tail-begin ~s" expr)
@@ -2331,8 +2350,6 @@
   (cond
    [(null? (begin-body expr))
      (emit "    ret                  # return thru stack")]
-;   [(not (pair? (begin-body expr)))
-;    (error 'begin (format "begin body must be null or a pair:~s" expr))]
    [(eq? (length (begin-body expr)) 1)
      (emit-tail-expr si env (first (begin-body expr)))]
    [else
@@ -2431,7 +2448,7 @@
     (let f ([fmls formals] [si (- (* 2 wordsize))] [env closed-env])
       (cond
        [(empty? fmls)
-	(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin
+	(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin [CLEAN UP??]
        [else
 	(f (rest fmls)
 	   (- si wordsize)

@@ -114,7 +114,7 @@
  [(symbol? '()) => "#f\n"]
  [(symbol? "") => "#f\n"]
  [(symbol? '(1 2)) => "#f\n"]
- [(symbol? '#()) => "#f\n"]
+;; [(symbol? '#()) => "#f\n"]              ;; <<---- vector constants not implemented yet
  [(symbol? (lambda (x) x)) => "#f\n"]
  [(symbol? 'foo) => "#t\n"]
  [(string? 'foo) => "#f\n"]
@@ -123,7 +123,13 @@
  [(null? 'foo) => "#f\n"]
  [(boolean? 'foo) => "#f\n"]
  [(procedure? 'foo) => "#f\n"]
- [(eq? 'foo 'bar) => "#f\n"]
+ 
+ [(eq? (string->symbol "foo") #t) => "#f\n"]
+ [(eq? #t (string->symbol "bar")) => "#f\n"]
+ [(begin (string->symbol "foo") (string->symbol "bar")) => "bar\n"]
+ [(eq? (string->symbol "foo") (string->symbol "bar")) => "#f\n"]    ;; calling twice blows up
+ 
+ [(eq? 'foo 'bar) => "#f\n"]               ;; <<------ BLOWS UP HERE with Seg Fault
  [(eq? 'foo 'foo) => "#t\n"]
  ['foo => "foo\n"]
  ['(foo bar baz) => "(foo bar baz)\n"]

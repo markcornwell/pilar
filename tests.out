@@ -14,4 +14,18 @@ test 8:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (strin
 test 9:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "" "fubar")) ... ok
 test 10:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) (s2sym "fubar")) ... ok
 Performing symbols tests ...
-test 11:(symbol? (quote foo)) ...> 
+test 11:(symbol? (quote foo)) ... ok
+test 12:(symbol? (quote ())) ... ok
+test 13:(symbol? "") ... ok
+test 14:(symbol? (quote (1 2))) ... ok
+test 15:(symbol? (lambda (x) x)) ... ok
+test 16:(symbol? (quote foo)) ... ok
+test 17:(string? (quote foo)) ... ok
+test 18:(pair? (quote foo)) ... ok
+test 19:(vector? (quote foo)) ... ok
+test 20:(null? (quote foo)) ... ok
+test 21:(boolean? (quote foo)) ... ok
+test 22:(procedure? (quote foo)) ... ok
+test 23:(eq? (string->symbol "foo") #t) ... ok
+test 24:(eq? #t (string->symbol "bar")) ... ok
+test 25:(begin (string->symbol "foo") (string->symbol "bar")) ...> 
