@@ -1,22 +1,22 @@
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-multi-element-body  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-let*  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-shadowing  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == vectorize-letrec  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-set!  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == close-free-variables  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-quote  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-when/unless  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # == eliminate-cond  ==>
-# (begin (string->symbol "foo") (string->symbol "bar"))
+# (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
 # emit-scheme-entry
     .text
     .align 4,0x90
@@ -24,12 +24,13 @@
 _L_scheme_entry:
           .data
           .globl symbols  # symbol list as a datum 
-          .globl s2symr
+          .globl s2sym
           .align 8
 symbols:
           .int 0xFF  # holds (symbols)
+          .align 8
 s2sym:
-          .int 0xFF  # to be patched
+          .int 0xFF  # holds pgm-str-sym
           .text
 # emit-expr (cons (make-symbol "nil" ()) ())
 # cons arg1=(make-symbol "nil" ()) arg2=()
@@ -37,13 +38,13 @@ s2sym:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_629
+    jmp _L_941
     .align 8,0x90
-_L_628 :
+_L_940 :
     .int 12
     .ascii "nil"
-_L_629:
-    movl $_L_628, %eax
+_L_941:
+    movl $_L_940, %eax
     orl $6, %eax
     movl %eax, -8(%esp)
 # emit-expr ()
@@ -67,29 +68,29 @@ _L_629:
 # cons end
     movl %eax, symbols
 # == eliminate-multi-element-body  ==>
-# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) s2sym)
+# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (str->sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) (str->sym1 str (cdr symlist)))))) (str->sym (lambda (str) (str->sym1 str (symbols))))) str->sym)
 # == eliminate-let*  ==>
-# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) s2sym)
+# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (str->sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) (str->sym1 str (cdr symlist)))))) (str->sym (lambda (str) (str->sym1 str (symbols))))) str->sym)
 # == eliminate-shadowing  ==>
-# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) s2sym)
+# (letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (str->sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) (str->sym1 str (cdr symlist)))))) (str->sym (lambda (str) (str->sym1 str (symbols))))) str->sym)
 # == vectorize-letrec  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (vector-set! ss= 0 (lambda (s1 s2) ((vector-ref s= 0) s1 0 s2 0))) (vector-set! s2sym1 0 (lambda (str symlist) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist)))))) (vector-set! s2sym 0 (lambda (str) ((vector-ref s2sym1 0) str (symbols))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (vector-set! ss= 0 (lambda (s1 s2) ((vector-ref s= 0) s1 0 s2 0))) (vector-set! str->sym1 0 (lambda (str symlist) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist)))))) (vector-set! str->sym 0 (lambda (str) ((vector-ref str->sym1 0) str (symbols))))) (vector-ref str->sym 0)))
 # == eliminate-set!  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (lambda (s1 i s2 j) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (lambda (s1 s2) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (lambda (str symlist) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (lambda (str) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (lambda (s1 i s2 j) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (lambda (s1 s2) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (lambda (str symlist) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (lambda (str) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
 # == close-free-variables  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
 # == eliminate-quote  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
 # == eliminate-when/unless  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
 # == eliminate-cond  ==>
-# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
-# emit-expr (let ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0)))
+# (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
+# emit-expr (let ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1))) (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0)))
 # emit-let
 #  si   = -8
 #  env  = ()
-#  bindings = ((s= (make-vector 1)) (ss= (make-vector 1)) (s2sym1 (make-vector 1)) (s2sym (make-vector 1)))
-#  body = (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0))
+#  bindings = ((s= (make-vector 1)) (ss= (make-vector 1)) (str->sym1 (make-vector 1)) (str->sym (make-vector 1)))
+#  body = (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -142,18 +143,18 @@ _L_629:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -20(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0))
+# emit-expr (begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0))
 # emit-begin
-#   expr=(begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))) (vector-ref s2sym 0))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
+#   expr=(begin (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))) (vector-ref str->sym 0))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
 # emit-begin
-#   expr=(begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))))
+#   expr=(begin (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (vector-set! s= 0 (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))))
 # emit-expr s=
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # var=s=
     movl -8(%esp), %eax  # stack load s=
 # end emit-variable-ref
@@ -161,14 +162,14 @@ _L_629:
 # emit-expr 0
     movl $0, %eax     # immed 0
     movl %eax, -28(%esp)
-# emit-expr (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
+# emit-expr (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
 # emit-closure
 # si = -32
-# env = ((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# expr = (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
-    movl $_L_630, 0(%ebp)  # closure label
+# env = ((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# expr = (closure (s1 i s2 j) (s=) (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
+    movl $_L_942, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # var=s=
     movl -8(%esp), %eax  # stack load s=
 # end emit-variable-ref
@@ -176,23 +177,23 @@ _L_629:
     movl %ebp, %eax    # return base ptr
     add $2, %eax      # closure tag
     add $8, %ebp      # bump ebp
-    jmp _L_631
-_L_630:
+    jmp _L_943
+_L_942:
 # emit-tail-expr
 # si=-24
 # env=((j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(begin (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
-# tail-begin (begin (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
+# expr=(begin (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
+# tail-begin (begin (let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))
 #   env=((j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 # emit-tail-expr
 # si=-24
 # env=((j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))
+# expr=(let ((s1 s1) (i i) (s2 s2) (j j)) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))
 # emit-tail-let
 #  si   = -24
 #  env  = ((j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 #  bindings = ((s1 s1) (i i) (s2 s2) (j j))
-#  body = (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))
+#  body = (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))
 # emit-expr s1
 # emit-variable-ref
 # env=((j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
@@ -224,12 +225,12 @@ _L_630:
 # emit-tail-expr
 # si=-40
 # env=((j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))
+# expr=(let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))))
 # emit-tail-let
 #  si   = -40
 #  env  = ((j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 #  bindings = ((l1 (string-length s1)) (l2 (string-length s2)))
-#  body = (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))
+#  body = (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))
 # emit-expr (string-length s1)
 # emit-expr s1
 # emit-variable-ref
@@ -251,7 +252,7 @@ _L_630:
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))
+# expr=(if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)))
 # emit-expr (not (fx= l1 l2))
 # emit-expr (fx= l1 l2)
 # emit-expr l2
@@ -278,19 +279,19 @@ _L_630:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_632
+    je _L_944
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # tail return
-    jmp _L_633
-_L_632:
+    jmp _L_945
+_L_944:
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))
+# expr=(if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f))
 # emit-expr (fx= i l1)
 # emit-expr l1
 # emit-variable-ref
@@ -311,40 +312,21 @@ _L_632:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_634
+    je _L_946
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # tail return
-    jmp _L_635
-_L_634:
+    jmp _L_947
+_L_946:
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# expr=(if (fx= (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)
-# emit-expr (fx= (string-ref s1 i) (string-ref s2 j))
-# emit-expr (string-ref s2 j)
-# emit-expr s2
-# emit-variable-ref
-# env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# var=s2
-    movl -32(%esp), %eax  # stack load s2
-# end emit-variable-ref
-    movl %eax, -48(%esp)
-# emit-expr j
-# emit-variable-ref
-# env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
-# var=j
-    movl -36(%esp), %eax  # stack load j
-# end emit-variable-ref
-    sar $2, %eax
-    movl -48(%esp), %esi
-    movl -2(%eax,%esi), %eax
-    sal $8, %eax
-    or  $15, %eax
-    movl %eax, -48(%esp)
+# expr=(if (char=? (string-ref s1 i) (string-ref s2 j)) ((vector-ref s= 0) s1 (fx+ i 1) s2 (fx+ j 1)) #f)
+# emit-expr (char=? (string-ref s1 i) (string-ref s2 j))
+# char= c1=(string-ref s1 i) c2=(string-ref s2 j)
 # emit-expr (string-ref s1 i)
 # emit-expr s1
 # emit-variable-ref
@@ -352,7 +334,7 @@ _L_634:
 # var=s1
     movl -24(%esp), %eax  # stack load s1
 # end emit-variable-ref
-    movl %eax, -52(%esp)
+    movl %eax, -48(%esp)
 # emit-expr i
 # emit-variable-ref
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
@@ -360,17 +342,37 @@ _L_634:
     movl -28(%esp), %eax  # stack load i
 # end emit-variable-ref
     sar $2, %eax
+    movl -48(%esp), %esi
+    movl -2(%eax,%esi), %eax
+    sal $8, %eax
+    or  $15, %eax
+    movb %ah, -48(%esp)
+# emit-expr (string-ref s2 j)
+# emit-expr s2
+# emit-variable-ref
+# env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
+# var=s2
+    movl -32(%esp), %eax  # stack load s2
+# end emit-variable-ref
+    movl %eax, -52(%esp)
+# emit-expr j
+# emit-variable-ref
+# env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
+# var=j
+    movl -36(%esp), %eax  # stack load j
+# end emit-variable-ref
+    sar $2, %eax
     movl -52(%esp), %esi
     movl -2(%eax,%esi), %eax
     sal $8, %eax
     or  $15, %eax
-    cmp -48(%esp), %eax
+    cmp %ah, -48(%esp)
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_636
+    je _L_948
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
@@ -444,30 +446,31 @@ _L_634:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  argc=0   si=-72  delta=48
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_637
-_L_636:
+    jmp _L_949
+_L_948:
 # emit-tail-expr
 # si=-48
 # env=((l2 . -44) (l1 . -40) (j . -36) (s2 . -32) (i . -28) (s1 . -24) (j . -20) (s2 . -16) (i . -12) (s1 . -8) (s= . 4))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # tail return
-_L_637:
-_L_635:
-_L_633:
+_L_949:
+_L_947:
+_L_945:
+     ret   # return thru stack
     .align 4,0x90
-_L_631:
+_L_943:
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
+# emit-expr (begin (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
 # emit-begin
-#   expr=(begin (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+#   expr=(begin (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))) (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # emit-expr (vector-set! ss= 0 (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0))))
 # emit-expr ss=
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # var=ss=
     movl -12(%esp), %eax  # stack load ss=
 # end emit-variable-ref
@@ -478,11 +481,11 @@ _L_631:
 # emit-expr (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))
 # emit-closure
 # si = -32
-# env = ((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env = ((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # expr = (closure (s1 s2) (s=) (let ((s1 s1) (s2 s2)) ((vector-ref s= 0) s1 0 s2 0)))
-    movl $_L_638, 0(%ebp)  # closure label
+    movl $_L_950, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # var=s=
     movl -8(%esp), %eax  # stack load s=
 # end emit-variable-ref
@@ -490,8 +493,8 @@ _L_631:
     movl %ebp, %eax    # return base ptr
     add $2, %eax      # closure tag
     add $8, %ebp      # bump ebp
-    jmp _L_639
-_L_638:
+    jmp _L_951
+_L_950:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (s= . 4))
@@ -576,91 +579,92 @@ _L_638:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  argc=0   si=-48  delta=24
     jmp *-2(%edi)  # tail-funcall
+     ret   # return thru stack
     .align 4,0x90
-_L_639:
+_L_951:
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
+# emit-expr (begin (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
 # emit-begin
-#   expr=(begin (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))) (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (vector-set! s2sym1 0 (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist)))))))
-# emit-expr s2sym1
+#   expr=(begin (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))) (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (vector-set! str->sym1 0 (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist)))))))
+# emit-expr str->sym1
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# var=s2sym1
-    movl -16(%esp), %eax  # stack load s2sym1
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# var=str->sym1
+    movl -16(%esp), %eax  # stack load str->sym1
 # end emit-variable-ref
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
     movl %eax, -28(%esp)
-# emit-expr (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))
+# emit-expr (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))
 # emit-closure
 # si = -32
-# env = ((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# expr = (closure (str symlist) (ss= s2sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))
-    movl $_L_640, 0(%ebp)  # closure label
+# env = ((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# expr = (closure (str symlist) (ss= str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))
+    movl $_L_952, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
 # var=ss=
     movl -12(%esp), %eax  # stack load ss=
 # end emit-variable-ref
    movl  %eax, 4(%ebp)
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# var=s2sym1
-    movl -16(%esp), %eax  # stack load s2sym1
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# var=str->sym1
+    movl -16(%esp), %eax  # stack load str->sym1
 # end emit-variable-ref
    movl  %eax, 8(%ebp)
     movl %ebp, %eax    # return base ptr
     add $2, %eax      # closure tag
     add $16, %ebp      # bump ebp
-    jmp _L_641
-_L_640:
+    jmp _L_953
+_L_952:
 # emit-tail-expr
 # si=-16
-# env=((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(begin (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))
-# tail-begin (begin (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))))
-#   env=((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(begin (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))
+# tail-begin (begin (let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))))
+#   env=((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # emit-tail-expr
 # si=-16
-# env=((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist)))))
+# env=((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(let ((str str) (symlist symlist)) (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist)))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+#  env  = ((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 #  bindings = ((str str) (symlist symlist))
-#  body = (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))
+#  body = (if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))
 # emit-expr str
 # emit-variable-ref
-# env=((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=str
     movl -8(%esp), %eax  # stack load str
 # end emit-variable-ref
     movl %eax, -16(%esp)  # stack save
 # emit-expr symlist
 # emit-variable-ref
-# env=((symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=symlist
     movl -12(%esp), %eax  # stack load symlist
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist))))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(if ((vector-ref ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist))))
 # emit-expr ((vector-ref ss= 0) str (symbol->string (car symlist)))
 # funcall
 #    si   =-24
-#    env  = ((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+#    env  = ((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 #    expr = (funcall (vector-ref ss= 0) str (symbol->string (car symlist)))
 # emit-expr (vector-ref ss= 0)
 # emit-expr ss=
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=ss=
     movl 2(%edi), %eax  # frame load ss=
 # end emit-variable-ref
@@ -672,7 +676,7 @@ _L_640:
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr str
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=str
     movl -16(%esp), %eax  # stack load str
 # end emit-variable-ref
@@ -682,7 +686,7 @@ _L_640:
 # emit-expr (car symlist)
 # emit-expr symlist
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=symlist
     movl -20(%esp), %eax  # stack load symlist
 # end emit-variable-ref
@@ -695,32 +699,32 @@ _L_640:
     add $24, %esp    # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_642
+    je _L_954
 # emit-tail-expr
 # si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # expr=(car symlist)
 # tail primcall
 # emit-expr symlist
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=symlist
     movl -20(%esp), %eax  # stack load symlist
 # end emit-variable-ref
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_643
-_L_642:
+    jmp _L_955
+_L_954:
 # emit-tail-expr
 # si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) ((vector-ref s2sym1 0) str (cdr symlist)))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) ((vector-ref str->sym1 0) str (cdr symlist)))
 # emit-expr (null? (cdr symlist))
 # emit-expr (cdr symlist)
 # emit-expr symlist
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=symlist
     movl -20(%esp), %eax  # stack load symlist
 # end emit-variable-ref
@@ -732,88 +736,101 @@ _L_642:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_644
+    je _L_956
 # emit-tail-expr
 # si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist)))
-# tail-begin (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist)))
-#   env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# emit-expr (set-cdr! symlist (cons (make-symbol str #f) ()))
-# emit-expr symlist
-# emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# var=symlist
-    movl -20(%esp), %eax  # stack load symlist
-# end emit-variable-ref
-    movl %eax, -24(%esp)
-# emit-expr (cons (make-symbol str #f) ())
-# cons arg1=(make-symbol str #f) arg2=()
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym))
+# emit-tail-let
+#  si   = -24
+#  env  = ((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+#  bindings = ((new-sym (make-symbol str #f)))
+#  body = (begin (set-cdr! symlist (cons new-sym ())) new-sym)
 # emit-expr (make-symbol str #f)
 # make-symbol arg1=str arg2=#f
 # emit-expr str
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=str
     movl -16(%esp), %eax  # stack load str
 # end emit-variable-ref
-    movl %eax, -28(%esp)
+    movl %eax, -24(%esp)
 # emit-expr #f
     movl $47, %eax     # immed #f
     movl %eax, 4(%ebp)
-    movl -28(%esp), %eax
+    movl -24(%esp), %eax
     movl %eax, 0(%ebp)
     movl %ebp, %eax
     orl  $3, %eax
     add  $8, %ebp
 # make-symbol end
+    movl %eax, -24(%esp)  # stack save
+# emit-tail-expr
+# si=-28
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(begin (set-cdr! symlist (cons new-sym ())) new-sym)
+# tail-begin (begin (set-cdr! symlist (cons new-sym ())) new-sym)
+#   env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# emit-expr (set-cdr! symlist (cons new-sym ()))
+# emit-expr symlist
+# emit-variable-ref
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# var=symlist
+    movl -20(%esp), %eax  # stack load symlist
+# end emit-variable-ref
     movl %eax, -28(%esp)
+# emit-expr (cons new-sym ())
+# cons arg1=new-sym arg2=()
+# emit-expr new-sym
+# emit-variable-ref
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# var=new-sym
+    movl -24(%esp), %eax  # stack load new-sym
+# end emit-variable-ref
+    movl %eax, -32(%esp)
 # emit-expr ()
     movl $63, %eax     # immed ()
     movl %eax, 4(%ebp)
-    movl -28(%esp), %eax
+    movl -32(%esp), %eax
     movl %eax, 0(%ebp)
     movl %ebp, %eax
     or   $1, %al
     add  $8, %ebp
 # cons end
-    movl -24(%esp), %ebx
+    movl -28(%esp), %ebx
     movl %eax, 3(%ebx)
 # emit-tail-expr
-# si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(begin (car (cdr symlist)))
-# tail-begin (begin (car (cdr symlist)))
-#   env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# si=-28
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=(begin new-sym)
+# tail-begin (begin new-sym)
+#   env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # emit-tail-expr
-# si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=(car (cdr symlist))
-# tail primcall
-# emit-expr (cdr symlist)
-# emit-expr symlist
+# si=-28
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=new-sym
+# emit-tail-variable-ref
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# var=symlist
-    movl -20(%esp), %eax  # stack load symlist
+# env=((new-sym . -24) (symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# var=new-sym
+    movl -24(%esp), %eax  # stack load new-sym
 # end emit-variable-ref
-    movl 3(%eax), %eax
-    movl -1(%eax), %eax
-#return from tail (car (cdr symlist))
     ret
-    jmp _L_645
-_L_644:
+# end emit-tail-variable ref
+     ret   # return thru stack
+    jmp _L_957
+_L_956:
 # emit-tail-expr
 # si=-24
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# expr=((vector-ref s2sym1 0) str (cdr symlist))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# expr=((vector-ref str->sym1 0) str (cdr symlist))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-#    expr = (funcall (vector-ref s2sym1 0) str (cdr symlist))
+#    env  = ((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+#    expr = (funcall (vector-ref str->sym1 0) str (cdr symlist))
 # emit-expr str
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=str
     movl -16(%esp), %eax  # stack load str
 # end emit-variable-ref
@@ -821,18 +838,18 @@ _L_644:
 # emit-expr (cdr symlist)
 # emit-expr symlist
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
 # var=symlist
     movl -20(%esp), %eax  # stack load symlist
 # end emit-variable-ref
     movl 3(%eax), %eax
     mov %eax, -36(%esp)    # arg 
-# emit-expr (vector-ref s2sym1 0)
-# emit-expr s2sym1
+# emit-expr (vector-ref str->sym1 0)
+# emit-expr str->sym1
 # emit-variable-ref
-# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (s2sym1 . 8) (ss= . 4))
-# var=s2sym1
-    movl 6(%edi), %eax  # frame load s2sym1
+# env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym1 . 8) (ss= . 4))
+# var=str->sym1
+    movl 6(%edi), %eax  # frame load str->sym1
 # end emit-variable-ref
     movl %eax, -40(%esp)
 # emit-expr 0
@@ -848,78 +865,79 @@ _L_644:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  argc=0   si=-40  delta=24
     jmp *-2(%edi)  # tail-funcall
-_L_645:
-_L_643:
+_L_957:
+_L_955:
+     ret   # return thru stack
     .align 4,0x90
-_L_641:
+_L_953:
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
+# emit-expr (begin (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
 # emit-begin
-#   expr=(begin (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (vector-set! s2sym 0 (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols)))))
-# emit-expr s2sym
+#   expr=(begin (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (vector-set! str->sym 0 (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols)))))
+# emit-expr str->sym
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# var=s2sym
-    movl -20(%esp), %eax  # stack load s2sym
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# var=str->sym
+    movl -20(%esp), %eax  # stack load str->sym
 # end emit-variable-ref
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
     movl %eax, -28(%esp)
-# emit-expr (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))
+# emit-expr (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))
 # emit-closure
 # si = -32
-# env = ((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# expr = (closure (str) (s2sym1) (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))
-    movl $_L_646, 0(%ebp)  # closure label
+# env = ((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# expr = (closure (str) (str->sym1) (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))
+    movl $_L_958, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# var=s2sym1
-    movl -16(%esp), %eax  # stack load s2sym1
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# var=str->sym1
+    movl -16(%esp), %eax  # stack load str->sym1
 # end emit-variable-ref
    movl  %eax, 4(%ebp)
     movl %ebp, %eax    # return base ptr
     add $2, %eax      # closure tag
     add $8, %ebp      # bump ebp
-    jmp _L_647
-_L_646:
+    jmp _L_959
+_L_958:
 # emit-tail-expr
 # si=-12
-# env=((str . -8) (s2sym1 . 4))
-# expr=(begin (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))
-# tail-begin (begin (let ((str str)) ((vector-ref s2sym1 0) str (symbols))))
-#   env=((str . -8) (s2sym1 . 4))
+# env=((str . -8) (str->sym1 . 4))
+# expr=(begin (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))
+# tail-begin (begin (let ((str str)) ((vector-ref str->sym1 0) str (symbols))))
+#   env=((str . -8) (str->sym1 . 4))
 # emit-tail-expr
 # si=-12
-# env=((str . -8) (s2sym1 . 4))
-# expr=(let ((str str)) ((vector-ref s2sym1 0) str (symbols)))
+# env=((str . -8) (str->sym1 . 4))
+# expr=(let ((str str)) ((vector-ref str->sym1 0) str (symbols)))
 # emit-tail-let
 #  si   = -12
-#  env  = ((str . -8) (s2sym1 . 4))
+#  env  = ((str . -8) (str->sym1 . 4))
 #  bindings = ((str str))
-#  body = ((vector-ref s2sym1 0) str (symbols))
+#  body = ((vector-ref str->sym1 0) str (symbols))
 # emit-expr str
 # emit-variable-ref
-# env=((str . -8) (s2sym1 . 4))
+# env=((str . -8) (str->sym1 . 4))
 # var=str
     movl -8(%esp), %eax  # stack load str
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((str . -12) (str . -8) (s2sym1 . 4))
-# expr=((vector-ref s2sym1 0) str (symbols))
+# env=((str . -12) (str . -8) (str->sym1 . 4))
+# expr=((vector-ref str->sym1 0) str (symbols))
 # emit-tail-funcall
 #    si   =-16
-#    env  = ((str . -12) (str . -8) (s2sym1 . 4))
-#    expr = (funcall (vector-ref s2sym1 0) str (symbols))
+#    env  = ((str . -12) (str . -8) (str->sym1 . 4))
+#    expr = (funcall (vector-ref str->sym1 0) str (symbols))
 # emit-expr str
 # emit-variable-ref
-# env=((str . -12) (str . -8) (s2sym1 . 4))
+# env=((str . -12) (str . -8) (str->sym1 . 4))
 # var=str
     movl -12(%esp), %eax  # stack load str
 # end emit-variable-ref
@@ -927,12 +945,12 @@ _L_646:
 # emit-expr (symbols)
     movl symbols, %eax
     mov %eax, -28(%esp)    # arg 
-# emit-expr (vector-ref s2sym1 0)
-# emit-expr s2sym1
+# emit-expr (vector-ref str->sym1 0)
+# emit-expr str->sym1
 # emit-variable-ref
-# env=((str . -12) (str . -8) (s2sym1 . 4))
-# var=s2sym1
-    movl 2(%edi), %eax  # frame load s2sym1
+# env=((str . -12) (str . -8) (str->sym1 . 4))
+# var=str->sym1
+    movl 2(%edi), %eax  # frame load str->sym1
 # end emit-variable-ref
     movl %eax, -32(%esp)
 # emit-expr 0
@@ -948,25 +966,26 @@ _L_646:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  argc=0   si=-32  delta=16
     jmp *-2(%edi)  # tail-funcall
+     ret   # return thru stack
     .align 4,0x90
-_L_647:
+_L_959:
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (begin (vector-ref s2sym 0))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (begin (vector-ref str->sym 0))
 # emit-begin
-#   expr=(begin (vector-ref s2sym 0))
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# emit-expr (vector-ref s2sym 0)
-# emit-expr s2sym
+#   expr=(begin (vector-ref str->sym 0))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# emit-expr (vector-ref str->sym 0)
+# emit-expr str->sym
 # emit-variable-ref
-# env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
-# var=s2sym
-    movl -20(%esp), %eax  # stack load s2sym
+# env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
+# var=str->sym
+    movl -20(%esp), %eax  # stack load str->sym
 # end emit-variable-ref
     movl %eax, -24(%esp)
 # emit-expr 0
@@ -976,68 +995,66 @@ _L_647:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((s2sym . -20) (s2sym1 . -16) (ss= . -12) (s= . -8))
+#   env=((str->sym . -20) (str->sym1 . -16) (ss= . -12) (s= . -8))
     movl %eax, s2sym
-# emit-expr (begin (string->symbol "foo") (string->symbol "bar"))
-# emit-begin
-#   expr=(begin (string->symbol "foo") (string->symbol "bar"))
-#   env=()
-# emit-expr (string->symbol "foo")
+# emit-expr (let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t)
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((a (string->symbol "goo")) (b (string->symbol "ber")))
+#  body = #t
+# emit-expr (string->symbol "goo")
 # funcall
 #    si   =-8
 #    env  = ()
-#    expr = (funcall (_s2sym) "foo")
-# emit-expr (_s2sym)
+#    expr = (funcall (primitive-str->sym) "goo")
+# emit-expr (primitive-str->sym)
     movl s2sym, %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
-# emit-expr "foo"
+# emit-expr "goo"
 # string literal
-    jmp _L_649
+    jmp _L_961
     .align 8,0x90
-_L_648 :
+_L_960 :
     .int 12
-    .ascii "foo"
-_L_649:
-    movl $_L_648, %eax
+    .ascii "goo"
+_L_961:
+    movl $_L_960, %eax
     orl $6, %eax
-    mov %eax, -20(%esp)    # arg foo
+    mov %eax, -20(%esp)    # arg goo
     movl -16(%esp), %edi   # load new closure to %edi
     add $-8, %esp    # adjust base
     call *-2(%edi)        # call thru closure ptr
     add $8, %esp    # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-# emit-expr (begin (string->symbol "bar"))
-# emit-begin
-#   expr=(begin (string->symbol "bar"))
-#   env=()
-# emit-expr (string->symbol "bar")
+    movl %eax, -8(%esp)  # stack save
+# emit-expr (string->symbol "ber")
 # funcall
-#    si   =-8
+#    si   =-12
 #    env  = ()
-#    expr = (funcall (_s2sym) "bar")
-# emit-expr (_s2sym)
+#    expr = (funcall (primitive-str->sym) "ber")
+# emit-expr (primitive-str->sym)
     movl s2sym, %eax
-   movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
-# emit-expr "bar"
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "ber"
 # string literal
-    jmp _L_651
+    jmp _L_963
     .align 8,0x90
-_L_650 :
+_L_962 :
     .int 12
-    .ascii "bar"
-_L_651:
-    movl $_L_650, %eax
+    .ascii "ber"
+_L_963:
+    movl $_L_962, %eax
     orl $6, %eax
-    mov %eax, -20(%esp)    # arg bar
-    movl -16(%esp), %edi   # load new closure to %edi
-    add $-8, %esp    # adjust base
+    mov %eax, -24(%esp)    # arg ber
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp    # adjust base
     call *-2(%edi)        # call thru closure ptr
-    add $8, %esp    # adjust base
+    add $12, %esp    # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-# emit-expr (begin)
-# emit-begin
-#   expr=(begin)
-#   env=()
+    movl %eax, -12(%esp)  # stack save
+# emit-expr #t
+    movl $111, %eax     # immed #t
     ret
     .text
     .align 4,0x90

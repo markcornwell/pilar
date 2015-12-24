@@ -136,7 +136,7 @@
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
 ;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
-(load "tests/tests-2.8-req.scm")  ;; symbols
+(load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
@@ -988,17 +988,16 @@
 	   (and pair (fixnum? (cdr pair)))))) 
   (emit "# emit-expr ~s" expr)
   (cond
-   [(begin? expr)      (emit-begin si env expr)]
+
    [(primcall? expr)   (emit-primcall si env expr)]   
    [(immediate? expr)  (emit-immediate expr)]
    [(label? expr)      (emit-label si env expr)]   ;; never in tail position
    [(string? expr)     (emit-string-literal expr)]
    [(variable? expr)   (emit-variable-ref env expr)]
-   ;[(begin? expr)      (emit-begin si env (begin-body expr))]  ;; rewrite to take whole expr
+   [(begin? expr)      (emit-begin si env expr)]  
    [(closure? expr)    (emit-closure si env expr)]
    [(funcall? expr)    (emit-funcall si env expr)]
    [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
-
    [(if? expr)         (emit-if si env expr)]
    [(and? expr)        (emit-and si env expr)]
    [(or? expr)         (emit-or si env expr)]
@@ -1016,13 +1015,12 @@
   (emit "# env=~s" env)
   (emit "# expr=~s" expr)
   (cond
-   [(begin? expr)      (emit-tail-begin si env expr)]
    [(primcall? expr)   (emit-tail-primcall si env expr)]   
    [(immediate? expr)  (emit-tail-immediate expr)]
    [(label? expr)      (error 'emit-tail-expr "label never in tail position")]
    [(string? expr)     (emit-tail-string-literal)]
    [(variable? expr)   (emit-tail-variable-ref env expr)]
-  ; [(begin? expr)      (emit-tail-begin si env (begin-body expr))]
+   [(begin? expr)      (emit-tail-begin si env expr)]   
    [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
    [(funcall? expr)    (emit-tail-funcall si env expr)]
    [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
@@ -1085,8 +1083,6 @@
 ;;  specified by the Scheme standard (R5RS) types are disjoint.  Each datum belongs
 ;;  to exactly one type.
 ;;-----------------------------------------------------------------------------------
-
-
 ;;  Constants
 
 (define fxshift         2)
@@ -1127,7 +1123,6 @@
 (define size-symbol     8)
 (define string-offset   0)
 (define value-offset    4)
-
 
 (define nil-value    #b00111111) ; #x3F)
 (define wordsize        4) ; bytes
@@ -1541,8 +1536,7 @@
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k
   (emit "    movl %eax, -1(%ebx,%esi)")             ;; v[k] <- object
-                                                    ;; offset -1 = tag(-5) + lenfield_size(4) 
-  )
+  )                                                 ;; offset -1 = tag(-5) + lenfield_size(4) 
 
 (define-primitive (vector-ref si env vector k)
   (emit-expr si env vector)
@@ -1620,11 +1614,11 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
-;;------------------------------------------
+;;-------------------------------------------------------
 ;; looking for a simple way to do string=?
 ;; this gets blasted out as an inline
-;; should become a callable subroutine
-;;------------------------------------------
+;; fast but not so compact as a callable subroutine
+;;-------------------------------------------------------
 
 ;; (define-primitive (string=? si env arg1 arg2)
 ;;   (let ([false (unique-label)]
@@ -1658,7 +1652,7 @@
 ;; A simple implementation of string literals using assember directives.
 ;;-----------------------------------------------------------------------------------
 
-(define (emit-string-literal s)
+(define (emit-string-literal s)             ;; IS THIS USED ???
   (let ([data (unique-label)]
 	[load (unique-label)])
     (emit "# string literal")
@@ -1805,53 +1799,61 @@
 (define (emit-init si env)
   (emit "          .data")
   (emit "          .globl symbols  # symbol list as a datum ")
-  (emit "          .globl s2symr")
+  (emit "          .globl s2sym")
   (emit "          .align 8")
   (emit "symbols:")
   (emit "          .int 0xFF  # holds (symbols)")
+  (emit "          .align 8")   ;;  does this need to be aligned ???
   (emit "s2sym:")
-  (emit "          .int 0xFF  # to be patched")
+  (emit "          .int 0xFF  # holds pgm-str-sym")
   (emit "          .text")
   (emit-expr si env '(cons (make-symbol "nil" ()) ()))
   (emit "    movl %eax, symbols")
-  (emit-expr si env (apply-transforms s2sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
+  (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
   (emit "    movl %eax, s2sym")
   )
 
-(define s2sym
+(define expr-str->sym    ;; string to symbol  
   '(letrec
      ([s= (lambda (s1 i s2 j) 
-	    (let ([l1 (string-length s1)]
-		  [l2 (string-length s2)])
-	      (if (not (fx= l1 l2))
-		  #f
-		  (if (fx= i l1)
-		      #t
-		      (if (fx= (string-ref s1 i)
-			       (string-ref s2 j))
-			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
-			  #f)))))]
+  	    (let ([l1 (string-length s1)]
+  		  [l2 (string-length s2)])
+  	      (if (not (fx= l1 l2))
+  		  #f
+  		  (if (fx= i l1)
+  		      #t
+  		      (if (char=? (string-ref s1 i)
+  				  (string-ref s2 j))
+  			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
+  			  #f)))))]
       [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
-      [s2sym1 (lambda (str symlist)
-		(if (ss= str (symbol->string (car symlist)))
-		    (car symlist)
-		    (if (null? (cdr symlist))
-			(begin
-			  (set-cdr! symlist (cons (make-symbol str #f) ()))
-			  (car (cdr symlist)))
-			(s2sym1 str (cdr symlist)))))]
-      [s2sym (lambda (str) (s2sym1 str (symbols)))])
-     s2sym))
+      [str->sym1 (lambda (str symlist)   ;; assumed symlist is never empty
+  		(if (ss= str (symbol->string (car symlist)))
+  		    (car symlist)
+  		    (if (null? (cdr symlist))
+  			(let ([new-sym (make-symbol str #f)])
+  			  (begin
+  			    (set-cdr! symlist (cons new-sym ()))
+  			    new-sym))
+  			(str->sym1 str (cdr symlist)))))]
+      [str->sym (lambda (str) (str->sym1 str (symbols)))])
+     str->sym))
 
 (define-primitive (string->symbol si env exp)
-  (emit-funcall si env (list 'funcall '(_s2sym) exp)))
+  (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
 
-(define-primitive (_s2sym si env)
-  (emit "    movl s2sym, %eax"))
+(define-primitive (primitive-str->sym si env)
+  (emit "    movl s2sym, %eax")
+ ;; (emit "    movl 0(%eax), %eax") ;; dereference ???
+
+  )    ;; does this move the address or the contents into eax?
 
 ;; (symbols) => a list of all interned symbols
 (define-primitive (symbols si env)
-  (emit "    movl symbols, %eax"))
+  (emit "    movl symbols, %eax")
+  ;;(emit "    movl 0(%eax), %eax")  ;; dereference???
+  )
+
 
 (define-primitive (symbols-set! si env exp)
   (emit-expr si env exp)
@@ -2326,7 +2328,8 @@
   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
   (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
-  (emit "    jmp *-2(%edi)  # tail-funcall"))   ;; jump to closure entry point
+  (emit "    jmp *-2(%edi)  # tail-funcall")
+  )   ;; jump to closure entry point
 
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
@@ -2349,9 +2352,10 @@
   (emit "#   env=~s" env)  
   (cond
    [(null? (begin-body expr))
-     (emit "    ret                  # return thru stack")]
+     (emit "    ret   # return thru stack")]
    [(eq? (length (begin-body expr)) 1)
-     (emit-tail-expr si env (first (begin-body expr)))]
+    (emit-tail-expr si env (first (begin-body expr)))
+    (emit "     ret   # return thru stack")] ;; <<<----- NEW: I think this is needed!
    [else
     (emit-expr si env (car (begin-body expr)))
     (emit-tail-expr si env (cons 'begin (cdr (begin-body expr))))]))

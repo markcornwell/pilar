@@ -7,25 +7,36 @@ test 1:(make-symbol "foo" "baz") ... ok
 test 2:(symbol? (make-symbol "foo" "bar")) ... ok
 test 3:(symbol->string (make-symbol "foo" "bar")) ... ok
 test 4:(symbol-value (make-symbol "foo" "bar")) ... ok
-test 5:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (s= "foo" 0 "foo" 0)) ... ok
-test 6:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "foo" "foo")) ... ok
-test 7:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "foo" "fo")) ... ok
-test 8:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "" "")) ... ok
-test 9:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "" "fubar")) ... ok
-test 10:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (fx= (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) (s2sym "fubar")) ... ok
+test 5:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f))))))) (s= "foo" 0 "foo" 0)) ... ok
+test 6:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "foo" "foo")) ... ok
+test 7:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "foo" "fo")) ... ok
+test 8:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "" "")) ... ok
+test 9:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0)))) (ss= "" "fubar")) ... ok
+test 10:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (begin (set-cdr! symlist (cons (make-symbol str #f) ())) (car (cdr symlist))) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) (s2sym "fubar")) ... ok
+test 11:(letrec ((s= (lambda (s1 i s2 j) (let ((l1 (string-length s1)) (l2 (string-length s2))) (if (not (fx= l1 l2)) #f (if (fx= i l1) #t (if (char=? (string-ref s1 i) (string-ref s2 j)) (s= s1 (fx+ i 1) s2 (fx+ j 1)) #f)))))) (ss= (lambda (s1 s2) (s= s1 0 s2 0))) (s2sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) (s2sym1 str (cdr symlist)))))) (s2sym (lambda (str) (s2sym1 str (symbols))))) (s2sym "baz")) ... ok
+test 12:(letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n s1 s2 0 (length s1)) #f))) (str->sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (begin (set-cdr! symlist (cons new-sym ())) new-sym)) (str->sym1 str (cdr symlist)))))) (str->sym (lambda (str) (str->sym1 str (symbols))))) (begin (str->sym "fu"))) ... ok
+test 13:(let ((a (cons #t ())) (b (cons #f ()))) (set-cdr! a b) a) ... ok
+test 14:(let ((a (cons #t ())) (b (cons #f ())) (c (cons 42 ()))) (set-cdr! a b) (set-cdr! b c) a) ... ok
+test 15:(letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n s1 s2 0 (length s1)) #f))) (str->sym1 (lambda (str symlist) (if (ss= str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let* ((new-sym (make-symbol str #f)) (new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym)) (str->sym1 str (cdr symlist)))))) (str->sym (lambda (str) (str->sym1 str (symbols))))) (begin (str->sym "fu") (symbols))) ... ok
 Performing symbols tests ...
-test 11:(symbol? (quote foo)) ... ok
-test 12:(symbol? (quote ())) ... ok
-test 13:(symbol? "") ... ok
-test 14:(symbol? (quote (1 2))) ... ok
-test 15:(symbol? (lambda (x) x)) ... ok
-test 16:(symbol? (quote foo)) ... ok
-test 17:(string? (quote foo)) ... ok
-test 18:(pair? (quote foo)) ... ok
-test 19:(vector? (quote foo)) ... ok
-test 20:(null? (quote foo)) ... ok
-test 21:(boolean? (quote foo)) ... ok
-test 22:(procedure? (quote foo)) ... ok
-test 23:(eq? (string->symbol "foo") #t) ... ok
-test 24:(eq? #t (string->symbol "bar")) ... ok
-test 25:(begin (string->symbol "foo") (string->symbol "bar")) ...> 
+test 16:(string->symbol "foo") ... ok
+test 17:(symbol? (quote foo)) ... ok
+test 18:(symbol? (quote ())) ... ok
+test 19:(symbol? "") ... ok
+test 20:(symbol? (quote (1 2))) ... ok
+test 21:(symbol? (lambda (x) x)) ... ok
+test 22:(symbol? (quote foo)) ... ok
+test 23:(string? (quote foo)) ... ok
+test 24:(pair? (quote foo)) ... ok
+test 25:(vector? (quote foo)) ... ok
+test 26:(null? (quote foo)) ... ok
+test 27:(boolean? (quote foo)) ... ok
+test 28:(procedure? (quote foo)) ... ok
+test 29:(eq? (string->symbol "foo") #t) ... ok
+test 30:(eq? #t (string->symbol "bar")) ... ok
+test 31:(begin (string->symbol "foo")) ... ok
+test 32:(string->symbol "nil") ... ok
+test 33:(let ((a (string->symbol "nil")) (b (string->symbol "nil"))) (eq? a b)) ... ok
+test 34:(let ((a (string->symbol "nil")) (b (string->symbol "foo"))) (eq? a b)) ... ok
+test 35:(let ((a (string->symbol "nil")) (b (string->symbol "nil")) (c (string->symbol "nil")) (d (string->symbol "nil")) (e (string->symbol "nil"))) #t) ... ok
+test 36:(let ((a (string->symbol "goo")) (b (string->symbol "ber"))) #t) ...> 
