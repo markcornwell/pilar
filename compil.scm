@@ -1617,33 +1617,33 @@
 ;; should become a callable subroutine
 ;;------------------------------------------
 
-(define-primitive (string=? si env arg1 arg2)
-  (let ([false (unique-label)]
-	[true (unique-label)]
-	[repeat (unique-label)]
-	[done (unique-label)])
-    (emit-expr si env arg1)
-    (emit "    movl %eax, ~s(%esp)" si)   ;; save arg1
-    (emit-expr (- si 4) env arg2)         ;; eax <- arg2[len]
-    (emit "    movl ~a(%esp),%ebx" si)    ;; ebx <- arg1[len]
-    (emit "    cmp %eax,%ebx")            ;; len1 =? len2
-    (emit "    jne ~a" false)             ;; if len differs return false
-    (emit "    movl %eax,%ecx")           ;; use ecx as counter
-    (emit "    sar $~a, %ecx" fxshift)     ;; eliminate tag
-    (emit "    add $4, %eax")             ;; eax -> arg1[0]
-    (emit "    add $4, %ebx")             ;; ebx -> arg2[0]
-    (emit "~a:" repeat)                   ;; repeat  
-    (emit "    movb 0(%eax),%dl")         ;;   
-    (emit "    cmpb 0(%ebx),%dl")         ;;    arg1[i] =? arg2[i]
-    (emit "    jne ~a" false)             ;;    if not return false
-    (emit "    inc %esi")                 ;;    esi++
-    (emit "    loop ~a" repeat)           ;; until (--ecx == 0)
-    (emit "~a:" true)                     
-    (emit "    movl $~a, %eax" bool-t)     ;; return true
-    (emit "    jmp ~a" done)
-    (emit "~a:" false)
-    (emit "    movl $~a, %eax" bool-f)     ;; return false
-    (emit "~a:" done)))
+;; (define-primitive (string=? si env arg1 arg2)
+;;   (let ([false (unique-label)]
+;; 	[true (unique-label)]
+;; 	[repeat (unique-label)]
+;; 	[done (unique-label)])
+;;     (emit-expr si env arg1)
+;;     (emit "    movl %eax, ~s(%esp)" si)   ;; save arg1
+;;     (emit-expr (- si 4) env arg2)         ;; eax <- arg2[len]
+;;     (emit "    movl ~a(%esp),%ebx" si)    ;; ebx <- arg1[len]
+;;     (emit "    cmp %eax,%ebx")            ;; len1 =? len2
+;;     (emit "    jne ~a" false)             ;; if len differs return false
+;;     (emit "    movl %eax,%ecx")           ;; use ecx as counter
+;;     (emit "    sar $~a, %ecx" fxshift)     ;; eliminate tag
+;;     (emit "    add $4, %eax")             ;; eax -> arg1[0]
+;;     (emit "    add $4, %ebx")             ;; ebx -> arg2[0]
+;;     (emit "~a:" repeat)                   ;; repeat  
+;;     (emit "    movb 0(%eax),%dl")         ;;   
+;;     (emit "    cmpb 0(%ebx),%dl")         ;;    arg1[i] =? arg2[i]
+;;     (emit "    jne ~a" false)             ;;    if not return false
+;;     (emit "    inc %esi")                 ;;    esi++
+;;     (emit "    loop ~a" repeat)           ;; until (--ecx == 0)
+;;     (emit "~a:" true)                     
+;;     (emit "    movl $~a, %eax" bool-t)     ;; return true
+;;     (emit "    jmp ~a" done)
+;;     (emit "~a:" false)
+;;     (emit "    movl $~a, %eax" bool-f)     ;; return false
+;;     (emit "~a:" done)))
 
 ;;-----------------------------------------------------------------------------------
 ;; A simple implementation of string literals using assember directives.
@@ -1744,7 +1744,7 @@
 ;;
 ;;-------- ??
 ;;
-;;   (primitive-ref x)
+;;   (primitive-ref x)    
 ;;   (primitive-set! x v)
 ;;
 ;;
@@ -1794,12 +1794,15 @@
 ;; go back to dynamic initialization
 
 (define (emit-init si env)
-  (emit "    .data")
-  (emit "    .globl symbols  # symbol list as a datum ")
-  (emit "    .align 8")
+  (emit "          .data")
+  (emit "          .globl symbols  # symbol list as a datum ")
+  (emit "          .globl sym2str")
+  (emit "          .align 8")
   (emit "symbols:")
-  (emit "    .int 0xFF       # to be patched")
-  (emit "    .text")
+  (emit "          .int 0xFF  # holds (symbols)")
+  (emit "sym2str:")
+  (emit "          .int 0xFF  # to be patched")
+  (emit "          .text")
   (emit-expr si env '(cons (make-symbol "nil" ()) ()))
   (emit "    movl %eax, symbols"))
 

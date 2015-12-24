@@ -22,12 +22,15 @@
     .align 4,0x90
     .globl _L_scheme_entry
 _L_scheme_entry:
-    .data
-    .globl symbols  # symbol list as a datum 
-    .align 8
+          .data
+          .globl symbols  # symbol list as a datum 
+          .globl sym2str
+          .align 8
 symbols:
-    .int 0xFF       # to be patched
-    .text
+          .int 0xFF  # holds (symbols)
+sym2str:
+          .int 0xFF  # to be patched
+          .text
 # emit-expr (cons (make-symbol "nil" ()) ())
 # cons arg1=(make-symbol "nil" ()) arg2=()
 # emit-expr (make-symbol "nil" ())
