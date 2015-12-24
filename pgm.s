@@ -1,22 +1,22 @@
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == eliminate-multi-element-body  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == eliminate-let*  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == eliminate-shadowing  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == vectorize-letrec  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == eliminate-set!  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == close-free-variables  ==>
-# (symbol? (quote foo))
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist)))))
 # == eliminate-quote  ==>
-# (symbol? #<void>)
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ()))) (else (f str (cdr symlist)))))
 # == eliminate-when/unless  ==>
-# (symbol? #<void>)
+# (let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ()))) (else (f str (cdr symlist)))))
 # == eliminate-cond  ==>
-# (symbol? #<void>)
+# (let ((symlist (symbols))) (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist)))))
 # emit-scheme-entry
     .text
     .align 4,0x90
@@ -34,13 +34,13 @@ symbols:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_9
+    jmp _L_27
     .align 8,0x90
-_L_8 :
+_L_26 :
     .int 12
     .ascii "nil"
-_L_9:
-    movl $_L_8, %eax
+_L_27:
+    movl $_L_26, %eax
     orl $6, %eax
     movl %eax, -8(%esp)
 # emit-expr ()
@@ -63,5 +63,19 @@ _L_9:
     add  $8, %ebp
 # cons end
     movl %eax, symbols
-# emit-expr (symbol? #<void>)
-# emit-expr #<void>
+# emit-expr (let ((symlist (symbols))) (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist)))))
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((symlist (symbols)))
+#  body = (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist))))
+# emit-expr (symbols)
+    movl symbols, %eax
+    movl %eax, -8(%esp)  # stack save
+# emit-expr (if (string=? str (symbol->string (car (symlist)))) (car symlist) (if (null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" ())) (f str (cdr symlist))))
+# emit-expr (string=? str (symbol->string (car (symlist))))
+# funcall
+#    si   =-12
+#    env  = ((symlist . -8))
+#    expr = (funcall string=? str (symbol->string (car (symlist))))
+# emit-expr string=?

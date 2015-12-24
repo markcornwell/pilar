@@ -228,7 +228,6 @@
 		(lambda (v) b b* ... ))
        (set! transform-name (getprop 'transform-name '*procedure*)))]))
 
-
 ;;-----------------------------------------------------------------------------------
 ;;                         Special Forms
 ;;-----------------------------------------------------------------------------------
@@ -1609,6 +1608,9 @@
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
 
+
+
+
 ;;-----------------------------------------------------------------------------------
 ;; A simple implementation of string literals using assember directives.
 ;;-----------------------------------------------------------------------------------
@@ -1702,7 +1704,9 @@
 ;;
 ;;   (symbols)   returns a list of all interned symbols
 ;;   (symbol->string <symbol>)
-;;   (string->symbol <string>)
+;;   (symbol-value <symbol>)    ;; returns the value (what is standard for this?)
+;;
+;;   (string->symbol <string>)  ;; this one does the work
 ;;
 ;;-------- ??
 ;;
@@ -1780,7 +1784,7 @@
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
-  (emit "    orl $~s, %al" bool-f)) 
+  (emit "    or $~s, %al" bool-f)) 
 
 (define-primitive (make-symbol si env arg1 arg2)
   (emit "# make-symbol arg1=~s arg2=~s" arg1 arg2);
@@ -1795,6 +1799,23 @@
   (emit "    add  $~s, %ebp" size-symbol)        ;; bump heap ptr
   (emit "# make-symbol end"))
 
+(define-primitive (symbol->string si env arg)
+  (emit "# symbol->string ~s" arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax" (- string-offset symbol-tag)))
+
+(define-primitive (symbol-value si env arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax" (- value-offset symbol-tag))) 
+
+(define-primitive (car si env arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
+
+(define-primitive (cdr si env arg)
+  (emit-expr si env arg)
+  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
+   
 ;;-----------------------------------------------------------------------------------
 ;; procedures and closures
 

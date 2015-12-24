@@ -4,5 +4,7 @@ Copyright (c) 1985-2011 Cadence Research Systems
 > Performing symbols list tests ...
 test 0:(symbols) ... ok
 test 1:(make-symbol "foo" "baz") ... ok
-Performing symbols tests ...
-test 2:(symbol? (quote foo)) ...> 
+test 2:(symbol? (make-symbol "foo" "bar")) ... ok
+test 3:(symbol->string (make-symbol "foo" "bar")) ... ok
+test 4:(symbol-value (make-symbol "foo" "bar")) ... ok
+test 5:(let ((symlist (symbols))) (cond ((string=? str (symbol->string (car (symlist)))) (car symlist)) ((null? (cdr symlist)) (set-cdr! symlist (make-symbol "foo" (quote ())))) (else (f str (cdr symlist))))) ...> 
