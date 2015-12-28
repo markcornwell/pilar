@@ -387,17 +387,17 @@
        (string-set! v1 1 #\d)
        (cons v0 v1)))) => "(\"ab\" . \"cd\")\n"]
 
-  ;;  ISSUE #15 on GITHUB
-  ;; [(let ([n 3])
-  ;;   (let ([v0 (make-string n)])
-  ;;    (let ([v1 (make-string (string-length v0))])
-  ;;      (string-set! v0 (fx- (string-length v0) 3) #\a)
-  ;;      (string-set! v0 (fx- (string-length v1) 2) #\b)
-  ;;      (string-set! v0 (fx- (string-length v0) 1) #\c)
-  ;;      (string-set! v1 (fx- (string-length v1) 3) #\Z)
-  ;;      (string-set! v1 (fx- (string-length v0) 2) #\Y)
-  ;;      (string-set! v1 (fx- (string-length v1) 1) #\X)
-  ;;      (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]      ;; <<--- broken
+;; ;;   ISSUE #15 on GITHUB
+;;   [(let ([n 3])
+;;     (let ([v0 (make-string n)])
+;;      (let ([v1 (make-string (string-length v0))])
+;;        (string-set! v0 (fx- (string-length v0) 3) #\a)
+;;        (string-set! v0 (fx- (string-length v1) 2) #\b)
+;;        (string-set! v0 (fx- (string-length v0) 1) #\c)
+;;        (string-set! v1 (fx- (string-length v1) 3) #\Z)
+;;        (string-set! v1 (fx- (string-length v0) 2) #\Y)
+;;        (string-set! v1 (fx- (string-length v1) 1) #\X)
+;;        (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]      ;; <<--- broken
 
   [(let ([n 1])
      (string-set! (make-string n) (fxsub1 n) (fixnum->char 34))

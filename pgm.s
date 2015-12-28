@@ -1,22 +1,22 @@
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))))
 # == explicit-begins  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-let*  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-shadowing  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == vectorize-letrec  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-set!  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == close-free-variables  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-quote  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-when/unless  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # == eliminate-cond  ==>
-# -536870912
+# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
 # emit-scheme-entry
     .text
     .align 4,0x90
@@ -39,13 +39,13 @@ s2sym:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_19161
+    jmp _L_6569
     .align 8,0x90
-_L_19160 :
+_L_6568 :
     .int 12
     .ascii "nil"
-_L_19161:
-    movl $_L_19160, %eax
+_L_6569:
+    movl $_L_6568, %eax
     orl $6, %eax
     movl %eax, -8(%esp)
 # emit-expr ()
@@ -181,12 +181,12 @@ _L_19161:
 # si = -36
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))
-    movl $_L_19162, 0(%ebp)  # closure label
+    movl $_L_6570, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_19163            # jump around closure body
-_L_19162:
+    jmp _L_6571            # jump around closure body
+_L_6570:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -240,7 +240,7 @@ _L_19162:
 #return from tail (fx= (string-length s1) (string-length s2))
     ret
     .align 4,0x90
-_L_19163:
+_L_6571:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -264,12 +264,12 @@ _L_19163:
 # si = -36
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))
-    movl $_L_19164, 0(%ebp)  # closure label
+    movl $_L_6572, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_19165            # jump around closure body
-_L_19164:
+    jmp _L_6573            # jump around closure body
+_L_6572:
 # emit-tail-expr
 # si=-20
 # env=((i . -16) (s2 . -12) (s1 . -8) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -353,7 +353,7 @@ _L_19164:
 #return from tail (char=? (string-ref s1 i) (string-ref s2 i))
     ret
     .align 4,0x90
-_L_19165:
+_L_6573:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -377,7 +377,7 @@ _L_19165:
 # si = -36
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))
-    movl $_L_19166, 0(%ebp)  # closure label
+    movl $_L_6574, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=(($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # var=$si=
@@ -393,8 +393,8 @@ _L_19165:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_19167            # jump around closure body
-_L_19166:
+    jmp _L_6575            # jump around closure body
+_L_6574:
 # emit-tail-expr
 # si=-24
 # env=((n . -20) (i . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($si= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -456,15 +456,15 @@ _L_19166:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_19168
+    je _L_6576
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($si= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # tail return
-    jmp _L_19169
-_L_19168:
+    jmp _L_6577
+_L_6576:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($si= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -514,7 +514,7 @@ _L_19168:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_19170
+    je _L_6578
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($si= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -587,18 +587,18 @@ _L_19168:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-60  delta=36
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_19171
-_L_19170:
+    jmp _L_6579
+_L_6578:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($si= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # tail return
-_L_19171:
-_L_19169:
+_L_6579:
+_L_6577:
     .align 4,0x90
-_L_19167:
+_L_6575:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -622,7 +622,7 @@ _L_19167:
 # si = -36
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))
-    movl $_L_19172, 0(%ebp)  # closure label
+    movl $_L_6580, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=(($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # var=$slen=
@@ -638,8 +638,8 @@ _L_19167:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_19173            # jump around closure body
-_L_19172:
+    jmp _L_6581            # jump around closure body
+_L_6580:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) ($si<n= . 8) ($slen= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -705,7 +705,7 @@ _L_19172:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_19174
+    je _L_6582
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($slen= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -771,17 +771,17 @@ _L_19172:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-44  delta=20
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_19175
-_L_19174:
+    jmp _L_6583
+_L_6582:
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) ($si<n= . 8) ($slen= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # tail return
-_L_19175:
+_L_6583:
     .align 4,0x90
-_L_19173:
+_L_6581:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -805,7 +805,7 @@ _L_19173:
 # si = -36
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist))))))
-    movl $_L_19176, 0(%ebp)  # closure label
+    movl $_L_6584, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=(($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # var=$ss=
@@ -821,8 +821,8 @@ _L_19173:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_19177            # jump around closure body
-_L_19176:
+    jmp _L_6585            # jump around closure body
+_L_6584:
 # emit-tail-expr
 # si=-16
 # env=((symlist . -12) (str . -8) ($str->sym1 . 8) ($ss= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -893,7 +893,7 @@ _L_19176:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_19178
+    je _L_6586
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) ($str->sym1 . 8) ($ss= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -908,8 +908,8 @@ _L_19176:
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_19179
-_L_19178:
+    jmp _L_6587
+_L_6586:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) ($str->sym1 . 8) ($ss= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -930,7 +930,7 @@ _L_19178:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_19180
+    je _L_6588
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) ($str->sym1 . 8) ($ss= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -1028,8 +1028,8 @@ _L_19178:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_19181
-_L_19180:
+    jmp _L_6589
+_L_6588:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) ($str->sym1 . 8) ($ss= . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -1079,10 +1079,10 @@ _L_19180:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  size=0   si=-36  delta=20
     jmp *-2(%edi)  # tail-funcall
-_L_19181:
-_L_19179:
+_L_6589:
+_L_6587:
     .align 4,0x90
-_L_19177:
+_L_6585:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1099,7 +1099,7 @@ _L_19177:
 # si = -28
 # env = (($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # expr = (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))
-    movl $_L_19182, 0(%ebp)  # closure label
+    movl $_L_6590, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=(($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
 # var=$str->sym1
@@ -1109,8 +1109,8 @@ _L_19177:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_19183            # jump around closure body
-_L_19182:
+    jmp _L_6591            # jump around closure body
+_L_6590:
 # emit-tail-expr
 # si=-12
 # env=((str . -8) ($str->sym1 . 4) ($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
@@ -1171,14 +1171,295 @@ _L_19182:
 # emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_19183:
+_L_6591:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
 #   env=(($str->sym1 . -24) ($ss= . -20) ($si<n= . -16) ($si= . -12) ($slen= . -8))
     movl %eax, s2sym
-# emit-expr -536870912
-    movl $-2147483648, %eax     # immed -536870912
+# emit-expr (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))))
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((n 3))
+#  body = (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))))
+# emit-expr 3
+    movl $12, %eax     # immed 3
+    movl %eax, -8(%esp)  # stack save
+# emit-expr (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))))
+# emit-let
+#  si   = -12
+#  env  = ((n . -8))
+#  bindings = ((v0 (make-string n)))
+#  body = (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))
+# emit-expr (make-string n)
+# make-string len=n
+# emit-expr n
+# emit-variable-ref
+# env=((n . -8))
+# var=n
+    movl -8(%esp), %eax  # stack load n
+# end emit-variable-ref
+    movl %eax, %esi
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    orl $6, %eax
+    sar $2, %esi
+    add $4, %esi
+    add $7, %esi
+    andl $-8, %esi
+    add  %esi, %ebp
+# make-string end
+    movl %eax, -12(%esp)  # stack save
+# emit-expr (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1)))
+# emit-let
+#  si   = -16
+#  env  = ((v0 . -12) (n . -8))
+#  bindings = ((v1 (make-string (string-length v0))))
+#  body = (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-expr (make-string (string-length v0))
+# make-string len=(string-length v0)
+# emit-expr (string-length v0)
+# emit-expr v0
+# emit-variable-ref
+# env=((v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    movl %eax, %esi
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    orl $6, %eax
+    sar $2, %esi
+    add $4, %esi
+    add $7, %esi
+    andl $-8, %esi
+    add  %esi, %ebp
+# make-string end
+    movl %eax, -16(%esp)  # stack save
+# emit-expr (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v0 (fx- (string-length v0) 3) #\a)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v0) 3)
+# emit-expr 3
+    movl $12, %eax     # immed 3
+    movl %eax, -20(%esp)
+# emit-expr (string-length v0)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\a
+    movl $24847, %eax     # immed #\a
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v0 (fx- (string-length v1) 2) #\b) (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v0 (fx- (string-length v1) 2) #\b)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v1) 2)
+# emit-expr 2
+    movl $8, %eax     # immed 2
+    movl %eax, -20(%esp)
+# emit-expr (string-length v1)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\b
+    movl $25103, %eax     # immed #\b
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v0 (fx- (string-length v0) 1) #\c) (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v0 (fx- (string-length v0) 1) #\c)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v0) 1)
+# emit-expr 1
+    movl $4, %eax     # immed 1
+    movl %eax, -20(%esp)
+# emit-expr (string-length v0)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\c
+    movl $25359, %eax     # immed #\c
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v1 (fx- (string-length v1) 3) #\Z) (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v1 (fx- (string-length v1) 3) #\Z)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v1) 3)
+# emit-expr 3
+    movl $12, %eax     # immed 3
+    movl %eax, -20(%esp)
+# emit-expr (string-length v1)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\Z
+    movl $23055, %eax     # immed #\Z
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v1 (fx- (string-length v0) 2) #\Y) (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v1 (fx- (string-length v0) 2) #\Y)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v0) 2)
+# emit-expr 2
+    movl $8, %eax     # immed 2
+    movl %eax, -20(%esp)
+# emit-expr (string-length v0)
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\Y
+    movl $22799, %eax     # immed #\Y
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+# emit-begin
+#   expr=(begin (string-set! v1 (fx- (string-length v1) 1) #\X) (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (string-set! v1 (fx- (string-length v1) 1) #\X)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr (fx- (string-length v1) 1)
+# emit-expr 1
+    movl $4, %eax     # immed 1
+    movl %eax, -20(%esp)
+# emit-expr (string-length v1)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    subl -20(%esp), %eax
+    movl %eax, -24(%esp)
+# emit-expr #\X
+    movl $22543, %eax     # immed #\X
+    movl -20(%esp), %ebx
+    movl -24(%esp), %esi
+    sar $2, %esi
+    movb  %ah, -2(%ebx,%esi)
+# emit-expr (begin (cons v0 v1))
+# emit-begin
+#   expr=(begin (cons v0 v1))
+#   env=((v1 . -16) (v0 . -12) (n . -8))
+# emit-expr (cons v0 v1)
+# cons arg1=v0 arg2=v1
+# emit-expr v0
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v0
+    movl -12(%esp), %eax  # stack load v0
+# end emit-variable-ref
+    movl %eax, -20(%esp)
+# emit-expr v1
+# emit-variable-ref
+# env=((v1 . -16) (v0 . -12) (n . -8))
+# var=v1
+    movl -16(%esp), %eax  # stack load v1
+# end emit-variable-ref
+    movl %eax, 4(%ebp)
+    movl -20(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+# emit-expr (begin)
+# emit-begin
+#   expr=(begin)
+#   env=((v1 . -16) (v0 . -12) (n . -8))
     ret
     .text
     .align 4,0x90
