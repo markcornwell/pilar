@@ -8,22 +8,16 @@ breakpoint set --name  scheme_entry
 dis
 run
 
-
 register read eax    - current return value
 register read esp    - current stack pointer
 register read ebp    - current heap pointer
 
-memory read 0x36000                        - read the base of the heap
-memory read 0x36000 0x36100         - read a bigger section of the heap
+memory read 0x36000                      - read the base of the heap
+memory read 0x36000 0x36100       - read a bigger section of the heap
 
 dis -s 0x02c91
 
-
-
-
 Examples
-
-
 
 (lldb) memory read 0x36000
 0x00036000: 91 2c 00 00 00 00 00 00 00 00 00 00 00 00 00 00  .,..............
@@ -73,8 +67,3 @@ Take apart the stack frames as follows:
    esp-8     0x00036002      
    esp-4       -0-  
    esp ->    0x00002cf0
-
-
-	    
-
-	    

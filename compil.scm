@@ -139,10 +139,10 @@
 (load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
-(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
+;(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
-(load "tests/tests-2.1-req.scm")   ;; procedure
+(load "tests/tests-2.1-req.scm")   ;; procedures and closures
 (load "tests/tests-1.9-req.scm")   ;; begin/implicit begin set-car! set-cdr! eq? vectors
 (load "tests/tests-1.8-req.scm")   ;; cons procedures deeply nested procedures
 (load "tests/tests-1.7-req.scm")   ;; more binary primitives
@@ -181,7 +181,7 @@
 ;;-----------------------------------------------------------------------------------
 
 (define *transform-list*         ;; all transforms get applied in the order below
-  (list 'eliminate-multi-element-body  ;; add implicit begin to make bodies a single expression
+  (list 'explicit-begins         ;; add implicit begin to make bodies a single expression
 	'eliminate-let*          ;; transform all let* to nested lets	
 	'eliminate-shadowing     ;; rename variables to make names unique
 	'vectorize-letrec        ;; rewrite letrec as let with vars transformed to vectors
@@ -243,14 +243,13 @@
 ;;                         Special Forms
 ;;-----------------------------------------------------------------------------------
 ;; Used by eliminate-closure and perhaps other places.
-;;
+;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
   (memq x '(quote begin if let let* lambda letrec closure)))
 
-
 ;;-----------------------------------------------------------------------------------
-;;                        Eliminate-multi-element-body
+;;                        Explicit Begins
 ;;-----------------------------------------------------------------------------------
 ;;
 ;; Normalize let and lambda expressions to wrap multi element body in a begin
@@ -267,18 +266,18 @@
 ;;  (lambda (v ...) E)
 ;;-----------------------------------------------------------------------------------
 
-(define-transform (eliminate-multi-element-body expr)
+(define-transform (explicit-begins expr)
   (cond
    [(or (let? expr) (letrec? expr) (let*? expr))
     (let* ([letform (car expr)]
 	   [bindings (let-bindings expr)]
 	   [vars (map car bindings)]
 	   [exprs (map cadr bindings)]
-	   [new-exprs (map eliminate-multi-element-body exprs)]
+	   [new-exprs (map explicit-begins exprs)]
 	   [long-body (cddr expr)]
 	   [new-body (if (fx> (length long-body) 1)
-			 (eliminate-multi-element-body (cons 'begin long-body))
-		         (eliminate-multi-element-body (car long-body)))]
+			 (explicit-begins (cons 'begin long-body))
+		         (explicit-begins (car long-body)))]
            [new-bindings (map list vars new-exprs)])
       (list letform new-bindings new-body))]
    [(lambda? expr)
@@ -289,8 +288,8 @@
 			 (car long-body))])
       (list 'lambda formals new-body))]      
    [(pair? expr)
-    (cons (eliminate-multi-element-body (car expr))
-	  (eliminate-multi-element-body (cdr expr)))]
+    (cons (explicit-begins (car expr))
+	  (explicit-begins (cdr expr)))]
    [else expr]))
 
 ;;-----------------------------------------------------------------------------------
@@ -1043,6 +1042,7 @@
 (define (emit-scheme-entry env expr) 
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
+  (emit "    movl $0x66666666, %edi  # dummy for debugging")
   (emit-init (- (* 2 wordsize)) env)  
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
@@ -1412,6 +1412,8 @@
 ;;                           |     cdr      | 4
 ;;                           +--------------+
 ;;
+;;  Key Invariant:  %epb points to next open slot in the heap
+;;                 
 ;;-----------------------------------------------------------------------------------
 
 (define-primitive (pair? si env arg)
@@ -1457,8 +1459,6 @@
   (emit-expr (- si wordsize) env obj)  ;; eax = obj
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
   (emit "    movl %eax, ~s(%ebx)" (- cdr-offset pair-tag)))
-
-
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Vectors
@@ -1803,7 +1803,7 @@
   (emit "          .align 8")
   (emit "symbols:")
   (emit "          .int 0xFF  # holds (symbols)")
-  (emit "          .align 8")   ;;  does this need to be aligned ???
+  (emit "          .align 8")   ;;  does this really need to be aligned ???
   (emit "s2sym:")
   (emit "          .int 0xFF  # holds pgm-str-sym")
   (emit "          .text")
@@ -1813,47 +1813,84 @@
   (emit "    movl %eax, s2sym")
   )
 
-(define expr-str->sym    ;; string to symbol  
-  '(letrec
-     ([s= (lambda (s1 i s2 j) 
-  	    (let ([l1 (string-length s1)]
-  		  [l2 (string-length s2)])
-  	      (if (not (fx= l1 l2))
-  		  #f
-  		  (if (fx= i l1)
-  		      #t
-  		      (if (char=? (string-ref s1 i)
-  				  (string-ref s2 j))
-  			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
-  			  #f)))))]
-      [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
-      [str->sym1 (lambda (str symlist)   ;; assumed symlist is never empty
-  		(if (ss= str (symbol->string (car symlist)))
-  		    (car symlist)
-  		    (if (null? (cdr symlist))
-  			(let ([new-sym (make-symbol str #f)])
-  			  (begin
-  			    (set-cdr! symlist (cons new-sym ()))
-  			    new-sym))
-  			(str->sym1 str (cdr symlist)))))]
-      [str->sym (lambda (str) (str->sym1 str (symbols)))])
-     str->sym))
+;;-------------------------------------------------------------------------
+;; This expression will be compiled by our pilar scheme compiler, not by
+;; petite scheme! This is a big step toward getting the compiler to compile
+;; itself.
+;;
+;; The generated code gets incorporated into our string->symbol primitive.
+;;-------------------------------------------------------------------------
+
+(define expr-str->sym   ;; string to symbol
+    '(letrec
+	 ([$slen= (lambda (s1 s2)
+		   (fx= (string-length s1)
+			(string-length s2)))]
+	  
+	  [$si=  (lambda (s1 s2 i)
+		  (char=? (string-ref s1 i)
+			  (string-ref s2 i)))]
+	  
+	  [$si<n= (lambda (s1 s2 i n)
+		   (if (fx= i n)
+		       #t
+		       (if ($si= s1 s2 i)
+			   ($si<n= s1 s2 (fx+ i 1) n)
+		           #f)))]
+	  
+	  [$ss= (lambda (s1 s2)
+		 (if ($slen= s1 s2)
+		     ($si<n= s1 s2 0 (string-length s1))
+		     #f))]
+
+	  [$str->sym1  (lambda (str symlist)   ;; assume symlist is never empty
+			(if ($ss= str (symbol->string (car symlist)))
+			    (car symlist)
+			    (if (null? (cdr symlist))
+				(let* ([new-sym (make-symbol str #f)]
+                                       [new-cdr (cons new-sym ())])
+				  (begin
+				    (set-cdr! symlist new-cdr)
+				    new-sym))
+				($str->sym1 str (cdr symlist)))))])
+	  
+	 (lambda (str)
+	   ($str->sym1 str (symbols)))))
+
+;; (define expr-str->sym    ;; string to symbol  
+;;   '(letrec
+;;      ([s= (lambda (s1 i s2 j) 
+;;   	    (let ([l1 (string-length s1)]
+;;   		  [l2 (string-length s2)])
+;;   	      (if (not (fx= l1 l2))
+;;   		  #f
+;;   		  (if (fx= i l1)
+;;   		      #t
+;;   		      (if (char=? (string-ref s1 i)
+;;   				  (string-ref s2 j))
+;;   			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
+;;   			  #f)))))]
+;;       [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
+;;       [str->sym1 (lambda (str symlist)   ;; assumed symlist is never empty
+;;   		(if (ss= str (symbol->string (car symlist)))
+;;   		    (car symlist)
+;;   		    (if (null? (cdr symlist))
+;;   			(let ([new-sym (make-symbol str #f)])
+;;   			  (begin
+;;   			    (set-cdr! symlist (cons new-sym ()))
+;;   			    new-sym))
+;;   			(str->sym1 str (cdr symlist)))))]
+;;       [str->sym (lambda (str) (str->sym1 str (symbols)))])
+;;      str->sym))
 
 (define-primitive (string->symbol si env exp)
   (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
 
 (define-primitive (primitive-str->sym si env)
-  (emit "    movl s2sym, %eax")
- ;; (emit "    movl 0(%eax), %eax") ;; dereference ???
+  (emit "    movl s2sym, %eax")) ;; does this move the address or the contents into eax?
 
-  )    ;; does this move the address or the contents into eax?
-
-;; (symbols) => a list of all interned symbols
-(define-primitive (symbols si env)
-  (emit "    movl symbols, %eax")
-  ;;(emit "    movl 0(%eax), %eax")  ;; dereference???
-  )
-
+(define-primitive (symbols si env) ;; (symbols) => a list of all interned symbols
+  (emit "    movl symbols, %eax"))
 
 (define-primitive (symbols-set! si env exp)
   (emit-expr si env exp)
@@ -1899,7 +1936,7 @@
   (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
    
 ;;-----------------------------------------------------------------------------------
-;; procedures and closures
+;;                            procedures and closures
 ;;-----------------------------------------------------------------------------------
 (define-primitive (procedure? si env expr)
   (emit-expr si env expr)
@@ -1940,7 +1977,9 @@
   ))
 
 (define (check-primcall-args prim args)
-    (= (length args) (getprop prim '*arg-count*)))
+  (if (eq? (length args) (getprop prim '*arg-count*))
+      #t
+      (error prim (format "wrong number of arugments to ~s" prim))))
 
 (define unique-label
   (let ([count 0])
@@ -2208,9 +2247,9 @@
 ;; args     +------------+                   args      +------------+
 ;;     |    |   arg 1    |  %esp - 28           |      |   arg 1    |  %esp - 8      (si - 12) -> si' - 8
 ;;     +--  +------------+                      +--    +------------+
-;;          |            |  %esp - 24                  |  old edi   |  %esp - 4      (si - 8)  -> si' - 4
+;;          |            |  %esp - 24                  |  closure   |  %esp - 4      (si - 8)  -> si' - 4
 ;;          +------------+                             +------------+
-;;          |            |  %esp - 20        base -->  |  old eip   |  %esp          (si + 4)  -> si'
+;;          |            |  %esp - 20        base -->  |  return    |  %esp          (si + 4)  -> si'
 ;;     +--  +------------+                             +------------+
 ;;     |    |  local 3   |  %esp - 16    +---------->                              (C) How callee's frame
 ;;     |    +------------+               |                                             looks to caller
@@ -2220,7 +2259,7 @@
 ;;     +--  +------------+               |         old edi = saved closure ptr
 ;;          |  closure   |  %esp - 4     |         Note that args/locals
 ;;          +------------+               |           start at %esp - 8
-;; base --> |  old eip   |  %esp    <----+
+;; base --> |  return    |  %esp    <----+
 ;;          +------------+                         si = offset to top stack elt when funcall happens
 ;;           high address                               (in this example -16)  
 ;;                       
@@ -2257,13 +2296,13 @@
   
   (define (emit-arguments si env args)
     (unless (empty? args)
-        (emit-expr si env (first args))                              ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))  ;; save %eax as evaluated arg
-        (emit-arguments (- si wordsize) env (rest args))))           ;; recursively emit the rest
+        (emit-expr si env (first args))                            ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)  # arg ~a" si (first args))  ;; save %eax as evaluated arg
+        (emit-arguments (- si wordsize) env (rest args))))         ;; recursively emit the rest
   
   (define (emit-adjust-base delta-si)
     (unless (eq? delta-si 0)
-	    (emit "    add $~s, %esp    # adjust base" delta-si)))
+	    (emit "    add $~s, %esp   # adjust base" delta-si)))
   
   (emit "# funcall")
   (emit "#    si   =~s" si)
@@ -2276,60 +2315,102 @@
   (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
 
   ;; evaluate the arguments ar1 ... argN and push on stack
-  (emit-arguments (- si 12) env (funcall-args expr)) 
+  (emit-arguments (- si 12) env (funcall-args expr))
 
-  ;; Load new fram closure into edi
+  ;; Load new frame closure into edi
   (emit "    movl ~s(%esp), %edi   # load new closure to %edi" (- si 8))
 
   (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
-  ;;---------------------------------------------------------------------------------
-  ;; This is the only place "call" appears in the entire compiler.
-  ;; Call acts just like.
-  ;;
-  ;;     add $-4, %esp        # bump stack ptr
-  ;;     movl $cont, 0(%esp)  # save return point
-  ;;     jmp *-2(%esp)        # jump to the label  
-  ;;  cont:
-  ;;
-  ;; which is less esoteric than understanding call
-  ;;
-  ;; CAUTION: call is going to bump %esp before saving indirect
-  ;;          through it.
-  ;;---------------------------------------------------------------------------------
-
-  ;; call is going to bump %esp by 4 and save return there.
+  ;; call first bumps %esp by 4 and then saves %eip at 0(%esp).  
   (emit "    call *-2(%edi)        # call thru closure ptr")
-                                  ;; closure ptr in %eax since arg1 emitted last
+                                   ;; closure ptr in %eax since arg1 emitted last
   
-  (emit-adjust-base (- si))        ;; after return the value of %esp is adjusted back
+  (emit-adjust-base (- si))        ;; After return the value of %esp is adjusted back
+                                   ;; for tail recursive version below, we do not adjust
+                                   ;; adjust the base, we shift args instead
   (emit "    movl -4(%esp), %edi   # restore closure frame ptr")
   )
 
 ;;-----------------------------------------------------------------------------------
+;; In tail position, we do not need to allocate a new frame.  Instead, we will re-use
+;; the old frame.  We keep the return pointer.  But we will reset the frame slots for
+;; the current closure and args.  We mimic the implementation above to build the
+;; new frame, but then we slide the new frame down to overwrite the caller's frame,
+;; keeping only the frame's return address.
+;;-----------------------------------------------------------------------------------
 
-(define (emit-tail-funcall si env expr) 
-  (define (emit-arguments si args)
+(define (emit-tail-funcall si env expr)
+  
+  (define (emit-arguments si env args)
     (unless (empty? args)
         (emit-expr si env (first args))                ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg " si)   ;; save %eax as evaluated arg    
-        (emit-arguments (- si wordsize) (rest args)))) 
-  (define (emit-shift-args argc si delta)
-    (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
-    (unless (zero? argc)
-	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
+        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))   ;; save %eax as evaluated arg    
+        (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
+  
+  (define (emit-shift-frame size si delta)
+    (emit "# emit-shift-args:  size=~s   si=~s  delta=~s" size si delta)
+    (unless (zero? size)
+	   (emit "    mov ~a(%esp), %ebx  # shift frame cell" si)
 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
+	   (emit-shift-frame (- size 1) (- si wordsize) delta)))
+  
   (emit "# emit-tail-funcall")
   (emit "#    si   =~s" si)
   (emit "#    env  = ~s" env)
   (emit "#    expr = ~s" expr)
-  (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values 
-  (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr))
-  (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
-  (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))
+
+  ;; Evaluate the funcall-oper and save it on the stack
+  (emit-expr si env (funcall-oper expr))
+  (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in next closure slot" si)
+
+  ;; Evaluate the arguments arg[0] ... arg[k-1] and put them on stack above oper 
+  (emit-arguments (- si 4) env (funcall-args expr))
+
+  ;; Load new frame closure into edi
+  (emit "    movl ~s(%esp), %edi   # load new closure to %edi" si)
+
+  ;; shift the whole frame (closure + args) down by |si|-4
+  (emit-shift-frame (1+ (length (funcall-args expr)))  ;; size
+		    si                                 ;; si
+		    (- (abs si) 4))                    ;; delta
+  
   (emit "    jmp *-2(%edi)  # tail-funcall")
-  )   ;; jump to closure entry point
+  )  ;; jump to closure entry point
+
+
+;; ;; In tail position, we do not need to allocate an frame, we will re-use the old
+;; ;; frame.  We keep the return pointer, but putting in a new current closure, args
+;; ;; and local vars
+
+;; (define (emit-tail-funcall si env expr)
+;;   (define (emit-arguments si args)
+;;     (unless (empty? args)
+;;         (emit-expr si env (first args))                ;; evaluated arg in %eax
+;;         (emit "    mov %eax, ~s(%esp)    # arg " si)   ;; save %eax as evaluated arg    
+;;         (emit-arguments (- si wordsize) (rest args)))) ;; recursively emit the rest
+;;   (define (emit-shift-args argc si delta)
+;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
+;;     (unless (zero? argc)
+;; 	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
+;; 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
+;; 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
+;;   (emit "# emit-tail-funcall")
+;;   (emit "#    si   =~s" si)
+;;   (emit "#    env  = ~s" env)
+;;   (emit "#    expr = ~s" expr)
+;;   ;; (why do we not evaluate the funcall-op and stash it in exp+si-8?
+;;   ;; because a tail funcall assumes the closure value is already there and will re-use it. But is it????)
+;;   ;; Evaluate the funcall and 
+;;   (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values
+
+;;   ;; Why so fancy?  because we are evaluating this after evaluating the args
+;;   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr)) 
+  
+;;   (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
+;;   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))  ;; VERFIY THIS
+;;   (emit "    jmp *-2(%edi)  # tail-funcall")
+;;   )   ;; jump to closure entry point
 
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
@@ -2363,12 +2444,34 @@
 ;;-----------------------------------------------------------------------------------
 ;;                                      Closures
 ;;-----------------------------------------------------------------------------------
-;; A closure is the result of making the free variables in a lambda expression
-;; explicit.
+;;                       low addr
+;;                   +--------------+                     Closure tag is 010
+;;    closure-2  --->|    label     |   %ebp              so closure-2 is pointer
+;;                   +--------------+                     to an 8-byte aligned
+;;                   |  free var 0  |   %ebp + 4          memory location.
+;;                   +--------------+
+;;                   |  free var 1  |   %ebp + 8          Element at the location
+;;                   +--------------+                     is a label that be passed
+;;                   |     ...      |    ...              to jmp or call to execute 
+;;                   +--------------+                     a procedure
+;;                   | free var k-1 |   %ebp + 4 * k
+;;                   +--------------+                     The closure value in the
+;;                       high addr                        stack is the tagged
+;;                                                        closure form.
 ;;
-;;   (closure (formal ...) (freevar ...) body)
+;; A closure form is the result of making the free variables in a lambda expression
+;; explicit by a process called "free variable analysis".  A pre-processing pass
+;; converts all expressions (and sub-espressions) of the form
 ;;
-;; Basically the closure will compile to code like the following
+;;   (lambda (V[0] ... V[j-1] body)                       where V[i] are the j
+;;                                                        formal variables
+;;
+;;  to corresponding expressions of the form
+;;
+;;   (closure (V[0] ... V[j-1]) (W[0] ...W[k-1]) body)    where W[i] are the k
+;;                                                        variables free in body
+;;
+;; The closure will compile to code like the following
 ;;
 ;;   Alloc heap space for label + free variables
 ;;   Set the label field to L_yy
@@ -2385,43 +2488,16 @@
 ;;-----------------------------------------------------------------------------------
 
 (define (closure? expr)
-   (and (pair? expr) (symbol? (car expr)) (eq? (car expr) 'closure)))
+   (and (pair? expr) (eq? (car expr) 'closure)))
 
-(define closure-formals cadr)
-(define closure-freevars caddr)
-(define closure-body cdddr)
+;(define closure-formals first)
+(define closure-formals second)
+;(define closure-freevars second)
+(define closure-freevars third)
+;(define closure-body cdddr)        ;; ISSUE -- fixup to uniform style of whole expressions to emit
+(define closure-body fourth)
 
-(define (emit-close-free-vars ci env vars)
-  (unless (null? vars)
-	  (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
-	      (begin
-		(emit-variable-ref env (car vars))                 ;; reference the value of the first variable
-		(emit "   movl  %eax, ~s(%ebp)" ci)))              ;; copy that value to the closure cell
-	  (emit-close-free-vars (+ wordsize ci) env (cdr vars))))  ;; recursively process remaining free vars
-
-(define (extend-closure-env env frev)
-  (let f ([frev frev] [ci wordsize] [env env])
-    (cond
-     [(empty? frev) env]
-     [else
-      (f (rest frev)
-	 (+ ci wordsize)
-	 (extend-env ci env (first frev)))])))
-
-(define (extend-formals-env env fmsl)
-   (let f ([fmls fmsl] [ci (* -2 wordsize)] [env env])
-    (cond
-     [(empty? fmls) env]
-     [else
-      (f (rest fmls)
-	 (- ci wordsize)
-	 (extend-env ci env (first fmls)))]))) 
-
-(define (emit-closure si env expr)  
-  (define (align-to-8-bytes i)
-    (if (zero? (remainder i 8))
-	i
-	(+ i (- 8 (remainder i 8))))) 
+(define (emit-closure si env expr)   ;; <<----- THIS IS THE CORE ENTRY POINT
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
@@ -2429,30 +2505,47 @@
   (let* ([formals (closure-formals expr)]
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
-	 [closed-env (extend-closure-env '() freevars)]
+      ;; [closed-env (extend-closure-env '() freevars)] ;; why not use full env?
+	 [closed-env (extend-closure-env env freevars)]
 	 [entry-point (unique-label)]
 	 [exit-point (unique-label)]
-	 [size (* wordsize (+ 1 (length freevars)))])
+	 [k (length freevars)]
+	 [size (* 4 (+ k 1))])   ;; 4*(k + 1)
+
+    ;;-----------------------------------------------------------
+    ;; Build a closure object in the heap
+    ;;-----------------------------------------------------------
     
     ;; Set the label field to L_yy
-    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)
+    (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)  ;; fills %ebp + 0 <-- label
     
     ;; Copy the free vars values from the binding environment to the closure
-    (emit-close-free-vars wordsize env freevars)
+    ;; or reserve space if unbound.  Q: what happens with the unbound vars?
+    (emit-close-free-vars 4 env freevars)  ;; fills %ebp + 4 ... %ebp + (4*k)
     
     ;; Return the tagged pointer to the heap allocated content
-    (emit "    movl %ebp, %eax    # return base ptr")
-    (emit "    add $~s, %eax      # closure tag"  closure-tag)
-    (emit "    add $~s, %ebp      # bump ebp" (align-to-8-bytes size))
-    (emit "    jmp ~a"  exit-point)  ;; Jump around code for closure body
+    (emit "    movl %ebp, %eax   # get the base ptr")
+    (emit "    add $~s, %eax     # add the closure tag"  closure-tag)
+    (emit "    add $~s, %ebp     # bump ebp" (align-to-8-bytes size))
+    (emit "    jmp ~a            # jump around closure body"  exit-point) 
+
+    ;;------------------------------------------------------------------
+    ;; Build the code to execute the closure body using the closed
+    ;; environment so any free variable references all resolve to cells
+    ;; in the closure object
+    ;;------------------------------------------------------------------
     
-    ;; note that we use the closed environment so free variable
-    ;; references all resolve to the cells in the closure object
-    (emit "~a:" entry-point)    
-    (let f ([fmls formals] [si (- (* 2 wordsize))] [env closed-env])
+    (emit "~a:" entry-point)         ;; this is the label that we put in the closure
+    (let f ([fmls formals]
+	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
+	    [env closed-env])        ;; <<- ISSUE: Closed Environment is WRONG!
+                                     ;;     Need to Shadow closure vars not eliminiate
+                                     ;;     all vars.  O/W can't copy their bindings.
+       
       (cond
        [(empty? fmls)
-	(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin [CLEAN UP??]
+      ;(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin [CLEAN UP??]
+	(emit-tail-expr si env body)]  ;; <<--- heart of body generation
        [else
 	(f (rest fmls)
 	   (- si wordsize)
@@ -2465,4 +2558,35 @@
   (emit-closure si env expr)
   (emit "   ret"))
 
+ (define (extend-formals-env env fmsl)
+   (let f ([fmls fmsl] [ci (* -2 wordsize)] [env env])  ;; Why -2 * wordsize??  = -8
+    (cond
+     [(empty? fmls) env]
+     [else
+      (f (rest fmls)
+	 (- ci wordsize)
+	 (extend-env ci env (first fmls)))]))) 
 
+(define (emit-close-free-vars ci env vars)
+  (unless (null? vars)
+	  (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
+	      (begin
+		(emit-variable-ref env (car vars))                     ;; reference the value of the first variable
+		(emit "   movl  %eax, ~s(%ebp)  # ~s" ci (car vars))) ;; copy that value to the closure cell
+	      (emit "# WARNING: free var ~s not defined in the environmnet" (car vars)))
+	  (emit-close-free-vars (+ 4 ci) env (cdr vars))))  ;; recursively process remaining free vars
+
+(define (extend-closure-env env frev)
+  (let f ([frev frev] [ci wordsize] [env env])
+    (cond
+     [(empty? frev) env]
+     [else
+      (f (rest frev)
+	 (+ ci wordsize)
+	 (extend-env ci env (first frev)))])))
+
+
+(define (align-to-8-bytes i)          ;; rounds i up to first multiple of 8
+    (if (zero? (remainder i 8))
+	i
+	(+ i (- 8 (remainder i 8)))))
