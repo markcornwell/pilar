@@ -1,4 +1,11 @@
-
+(add-tests-with-string-output "begin border case"
+   [12 => "12\n"]
+   [(begin 12) => "12\n"]			      
+   [(begin (begin) 12) => "12\n"]
+   [(begin (begin) (begin) (begin) (begin) #f) => "#f\n"]
+   [(begin (begin) (begin) (begin (begin (begin (begin)))) (begin #\A)) => "#\\A\n"]
+   [(begin (begin (begin (begin (begin (begin (begin (begin #f) 42))))))) => "42\n"]
+   )
 
 (add-tests-with-string-output "letrec"
   [(letrec () 12) => "12\n"]
