@@ -1,4 +1,4 @@
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------
 ;;
 ;;                                 Pilar: A Scheme Compiler
 ;;
@@ -9,9 +9,9 @@
 ;;
 ;;                        Copyright (C) 2015, All Rights Reserved
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;
 ;; Runs under petite chez scheme.  See makefile for details.
 ;;
@@ -52,14 +52,14 @@
 ;;  code generation.  Stage II takes this IL and generates x86 assembly by recursive
 ;;  descent.
 ;;
-;;              +--------------+         +-----------+           +-----------+
-;;              |   Source     |         |  Code     |           |   GNU     |
-;;   Source  -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
-;;     SL       |  Transforms  |         |           |    ASM    |           |
-;;              +--------------+         +-----------+           +-----------+
-;;                 Stage  I                Stage II
+;;             +--------------+         +-----------+           +-----------+
+;;             |   Source     |         |  Code     |           |   GNU     |
+;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;     SL      |  Transforms  |         |           |    ASM    |           |
+;;             +--------------+         +-----------+           +-----------+
+;;                Stage  I                Stage II
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
 ;;
 ;;   E -> I | V | P
@@ -80,7 +80,7 @@
 ;;
 ;;                                     Figure 1
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
 ;;   E   ->  I | V | P
@@ -97,7 +97,7 @@
 ;;
 ;;                                    Figure 2
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
 ;;  paper (Ghuloum 2006)
@@ -116,9 +116,9 @@
 ;; 1.2 Immediate Constants
 ;; 1.1 Integers
 
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 
 (load "tests-driver.scm")
 
@@ -139,7 +139,7 @@
 (load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
-;(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
+(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
 (load "tests/tests-2.1-req.scm")   ;; procedures and closures
@@ -580,7 +580,7 @@
 ;;
 ;;-----------------------------------------------------------------------------------
 
-;; ISSUE: Rewrite this.
+;; ISSUE: Rewrite this comment.
 ;;
 ;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
 ;; (set! z2 '(letrec ((f (letrec ((g (lambda (x) (fx* x 2)))) (lambda (n) (g (fx* n 2)))))) (f 12)))
@@ -974,7 +974,7 @@
 
    [(primcall? expr)   (emit-primcall si env expr)]   
    [(immediate? expr)  (emit-immediate expr)]
-   [(label? expr)      (emit-label si env expr)]   ;; never in tail position
+   [(labels? expr)      (emit-label si env expr)]   ;; labels never in tail position
    [(string? expr)     (emit-string-literal expr)]
    [(variable? expr)   (emit-variable-ref env expr)]
    [(begin? expr)      (emit-begin si env expr)]  
@@ -1000,7 +1000,7 @@
   (cond
    [(primcall? expr)   (emit-tail-primcall si env expr)]   
    [(immediate? expr)  (emit-tail-immediate expr)]
-   [(label? expr)      (error 'emit-tail-expr "label never in tail position")]
+   [(labels? expr)      (error 'emit-tail-expr "labels never in tail position")]
    [(string? expr)     (emit-tail-string-literal)]
    [(variable? expr)   (emit-tail-variable-ref env expr)]
    [(begin? expr)      (emit-tail-begin si env expr)]   
@@ -1673,29 +1673,59 @@
 ;; and their content may be accessed anywhere with the primitive label-ref.
 ;;-----------------------------------------------------------------------------------
 
-(define (label? exp)
-  (and (pair? exp) (eq? (car exp) 'label)))
-(define label-bindings second)
-(define label-expr third)
 
-(define (emit-label si env exp)                            ;;  UNUSED ???
-  (let* ([labels (map first (label-bindings exp))]
-	 [exprs (map second (label-bindings exp))])
-    (map (lambda (gl x)
-	   (emit-expr si env x)
-	   (emit "    .data")
-	   (emit "    .align 8,0x90")
-	   (emit "    .globl ~a" gl)   ;; all Li become global labels
-	   (emit "~a:" gl) ;; TBD - verify that l is a valid asm symbol
-	   (emit "    .int 0")
-	   (emit "    .text")
-	   (emit "    movl %eax, ~a" gl))
-	 labels
-	 exprs))
-  (emit-expr si env (label-expr exp)))
+(define (labels? expr)
+  (and (pair? expr) (eq? (car expr) 'labels)))
+(define labels-bindings second)
+(define labels-body third)
+
+(define (emit-labels si env expr)
+  (let* ([bindings (labels-bindings expr)]
+	 [labs (map first bindings)]
+	 [exprs (map second bindings)]
+	 [body (labels-body expr)])
+    (emit "     .data")
+    (for-each (lambda (l)
+	       (emit "     .global ~s" l)
+	       (emit "     .align 8")
+	       (emit "~a:" l)
+	       (emit "     .int 0xFF"))
+	     labs)
+    (emit "     .text")
+    (for-each (lambda (l e)
+	       (emit-expr si env (apply-transforms e))
+	       (emit "     movl %eax, ~a" l))
+	     labs
+	     exprs)
+    (emit-expr si env body))) 
+
 
 (define-primitive (label-ref si env gl)
   (emit "    movl ~a, %eax" gl))
+
+
+;; (define (label? exp)
+;;   (and (pair? exp) (eq? (car exp) 'label)))
+;; (define label-bindings second)
+;; (define label-expr third)
+
+;; (define (emit-label si env exp)                            ;;  UNUSED ???
+;;   (let* ([labels (map first (label-bindings exp))]
+;; 	 [exprs (map second (label-bindings exp))])
+;;     (map (lambda (gl x)
+;; 	   (emit-expr si env x)
+;; 	   (emit "    .data")
+;; 	   (emit "    .align 8,0x90")
+;; 	   (emit "    .globl ~a" gl)   ;; all Li become global labels
+;; 	   (emit "~a:" gl) ;; TBD - verify that l is a valid asm symbol
+;; 	   (emit "    .int 0")
+;; 	   (emit "    .text")
+;; 	   (emit "    movl %eax, ~a" gl))
+;; 	 labels
+;; 	 exprs))
+;;   (emit-expr si env (label-expr exp)))
+
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                 Symbols, Libraries, and Separate Compilation
@@ -1781,6 +1811,12 @@
 ;; Dynamic initialization  
 ;;---------------------------
 
+;; Idea is to move this off into a separately compiled library
+;; this separate library will be required by the compiler just
+;; like runtime.o is required.  The library will define the
+;; global variables symbols and s2sym and contain the corresponding
+;; code.  
+
 (define (emit-init si env)
   (emit "          .data")
   (emit "          .globl symbols  # symbol list as a datum ")
@@ -1807,8 +1843,7 @@
   (emit "       .globl ~a$init" lname)
   (emit "       .align 8")
   (emit "~a$init:" lname)     ;; entry point to initialize library
-  (emit "       .int 0xFF")   ;; will be patched with entry point
-  (emit si env expr))
+  (emit si env expr))         ;; starts executing library at first expression
 
 ;;-------------------------------------------------------------------------
 ;; This expression will be compiled by our pilar scheme compiler, not by
@@ -2454,14 +2489,11 @@
 (define (closure? expr)
    (and (pair? expr) (eq? (car expr) 'closure)))
 
-;(define closure-formals first)
 (define closure-formals second)
-;(define closure-freevars second)
 (define closure-freevars third)
-;(define closure-body cdddr)  ;; ISSUE -- fixup to uniform style of passing whole expressions to emit
 (define closure-body fourth)
 
-(define (emit-closure si env expr)   ;; <<----- THIS IS THE CORE ENTRY POINT
+(define (emit-closure si env expr)
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
@@ -2469,7 +2501,6 @@
   (let* ([formals (closure-formals expr)]
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
-      ;; [closed-env (extend-closure-env '() freevars)] ;; why not use full env?
 	 [closed-env (extend-closure-env env freevars)]
 	 [entry-point (unique-label)]
 	 [exit-point (unique-label)]
@@ -2502,14 +2533,10 @@
     (emit "~a:" entry-point)         ;; this is the label that we put in the closure
     (let f ([fmls formals]
 	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
-	    [env closed-env])        ;; <<- ISSUE: Closed Environment is WRONG!
-                                     ;;     Need to Shadow closure vars not eliminiate
-                                     ;;     all vars.  O/W can't copy their bindings.
-       
+	    [env closed-env])      
       (cond
        [(empty? fmls)
-      ;(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin [CLEAN UP??]
-	(emit-tail-expr si env body)]  ;; <<--- heart of body generation
+	(emit-tail-expr si env body)]
        [else
 	(f (rest fmls)
 	   (- si wordsize)
@@ -2533,9 +2560,10 @@
 
 (define (emit-close-free-vars ci env vars)
   (unless (null? vars)
-	  (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
+	  (if (lookup (car vars) env) ;; only initialize closure-variables
+	                              ;; that exist in the binding environment.
 	      (begin
-		(emit-variable-ref env (car vars))                     ;; reference the value of the first variable
+		(emit-variable-ref env (car vars))  ;; reference the value of the first variable
 		(emit "   movl  %eax, ~s(%ebp)  # ~s" ci (car vars))) ;; copy that value to the closure cell
 	      (emit "# WARNING: free var ~s not defined in the environmnet" (car vars)))
 	  (emit-close-free-vars (+ 4 ci) env (cdr vars))))  ;; recursively process remaining free vars
@@ -2550,7 +2578,8 @@
 	 (extend-env ci env (first frev)))])))
 
 
-(define (align-to-8-bytes i)          ;; rounds i up to first multiple of 8
+(define (align-to-8-bytes i)    ;; rounds i up to next multiple of 8
     (if (zero? (remainder i 8))
 	i
 	(+ i (- 8 (remainder i 8)))))
+

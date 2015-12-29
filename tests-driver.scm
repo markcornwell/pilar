@@ -20,14 +20,21 @@
 
 (define (run-compil expr)
   (let ([p (open-output-file "pgm.s" 'replace)]) 
- ; (let ([p (open-output-file "pgm1.s" 'replace)])  ;; DEBUG
     (parameterize ([compil-port p])
        (compil-program expr))
     (close-output-port p)))
 
+;;----- new
+(define (run-compil-lib)
+  (let ([p (open-output-file "symbol.s" 'replace)]) 
+    (parameterize ([compil-port p])
+      (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read)))))
+    (close-output-port p)))
+;;-----
+
+
 (define (build)
   (unless (zero? (system "as -arch i386 pgm.s -o pgm.o"))  
-  ;(unless (zero? (system "as -arch i386 pgm1.s -o pgm.o"))  ;; DEBUG
      (error 'build "produced program failed assembly"))
   (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o -o stst"))
      (error 'build "produced program failed to link")))

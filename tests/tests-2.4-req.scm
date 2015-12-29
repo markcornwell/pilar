@@ -113,7 +113,7 @@
   [(let ([t 1])
      (and (begin (set! t (fxadd1 t)) t) t)) => "2\n"]
   [(let ([t 1])
-     (or (begin  (set! t (fxadd1 t)) t) t)) => "2\n"]  ;; <<--- AHA!
+     (or (begin  (set! t (fxadd1 t)) t) t)) => "2\n"]
 )
 
 
