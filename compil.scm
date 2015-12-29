@@ -192,18 +192,6 @@
 	'eliminate-cond          ;; rewrite cond as if
 	))
 
-(define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
-  (emit "# ~s" expr)
-  (for-each
-   (lambda (tf)
-     (unless (getprop tf '*is-transform*)
-	 (error 'emit-program (format "undefined transform: ~s" tf)))
-     (emit "# == ~a  ==>" (getprop tf '*name-string*))
-     (set! expr ((getprop tf '*procedure*) expr))
-     (emit "# ~s" expr))
-   *transform-list*)
-  (emit-scheme-entry '() expr))
-
 (define (apply-transforms expr)   ;; CLEAN UP emit program and emit library program
   (for-each
    (lambda (tf)
@@ -215,19 +203,15 @@
    *transform-list*)
   expr)
 
+(define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
+  (emit "# ~s" expr)
+  (emit-scheme-entry '() (apply-transforms expr)))
+
 (define compil-program emit-program) ;; hook to the test driver which calls compil-program
 
 (define (emit-library-program expr)  ;; like emit program, but no scheme entry
   (emit "# ~s" expr)
-  (for-each
-   (lambda (tf)
-     (unless (getprop tf '*is-transform*)
-	 (error 'emit-program (format "undefined transform: ~s" tf)))
-     (emit "# == ~a  ==>" (getprop tf '*name-string*))
-     (set! expr ((getprop tf '*procedure*) expr))
-     (emit "# ~s" expr))
-   *transform-list*)
-  (emit-expr 0 '() expr))
+  (emit-library-init '() (apply-transforms expr)))
 
 (define-syntax define-transform
   (syntax-rules ()
@@ -1750,7 +1734,6 @@
 ;;   (primitive-ref x)    
 ;;   (primitive-set! x v)
 ;;
-;;
 ;;-----------------------------------------------------------------------------------
 
 
@@ -1794,7 +1777,9 @@
 ;;   (emit "    .int ~a" nil-value)   
 ;;   (emit "    .text"))
 
-;; go back to dynamic initialization
+;;---------------------------
+;; Dynamic initialization  
+;;---------------------------
 
 (define (emit-init si env)
   (emit "          .data")
@@ -1807,11 +1792,23 @@
   (emit "s2sym:")
   (emit "          .int 0xFF  # holds pgm-str-sym")
   (emit "          .text")
-  (emit-expr si env '(cons (make-symbol "nil" ()) ()))
+  (emit-expr si env '(cons (make-symbol "nil" ()) ()))  ;; start the symbols list
   (emit "    movl %eax, symbols")
   (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
   (emit "    movl %eax, s2sym")
   )
+
+;;----------------------------
+;;  Library initialization
+;;----------------------------
+
+(define (emit-library-init lname si env expr)
+  (emit "       .text")
+  (emit "       .globl ~a$init" lname)
+  (emit "       .align 8")
+  (emit "~a$init:" lname)     ;; entry point to initialize library
+  (emit "       .int 0xFF")   ;; will be patched with entry point
+  (emit si env expr))
 
 ;;-------------------------------------------------------------------------
 ;; This expression will be compiled by our pilar scheme compiler, not by
@@ -2379,39 +2376,6 @@
   )  ;; jump to closure entry point
 
 
-;; ;; In tail position, we do not need to allocate an frame, we will re-use the old
-;; ;; frame.  We keep the return pointer, but putting in a new current closure, args
-;; ;; and local vars
-
-;; (define (emit-tail-funcall si env expr)
-;;   (define (emit-arguments si args)
-;;     (unless (empty? args)
-;;         (emit-expr si env (first args))                ;; evaluated arg in %eax
-;;         (emit "    mov %eax, ~s(%esp)    # arg " si)   ;; save %eax as evaluated arg    
-;;         (emit-arguments (- si wordsize) (rest args)))) ;; recursively emit the rest
-;;   (define (emit-shift-args argc si delta)
-;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
-;;     (unless (zero? argc)
-;; 	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
-;; 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-;; 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
-;;   (emit "# emit-tail-funcall")
-;;   (emit "#    si   =~s" si)
-;;   (emit "#    env  = ~s" env)
-;;   (emit "#    expr = ~s" expr)
-;;   ;; (why do we not evaluate the funcall-op and stash it in exp+si-8?
-;;   ;; because a tail funcall assumes the closure value is already there and will re-use it. But is it????)
-;;   ;; Evaluate the funcall and 
-;;   (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values
-
-;;   ;; Why so fancy?  because we are evaluating this after evaluating the args
-;;   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr)) 
-  
-;;   (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
-;;   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))  ;; VERFIY THIS
-;;   (emit "    jmp *-2(%edi)  # tail-funcall")
-;;   )   ;; jump to closure entry point
-
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
 ;;-----------------------------------------------------------------------------------
@@ -2494,7 +2458,7 @@
 (define closure-formals second)
 ;(define closure-freevars second)
 (define closure-freevars third)
-;(define closure-body cdddr)        ;; ISSUE -- fixup to uniform style of whole expressions to emit
+;(define closure-body cdddr)  ;; ISSUE -- fixup to uniform style of passing whole expressions to emit
 (define closure-body fourth)
 
 (define (emit-closure si env expr)   ;; <<----- THIS IS THE CORE ENTRY POINT
