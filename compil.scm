@@ -163,6 +163,9 @@
 (define fourth cadddr)
 (define rest cdr)
 
+
+
+
 ;;------------------------------------------------------------------------------------
 ;;                           PART I - SOURCE CODE TRANSFORMATIONS
 ;;------------------------------------------------------------------------------------
@@ -190,6 +193,7 @@
 	'eliminate-quote         ;; eliminate complex constants
 	'eliminate-when/unless   ;; when/unless translate to corresponding if expressions
 	'eliminate-cond          ;; rewrite cond as if
+	'external-symbols        ;; substitute primitive-ref and primitive-set!
 	))
 
 (define (apply-transforms expr)   ;; CLEAN UP emit program and emit library program
@@ -825,7 +829,7 @@
     (let ([body (quote-body expr)])
       (cond
        [(or (boolean? body) (fixnum? body) (char? body) (null? body)) body]
-       [(symbol? body) (list 'string->symbol (symbol->string body))]  ;; requires string->symbol
+       [(symbol? body) (list 'string->symbol (symbol->string body))] ;; requires string->symbol
        [(pair? body) (expand-list body)]
        [(string? body) body]))]
    [(pair? expr)
@@ -840,7 +844,7 @@
 	  (eliminate-quote (list 'quote (car exp)))
 	  (eliminate-quote (list 'quote (cdr exp))))]
    [(null? exp) exp]
-  ; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
+;; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
@@ -916,10 +920,85 @@
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
+;;                                External Symbols
+;;-----------------------------------------------------------------------------------
+;; So-called external symbols have their values stored in memory at locations
+;; denoted by global labels
+
+(define-syntax import-from
+  (syntax-rules ()
+    [(import-from (library-name) s)
+     (begin
+       (putprop 's '*is-external* #t)
+       (putprop 's '*library-name* 'library-name)
+       (putprop 's '*label* (asmify 's)))]
+    [(import-from (library-name) s s* ...)
+     (begin
+       (import-from (library-name) s)
+       (import-from (library-name) s* ...))]))
+
+(define (external? symbol)
+  (getprop symbol '*is-external*))
+
+(import-from (base) string->symbol symbols) ;; could put this in some header file
+
+;;------------------------------------------------------------------------------
+;; asmify maps scheme identifiers to assembler identifiers by substituting legal
+;; escape sequences for illegal special characters.
+;;
+;; Example
+;;
+;;   (asmify 'string->symbol) => "string$m$gsymbol"
+;;
+;; The full compliment of special characters that (R5RS) allows:
+;;
+;;            ! $ % & * + - . / : < = > ? @ ^ _ ~
+;;
+;;------------------------------------------------------------------------------
+
+(define (asmify s)
+  (list->string (asmify1 (string->list (symbol->string s)))))
+
+(define (asmify1 l)  ;;  TBD expand this list to all scheme specials chars 
+    (cond
+     [(null? l) l]
+     [(eq? (car l) #\!) (cons #\$ (cons #\b (asmify1 (cdr l))))]  ; bang
+     [(eq? (car l) #\$) (cons #\$ (cons #\$ (asmify1 (cdr l))))]  ; dollar
+     [(eq? (car l) #\%) (cons #\$ (cons #\p (asmify1 (cdr l))))]  ; percent
+     [(eq? (car l) #\&) (cons #\$ (cons #\a (asmify1 (cdr l))))]  ; ampersand
+     [(eq? (car l) #\*) (cons #\$ (cons #\s (asmify1 (cdr l))))]  ; star
+     [(eq? (car l) #\+) (cons #\$ (cons #\p (asmify1 (cdr l))))]  ; plus
+     [(eq? (car l) #\-) (cons #\$ (cons #\m (asmify1 (cdr l))))]  ; minus
+     [(eq? (car l) #\.) (cons #\$ (cons #\d (asmify1 (cdr l))))]  ; dot
+     [(eq? (car l) #\/) (cons #\$ (cons #\S (asmify1 (cdr l))))]  ; slash
+     [(eq? (car l) #\:) (cons #\$ (cons #\c (asmify1 (cdr l))))]  ; colon
+     [(eq? (car l) #\<) (cons #\$ (cons #\l (asmify1 (cdr l))))]  ; less than
+     [(eq? (car l) #\=) (cons #\$ (cons #\e (asmify1 (cdr l))))]  ; equals
+     [(eq? (car l) #\>) (cons #\$ (cons #\g (asmify1 (cdr l))))]  ; greater than
+     [(eq? (car l) #\?) (cons #\$ (cons #\q (asmify1 (cdr l))))]  ; question mark
+     [(eq? (car l) #\@) (cons #\$ (cons #\A (asmify1 (cdr l))))]  ; at
+     [(eq? (car l) #\^) (cons #\$ (cons #\h (asmify1 (cdr l))))]  ; hat
+     [(eq? (car l) #\_) (cons #\$ (cons #\u (asmify1 (cdr l))))]  ; underscore
+     [(eq? (car l) #\~) (cons #\$ (cons #\t (asmify1 (cdr l))))]  ; tilde
+     [else (cons (car l) (asmify1 (cdr l)))]))	
+
+
+(define-transform (external-symbols expr)
+  (cond
+   [(and (pair? expr) (symbol? (car expr)) (external? (car expr)))
+    (cons (list 'primitive-ref (car expr)) (external-symbols (cdr expr)))]
+   [(pair? expr)
+    (cons (external-symbols (car expr))
+	  (external-symbols (cdr expr)))]
+   [else expr]))
+
+
+;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 
 
+;;-----------------------------------------------------------------------------------
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Proper Tail Recursion
@@ -964,6 +1043,9 @@
 (define (begin? expr)
   (and (pair? expr) (eq? (car expr) 'begin)))
 
+(define (primitive-ref? expr)
+  (and (pair? expr) (eq? (car expr) 'primitive-ref)))
+
 (define (emit-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
@@ -971,20 +1053,20 @@
 	   (and pair (fixnum? (cdr pair)))))) 
   (emit "# emit-expr ~s" expr)
   (cond
-
-   [(primcall? expr)   (emit-primcall si env expr)]   
-   [(immediate? expr)  (emit-immediate expr)]
-   [(labels? expr)      (emit-label si env expr)]   ;; labels never in tail position
-   [(string? expr)     (emit-string-literal expr)]
-   [(variable? expr)   (emit-variable-ref env expr)]
-   [(begin? expr)      (emit-begin si env expr)]  
-   [(closure? expr)    (emit-closure si env expr)]
-   [(funcall? expr)    (emit-funcall si env expr)]
-   [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
-   [(if? expr)         (emit-if si env expr)]
-   [(and? expr)        (emit-and si env expr)]
-   [(or? expr)         (emit-or si env expr)]
-   [(pair? expr)       (emit-funcall si env (cons 'funcall expr))] ;; implicit funcall
+   [(primcall? expr)        (emit-primcall si env expr)]   
+   [(immediate? expr)       (emit-immediate expr)]
+   [(labels? expr)          (emit-label si env expr)]   ;; labels never in tail position
+   [(string? expr)          (emit-string-literal expr)]
+   [(variable? expr)        (emit-variable-ref env expr)]
+   [(primitive-ref? expr)   (emit-primitive-ref si env expr)] 
+   [(begin? expr)           (emit-begin si env expr)]  
+   [(closure? expr)         (emit-closure si env expr)]
+   [(funcall? expr)         (emit-funcall si env expr)]
+   [(let? expr)             (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
+   [(if? expr)              (emit-if si env expr)]
+   [(and? expr)             (emit-and si env expr)]
+   [(or? expr)              (emit-or si env expr)]
+   [(pair? expr)            (emit-funcall si env (cons 'funcall expr))] ;; implicit funcall
    [else
     (error "emit-expr" "unrecognized form" expr)]))
 
@@ -1003,6 +1085,7 @@
    [(labels? expr)      (error 'emit-tail-expr "labels never in tail position")]
    [(string? expr)     (emit-tail-string-literal)]
    [(variable? expr)   (emit-tail-variable-ref env expr)]
+   [(primitive-ref? expr) (emit-tail-primitive-ref si env expr)]
    [(begin? expr)      (emit-tail-begin si env expr)]   
    [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
    [(funcall? expr)    (emit-tail-funcall si env expr)]
@@ -1598,11 +1681,11 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
-;;-------------------------------------------------------
+;;-----------------------------------------------------------
 ;; looking for a simple way to do string=?
 ;; this gets blasted out as an inline
 ;; fast but not so compact as a callable subroutine
-;;-------------------------------------------------------
+;;-----------------------------------------------------------
 
 ;; (define-primitive (string=? si env arg1 arg2)
 ;;   (let ([false (unique-label)]
@@ -1667,12 +1750,11 @@
 ;;
 ;; Important: the label is an asm symbol which is restricted to letters, digits,
 ;; and 3 symbols _ . $ (that is underscore, dot, and dollar sign).  Other stuff
-;; is not allowed, so we must be cautious in what we write for Li.  See TBD below.
+;; is not allowed, so we must be cautious in what we write for Li. See asmify below.
 ;;
 ;; Unlike let, the labels are not defined in the environment.  All labels are global
 ;; and their content may be accessed anywhere with the primitive label-ref.
 ;;-----------------------------------------------------------------------------------
-
 
 (define (labels? expr)
   (and (pair? expr) (eq? (car expr) 'labels)))
@@ -1681,7 +1763,8 @@
 
 (define (emit-labels si env expr)
   (let* ([bindings (labels-bindings expr)]
-	 [labs (map first bindings)]
+	 [syms (map first bindings)]
+	 [labs (map asmify syms)]
 	 [exprs (map second bindings)]
 	 [body (labels-body expr)])
     (emit "     .data")
@@ -1699,33 +1782,16 @@
 	     exprs)
     (emit-expr si env body))) 
 
+(define (emit-primitive-set! si env expr)  ;; not used yet
+  (emit-expr si env (third expr))
+  (emit "    movl %eax,~a" (asmify (second expr))))
 
-(define-primitive (label-ref si env gl)
-  (emit "    movl ~a, %eax" gl))
+(define (emit-primitive-ref si env expr)
+  (emit "    movl ~a,%eax" (asmify (second expr))))
 
-
-;; (define (label? exp)
-;;   (and (pair? exp) (eq? (car exp) 'label)))
-;; (define label-bindings second)
-;; (define label-expr third)
-
-;; (define (emit-label si env exp)                            ;;  UNUSED ???
-;;   (let* ([labels (map first (label-bindings exp))]
-;; 	 [exprs (map second (label-bindings exp))])
-;;     (map (lambda (gl x)
-;; 	   (emit-expr si env x)
-;; 	   (emit "    .data")
-;; 	   (emit "    .align 8,0x90")
-;; 	   (emit "    .globl ~a" gl)   ;; all Li become global labels
-;; 	   (emit "~a:" gl) ;; TBD - verify that l is a valid asm symbol
-;; 	   (emit "    .int 0")
-;; 	   (emit "    .text")
-;; 	   (emit "    movl %eax, ~a" gl))
-;; 	 labels
-;; 	 exprs))
-;;   (emit-expr si env (label-expr exp)))
-
-
+(define (emit-tail-primitive-ref si env expr)
+  (emit-primitive-ref si env expr)
+  (emit "    ret"))
 
 ;;-----------------------------------------------------------------------------------
 ;;                 Symbols, Libraries, and Separate Compilation
@@ -1759,11 +1825,9 @@
 ;;
 ;;   (string->symbol <string>)  ;; this one does the work
 ;;
-;;-------- ??
-;;
+;;-----------------------------------------------------------------------------------
 ;;   (primitive-ref x)    
 ;;   (primitive-set! x v)
-;;
 ;;-----------------------------------------------------------------------------------
 
 
@@ -1838,12 +1902,12 @@
 ;;  Library initialization
 ;;----------------------------
 
-(define (emit-library-init lname si env expr)
-  (emit "       .text")
-  (emit "       .globl ~a$init" lname)
-  (emit "       .align 8")
-  (emit "~a$init:" lname)     ;; entry point to initialize library
-  (emit si env expr))         ;; starts executing library at first expression
+;; (define (emit-library-init lname si env expr)
+;;   (emit "       .text")
+;;   (emit "       .globl ~a$init" lname)
+;;   (emit "       .align 8")
+;;   (emit "~a$init:" lname)     ;; entry point to initialize library
+;;   (emit si env expr))         ;; starts executing library at first expression
 
 ;;-------------------------------------------------------------------------
 ;; This expression will be compiled by our pilar scheme compiler, not by
@@ -1853,41 +1917,41 @@
 ;; The generated code gets incorporated into our string->symbol primitive.
 ;;-------------------------------------------------------------------------
 
-(define expr-str->sym   ;; string to symbol
-    '(letrec
-	 ([$slen= (lambda (s1 s2)
-		   (fx= (string-length s1)
-			(string-length s2)))]
+;; (define expr-str->sym   ;; string to symbol
+;;     '(letrec
+;; 	 ([$slen= (lambda (s1 s2)
+;; 		   (fx= (string-length s1)
+;; 			(string-length s2)))]
 	  
-	  [$si=  (lambda (s1 s2 i)
-		  (char=? (string-ref s1 i)
-			  (string-ref s2 i)))]
+;; 	  [$si=  (lambda (s1 s2 i)
+;; 		  (char=? (string-ref s1 i)
+;; 			  (string-ref s2 i)))]
 	  
-	  [$si<n= (lambda (s1 s2 i n)
-		   (if (fx= i n)
-		       #t
-		       (if ($si= s1 s2 i)
-			   ($si<n= s1 s2 (fx+ i 1) n)
-		           #f)))]
+;; 	  [$si<n= (lambda (s1 s2 i n)
+;; 		   (if (fx= i n)
+;; 		       #t
+;; 		       (if ($si= s1 s2 i)
+;; 			   ($si<n= s1 s2 (fx+ i 1) n)
+;; 		           #f)))]
 	  
-	  [$ss= (lambda (s1 s2)
-		 (if ($slen= s1 s2)
-		     ($si<n= s1 s2 0 (string-length s1))
-		     #f))]
+;; 	  [$ss= (lambda (s1 s2)
+;; 		 (if ($slen= s1 s2)
+;; 		     ($si<n= s1 s2 0 (string-length s1))
+;; 		     #f))]
 
-	  [$str->sym1  (lambda (str symlist)   ;; assume symlist is never empty
-			(if ($ss= str (symbol->string (car symlist)))
-			    (car symlist)
-			    (if (null? (cdr symlist))
-				(let* ([new-sym (make-symbol str #f)]
-                                       [new-cdr (cons new-sym ())])
-				  (begin
-				    (set-cdr! symlist new-cdr)
-				    new-sym))
-				($str->sym1 str (cdr symlist)))))])
+;; 	  [$str->sym1  (lambda (str symlist)   ;; assume symlist is never empty
+;; 			(if ($ss= str (symbol->string (car symlist)))
+;; 			    (car symlist)
+;; 			    (if (null? (cdr symlist))
+;; 				(let* ([new-sym (make-symbol str #f)]
+;;                                        [new-cdr (cons new-sym ())])
+;; 				  (begin
+;; 				    (set-cdr! symlist new-cdr)
+;; 				    new-sym))
+;; 				($str->sym1 str (cdr symlist)))))])
 	  
-	 (lambda (str)
-	   ($str->sym1 str (symbols)))))
+;; 	 (lambda (str)
+;; 	   ($str->sym1 str (symbols)))))
 
 ;; (define expr-str->sym    ;; string to symbol  
 ;;   '(letrec
@@ -1915,18 +1979,18 @@
 ;;       [str->sym (lambda (str) (str->sym1 str (symbols)))])
 ;;      str->sym))
 
-(define-primitive (string->symbol si env exp)
-  (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
+;; (define-primitive (string->symbol si env exp)
+;;   (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
 
-(define-primitive (primitive-str->sym si env)
-  (emit "    movl s2sym, %eax")) ;; does this move the address or the contents into eax?
+;; (define-primitive (primitive-str->sym si env)
+;;   (emit "    movl s2sym, %eax")) ;; does this move the address or the contents into eax?
 
-(define-primitive (symbols si env) ;; (symbols) => a list of all interned symbols
-  (emit "    movl symbols, %eax"))
+;; (define-primitive (symbols si env) ;; (symbols) => a list of all interned symbols
+;;   (emit "    movl symbols, %eax"))
 
-(define-primitive (symbols-set! si env exp)
-  (emit-expr si env exp)
-  (emit "    movl %eax, symbols"))
+;; (define-primitive (symbols-set! si env exp)
+;;   (emit-expr si env exp)
+;;   (emit "    movl %eax, symbols"))
 
 (define-primitive (symbol? si env arg)
   (emit-expr si env arg)
@@ -2582,4 +2646,3 @@
     (if (zero? (remainder i 8))
 	i
 	(+ i (- 8 (remainder i 8)))))
-

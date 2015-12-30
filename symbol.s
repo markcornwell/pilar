@@ -1,11 +1,11 @@
      .data
-     .global symbols
+     .global "symbols"
      .align 8
 symbols:
      .int 0xFF
-     .global s2sym
+     .global "symbol$m$gstring"
      .align 8
-s2sym:
+symbol$m$gstring:
      .int 0xFF
      .text
 # == explicit-begins  ==>
@@ -25,6 +25,8 @@ s2sym:
 # == eliminate-when/unless  ==>
 # (cons (make-symbol "nil" ()) ())
 # == eliminate-cond  ==>
+# (cons (make-symbol "nil" ()) ())
+# == external-symbols  ==>
 # (cons (make-symbol "nil" ()) ())
 # emit-expr (cons (make-symbol "nil" ()) ())
 # cons arg1=(make-symbol "nil" ()) arg2=()
@@ -72,19 +74,21 @@ _L_1:
 # == eliminate-set!  ==>
 # (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (lambda (s1 s2) (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (lambda (s1 s2 i) (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (lambda (s1 s2 i n) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (lambda (s1 s2) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (lambda (str symlist) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (lambda (str) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
 # == close-free-variables  ==>
-# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
+# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 symbols) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
 # == eliminate-quote  ==>
-# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
+# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 symbols) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
 # == eliminate-when/unless  ==>
-# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
+# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 symbols) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
 # == eliminate-cond  ==>
-# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
-# emit-expr (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
+# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 symbols) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))))
+# == external-symbols  ==>
+# (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols)))))))
+# emit-expr (let (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1))) (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols)))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = (($slen= (make-vector 1)) ($si= (make-vector 1)) ($si<n= (make-vector 1)) ($ss= (make-vector 1)) ($str->sym1 (make-vector 1)))
-#  body = (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))))
+#  body = (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -150,9 +154,9 @@ _L_1:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -16(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))))
+# emit-expr (begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))))
 # emit-begin
-#   expr=(begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))))
+#   expr=(begin (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist)))))))) (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))))
 #   env=(($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
 # emit-expr (begin (vector-set! $slen= 0 (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))) (vector-set! $si= 0 (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))) (vector-set! $si<n= 0 (closure (s1 s2 i n) ($si= $si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref $si= 0) s1 s2 i) ((vector-ref $si<n= 0) s1 s2 (fx+ i 1) n) #f))))) (vector-set! $ss= 0 (closure (s1 s2) ($slen= $si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref $slen= 0) s1 s2) ((vector-ref $si<n= 0) s1 s2 0 (string-length s1)) #f)))) (vector-set! $str->sym1 0 (closure (str symlist) ($ss= $str->sym1) (let ((str str) (symlist symlist)) (if ((vector-ref $ss= 0) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref $str->sym1 0) str (cdr symlist))))))))
 # emit-begin
@@ -1083,15 +1087,15 @@ _L_17:
 # emit-begin
 #   expr=(begin)
 #   env=(($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-# emit-expr (begin (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))))
+# emit-expr (begin (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))))
 # emit-begin
-#   expr=(begin (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))))
+#   expr=(begin (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))))
 #   env=(($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-# emit-expr (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))
+# emit-expr (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols)))))
 # emit-closure
 # si = -20
 # env = (($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-# expr = (closure (str) ($str->sym1) (let ((str str)) ((vector-ref $str->sym1 0) str (symbols))))
+# expr = (closure (str) ($str->sym1 (primitive-ref symbols)) (let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols)))))
     movl $_L_22, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=(($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
@@ -1099,39 +1103,40 @@ _L_17:
     movl -16(%esp), %eax  # stack load $str->sym1
 # end emit-variable-ref
    movl  %eax, 4(%ebp)  # $str->sym1
+# WARNING: free var (primitive-ref symbols) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
-    add $8, %ebp     # bump ebp
+    add $16, %ebp     # bump ebp
     jmp _L_23            # jump around closure body
 _L_22:
 # emit-tail-expr
 # si=-12
-# env=((str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-# expr=(let ((str str)) ((vector-ref $str->sym1 0) str (symbols)))
+# env=((str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+# expr=(let ((str str)) ((vector-ref $str->sym1 0) str ((primitive-ref symbols))))
 # emit-tail-let
 #  si   = -12
-#  env  = ((str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+#  env  = ((str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
 #  bindings = ((str str))
-#  body = ((vector-ref $str->sym1 0) str (symbols))
+#  body = ((vector-ref $str->sym1 0) str ((primitive-ref symbols)))
 # emit-expr str
 # emit-variable-ref
-# env=((str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+# env=((str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
 # var=str
     movl -8(%esp), %eax  # stack load str
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((str . -12) (str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-# expr=((vector-ref $str->sym1 0) str (symbols))
+# env=((str . -12) (str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+# expr=((vector-ref $str->sym1 0) str ((primitive-ref symbols)))
 # emit-tail-funcall
 #    si   =-16
-#    env  = ((str . -12) (str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-#    expr = (funcall (vector-ref $str->sym1 0) str (symbols))
+#    env  = ((str . -12) (str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+#    expr = (funcall (vector-ref $str->sym1 0) str ((primitive-ref symbols)))
 # emit-expr (vector-ref $str->sym1 0)
 # emit-expr $str->sym1
 # emit-variable-ref
-# env=((str . -12) (str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+# env=((str . -12) (str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
 # var=$str->sym1
     movl 2(%edi), %eax  # frame load $str->sym1
 # end emit-variable-ref
@@ -1143,14 +1148,25 @@ _L_22:
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
 # emit-expr str
 # emit-variable-ref
-# env=((str . -12) (str . -8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+# env=((str . -12) (str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
 # var=str
     movl -12(%esp), %eax  # stack load str
 # end emit-variable-ref
     mov %eax, -20(%esp)    # arg str
-# emit-expr (symbols)
-    movl symbols, %eax
-    mov %eax, -24(%esp)    # arg (symbols)
+# emit-expr ((primitive-ref symbols))
+# funcall
+#    si   =-24
+#    env  = ((str . -12) (str . -8) ((primitive-ref symbols) . 8) ($str->sym1 . 4) ($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
+#    expr = (funcall (primitive-ref symbols))
+# emit-expr (primitive-ref symbols)
+    movl symbols,%eax
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -24(%esp)    # arg ((primitive-ref symbols))
     movl -16(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
@@ -1169,7 +1185,7 @@ _L_23:
 # emit-begin
 #   expr=(begin)
 #   env=(($str->sym1 . -16) ($ss= . -12) ($si<n= . -8) ($si= . -4) ($slen= . 0))
-     movl %eax, s2sym
+     movl %eax, symbol$m$gstring
 # emit-expr (begin #t)
 # emit-begin
 #   expr=(begin #t)

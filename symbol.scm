@@ -2,60 +2,16 @@
 ;;  Symbol libary
 ;;-------------------
 
-;; (define (emit-init si env)
-;;   (emit "          .data")
-;;   (emit "          .globl symbols  # symbol list as a datum ")
-;;   (emit "          .globl s2sym")
-;;   (emit "          .align 8")
-;;   (emit "symbols:")
-;;   (emit "          .int 0xFF  # holds (symbols)")
-;;   (emit "          .align 8")   ;;  does this really need to be aligned ???
-;;   (emit "s2sym:")
-;;   (emit "          .int 0xFF  # holds pgm-str-sym")
-;;   (emit "          .text")
-;;   (emit-expr si env '(cons (make-symbol "nil" ()) ()))  ;; start the symbols list
-;;   (emit "    movl %eax, symbols")
-;;   (emit-expr si env (apply-transforms expr-str->sym))
-;;   (emit "    movl %eax, s2sym")
-;;   )
-
-
-;; (define (labels? expr)
-;;   (and (pair? expr) (eq? (car expr) 'labels)))
-;; (define labels-bindings second)
-;; (define labels-body third)
-
-;; (define (emit-labels si env expr)
-;;   (let* ([bindings (labels-bindings expr)]
-;; 	 [labels (map first labels-bindings)]
-;; 	 [exprs (map second labels-bindings)]
-;; 	 [body (labels-body expr)])
-;;     (emit "     .data")
-;;     (foreach (lambda (l)
-;; 	       (emit "     .global ~s" l)
-;; 	       (emit "     .align 8")
-;; 	       (emit "~a:" l)
-;; 	       (emit "     .int 0xFF"))
-;; 	     labels)
-;;     (emit "     .text")
-;;     (emit "     .align 4");
-;;     (foreach (lambda (l e)
-;; 	       (emit-expr si env (apply-transforms e))
-;; 	       (emit "     movl %eax, ~a" l))
-;; 	     labels
-;; 	     exprs)
-;;     (emit-expr si env body))) 
-
-;; To read this file:     (with-input-from-file "symbol.scm" (lambda () (read))
-;; To compile this file:  (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
+;; To read:     (with-input-from-file "symbol.scm" (lambda () (read))
+;; To compile:  (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
 ;; (with-output-to-file "symbol.s" (lambda () (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))))
 
-;; To compile this file (run-compil-lib)   ;; see tests-drive.scm
+;; To compile this file (run-compil-lib)   ;; see tests-driver.scm
 
 (labels
  ([symbols
    (cons (make-symbol "nil" ()) ())]
-  [s2sym
+  [symbol->string
    (letrec
        ([$slen= (lambda (s1 s2)
 		  (fx= (string-length s1)
