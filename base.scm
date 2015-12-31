@@ -10,8 +10,9 @@
 
 (labels
  ([symbols
-   (cons (make-symbol "nil" ()) ())]
-  [symbol->string
+   (let ([interned-symbols (cons (make-symbol "nil" ()) ())])
+     (lambda () interned-symbols))]
+  [string->symbol
    (letrec
        ([$slen= (lambda (s1 s2)
 		  (fx= (string-length s1)
@@ -45,7 +46,6 @@
 			       ($str->sym1 str (cdr symlist)))))])
      
      (lambda (str)
-       ($str->sym1 str (symbols))))])
- (begin #t))
+       ($str->sym1 str (symbols))))]))
    
 

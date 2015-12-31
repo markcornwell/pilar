@@ -24,19 +24,21 @@
        (compil-program expr))
     (close-output-port p)))
 
-;;----- new
+;;----- 
 (define (run-compil-lib)
-  (let ([p (open-output-file "symbol.s" 'replace)]) 
+  (let ([p (open-output-file "base.s" 'replace)]) 
     (parameterize ([compil-port p])
-      (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read)))))
+      (with-input-from-file "base.scm" (lambda () (emit-labels 0 '() (read)))))
     (close-output-port p)))
 ;;-----
 
 
 (define (build)
   (unless (zero? (system "as -arch i386 pgm.s -o pgm.o"))  
-     (error 'build "produced program failed assembly"))
-  (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o -o stst"))
+	  (error 'build "produced program failed assembly"))
+  (unless (zero? (system "as -arch i386 base.s -o base.o"))
+	  (error 'build "library failed assembly"))
+  (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o base.o -o stst"))
      (error 'build "produced program failed to link")))
 
 (define (execute)
@@ -71,6 +73,7 @@
                  (g (add1 i) (cdr tests))])))))))
 
 (define (test-with-string-output test-id expr expected-output)
+   (run-compil-lib) ;; compile library every time
    (run-compil expr)
    (build)
    (execute)

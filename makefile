@@ -6,6 +6,9 @@
 go:
 	echo "(test-all)" | petite compil.scm | tee tests.out
 
+base.s: base.scm compil.scm tests-driver.scm
+	echo "(run-compil-lib)" | petite compil.scm | tee base.out
+
 dbg:
 	as -arch i386 p.s -o p.o
 	gcc -m32 -Wall -Wl,-no_pie runtime.c p.o -o st

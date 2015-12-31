@@ -163,9 +163,6 @@
 (define fourth cadddr)
 (define rest cdr)
 
-
-
-
 ;;------------------------------------------------------------------------------------
 ;;                           PART I - SOURCE CODE TRANSFORMATIONS
 ;;------------------------------------------------------------------------------------
@@ -919,29 +916,12 @@
 	  (eliminate-cond (cdr exp)))]
    [else exp]))
 
+
 ;;-----------------------------------------------------------------------------------
 ;;                                External Symbols
 ;;-----------------------------------------------------------------------------------
-;; So-called external symbols have their values stored in memory at locations
-;; denoted by global labels
-
-(define-syntax import-from
-  (syntax-rules ()
-    [(import-from (library-name) s)
-     (begin
-       (putprop 's '*is-external* #t)
-       (putprop 's '*library-name* 'library-name)
-       (putprop 's '*label* (asmify 's)))]
-    [(import-from (library-name) s s* ...)
-     (begin
-       (import-from (library-name) s)
-       (import-from (library-name) s* ...))]))
-
-(define (external? symbol)
-  (getprop symbol '*is-external*))
-
-(import-from (base) string->symbol symbols) ;; could put this in some header file
-
+;; External symbols have their values stored in memory at locations denoted by
+;; global labels that are defined in separately linked library files.
 ;;------------------------------------------------------------------------------
 ;; asmify maps scheme identifiers to assembler identifiers by substituting legal
 ;; escape sequences for illegal special characters.
@@ -982,6 +962,31 @@
      [(eq? (car l) #\~) (cons #\$ (cons #\t (asmify1 (cdr l))))]  ; tilde
      [else (cons (car l) (asmify1 (cdr l)))]))	
 
+(define-syntax import-from
+  (syntax-rules ()
+    [(import-from (library-name) s)
+     (begin
+       (putprop 's '*is-external* #t)
+       (putprop 's '*library-name* 'library-name)
+       (putprop 's '*label* (asmify 's)))]
+    [(import-from (library-name) s s* ...)
+     (begin
+       (import-from (library-name) s)
+       (import-from (library-name) s* ...))]))
+
+(define (external? symbol)
+  (getprop symbol '*is-external*))
+
+
+;; We need to know what symbols come from separately compiled libraries
+;; at compile time.  A transform uses this list to wrap those symbols
+;; in a primitive-ref form, e.g. (primitive-ref string->symbol)
+;;
+;; Then at code generation time, we recognize those forms and emit
+;; code to fetch the datum from memory using the global labels defined
+;; by the library.
+
+(import-from (base) string->symbol symbols)
 
 (define-transform (external-symbols expr)
   (cond
@@ -992,13 +997,11 @@
 	  (external-symbols (cdr expr)))]
    [else expr]))
 
-
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 
 
-;;-----------------------------------------------------------------------------------
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Proper Tail Recursion
@@ -1055,7 +1058,7 @@
   (cond
    [(primcall? expr)        (emit-primcall si env expr)]   
    [(immediate? expr)       (emit-immediate expr)]
-   [(labels? expr)          (emit-label si env expr)]   ;; labels never in tail position
+   [(labels? expr)          (emit-labels si env expr)]   ;; labels never in tail position
    [(string? expr)          (emit-string-literal expr)]
    [(variable? expr)        (emit-variable-ref env expr)]
    [(primitive-ref? expr)   (emit-primitive-ref si env expr)] 
@@ -1104,13 +1107,13 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-  (emit "    ret                  # tail return"))
+  (emit "    ret                  # immediate tail return"))
 
 (define (emit-scheme-entry env expr) 
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
-  (emit "    movl $0x66666666, %edi  # dummy for debugging")
-  (emit-init (- (* 2 wordsize)) env)  
+  (emit "    movl $0, %edi  # dummy for debugging")
+  (emit-init (- (* 2 wordsize)) env)
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
@@ -1128,13 +1131,23 @@
   (emit "    movl 20(%ecx), %edi")
   (emit "    movl 24(%ecx), %ebp")
   (emit "    movl 28(%ecx), %esp")
-  (emit "    ret"))  
+  (emit "    ret"))
+
+(define (emit-init si env)
+  (emit "    .global main_callback")
+  (emit "    .extern base_init")
+  (emit "    addl $-4,%esp")
+  (emit "    jmp base_init")   ;; would call work just as well?
+  (emit "main_callback:")
+  (emit "    addl $4,%esp"))
  
-(define (emit-function-header entry)
+(define (emit-function-header label)
   (emit "    .text")
   (emit "    .align 4,0x90")
-  (emit "    .globl ~a" entry)
-  (emit "~a:" entry))
+  (emit "    .globl ~a" label)
+  (emit "~a:" label))
+
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
@@ -1621,7 +1634,6 @@
   (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object;
                                          ;; offset -1 = tag(-5) + lenfield_size(4)
 
-
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings
 ;;-------------------------------------------------------------------------------
@@ -1737,7 +1749,7 @@
   (emit "    ret"))
 
 ;;-----------------------------------------------------------------------------------
-;;                                   Label
+;;                            Label - external libraries
 ;;-----------------------------------------------------------------------------------
 ;; Here we employ a label form to compile expressions and save the resulting
 ;; object at the label given in the form.  It works like a bridge between our
@@ -1753,20 +1765,21 @@
 ;; is not allowed, so we must be cautious in what we write for Li. See asmify below.
 ;;
 ;; Unlike let, the labels are not defined in the environment.  All labels are global
-;; and their content may be accessed anywhere with the primitive label-ref.
+;; and their content may be accessed anywhere with the form primitive-ref.
 ;;-----------------------------------------------------------------------------------
 
 (define (labels? expr)
   (and (pair? expr) (eq? (car expr) 'labels)))
 (define labels-bindings second)
-(define labels-body third)
+;(define labels-body third)    ;; eliminate body for now
 
-(define (emit-labels si env expr)
+(define (emit-labels si env expr)    ;; this is only used for base library right now
   (let* ([bindings (labels-bindings expr)]
 	 [syms (map first bindings)]
 	 [labs (map asmify syms)]
 	 [exprs (map second bindings)]
-	 [body (labels-body expr)])
+;	 [body (labels-body expr)]
+	 )
     (emit "     .data")
     (for-each (lambda (l)
 	       (emit "     .global ~s" l)
@@ -1775,19 +1788,28 @@
 	       (emit "     .int 0xFF"))
 	     labs)
     (emit "     .text")
+    (emit "     .global base_init")  ;; generalize later
+    (emit "     .align 4")
+    (emit "base_init:")
     (for-each (lambda (l e)
 	       (emit-expr si env (apply-transforms e))
 	       (emit "     movl %eax, ~a" l))
 	     labs
 	     exprs)
-    (emit-expr si env body))) 
+  ;  (emit "    ret")
+  ;  (emit-expr si env body)
+    (emit "    .extern main_callback")
+    (emit "    jmp main_callback")))
 
+  
 (define (emit-primitive-set! si env expr)  ;; not used yet
   (emit-expr si env (third expr))
   (emit "    movl %eax,~a" (asmify (second expr))))
 
 (define (emit-primitive-ref si env expr)
-  (emit "    movl ~a,%eax" (asmify (second expr))))
+  (let ([gl (asmify (second expr))])
+    (emit "    .extern ~a" gl)      ;; could float these to the top
+    (emit "    movl ~a,%eax" gl)))
 
 (define (emit-tail-primitive-ref si env expr)
   (emit-primitive-ref si env expr)
@@ -1881,22 +1903,24 @@
 ;; global variables symbols and s2sym and contain the corresponding
 ;; code.  
 
-(define (emit-init si env)
-  (emit "          .data")
-  (emit "          .globl symbols  # symbol list as a datum ")
-  (emit "          .globl s2sym")
-  (emit "          .align 8")
-  (emit "symbols:")
-  (emit "          .int 0xFF  # holds (symbols)")
-  (emit "          .align 8")   ;;  does this really need to be aligned ???
-  (emit "s2sym:")
-  (emit "          .int 0xFF  # holds pgm-str-sym")
-  (emit "          .text")
-  (emit-expr si env '(cons (make-symbol "nil" ()) ()))  ;; start the symbols list
-  (emit "    movl %eax, symbols")
-  (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
-  (emit "    movl %eax, s2sym")
-  )
+
+
+;; (define (emit-init si env)
+;;   (emit "          .data")
+;;   (emit "          .globl symbols  # symbol list as a datum ")
+;;   (emit "          .globl s2sym")
+;;   (emit "          .align 8")
+;;   (emit "symbols:")
+;;   (emit "          .int 0xFF  # holds (symbols)")
+;;   (emit "          .align 8")   ;;  does this really need to be aligned ???
+;;   (emit "s2sym:")
+;;   (emit "          .int 0xFF  # holds pgm-str-sym")
+;;   (emit "          .text")
+;;   (emit-expr si env '(cons (make-symbol "nil" ()) ()))  ;; start the symbols list
+;;   (emit "    movl %eax, symbols")
+;;   (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
+;;   (emit "    movl %eax, s2sym"))
+
 
 ;;----------------------------
 ;;  Library initialization
