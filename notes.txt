@@ -67,3 +67,24 @@ Take apart the stack frames as follows:
    esp-8     0x00036002      
    esp-4       -0-  
    esp ->    0x00002cf0
+
+
+You can easily tell the type of a datum by looking at the last
+character.
+
+0   0000 Fixnum
+1   0001 Pair
+2   0010 Closure
+3   0011
+4   0100 Fixnum
+5   0101 Vector
+6   0110 String
+7   0111
+8   1000 Fixnum
+9   1001 Pair
+A   1010 Closure
+B   1011
+C  1100 Fixnum
+D  1101 Vector
+E   1110 String
+F   1111     0F Char
