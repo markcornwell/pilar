@@ -25,11 +25,11 @@
     .globl _L_scheme_entry
 _L_scheme_entry:
     movl $0, %edi  # dummy for debugging
-    .global main_callback
+    .global base_init_callback
     .extern base_init
     addl $-4,%esp
     jmp base_init
-main_callback:
+base_init_callback:
     addl $4,%esp
 # emit-expr -536870912
     movl $-2147483648, %eax     # immed -536870912

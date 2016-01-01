@@ -986,7 +986,7 @@
 ;; code to fetch the datum from memory using the global labels defined
 ;; by the library.
 
-(import-from (base) string->symbol symbols)
+(import-from (base) string->symbol symbols string=?)
 
 (define-transform (external-symbols expr)
   (cond
@@ -1134,20 +1134,24 @@
   (emit "    ret"))
 
 (define (emit-init si env)
-  (emit "    .global main_callback")
+  (emit "    .global base_init_callback")
   (emit "    .extern base_init")
   (emit "    addl $-4,%esp")
-  (emit "    jmp base_init")   ;; would call work just as well?
-  (emit "main_callback:")
+  (emit "    jmp base_init")
+  (emit "base_init_callback:")
   (emit "    addl $4,%esp"))
- 
+
+;; (define (emit-init si env)
+;;   (emit "    .global main_callback")
+;;   (emit "    .extern base_init")
+;;   (emit "    call base_init")   ;; would call work just as well?
+;;   (emit "main_callback:"))
+
 (define (emit-function-header label)
   (emit "    .text")
   (emit "    .align 4,0x90")
   (emit "    .globl ~a" label)
   (emit "~a:" label))
-
-
 
 ;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
@@ -1693,40 +1697,6 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
-;;-----------------------------------------------------------
-;; looking for a simple way to do string=?
-;; this gets blasted out as an inline
-;; fast but not so compact as a callable subroutine
-;;-----------------------------------------------------------
-
-;; (define-primitive (string=? si env arg1 arg2)
-;;   (let ([false (unique-label)]
-;; 	[true (unique-label)]
-;; 	[repeat (unique-label)]
-;; 	[done (unique-label)])
-;;     (emit-expr si env arg1)
-;;     (emit "    movl %eax, ~s(%esp)" si)   ;; save arg1
-;;     (emit-expr (- si 4) env arg2)         ;; eax <- arg2[len]
-;;     (emit "    movl ~a(%esp),%ebx" si)    ;; ebx <- arg1[len]
-;;     (emit "    cmp %eax,%ebx")            ;; len1 =? len2
-;;     (emit "    jne ~a" false)             ;; if len differs return false
-;;     (emit "    movl %eax,%ecx")           ;; use ecx as counter
-;;     (emit "    sar $~a, %ecx" fxshift)     ;; eliminate tag
-;;     (emit "    add $4, %eax")             ;; eax -> arg1[0]
-;;     (emit "    add $4, %ebx")             ;; ebx -> arg2[0]
-;;     (emit "~a:" repeat)                   ;; repeat  
-;;     (emit "    movb 0(%eax),%dl")         ;;   
-;;     (emit "    cmpb 0(%ebx),%dl")         ;;    arg1[i] =? arg2[i]
-;;     (emit "    jne ~a" false)             ;;    if not return false
-;;     (emit "    inc %esi")                 ;;    esi++
-;;     (emit "    loop ~a" repeat)           ;; until (--ecx == 0)
-;;     (emit "~a:" true)                     
-;;     (emit "    movl $~a, %eax" bool-t)     ;; return true
-;;     (emit "    jmp ~a" done)
-;;     (emit "~a:" false)
-;;     (emit "    movl $~a, %eax" bool-f)     ;; return false
-;;     (emit "~a:" done)))
-
 ;;-----------------------------------------------------------------------------------
 ;; A simple implementation of string literals using assember directives.
 ;;-----------------------------------------------------------------------------------
@@ -1771,14 +1741,20 @@
 (define (labels? expr)
   (and (pair? expr) (eq? (car expr) 'labels)))
 (define labels-bindings second)
-;(define labels-body third)    ;; eliminate body for now
+(define labels-body third)    ;; eliminate body for now
 
-(define (emit-labels si env expr)    ;; this is only used for base library right now
+;; this is only used for separately compiled libraries
+;; could parameterize library name
+;; wondering if we could separate labels construct from
+;; the construct for libraries.  Lables might be useful in the main routine
+;; things like complex constants and top-level defines.
+
+(define (emit-labels si env expr)   
   (let* ([bindings (labels-bindings expr)]
 	 [syms (map first bindings)]
 	 [labs (map asmify syms)]
 	 [exprs (map second bindings)]
-;	 [body (labels-body expr)]
+	 [body (labels-body expr)]
 	 )
     (emit "     .data")
     (for-each (lambda (l)
@@ -1796,11 +1772,10 @@
 	       (emit "     movl %eax, ~a" l))
 	     labs
 	     exprs)
-  ;  (emit "    ret")
-  ;  (emit-expr si env body)
-    (emit "    .extern main_callback")
-    (emit "    jmp main_callback")))
-
+    (emit-expr si env body)
+    (emit "    .extern base_init_callback")    ;; see emit-scheme-entry
+    (emit "    jmp base_init_callback")
+    ))
   
 (define (emit-primitive-set! si env expr)  ;; not used yet
   (emit-expr si env (third expr))
@@ -1844,177 +1819,12 @@
 ;;   (symbols)   returns a list of all interned symbols
 ;;   (symbol->string <symbol>)
 ;;   (symbol-value <symbol>)    ;; returns the value (what is standard for this?)
-;;
-;;   (string->symbol <string>)  ;; this one does the work
+;;   (string->symbol <string>)  ;; this one does the work; it is defined in base.scm
 ;;
 ;;-----------------------------------------------------------------------------------
 ;;   (primitive-ref x)    
 ;;   (primitive-set! x v)
 ;;-----------------------------------------------------------------------------------
-
-
-;; Here we initialize a list of symbols.  The list is a conventional list of cons nodes
-;; Where the car of each node will hold a symbol.
-;;
-;;            +-----------+
-;;   pair --->|  *  | nil | 
-;;            +--|--------+
-;;               |
-;;               V symbol
-;;            +-----------+
-;;            |  *  | nil |  
-;;            +--|--------+         
-;;               |
-;;               V string
-;;            +-----+-----+----+----+
-;;            |  3  |  n  |  i |  l |
-;;            +-----+-----+----+----+  
-;;
-;; Important to note that the type tags are encoded in the pointers.  So we have to
-;; correct for the tags when turning them into addresses, usually by subtracting the
-;; tag value from the pointer.
-
-
-;; looks to me like assembler does not lay things in memory as I thought it would
-;; (define (emit-static-init si env)
-;;   (emit "    .data")
-;;   (emit "    .align 8,0x90")
-;;   (emit "nil_string:")
-;;   (emit "    .int 3*4")
-;;   (emit "    .ascii \"nil\"")
-;;   (emit "    .align 8,0x90") 
-;;   (emit "nil_symbol:")
-;;   (emit "    .int nil_string + ~a" string-tag)
-;;   (emit "    .int ~a" nil-value)
-;;   (emit "    .globl symbols_list")
-;;   (emit "    .align 8,0x90")
-;;   (emit "symbols_list:") 
-;;   (emit "    .int nil_symbol + ~a" symbol-tag)
-;;   (emit "    .int ~a" nil-value)   
-;;   (emit "    .text"))
-
-;;---------------------------
-;; Dynamic initialization  
-;;---------------------------
-
-;; Idea is to move this off into a separately compiled library
-;; this separate library will be required by the compiler just
-;; like runtime.o is required.  The library will define the
-;; global variables symbols and s2sym and contain the corresponding
-;; code.  
-
-
-
-;; (define (emit-init si env)
-;;   (emit "          .data")
-;;   (emit "          .globl symbols  # symbol list as a datum ")
-;;   (emit "          .globl s2sym")
-;;   (emit "          .align 8")
-;;   (emit "symbols:")
-;;   (emit "          .int 0xFF  # holds (symbols)")
-;;   (emit "          .align 8")   ;;  does this really need to be aligned ???
-;;   (emit "s2sym:")
-;;   (emit "          .int 0xFF  # holds pgm-str-sym")
-;;   (emit "          .text")
-;;   (emit-expr si env '(cons (make-symbol "nil" ()) ()))  ;; start the symbols list
-;;   (emit "    movl %eax, symbols")
-;;   (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
-;;   (emit "    movl %eax, s2sym"))
-
-
-;;----------------------------
-;;  Library initialization
-;;----------------------------
-
-;; (define (emit-library-init lname si env expr)
-;;   (emit "       .text")
-;;   (emit "       .globl ~a$init" lname)
-;;   (emit "       .align 8")
-;;   (emit "~a$init:" lname)     ;; entry point to initialize library
-;;   (emit si env expr))         ;; starts executing library at first expression
-
-;;-------------------------------------------------------------------------
-;; This expression will be compiled by our pilar scheme compiler, not by
-;; petite scheme! This is a big step toward getting the compiler to compile
-;; itself.
-;;
-;; The generated code gets incorporated into our string->symbol primitive.
-;;-------------------------------------------------------------------------
-
-;; (define expr-str->sym   ;; string to symbol
-;;     '(letrec
-;; 	 ([$slen= (lambda (s1 s2)
-;; 		   (fx= (string-length s1)
-;; 			(string-length s2)))]
-	  
-;; 	  [$si=  (lambda (s1 s2 i)
-;; 		  (char=? (string-ref s1 i)
-;; 			  (string-ref s2 i)))]
-	  
-;; 	  [$si<n= (lambda (s1 s2 i n)
-;; 		   (if (fx= i n)
-;; 		       #t
-;; 		       (if ($si= s1 s2 i)
-;; 			   ($si<n= s1 s2 (fx+ i 1) n)
-;; 		           #f)))]
-	  
-;; 	  [$ss= (lambda (s1 s2)
-;; 		 (if ($slen= s1 s2)
-;; 		     ($si<n= s1 s2 0 (string-length s1))
-;; 		     #f))]
-
-;; 	  [$str->sym1  (lambda (str symlist)   ;; assume symlist is never empty
-;; 			(if ($ss= str (symbol->string (car symlist)))
-;; 			    (car symlist)
-;; 			    (if (null? (cdr symlist))
-;; 				(let* ([new-sym (make-symbol str #f)]
-;;                                        [new-cdr (cons new-sym ())])
-;; 				  (begin
-;; 				    (set-cdr! symlist new-cdr)
-;; 				    new-sym))
-;; 				($str->sym1 str (cdr symlist)))))])
-	  
-;; 	 (lambda (str)
-;; 	   ($str->sym1 str (symbols)))))
-
-;; (define expr-str->sym    ;; string to symbol  
-;;   '(letrec
-;;      ([s= (lambda (s1 i s2 j) 
-;;   	    (let ([l1 (string-length s1)]
-;;   		  [l2 (string-length s2)])
-;;   	      (if (not (fx= l1 l2))
-;;   		  #f
-;;   		  (if (fx= i l1)
-;;   		      #t
-;;   		      (if (char=? (string-ref s1 i)
-;;   				  (string-ref s2 j))
-;;   			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
-;;   			  #f)))))]
-;;       [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
-;;       [str->sym1 (lambda (str symlist)   ;; assumed symlist is never empty
-;;   		(if (ss= str (symbol->string (car symlist)))
-;;   		    (car symlist)
-;;   		    (if (null? (cdr symlist))
-;;   			(let ([new-sym (make-symbol str #f)])
-;;   			  (begin
-;;   			    (set-cdr! symlist (cons new-sym ()))
-;;   			    new-sym))
-;;   			(str->sym1 str (cdr symlist)))))]
-;;       [str->sym (lambda (str) (str->sym1 str (symbols)))])
-;;      str->sym))
-
-;; (define-primitive (string->symbol si env exp)
-;;   (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
-
-;; (define-primitive (primitive-str->sym si env)
-;;   (emit "    movl s2sym, %eax")) ;; does this move the address or the contents into eax?
-
-;; (define-primitive (symbols si env) ;; (symbols) => a list of all interned symbols
-;;   (emit "    movl symbols, %eax"))
-
-;; (define-primitive (symbols-set! si env exp)
-;;   (emit-expr si env exp)
-;;   (emit "    movl %eax, symbols"))
 
 (define-primitive (symbol? si env arg)
   (emit-expr si env arg)
