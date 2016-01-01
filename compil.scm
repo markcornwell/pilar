@@ -1,4 +1,4 @@
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------
 ;;
 ;;                                 Pilar: A Scheme Compiler
 ;;
@@ -9,9 +9,9 @@
 ;;
 ;;                        Copyright (C) 2015, All Rights Reserved
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;
 ;; Runs under petite chez scheme.  See makefile for details.
 ;;
@@ -52,14 +52,14 @@
 ;;  code generation.  Stage II takes this IL and generates x86 assembly by recursive
 ;;  descent.
 ;;
-;;              +--------------+         +-----------+           +-----------+
-;;              |   Source     |         |  Code     |           |   GNU     |
-;;   Source  -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
-;;     SL       |  Transforms  |         |           |    ASM    |           |
-;;              +--------------+         +-----------+           +-----------+
-;;                 Stage  I                Stage II
+;;             +--------------+         +-----------+           +-----------+
+;;             |   Source     |         |  Code     |           |   GNU     |
+;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;     SL      |  Transforms  |         |           |    ASM    |           |
+;;             +--------------+         +-----------+           +-----------+
+;;                Stage  I                Stage II
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
 ;;
 ;;   E -> I | V | P
@@ -80,7 +80,7 @@
 ;;
 ;;                                     Figure 1
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
 ;;   E   ->  I | V | P
@@ -97,7 +97,7 @@
 ;;
 ;;                                    Figure 2
 ;;
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
 ;;  paper (Ghuloum 2006)
@@ -116,9 +116,9 @@
 ;; 1.2 Immediate Constants
 ;; 1.1 Integers
 
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
-;;-----------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
 
 (load "tests-driver.scm")
 
@@ -139,7 +139,7 @@
 (load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
-;(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
+(load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
 (load "tests/tests-2.1-req.scm")   ;; procedures and closures
@@ -190,19 +190,8 @@
 	'eliminate-quote         ;; eliminate complex constants
 	'eliminate-when/unless   ;; when/unless translate to corresponding if expressions
 	'eliminate-cond          ;; rewrite cond as if
+	'external-symbols        ;; substitute primitive-ref and primitive-set!
 	))
-
-(define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
-  (emit "# ~s" expr)
-  (for-each
-   (lambda (tf)
-     (unless (getprop tf '*is-transform*)
-	 (error 'emit-program (format "undefined transform: ~s" tf)))
-     (emit "# == ~a  ==>" (getprop tf '*name-string*))
-     (set! expr ((getprop tf '*procedure*) expr))
-     (emit "# ~s" expr))
-   *transform-list*)
-  (emit-scheme-entry '() expr))
 
 (define (apply-transforms expr)   ;; CLEAN UP emit program and emit library program
   (for-each
@@ -215,19 +204,15 @@
    *transform-list*)
   expr)
 
+(define (emit-program expr)  ;; runs the preprocessor passes then calls the code generator
+  (emit "# ~s" expr)
+  (emit-scheme-entry '() (apply-transforms expr)))
+
 (define compil-program emit-program) ;; hook to the test driver which calls compil-program
 
 (define (emit-library-program expr)  ;; like emit program, but no scheme entry
   (emit "# ~s" expr)
-  (for-each
-   (lambda (tf)
-     (unless (getprop tf '*is-transform*)
-	 (error 'emit-program (format "undefined transform: ~s" tf)))
-     (emit "# == ~a  ==>" (getprop tf '*name-string*))
-     (set! expr ((getprop tf '*procedure*) expr))
-     (emit "# ~s" expr))
-   *transform-list*)
-  (emit-expr 0 '() expr))
+  (emit-library-init '() (apply-transforms expr)))
 
 (define-syntax define-transform
   (syntax-rules ()
@@ -596,7 +581,7 @@
 ;;
 ;;-----------------------------------------------------------------------------------
 
-;; ISSUE: Rewrite this.
+;; ISSUE: Rewrite this comment.
 ;;
 ;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
 ;; (set! z2 '(letrec ((f (letrec ((g (lambda (x) (fx* x 2)))) (lambda (n) (g (fx* n 2)))))) (f 12)))
@@ -841,7 +826,7 @@
     (let ([body (quote-body expr)])
       (cond
        [(or (boolean? body) (fixnum? body) (char? body) (null? body)) body]
-       [(symbol? body) (list 'string->symbol (symbol->string body))]  ;; requires string->symbol
+       [(symbol? body) (list 'string->symbol (symbol->string body))] ;; requires string->symbol
        [(pair? body) (expand-list body)]
        [(string? body) body]))]
    [(pair? expr)
@@ -856,7 +841,7 @@
 	  (eliminate-quote (list 'quote (car exp)))
 	  (eliminate-quote (list 'quote (cdr exp))))]
    [(null? exp) exp]
-  ; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
+;; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
@@ -931,6 +916,86 @@
 	  (eliminate-cond (cdr exp)))]
    [else exp]))
 
+
+;;-----------------------------------------------------------------------------------
+;;                                External Symbols
+;;-----------------------------------------------------------------------------------
+;; External symbols have their values stored in memory at locations denoted by
+;; global labels that are defined in separately linked library files.
+;;------------------------------------------------------------------------------
+;; asmify maps scheme identifiers to assembler identifiers by substituting legal
+;; escape sequences for illegal special characters.
+;;
+;; Example
+;;
+;;   (asmify 'string->symbol) => "string$m$gsymbol"
+;;
+;; The full compliment of special characters that (R5RS) allows:
+;;
+;;            ! $ % & * + - . / : < = > ? @ ^ _ ~
+;;
+;;------------------------------------------------------------------------------
+
+(define (asmify s)
+  (list->string (asmify1 (string->list (symbol->string s)))))
+
+(define (asmify1 l)  ;;  TBD expand this list to all scheme specials chars 
+    (cond
+     [(null? l) l]
+     [(eq? (car l) #\!) (cons #\$ (cons #\b (asmify1 (cdr l))))]  ; bang
+     [(eq? (car l) #\$) (cons #\$ (cons #\$ (asmify1 (cdr l))))]  ; dollar
+     [(eq? (car l) #\%) (cons #\$ (cons #\p (asmify1 (cdr l))))]  ; percent
+     [(eq? (car l) #\&) (cons #\$ (cons #\a (asmify1 (cdr l))))]  ; ampersand
+     [(eq? (car l) #\*) (cons #\$ (cons #\s (asmify1 (cdr l))))]  ; star
+     [(eq? (car l) #\+) (cons #\$ (cons #\p (asmify1 (cdr l))))]  ; plus
+     [(eq? (car l) #\-) (cons #\$ (cons #\m (asmify1 (cdr l))))]  ; minus
+     [(eq? (car l) #\.) (cons #\$ (cons #\d (asmify1 (cdr l))))]  ; dot
+     [(eq? (car l) #\/) (cons #\$ (cons #\S (asmify1 (cdr l))))]  ; slash
+     [(eq? (car l) #\:) (cons #\$ (cons #\c (asmify1 (cdr l))))]  ; colon
+     [(eq? (car l) #\<) (cons #\$ (cons #\l (asmify1 (cdr l))))]  ; less than
+     [(eq? (car l) #\=) (cons #\$ (cons #\e (asmify1 (cdr l))))]  ; equals
+     [(eq? (car l) #\>) (cons #\$ (cons #\g (asmify1 (cdr l))))]  ; greater than
+     [(eq? (car l) #\?) (cons #\$ (cons #\q (asmify1 (cdr l))))]  ; question mark
+     [(eq? (car l) #\@) (cons #\$ (cons #\A (asmify1 (cdr l))))]  ; at
+     [(eq? (car l) #\^) (cons #\$ (cons #\h (asmify1 (cdr l))))]  ; hat
+     [(eq? (car l) #\_) (cons #\$ (cons #\u (asmify1 (cdr l))))]  ; underscore
+     [(eq? (car l) #\~) (cons #\$ (cons #\t (asmify1 (cdr l))))]  ; tilde
+     [else (cons (car l) (asmify1 (cdr l)))]))	
+
+(define-syntax import-from
+  (syntax-rules ()
+    [(import-from (library-name) s)
+     (begin
+       (putprop 's '*is-external* #t)
+       (putprop 's '*library-name* 'library-name)
+       (putprop 's '*label* (asmify 's)))]
+    [(import-from (library-name) s s* ...)
+     (begin
+       (import-from (library-name) s)
+       (import-from (library-name) s* ...))]))
+
+(define (external? symbol)
+  (getprop symbol '*is-external*))
+
+;; We need to know what symbols come from separately compiled libraries
+;; at compile time.  A transform uses this list to wrap those symbols
+;; in a primitive-ref form, e.g. (primitive-ref string->symbol)
+;;
+;; Then at code generation time, we recognize those forms and emit
+;; code to fetch the datum from memory using the global labels defined
+;; by the library.
+
+(import-from (base) string->symbol symbols string=? append1)
+
+(define-transform (external-symbols expr)
+  (cond
+   [(and (pair? expr) (symbol? (car expr)) (external? (car expr)))
+    (cons (list 'primitive-ref (car expr)) (external-symbols (cdr expr)))]
+   [(pair? expr)
+    (cons (external-symbols (car expr))
+	  (external-symbols (cdr expr)))]
+   [else expr]))
+
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
@@ -980,6 +1045,9 @@
 (define (begin? expr)
   (and (pair? expr) (eq? (car expr) 'begin)))
 
+(define (primitive-ref? expr)
+  (and (pair? expr) (eq? (car expr) 'primitive-ref)))
+
 (define (emit-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
@@ -987,20 +1055,20 @@
 	   (and pair (fixnum? (cdr pair)))))) 
   (emit "# emit-expr ~s" expr)
   (cond
-
-   [(primcall? expr)   (emit-primcall si env expr)]   
-   [(immediate? expr)  (emit-immediate expr)]
-   [(label? expr)      (emit-label si env expr)]   ;; never in tail position
-   [(string? expr)     (emit-string-literal expr)]
-   [(variable? expr)   (emit-variable-ref env expr)]
-   [(begin? expr)      (emit-begin si env expr)]  
-   [(closure? expr)    (emit-closure si env expr)]
-   [(funcall? expr)    (emit-funcall si env expr)]
-   [(let? expr)        (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
-   [(if? expr)         (emit-if si env expr)]
-   [(and? expr)        (emit-and si env expr)]
-   [(or? expr)         (emit-or si env expr)]
-   [(pair? expr)       (emit-funcall si env (cons 'funcall expr))] ;; implicit funcall
+   [(primcall? expr)        (emit-primcall si env expr)]   
+   [(immediate? expr)       (emit-immediate expr)]
+   [(labels? expr)          (emit-labels si env expr)]   ;; labels never in tail position
+   [(string? expr)          (emit-string-literal expr)]
+   [(variable? expr)        (emit-variable-ref env expr)]
+   [(primitive-ref? expr)   (emit-primitive-ref si env expr)] 
+   [(begin? expr)           (emit-begin si env expr)]  
+   [(closure? expr)         (emit-closure si env expr)]
+   [(funcall? expr)         (emit-funcall si env expr)]
+   [(let? expr)             (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
+   [(if? expr)              (emit-if si env expr)]
+   [(and? expr)             (emit-and si env expr)]
+   [(or? expr)              (emit-or si env expr)]
+   [(pair? expr)            (emit-funcall si env (cons 'funcall expr))] ;; implicit funcall
    [else
     (error "emit-expr" "unrecognized form" expr)]))
 
@@ -1016,9 +1084,10 @@
   (cond
    [(primcall? expr)   (emit-tail-primcall si env expr)]   
    [(immediate? expr)  (emit-tail-immediate expr)]
-   [(label? expr)      (error 'emit-tail-expr "label never in tail position")]
+   [(labels? expr)      (error 'emit-tail-expr "labels never in tail position")]
    [(string? expr)     (emit-tail-string-literal)]
    [(variable? expr)   (emit-tail-variable-ref env expr)]
+   [(primitive-ref? expr) (emit-tail-primitive-ref si env expr)]
    [(begin? expr)      (emit-tail-begin si env expr)]   
    [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
    [(funcall? expr)    (emit-tail-funcall si env expr)]
@@ -1037,13 +1106,13 @@
 
 (define (emit-tail-immediate x)
   (emit-immediate x)
-  (emit "    ret                  # tail return"))
+  (emit "    ret                  # immediate tail return"))
 
 (define (emit-scheme-entry env expr) 
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
-  (emit "    movl $0x66666666, %edi  # dummy for debugging")
-  (emit-init (- (* 2 wordsize)) env)  
+  (emit "    movl $0, %edi  # dummy for debugging")
+  (emit-init (- (* 2 wordsize)) env)
   (emit-expr (- (* 2 wordsize)) env expr)
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
@@ -1061,13 +1130,27 @@
   (emit "    movl 20(%ecx), %edi")
   (emit "    movl 24(%ecx), %ebp")
   (emit "    movl 28(%ecx), %esp")
-  (emit "    ret"))  
- 
-(define (emit-function-header entry)
+  (emit "    ret"))
+
+(define (emit-init si env)
+  (emit "    .global base_init_callback")
+  (emit "    .extern base_init")
+  (emit "    addl $-4,%esp")
+  (emit "    jmp base_init")
+  (emit "base_init_callback:")
+  (emit "    addl $4,%esp"))
+
+;; (define (emit-init si env)
+;;   (emit "    .global main_callback")
+;;   (emit "    .extern base_init")
+;;   (emit "    call base_init")   ;; would call work just as well?
+;;   (emit "main_callback:"))
+
+(define (emit-function-header label)
   (emit "    .text")
   (emit "    .align 4,0x90")
-  (emit "    .globl ~a" entry)
-  (emit "~a:" entry))
+  (emit "    .globl ~a" label)
+  (emit "~a:" label))
 
 ;;-----------------------------------------------------------------------------------
 ;;                       Value Representation
@@ -1554,7 +1637,6 @@
   (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object;
                                          ;; offset -1 = tag(-5) + lenfield_size(4)
 
-
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings
 ;;-------------------------------------------------------------------------------
@@ -1614,40 +1696,6 @@
   (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
-;;-------------------------------------------------------
-;; looking for a simple way to do string=?
-;; this gets blasted out as an inline
-;; fast but not so compact as a callable subroutine
-;;-------------------------------------------------------
-
-;; (define-primitive (string=? si env arg1 arg2)
-;;   (let ([false (unique-label)]
-;; 	[true (unique-label)]
-;; 	[repeat (unique-label)]
-;; 	[done (unique-label)])
-;;     (emit-expr si env arg1)
-;;     (emit "    movl %eax, ~s(%esp)" si)   ;; save arg1
-;;     (emit-expr (- si 4) env arg2)         ;; eax <- arg2[len]
-;;     (emit "    movl ~a(%esp),%ebx" si)    ;; ebx <- arg1[len]
-;;     (emit "    cmp %eax,%ebx")            ;; len1 =? len2
-;;     (emit "    jne ~a" false)             ;; if len differs return false
-;;     (emit "    movl %eax,%ecx")           ;; use ecx as counter
-;;     (emit "    sar $~a, %ecx" fxshift)     ;; eliminate tag
-;;     (emit "    add $4, %eax")             ;; eax -> arg1[0]
-;;     (emit "    add $4, %ebx")             ;; ebx -> arg2[0]
-;;     (emit "~a:" repeat)                   ;; repeat  
-;;     (emit "    movb 0(%eax),%dl")         ;;   
-;;     (emit "    cmpb 0(%ebx),%dl")         ;;    arg1[i] =? arg2[i]
-;;     (emit "    jne ~a" false)             ;;    if not return false
-;;     (emit "    inc %esi")                 ;;    esi++
-;;     (emit "    loop ~a" repeat)           ;; until (--ecx == 0)
-;;     (emit "~a:" true)                     
-;;     (emit "    movl $~a, %eax" bool-t)     ;; return true
-;;     (emit "    jmp ~a" done)
-;;     (emit "~a:" false)
-;;     (emit "    movl $~a, %eax" bool-f)     ;; return false
-;;     (emit "~a:" done)))
-
 ;;-----------------------------------------------------------------------------------
 ;; A simple implementation of string literals using assember directives.
 ;;-----------------------------------------------------------------------------------
@@ -1670,7 +1718,7 @@
   (emit "    ret"))
 
 ;;-----------------------------------------------------------------------------------
-;;                                   Label
+;;                            Label - external libraries
 ;;-----------------------------------------------------------------------------------
 ;; Here we employ a label form to compile expressions and save the resulting
 ;; object at the label given in the form.  It works like a bridge between our
@@ -1683,35 +1731,63 @@
 ;;
 ;; Important: the label is an asm symbol which is restricted to letters, digits,
 ;; and 3 symbols _ . $ (that is underscore, dot, and dollar sign).  Other stuff
-;; is not allowed, so we must be cautious in what we write for Li.  See TBD below.
+;; is not allowed, so we must be cautious in what we write for Li. See asmify below.
 ;;
 ;; Unlike let, the labels are not defined in the environment.  All labels are global
-;; and their content may be accessed anywhere with the primitive label-ref.
+;; and their content may be accessed anywhere with the form primitive-ref.
 ;;-----------------------------------------------------------------------------------
 
-(define (label? exp)
-  (and (pair? exp) (eq? (car exp) 'label)))
-(define label-bindings second)
-(define label-expr third)
+(define (labels? expr)
+  (and (pair? expr) (eq? (car expr) 'labels)))
+(define labels-bindings second)
+(define labels-body third)    ;; eliminate body for now
 
-(define (emit-label si env exp)                            ;;  UNUSED ???
-  (let* ([labels (map first (label-bindings exp))]
-	 [exprs (map second (label-bindings exp))])
-    (map (lambda (gl x)
-	   (emit-expr si env x)
-	   (emit "    .data")
-	   (emit "    .align 8,0x90")
-	   (emit "    .globl ~a" gl)   ;; all Li become global labels
-	   (emit "~a:" gl) ;; TBD - verify that l is a valid asm symbol
-	   (emit "    .int 0")
-	   (emit "    .text")
-	   (emit "    movl %eax, ~a" gl))
-	 labels
-	 exprs))
-  (emit-expr si env (label-expr exp)))
+;; this is only used for separately compiled libraries
+;; could parameterize library name
+;; wondering if we could separate labels construct from
+;; the construct for libraries.  Lables might be useful in the main routine
+;; things like complex constants and top-level defines.
 
-(define-primitive (label-ref si env gl)
-  (emit "    movl ~a, %eax" gl))
+(define (emit-labels si env expr)   
+  (let* ([bindings (labels-bindings expr)]
+	 [syms (map first bindings)]
+	 [labs (map asmify syms)]
+	 [exprs (map second bindings)]
+	 [body (labels-body expr)]
+	 )
+    (emit "     .data")
+    (for-each (lambda (l)
+	       (emit "     .global ~s" l)
+	       (emit "     .align 8")
+	       (emit "~a:" l)
+	       (emit "     .int 0xFF"))
+	     labs)
+    (emit "     .text")
+    (emit "     .global base_init")  ;; generalize later
+    (emit "     .align 4")
+    (emit "base_init:")
+    (for-each (lambda (l e)
+	       (emit-expr si env (apply-transforms e))
+	       (emit "     movl %eax, ~a" l))
+	     labs
+	     exprs)
+    (emit-expr si env body)
+    (emit "    .extern base_init_callback")    ;; see emit-scheme-entry
+    (emit "    jmp base_init_callback")
+    ))
+  
+(define (emit-primitive-set! si env expr)  ;; not used yet
+  (emit-expr si env (third expr))
+  (emit "    movl %eax,~a" (asmify (second expr))))
+
+(define (emit-primitive-ref si env expr)
+  (let ([gl (asmify (second expr))])
+    (emit "    .extern ~a" gl)      ;; could float these to the top
+    (emit "    movl ~a,%eax" gl)))
+
+(define (emit-tail-primitive-ref si env expr)
+  (emit-primitive-ref si env expr)
+  (emit "    ret"))
 
 ;;-----------------------------------------------------------------------------------
 ;;                 Symbols, Libraries, and Separate Compilation
@@ -1742,159 +1818,12 @@
 ;;   (symbols)   returns a list of all interned symbols
 ;;   (symbol->string <symbol>)
 ;;   (symbol-value <symbol>)    ;; returns the value (what is standard for this?)
-;;
-;;   (string->symbol <string>)  ;; this one does the work
-;;
-;;-------- ??
-;;
-;;   (primitive-ref x)    
-;;   (primitive-set! x v)
-;;
+;;   (string->symbol <string>)  ;; this one does the work; it is defined in base.scm
 ;;
 ;;-----------------------------------------------------------------------------------
-
-
-;; Here we initialize a list of symbols.  The list is a conventional list of cons nodes
-;; Where the car of each node will hold a symbol.
-;;
-;;            +-----------+
-;;   pair --->|  *  | nil | 
-;;            +--|--------+
-;;               |
-;;               V symbol
-;;            +-----------+
-;;            |  *  | nil |  
-;;            +--|--------+         
-;;               |
-;;               V string
-;;            +-----+-----+----+----+
-;;            |  3  |  n  |  i |  l |
-;;            +-----+-----+----+----+  
-;;
-;; Important to note that the type tags are encoded in the pointers.  So we have to
-;; correct for the tags when turning them into addresses, usually by subtracting the
-;; tag value from the pointer.
-
-
-;; looks to me like assembler does not lay things in memory as I thought it would
-;; (define (emit-static-init si env)
-;;   (emit "    .data")
-;;   (emit "    .align 8,0x90")
-;;   (emit "nil_string:")
-;;   (emit "    .int 3*4")
-;;   (emit "    .ascii \"nil\"")
-;;   (emit "    .align 8,0x90") 
-;;   (emit "nil_symbol:")
-;;   (emit "    .int nil_string + ~a" string-tag)
-;;   (emit "    .int ~a" nil-value)
-;;   (emit "    .globl symbols_list")
-;;   (emit "    .align 8,0x90")
-;;   (emit "symbols_list:") 
-;;   (emit "    .int nil_symbol + ~a" symbol-tag)
-;;   (emit "    .int ~a" nil-value)   
-;;   (emit "    .text"))
-
-;; go back to dynamic initialization
-
-(define (emit-init si env)
-  (emit "          .data")
-  (emit "          .globl symbols  # symbol list as a datum ")
-  (emit "          .globl s2sym")
-  (emit "          .align 8")
-  (emit "symbols:")
-  (emit "          .int 0xFF  # holds (symbols)")
-  (emit "          .align 8")   ;;  does this really need to be aligned ???
-  (emit "s2sym:")
-  (emit "          .int 0xFF  # holds pgm-str-sym")
-  (emit "          .text")
-  (emit-expr si env '(cons (make-symbol "nil" ()) ()))
-  (emit "    movl %eax, symbols")
-  (emit-expr si env (apply-transforms expr-str->sym)) ;; <<---- NEEDS PREPRECESSOR STEPS; layering?
-  (emit "    movl %eax, s2sym")
-  )
-
-;;-------------------------------------------------------------------------
-;; This expression will be compiled by our pilar scheme compiler, not by
-;; petite scheme! This is a big step toward getting the compiler to compile
-;; itself.
-;;
-;; The generated code gets incorporated into our string->symbol primitive.
-;;-------------------------------------------------------------------------
-
-(define expr-str->sym   ;; string to symbol
-    '(letrec
-	 ([$slen= (lambda (s1 s2)
-		   (fx= (string-length s1)
-			(string-length s2)))]
-	  
-	  [$si=  (lambda (s1 s2 i)
-		  (char=? (string-ref s1 i)
-			  (string-ref s2 i)))]
-	  
-	  [$si<n= (lambda (s1 s2 i n)
-		   (if (fx= i n)
-		       #t
-		       (if ($si= s1 s2 i)
-			   ($si<n= s1 s2 (fx+ i 1) n)
-		           #f)))]
-	  
-	  [$ss= (lambda (s1 s2)
-		 (if ($slen= s1 s2)
-		     ($si<n= s1 s2 0 (string-length s1))
-		     #f))]
-
-	  [$str->sym1  (lambda (str symlist)   ;; assume symlist is never empty
-			(if ($ss= str (symbol->string (car symlist)))
-			    (car symlist)
-			    (if (null? (cdr symlist))
-				(let* ([new-sym (make-symbol str #f)]
-                                       [new-cdr (cons new-sym ())])
-				  (begin
-				    (set-cdr! symlist new-cdr)
-				    new-sym))
-				($str->sym1 str (cdr symlist)))))])
-	  
-	 (lambda (str)
-	   ($str->sym1 str (symbols)))))
-
-;; (define expr-str->sym    ;; string to symbol  
-;;   '(letrec
-;;      ([s= (lambda (s1 i s2 j) 
-;;   	    (let ([l1 (string-length s1)]
-;;   		  [l2 (string-length s2)])
-;;   	      (if (not (fx= l1 l2))
-;;   		  #f
-;;   		  (if (fx= i l1)
-;;   		      #t
-;;   		      (if (char=? (string-ref s1 i)
-;;   				  (string-ref s2 j))
-;;   			  (s= s1 (fx+ i 1) s2 (fx+ j 1))
-;;   			  #f)))))]
-;;       [ss= (lambda (s1 s2) (s= s1 0 s2 0))]
-;;       [str->sym1 (lambda (str symlist)   ;; assumed symlist is never empty
-;;   		(if (ss= str (symbol->string (car symlist)))
-;;   		    (car symlist)
-;;   		    (if (null? (cdr symlist))
-;;   			(let ([new-sym (make-symbol str #f)])
-;;   			  (begin
-;;   			    (set-cdr! symlist (cons new-sym ()))
-;;   			    new-sym))
-;;   			(str->sym1 str (cdr symlist)))))]
-;;       [str->sym (lambda (str) (str->sym1 str (symbols)))])
-;;      str->sym))
-
-(define-primitive (string->symbol si env exp)
-  (emit-funcall si env (list 'funcall '(primitive-str->sym) exp)))
-
-(define-primitive (primitive-str->sym si env)
-  (emit "    movl s2sym, %eax")) ;; does this move the address or the contents into eax?
-
-(define-primitive (symbols si env) ;; (symbols) => a list of all interned symbols
-  (emit "    movl symbols, %eax"))
-
-(define-primitive (symbols-set! si env exp)
-  (emit-expr si env exp)
-  (emit "    movl %eax, symbols"))
+;;   (primitive-ref x)    
+;;   (primitive-set! x v)
+;;-----------------------------------------------------------------------------------
 
 (define-primitive (symbol? si env arg)
   (emit-expr si env arg)
@@ -2379,39 +2308,6 @@
   )  ;; jump to closure entry point
 
 
-;; ;; In tail position, we do not need to allocate an frame, we will re-use the old
-;; ;; frame.  We keep the return pointer, but putting in a new current closure, args
-;; ;; and local vars
-
-;; (define (emit-tail-funcall si env expr)
-;;   (define (emit-arguments si args)
-;;     (unless (empty? args)
-;;         (emit-expr si env (first args))                ;; evaluated arg in %eax
-;;         (emit "    mov %eax, ~s(%esp)    # arg " si)   ;; save %eax as evaluated arg    
-;;         (emit-arguments (- si wordsize) (rest args)))) ;; recursively emit the rest
-;;   (define (emit-shift-args argc si delta)
-;;     (emit "# emit-shift-args:  argc=~s   si=~s  delta=~s" argc si delta)
-;;     (unless (zero? argc)
-;; 	   (emit "    mov ~a(%esp), %ebx  # shift arg" si )
-;; 	   (emit "    mov %ebx, ~a(%esp)  # down to base" (+ si delta))
-;; 	   (emit-shift-args (- argc 1) (- si wordsize) delta)))
-;;   (emit "# emit-tail-funcall")
-;;   (emit "#    si   =~s" si)
-;;   (emit "#    env  = ~s" env)
-;;   (emit "#    expr = ~s" expr)
-;;   ;; (why do we not evaluate the funcall-op and stash it in exp+si-8?
-;;   ;; because a tail funcall assumes the closure value is already there and will re-use it. But is it????)
-;;   ;; Evaluate the funcall and 
-;;   (emit-arguments (- si 8) (funcall-args expr)) ;; leaving room for 2 values
-
-;;   ;; Why so fancy?  because we are evaluating this after evaluating the args
-;;   (emit-expr (- si 8 (* 4 (length (funcall-args expr)))) env (funcall-oper expr)) 
-  
-;;   (emit "    movl %eax, %edi  # evaluated funcall op -> %edi")
-;;   (emit-shift-args (length (funcall-args expr)) (- si 8) (- si))  ;; VERFIY THIS
-;;   (emit "    jmp *-2(%edi)  # tail-funcall")
-;;   )   ;; jump to closure entry point
-
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
 ;;-----------------------------------------------------------------------------------
@@ -2490,14 +2386,11 @@
 (define (closure? expr)
    (and (pair? expr) (eq? (car expr) 'closure)))
 
-;(define closure-formals first)
 (define closure-formals second)
-;(define closure-freevars second)
 (define closure-freevars third)
-;(define closure-body cdddr)        ;; ISSUE -- fixup to uniform style of whole expressions to emit
 (define closure-body fourth)
 
-(define (emit-closure si env expr)   ;; <<----- THIS IS THE CORE ENTRY POINT
+(define (emit-closure si env expr)
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
@@ -2505,7 +2398,6 @@
   (let* ([formals (closure-formals expr)]
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
-      ;; [closed-env (extend-closure-env '() freevars)] ;; why not use full env?
 	 [closed-env (extend-closure-env env freevars)]
 	 [entry-point (unique-label)]
 	 [exit-point (unique-label)]
@@ -2538,14 +2430,10 @@
     (emit "~a:" entry-point)         ;; this is the label that we put in the closure
     (let f ([fmls formals]
 	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
-	    [env closed-env])        ;; <<- ISSUE: Closed Environment is WRONG!
-                                     ;;     Need to Shadow closure vars not eliminiate
-                                     ;;     all vars.  O/W can't copy their bindings.
-       
+	    [env closed-env])      
       (cond
        [(empty? fmls)
-      ;(emit-tail-expr si env (cons 'begin body))] ;; implicity on-the-fly begin [CLEAN UP??]
-	(emit-tail-expr si env body)]  ;; <<--- heart of body generation
+	(emit-tail-expr si env body)]
        [else
 	(f (rest fmls)
 	   (- si wordsize)
@@ -2569,9 +2457,10 @@
 
 (define (emit-close-free-vars ci env vars)
   (unless (null? vars)
-	  (if (lookup (car vars) env) ;; only initialize closure-variables that exist in the binding environment.
+	  (if (lookup (car vars) env) ;; only initialize closure-variables
+	                              ;; that exist in the binding environment.
 	      (begin
-		(emit-variable-ref env (car vars))                     ;; reference the value of the first variable
+		(emit-variable-ref env (car vars))  ;; reference the value of the first variable
 		(emit "   movl  %eax, ~s(%ebp)  # ~s" ci (car vars))) ;; copy that value to the closure cell
 	      (emit "# WARNING: free var ~s not defined in the environmnet" (car vars)))
 	  (emit-close-free-vars (+ 4 ci) env (cdr vars))))  ;; recursively process remaining free vars
@@ -2586,7 +2475,7 @@
 	 (extend-env ci env (first frev)))])))
 
 
-(define (align-to-8-bytes i)          ;; rounds i up to first multiple of 8
+(define (align-to-8-bytes i)    ;; rounds i up to next multiple of 8
     (if (zero? (remainder i 8))
 	i
 	(+ i (- 8 (remainder i 8)))))

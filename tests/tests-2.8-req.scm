@@ -634,14 +634,13 @@
 	 ($str->sym "baz")				      
 	 )) => "baz\n"]     
 
- ;; [(string=? "foo" "foo") => "#t\n"]    ;; <<------ string=? not implemented
- ;; [(string=? "foo" "baz") => "#f\n"]
- ;; [(string=? "foo" "fo")  =>  "#f\n"]
- ;; [(string=? "foo" "for") => "#f\n"]
- ;; [(string=? "" "for")    => "#f\n"] 
- ;; [(string=? "foo" "")    => "#f\n"]
- ;; [(string=? "" "")       => "#t\n"]
- 
+    [(string=? "foo" "foo") => "#t\n"]
+    [(string=? "foo" "baz") => "#f\n"]
+    [(string=? "foo" "fo")  =>  "#f\n"]
+    [(string=? "foo" "for") => "#f\n"]
+    [(string=? "" "for")    => "#f\n"] 
+    [(string=? "foo" "")    => "#f\n"]
+    [(string=? "" "")       => "#t\n"]
  )
 
 (add-tests-with-string-output "symbols"
