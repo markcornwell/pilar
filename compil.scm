@@ -1,13 +1,13 @@
 ;;-----------------------------------------------------------------------------
 ;;
-;;                                 Pilar: A Scheme Compiler
+;;                          Pilar: A Scheme Compiler
 ;;
-;;                                           by
+;;                                     by
 ;;
-;;                                      Mark Cornwell
+;;                                Mark Cornwell
 ;;
 ;;
-;;                        Copyright (C) 2015, All Rights Reserved
+;;                   Copyright (C) 2015, All Rights Reserved
 ;;
 ;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
@@ -25,7 +25,7 @@
 ;;       TR-2006-06.
 ;;
 ;;
-;;  OVERVIEW
+;;  INTRODUCTION
 ;;
 ;;  This compiler translates programs expressed in the Source Language (fig 1)
 ;;  into assembly code that can be run through a conventional assembler and linked
@@ -79,7 +79,6 @@
 ;;   V  ->  variable
 ;;
 ;;                                     Figure 1
-;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
@@ -97,25 +96,30 @@
 ;;   V  ->  variable
 ;;
 ;;                                    Figure 2
-;;
 ;;------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
 ;;  paper (Ghuloum 2006)
 ;;
-;; 2.1 Closure
-;; 1.9.3  String
-;; 1.9.2  Vector
-;; 1.9.1  Pair
-;; 1.9 Heap Allocation
-;; 1.8 Proper Tail Calls
-;; 1.7 Procedures
-;; 1.6 Local Variables
-;; 1.5 Binary Primitives
-;; 1.4 Conditional Expressions
-;; 1.3 Unary Primitives
-;; 1.2 Immediate Constants
-;; 1.1 Integers
+;; 3.1 Integers
+;; 3.2 Immediate Constants
+;; 3.3 Unary Primitives
+;; 3.4 Binary Primitives
+;; 3.5 Local Variables
+;; 3.6 Conditional Expressions
+;; 3.7 Heap Allocation
+;; 1.9.3  String (tutorial)
+;; 1.9.2  Vector (tutorial)
+;; 1.9.1  Pair   (tutorial)
+;; 3.8 Procedure Calls
+;; 3.9 Closures
+;; 3.10 Proper Tail Calls
+;; 3.11 Complex Constants
+;; 3.12 Assignment
+;; 3.13 Extending the Syntax
+;; 3.14 Symbols, Libraries, and Separate Compilation
+;; 3.15 Foreigh Functions
+
 
 ;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
@@ -123,7 +127,7 @@
 
 (load "tests-driver.scm")
 
-;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
+;; (load "tests/tests-9.0-square.scm")  ;; e5chess define square -- pass 1.8 first
 
 ;; (load "tests/tests-5.6-req.scm")  ;; fxmodulo
 ;; (load "tests/tests-5.3-req.scm")  ;; call/cc
@@ -2480,3 +2484,20 @@
     (if (zero? (remainder i 8))
 	i
 	(+ i (- 8 (remainder i 8)))))
+
+
+;;-------------------------------------------------------------------------------------
+;;                                Foreign functions
+;;-------------------------------------------------------------------------------------
+;;
+;; Our Scheme implementation cannot exist in isolation. It needs a way of interacting
+;; with the host operating system in order to perform Input/Output and many other useful
+;; operations. We now add a very simple way of calling to foreign C procedures.
+;; We add one additional form to our compiler:
+;;    <Expr> ::= (foreign-call <string> <Expr> ...)
+;; The foreign-call form takes a string literal as the first argu- ment. The string
+;; denotes the name of the C procedure that we intend to call. Each of the expressions
+;; are evaluated first and their values are passed as arguments to the C procedure. The
+;; calling convention for C differs from the calling convention that we have been using
+;; for Scheme in that the arguments are placed below the return point and in reverse
+;; order. Figure 4 illustrates the difference.  (Ghuloum 2006)
