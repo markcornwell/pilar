@@ -1,30 +1,24 @@
-# (symbols)
+# -536870912
 # == explicit-begins  ==>
-# (symbols)
+# -536870912
 # == eliminate-let*  ==>
-# (symbols)
+# -536870912
 # == eliminate-shadowing  ==>
-# (symbols)
+# -536870912
 # == vectorize-letrec  ==>
-# (symbols)
+# -536870912
 # == eliminate-set!  ==>
-# (symbols)
+# -536870912
 # == close-free-variables  ==>
-# (symbols)
+# -536870912
 # == eliminate-quote  ==>
-# (symbols)
+# -536870912
 # == eliminate-when/unless  ==>
-# (symbols)
+# -536870912
 # == eliminate-cond  ==>
-<<<<<<< HEAD
-# (symbols)
-# == external-symbols  ==>
-# ((primitive-ref symbols))
-=======
 # -536870912
 # == external-symbols  ==>
 # -536870912
->>>>>>> separate-compilation
 # emit-scheme-entry
     .text
     .align 4,0x90
@@ -37,25 +31,8 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-<<<<<<< HEAD
-# emit-expr ((primitive-ref symbols))
-# funcall
-#    si   =-8
-#    env  = ()
-#    expr = (funcall (primitive-ref symbols))
-# emit-expr (primitive-ref symbols)
-    .extern symbols
-    movl symbols,%eax
-   movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
-    movl -16(%esp), %edi   # load new closure to %edi
-    add $-8, %esp   # adjust base
-    call *-2(%edi)        # call thru closure ptr
-    add $8, %esp   # adjust base
-    movl -4(%esp), %edi   # restore closure frame ptr
-=======
 # emit-expr -536870912
     movl $-2147483648, %eax     # immed -536870912
->>>>>>> separate-compilation
     ret
     .text
     .align 4,0x90

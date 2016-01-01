@@ -2,9 +2,6 @@ Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
 > Performing symbols list tests ...
-<<<<<<< HEAD
-test 0:(symbols) ...> 
-=======
 test 0:(symbols) ... ok
 test 1:(make-symbol "foo" "baz") ... ok
 test 2:(symbol? (make-symbol "foo" "bar")) ... ok
@@ -865,4 +862,3 @@ test 806:536870911 ... ok
 test 807:-536870912 ... ok
 passed all 808 tests
 > 
->>>>>>> separate-compilation
