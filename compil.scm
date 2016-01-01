@@ -84,12 +84,13 @@
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
 ;;   E   ->  I | V | P
-;;       |  (begin E ... )
+;;       |  (begin E ...)
 ;;       |  (if E E E)
 ;;       |  (P E E* ...)        
 ;;       |  (E E E* ...)        
 ;;       |  (closure (V ...) (V...) E)
 ;;       |  (let ((V E) ...) E)
+;;       |  (labels ((V E) ...) E)
 ;;
 ;;   I  ->  fixnum | boolean | char | ()
 ;;   P  ->  any primitive function
@@ -841,7 +842,7 @@
 	  (eliminate-quote (list 'quote (car exp)))
 	  (eliminate-quote (list 'quote (cdr exp))))]
    [(null? exp) exp]
-;; [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
+   [(symbol? exp) (list 'quote exp)]   ;; symbol not yet implemented
    [else exp]))
 
 ;;-----------------------------------------------------------------------------------
