@@ -23,7 +23,6 @@
 #define char_tag   0x000F
 #define char_shift  8
 
-
 #define pair_mask  0x0007
 #define pair_tag   0x0001
 
@@ -145,6 +144,61 @@ static void print_vector(vector v) {
   }
 }
 
+// wrappers for foreign functions covert scheme datum to corresponding
+// C values
+
+// scheme fixum have a 2-bit tag in the low order. Shifting right
+// two bits eliminates the tag, and gets you the corresponding int.
+int unshift(ptr x) {
+  if ((x & fx_mask) == fx_tag)
+    return x >> fx_shift;   // add more types as we need them
+  else {
+    printf("unrecognized datum in foreign function call; exiting\n");
+    exit(-4);
+  }
+}
+
+// since the fixnum tag is 00, shifting left 2 bit converts a C int
+// to a scheme fixnum.
+ptr shift(int n) {
+  return (ptr)(n << fx_shift);
+}
+
+// to convert scheme stings to char* we allocate memory with malloc
+// and copy the characters into the memory as bytes.  Then all we
+// need to do is stick a 0 byte on the end and return the result.
+// The caller needs to explicitly free the string it gets or we will
+// have a memory leak.
+char* string_data(ptr x) {
+  if ((x & str_mask) == str_tag) {
+    string s =  (string)(x-str_tag);
+    if (((int) s & -4) != (int) s)  {
+      printf("error: print_string: s=%x must be 8-byte aligned\n", (unsigned int) s);
+      exit(-1);
+    }   
+    int len = s->len/4;
+    char *c_string = malloc(len+1);
+    strncpy(c_string,s->ch,len+1);
+    c_string[len+1]=0;
+    return c_string;
+  }
+  else {
+    printf("expected string datum in foreign call; exiting");
+    exit(-5);
+  }
+}
+
+// The wrapper for the write function.  The argument conversions take place
+// inside the wrapper.
+ptr s_write(ptr fd, ptr str, ptr len) {
+  int bytes = write(unshift(fd),
+                    string_data(str),
+                    unshift(len));
+  return shift(bytes);
+}
+
+// Support for allocation of heap and stack.  Note the allocation of protected
+// pages at the ends to help detect stack/heap overflow.
 static char* allocate_protected_space(int size) {
   int page = getpagesize();
   int status;
@@ -169,6 +223,7 @@ static void deallocate_protected_space(char *p, int size) {
   if (status != 0) { printf("munmap returned non-zero status\n"); }
 }
 
+
 typedef struct {
   void* eax;  /* 0    scratch  */
   void* ebx;  /* 4    preserve */
@@ -180,9 +235,13 @@ typedef struct {
   void* esp;  /* 28   preserve */
 } context;
 
+
+// dumps heap allocation diagnostics to stderr
+
 static void dump(char *heap, int words) {
    while(words > 0) {
-     fprintf(stderr,"@%8p  %02hhx %02hhx %02hhx %02hhx  %ld\n", heap, heap[3], heap[2], heap[1], heap[0], (long) *heap);
+     fprintf(stderr,"@%8p  %02hhx %02hhx %02hhx %02hhx  %ld\n",
+	     heap, heap[3], heap[2], heap[1], heap[0], (long) *heap);
      words--;
      heap = heap + 4;
    }

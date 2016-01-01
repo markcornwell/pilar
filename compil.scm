@@ -2485,7 +2485,6 @@
 	i
 	(+ i (- 8 (remainder i 8)))))
 
-
 ;;-------------------------------------------------------------------------------------
 ;;                                Foreign functions
 ;;-------------------------------------------------------------------------------------
@@ -2495,9 +2494,53 @@
 ;; operations. We now add a very simple way of calling to foreign C procedures.
 ;; We add one additional form to our compiler:
 ;;    <Expr> ::= (foreign-call <string> <Expr> ...)
-;; The foreign-call form takes a string literal as the first argu- ment. The string
+;; The foreign-call form takes a string literal as the first argument. The string
 ;; denotes the name of the C procedure that we intend to call. Each of the expressions
 ;; are evaluated first and their values are passed as arguments to the C procedure. The
 ;; calling convention for C differs from the calling convention that we have been using
 ;; for Scheme in that the arguments are placed below the return point and in reverse
 ;; order. Figure 4 illustrates the difference.  (Ghuloum 2006)
+;;
+;;
+;;
+;;                 low addr                                    low addr
+;;               +------------+                             +------------+
+;;               |   ...      |                             |    ...     |
+;;         +--   +------------+                             +------------+
+;;         |     |   arg 3    |  %esp - 12                  |   return   |  %esp - 12
+;;         |     +------------+                             +------------+
+;;      incoming |   arg 2    |  %esp - 8                   |   arg 1    |  %esp - 4    
+;;      args     +------------+                             +------------+
+;;         |     |   arg 1    |  %esp - 4                   |   arg 2    |  %esp - 8  
+;;         +--   +------------+                             +------------+
+;;    base---->  |  return    |  %esp                       |   arg 3    |  %esp - 12        
+;;               +------------+                             +------------+
+;;
+;;      (A) Parameter passing to Scheme                (B) Parameter passing to C
+;;
+;;                                      fig 4
+;;-------------------------------------------------------------------------------------
+
+(define foreign-call-proc second)
+(define foreigh-call-args cddr)
+
+(define (emit-foreign-call si env expr)
+  
+  (define (emit-args si env i args)
+    (unless (null? args)
+	    (emit-expr si env (car args))
+	    (emit "movl %eax, ~s(%esp)" si)
+	    (emit-args (+ si wordsize) env (cdr args))))
+
+  (let ([proc (foreign-call-proc expr)]
+  	[argc (length (foreign-call-args expr))])
+
+    ;; adjust esp
+    (emit "    addl $~s,%esp" (- si (* 4 argc)))
+
+    ;; make the call
+    (emit "    .extern ~s" proc)
+    (emit "    call ~s" proc)
+    
+    ;; fixup the esp
+    (emit "    subl $~s,%esp" (- si (* 4 argc)))))
