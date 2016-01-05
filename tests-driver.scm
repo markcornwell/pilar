@@ -38,7 +38,7 @@
 	  (error 'build "produced program failed assembly"))
   (unless (zero? (system "as -arch i386 base.s -o base.o"))
 	  (error 'build "library failed assembly"))
-  (unless (zero? (system "gcc -m32 -Wall -Wl,-no_pie runtime.c pgm.o base.o -o stst"))
+  (unless (zero? (system "clang -m32 -Wall -Wl,-no_pie runtime.c pgm.o base.o -o stst"))
      (error 'build "produced program failed to link")))
 
 (define (execute)

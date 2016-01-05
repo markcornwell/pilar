@@ -20,3 +20,22 @@ test.s: test.c
 
 test.o: test.s
 	as test.s -o test.o
+
+runtime.s: runtime.c
+	gcc -m32 -Wall -S runtime.c
+
+hello.s: hello.c
+	gcc -Wall -O3 -m32 hello.c -S -o hello.s
+
+hello: hello.s
+	gcc -Wall -m32 hello.s -o hello
+
+exit.s:
+	gcc -Wall -O3 -m32 exit.c -S -o exit.s
+
+exit: .s exit.c
+	gcc -Wall -m32 exit.s -o exit
+
+foo : foo.s
+	as -arch i386 foo.s -o foo.o
+	gcc -Wall -O3 -m32 -Wl,-no_pie runtime.c base.o foo.o -o foo

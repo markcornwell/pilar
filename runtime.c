@@ -144,59 +144,6 @@ static void print_vector(vector v) {
   }
 }
 
-// wrappers for foreign functions covert scheme datum to corresponding
-// C values
-
-// scheme fixum have a 2-bit tag in the low order. Shifting right
-// two bits eliminates the tag, and gets you the corresponding int.
-int unshift(ptr x) {
-  if ((x & fx_mask) == fx_tag)
-    return x >> fx_shift;   // add more types as we need them
-  else {
-    printf("unrecognized datum in foreign function call; exiting\n");
-    exit(-4);
-  }
-}
-
-// since the fixnum tag is 00, shifting left 2 bit converts a C int
-// to a scheme fixnum.
-ptr shift(int n) {
-  return (ptr)(n << fx_shift);
-}
-
-// to convert scheme stings to char* we allocate memory with malloc
-// and copy the characters into the memory as bytes.  Then all we
-// need to do is stick a 0 byte on the end and return the result.
-// The caller needs to explicitly free the string it gets or we will
-// have a memory leak.
-char* string_data(ptr x) {
-  if ((x & str_mask) == str_tag) {
-    string s =  (string)(x-str_tag);
-    if (((int) s & -4) != (int) s)  {
-      printf("error: print_string: s=%x must be 8-byte aligned\n", (unsigned int) s);
-      exit(-1);
-    }   
-    int len = s->len/4;
-    char *c_string = malloc(len+1);
-    strncpy(c_string,s->ch,len+1);
-    c_string[len+1]=0;
-    return c_string;
-  }
-  else {
-    printf("expected string datum in foreign call; exiting");
-    exit(-5);
-  }
-}
-
-// The wrapper for the write function.  The argument conversions take place
-// inside the wrapper.
-ptr s_write(ptr fd, ptr str, ptr len) {
-  int bytes = write(unshift(fd),
-                    string_data(str),
-                    unshift(len));
-  return shift(bytes);
-}
-
 // Support for allocation of heap and stack.  Note the allocation of protected
 // pages at the ends to help detect stack/heap overflow.
 static char* allocate_protected_space(int size) {
@@ -222,7 +169,6 @@ static void deallocate_protected_space(char *p, int size) {
   status = munmap(p - page, aligned_size + 2 * page);
   if (status != 0) { printf("munmap returned non-zero status\n"); }
 }
-
 
 typedef struct {
   void* eax;  /* 0    scratch  */
@@ -301,3 +247,96 @@ int main(int argc, char** argv){
   deallocate_protected_space(heap, heap_size);
   return 0;
 }
+
+//---------------------------------------------------------------------
+//                       Foreign Functions
+//---------------------------------------------------------------------
+// Wrappers for foreign functions covert scheme datum to corresponding
+// C values.
+//---------------------------------------------------------------------
+
+//---------------------------------------------------------------------
+// Scheme fixum have a 2-bit tag in the low order. Shifting right
+// two bits eliminates the tag, and gets you the corresponding int.
+//---------------------------------------------------------------------
+
+int unshift(ptr x) {
+  if ((x & fx_mask) == fx_tag)
+    return (int)x >> fx_shift;   // add more types as we need them
+  else {
+    printf("unrecognized datum in foreign function call; exiting\n");
+    exit(-4);
+  }
+}
+
+//--------------------------------------------------------------------
+// Since the fixnum tag is 00, shifting left 2 bit converts a C int
+// to a scheme fixnum.
+//--------------------------------------------------------------------
+
+ptr shift(int n) {
+  return ((ptr)(n << fx_shift));
+}
+
+char* string_data(ptr x) {
+  string s = (string) ((int)x - str_tag);
+  return s->ch;
+}
+
+//--------------------------------------------------------------------
+// String data we first verify that the ptr is a string object, then
+// we return the pointer to the start of characters as a char*.
+// Note the sting is *not* 0 terminated.
+//--------------------------------------------------------------------
+
+// gcc -m32 -Wall -S runtime.c
+
+void s_nop() {
+  // nothing - returns whatever is left on top of stack by base.scm
+}
+
+ptr s_42() {
+  return shift(42);
+}
+
+ptr s_true() {
+  return bool_t;
+}
+
+ptr s_false() {
+  return bool_f;
+}
+
+
+ptr s_once(ptr x) {
+  return x;
+}
+
+ptr s_twice(ptr n) {
+  return 2*n;
+}
+
+ptr s_foo() {
+  //puts("foo");
+  write(0,"foo\n",4);
+  return bool_f;
+}
+
+ptr s_exit() {
+  exit(-1);
+  return bool_f;
+}
+
+//-------------------------------------------------------------------------
+// The wrapper for the write function.  The argument conversions take place
+// inside the wrapper.
+//-------------------------------------------------------------------------
+
+ptr s_write(ptr fd, ptr str, ptr len) {
+  int bytes = write(unshift(fd),
+                    string_data(str),
+                    unshift(len));
+  return shift(bytes);  // this leaves the bytes in eax?
+}
+
+

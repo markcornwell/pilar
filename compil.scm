@@ -17,13 +17,16 @@
 ;;
 ;;  REFERENCES
 ;;
-;; (R5RS) 
+;; (R5RS) KELSEY, R., CLINGER, W., AND (EDITORS), J. R. Revised5 report on the
+;;        algorithmic language Scheme. ACM SIGPLAN Notices 33, 9 (1998), 26–76.
 ;;
 ;; (Ghuloum 2006) Abdulaziz Ghuloum, An Incremental Approach to Compiler
-;;       Development, Proceedings of the 2006 Scheme and Functional
-;;       Programming Workshop, University of Chicago Technical Report
-;;       TR-2006-06.
+;;        Development, Proceedings of the 2006 Scheme and Functional
+;;        Programming Workshop, University of Chicago Technical Report
+;;        TR-2006-06.
 ;;
+;; (ABI)  SCO. System V Application Binary Interface, Intel386TM Architecture
+;;        Processor Supplement Fourth Edition, 1997.
 ;;
 ;;  INTRODUCTION
 ;;
@@ -118,8 +121,7 @@
 ;; 3.12 Assignment
 ;; 3.13 Extending the Syntax
 ;; 3.14 Symbols, Libraries, and Separate Compilation
-;; 3.15 Foreigh Functions
-
+;; 3.15 Foreign Functions
 
 ;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
@@ -140,8 +142,8 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
-(load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
+;(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
@@ -236,7 +238,7 @@
 ;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
-  (memq x '(quote begin if let let* lambda letrec closure)))
+  (memq x '(quote begin if let let* lambda letrec closure foreign-call primitive-ref)))
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Explicit Begins
@@ -1053,6 +1055,9 @@
 (define (primitive-ref? expr)
   (and (pair? expr) (eq? (car expr) 'primitive-ref)))
 
+(define (foreign-call? expr)
+  (and (pair? expr) (eq? (car expr) 'foreign-call)))
+
 (define (emit-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
@@ -1065,7 +1070,8 @@
    [(labels? expr)          (emit-labels si env expr)]   ;; labels never in tail position
    [(string? expr)          (emit-string-literal expr)]
    [(variable? expr)        (emit-variable-ref env expr)]
-   [(primitive-ref? expr)   (emit-primitive-ref si env expr)] 
+   [(primitive-ref? expr)   (emit-primitive-ref si env expr)]
+   [(foreign-call? expr)    (emit-foreign-call si env expr)]
    [(begin? expr)           (emit-begin si env expr)]  
    [(closure? expr)         (emit-closure si env expr)]
    [(funcall? expr)         (emit-funcall si env expr)]
@@ -1087,21 +1093,21 @@
   (emit "# env=~s" env)
   (emit "# expr=~s" expr)
   (cond
-   [(primcall? expr)   (emit-tail-primcall si env expr)]   
-   [(immediate? expr)  (emit-tail-immediate expr)]
-   [(labels? expr)      (error 'emit-tail-expr "labels never in tail position")]
-   [(string? expr)     (emit-tail-string-literal)]
-   [(variable? expr)   (emit-tail-variable-ref env expr)]
+   [(primcall? expr)      (emit-tail-primcall si env expr)]   
+   [(immediate? expr)     (emit-tail-immediate expr)]
+   [(labels? expr)        (error 'emit-tail-expr "labels never in tail position")]
+   [(string? expr)        (emit-tail-string-literal)]
+   [(variable? expr)      (emit-tail-variable-ref env expr)]
    [(primitive-ref? expr) (emit-tail-primitive-ref si env expr)]
-   [(begin? expr)      (emit-tail-begin si env expr)]   
-   [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
-   [(funcall? expr)    (emit-tail-funcall si env expr)]
-   [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
-
-   [(if? expr)         (emit-tail-if si env expr)]
-   [(and? expr)        (emit-tail-and si env expr)]
-   [(or? expr)         (emit-tail-or si env expr)]
-   [(pair? expr)       (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
+   [(foreign-call? expr)  (emit-tail-foreign-call si env expr)]
+   [(begin? expr)         (emit-tail-begin si env expr)]   
+   [(closure? expr)       (emit-tail-closure si env expr)]
+   [(funcall? expr)       (emit-tail-funcall si env expr)]
+   [(let? expr)           (emit-tail-let si env (let-bindings expr) (let-body expr))]
+   [(if? expr)            (emit-tail-if si env expr)]
+   [(and? expr)           (emit-tail-and si env expr)]
+   [(or? expr)            (emit-tail-or si env expr)]
+   [(pair? expr)          (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
    [else
     (error "emit-tail-expr" "unrecognized form:" expr)]))
 
@@ -1118,7 +1124,9 @@
   (emit-function-header "_L_scheme_entry")
   (emit "    movl $0, %edi  # dummy for debugging")
   (emit-init (- (* 2 wordsize)) env)
+  ;(emit-init -4 env)       ;; return is at %esp, so start at %esp - 4
   (emit-expr (- (* 2 wordsize)) env expr)
+  ;(emit-expr -4 env expr)  ;; return is at %esp, so start at %esp - 4
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)
@@ -1129,7 +1137,7 @@
   (emit "    movl %esp, 28(%ecx)")
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
-  (emit "    call _L_scheme_entry") 
+  (emit "    call _L_scheme_entry") ;; %esp, -4(%esp), eip := %esp-4, eip, _L_scheme_entry 
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
   (emit "    movl 20(%ecx), %edi")
@@ -1140,8 +1148,8 @@
 (define (emit-init si env)
   (emit "    .global base_init_callback")
   (emit "    .extern base_init")
-  (emit "    addl $-4,%esp")
-  (emit "    jmp base_init")
+  (emit "    addl $-4,%esp")  ;;
+  (emit "    jmp base_init")  ;;
   (emit "base_init_callback:")
   (emit "    addl $4,%esp"))
 
@@ -1153,7 +1161,8 @@
 
 (define (emit-function-header label)
   (emit "    .text")
-  (emit "    .align 4,0x90")
+ ;(emit "    .align 4,0x90")
+  (emit "    .align 16, 0x90")
   (emit "    .globl ~a" label)
   (emit "~a:" label))
 
@@ -2501,13 +2510,11 @@
 ;; for Scheme in that the arguments are placed below the return point and in reverse
 ;; order. Figure 4 illustrates the difference.  (Ghuloum 2006)
 ;;
-;;
-;;
 ;;                 low addr                                    low addr
 ;;               +------------+                             +------------+
 ;;               |   ...      |                             |    ...     |
 ;;         +--   +------------+                             +------------+
-;;         |     |   arg 3    |  %esp - 12                  |   return   |  %esp - 12
+;;         |     |   arg 3    |  %esp - 12                  |   return   |  %esp
 ;;         |     +------------+                             +------------+
 ;;      incoming |   arg 2    |  %esp - 8                   |   arg 1    |  %esp - 4    
 ;;      args     +------------+                             +------------+
@@ -2522,25 +2529,58 @@
 ;;-------------------------------------------------------------------------------------
 
 (define foreign-call-proc second)
-(define foreigh-call-args cddr)
+(define foreign-call-args cddr)
 
 (define (emit-foreign-call si env expr)
   
-  (define (emit-args si env i args)
+  (define (emit-args si env args)
     (unless (null? args)
 	    (emit-expr si env (car args))
-	    (emit "movl %eax, ~s(%esp)" si)
-	    (emit-args (+ si wordsize) env (cdr args))))
+	    (emit "    movl %eax, ~s(%esp)" si)
+	    (emit-args (- si wordsize) env (cdr args))))
 
-  (let ([proc (foreign-call-proc expr)]
-  	[argc (length (foreign-call-args expr))])
+  (let* ([proc (foreign-call-proc expr)]
+	 [args (foreign-call-args expr)]	 
+	 [argc (length args)])
+
+    ;; emit args in reverse order
+    (emit-args si env (reverse args))
 
     ;; adjust esp
-    (emit "    addl $~s,%esp" (- si (* 4 argc)))
+    (emit "    addl $~s,%esp" (- si (* wordsize argc)))
 
     ;; make the call
-    (emit "    .extern ~s" proc)
-    (emit "    call ~s" proc)
-    
+    (emit "    .extern _~a" proc)
+    (emit "fcall:") ;; DEBUG
+    (emit "    call _~a" proc)
+    (emit "fret:") ;; DEBUG
     ;; fixup the esp
-    (emit "    subl $~s,%esp" (- si (* 4 argc)))))
+    (emit "    subl $~s,%esp" (- si (* wordsize argc)))
+    ))
+
+(define (emit-tail-foreign-call si env expr)
+  (emit-foreign-call si env expr)
+  (emit "     ret"))
+
+;;-----------------------------------------------------------------
+;;   Mac OSX System Calls
+;;-----------------------------------------------------------------
+
+;; I’m on a Intel machine, so what we are looking for is the x86 syscall
+;; calling conventions for the OS X or BSD platform. They are pretty
+;; simple:
+;;
+;; arguments passed on the stack, pushed right-to-left
+;; stack 16-bytes aligned
+;; syscall number in the eax register
+;; call by interrupt 0x80
+;; So what we have to do to print a “Hello world” is:
+;;
+;; push the length of the string (int) to the stack
+;; push a pointer to the string to the stack
+;; push the stdout file descriptor (1) to the stack
+;; align the stack by moving the stack pointer 4 more bytes (16 - 4 * 3)
+;; set the eax register to the write syscall number (4)
+;; interrupt 0x80
+
+
