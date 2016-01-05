@@ -30,6 +30,9 @@ hello.s: hello.c
 hello: hello.s
 	gcc -Wall -m32 hello.s -o hello
 
+hell: hell.s
+	gcc -Wall -m32 -Wl,-no_pie hell.s -o hell
+
 exit.s:
 	gcc -Wall -O3 -m32 exit.c -S -o exit.s
 

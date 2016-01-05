@@ -142,7 +142,7 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-;(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
@@ -1134,7 +1134,7 @@
   (emit "    movl %esi, 16(%ecx)")
   (emit "    movl %edi, 20(%ecx)")
   (emit "    movl %ebp, 24(%ecx)")
-  (emit "    movl %esp, 28(%ecx)")
+  (emit "    movl %esp, 28(%ecx)")  ;; we really need to perserve ecx
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
   (emit "    call _L_scheme_entry") ;; %esp, -4(%esp), eip := %esp-4, eip, _L_scheme_entry 
@@ -2531,6 +2531,10 @@
 (define foreign-call-proc second)
 (define foreign-call-args cddr)
 
+
+;; Notes:  It seems important to  preserve the %ebp register accross the call by
+;;         saving it first and then restoring it.
+
 (define (emit-foreign-call si env expr)
   
   (define (emit-args si env args)
@@ -2541,21 +2545,33 @@
 
   (let* ([proc (foreign-call-proc expr)]
 	 [args (foreign-call-args expr)]	 
-	 [argc (length args)])
+	 [argc (length args)]
+	 [pad (- 36 (* 4 argc))])   ;; works for all but exi
+    ;; s_once likes a pad of 0    nargs=1
+    ;; s_exit likes a pad of 0    
+    ;; s_foo likes a pad of 4
 
-    ;; emit args in reverse order
-    (emit-args si env (reverse args))
+    ;; preserve ecx on stack
+   (emit  "    movl %ecx,~s(%esp)" si)
 
-    ;; adjust esp
-    (emit "    addl $~s,%esp" (- si (* wordsize argc)))
+    ;; emit args in reverse order skipping 2 slots
+    (emit-args (- si pad) env (reverse args))
 
-    ;; make the call
+    ;; adjust esp to point to the top argument we pushed
+    (emit "    addl $~s,%esp" (- si pad (* wordsize argc)))
+
+    ;; now make the call via absolute address
     (emit "    .extern _~a" proc)
     (emit "fcall:") ;; DEBUG
     (emit "    call _~a" proc)
+   ; (emit "    xorl %eax,%eax")  ;; from the model; necessary???
     (emit "fret:") ;; DEBUG
+    
     ;; fixup the esp
-    (emit "    subl $~s,%esp" (- si (* wordsize argc)))
+    (emit "    subl $~s,%esp" (- si pad (* wordsize argc)))
+    
+    ;; restore ecx
+   (emit "    movl ~s(%esp),%ecx" si) 
     ))
 
 (define (emit-tail-foreign-call si env expr)

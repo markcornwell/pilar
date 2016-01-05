@@ -316,10 +316,21 @@ ptr s_twice(ptr n) {
   return 2*n;
 }
 
+
 ptr s_foo() {
-  //puts("foo");
-  write(0,"foo\n",4);
-  return bool_f;
+  puts("foo");
+  //write(0,"foo\n",4);  
+  return bool_t;
+}
+
+ptr s_write_foo() {
+  write(1,"foo\n",4);
+  return bool_t;
+}
+
+ptr s_write_hello() {
+  write(1,"Hello World!\n",13);
+  return bool_t;
 }
 
 ptr s_exit() {
