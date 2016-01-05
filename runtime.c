@@ -264,7 +264,7 @@ int unshift(ptr x) {
   if ((x & fx_mask) == fx_tag)
     return (int)x >> fx_shift;   // add more types as we need them
   else {
-    printf("unrecognized datum in foreign function call; exiting\n");
+    printf("unrecognized datum in foreign function call: %x; exiting\n",x);
     exit(-4);
   }
 }
@@ -347,7 +347,7 @@ ptr s_write(ptr fd, ptr str, ptr len) {
   int bytes = write(unshift(fd),
                     string_data(str),
                     unshift(len));
-  return shift(bytes);  // this leaves the bytes in eax?
+  return bytes*4;  // this leaves the bytes in eax?
 }
 
 

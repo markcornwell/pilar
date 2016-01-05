@@ -51,13 +51,13 @@ base_init:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_25699
+    jmp _L_331
     .align 8,0x90
-_L_25698 :
+_L_330 :
     .int 12
     .ascii "nil"
-_L_25699:
-    movl $_L_25698, %eax
+_L_331:
+    movl $_L_330, %eax
     orl $6, %eax
     movl %eax, 0(%esp)
 # emit-expr ()
@@ -85,7 +85,7 @@ _L_25699:
 # si = -4
 # env = ((interned-symbols . 0))
 # expr = (closure () (interned-symbols) (let () interned-symbols))
-    movl $_L_25700, 0(%ebp)  # closure label
+    movl $_L_332, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((interned-symbols . 0))
 # var=interned-symbols
@@ -95,8 +95,8 @@ _L_25699:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25701            # jump around closure body
-_L_25700:
+    jmp _L_333            # jump around closure body
+_L_332:
 # emit-tail-expr
 # si=-8
 # env=((interned-symbols . 4) (interned-symbols . 0))
@@ -119,7 +119,7 @@ _L_25700:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_25701:
+_L_333:
      movl %eax, symbols
 # == explicit-begins  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
@@ -223,12 +223,12 @@ _L_25701:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))
-    movl $_L_25702, 0(%ebp)  # closure label
+    movl $_L_334, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25703            # jump around closure body
-_L_25702:
+    jmp _L_335            # jump around closure body
+_L_334:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -282,7 +282,7 @@ _L_25702:
 #return from tail (fx= (string-length s1) (string-length s2))
     ret
     .align 4,0x90
-_L_25703:
+_L_335:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -306,12 +306,12 @@ _L_25703:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))
-    movl $_L_25704, 0(%ebp)  # closure label
+    movl $_L_336, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25705            # jump around closure body
-_L_25704:
+    jmp _L_337            # jump around closure body
+_L_336:
 # emit-tail-expr
 # si=-20
 # env=((i . -16) (s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -395,7 +395,7 @@ _L_25704:
 #return from tail (char=? (string-ref s1 i) (string-ref s2 i))
     ret
     .align 4,0x90
-_L_25705:
+_L_337:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -419,7 +419,7 @@ _L_25705:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i n) (si= si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref si= 0) s1 s2 i) ((vector-ref si<n= 0) s1 s2 (fx+ i 1) n) #f))))
-    movl $_L_25706, 0(%ebp)  # closure label
+    movl $_L_338, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=si=
@@ -435,8 +435,8 @@ _L_25705:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25707            # jump around closure body
-_L_25706:
+    jmp _L_339            # jump around closure body
+_L_338:
 # emit-tail-expr
 # si=-24
 # env=((n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -498,15 +498,15 @@ _L_25706:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25708
+    je _L_340
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_25709
-_L_25708:
+    jmp _L_341
+_L_340:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -556,7 +556,7 @@ _L_25708:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25710
+    je _L_342
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -629,18 +629,18 @@ _L_25708:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-60  delta=36
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_25711
-_L_25710:
+    jmp _L_343
+_L_342:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_25711:
-_L_25709:
+_L_343:
+_L_341:
     .align 4,0x90
-_L_25707:
+_L_339:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -664,7 +664,7 @@ _L_25707:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) (slen= si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref slen= 0) s1 s2) ((vector-ref si<n= 0) s1 s2 0 (string-length s1)) #f)))
-    movl $_L_25712, 0(%ebp)  # closure label
+    movl $_L_344, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=slen=
@@ -680,8 +680,8 @@ _L_25707:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25713            # jump around closure body
-_L_25712:
+    jmp _L_345            # jump around closure body
+_L_344:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -747,7 +747,7 @@ _L_25712:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25714
+    je _L_346
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -813,17 +813,17 @@ _L_25712:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-44  delta=20
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_25715
-_L_25714:
+    jmp _L_347
+_L_346:
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_25715:
+_L_347:
     .align 4,0x90
-_L_25713:
+_L_345:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -915,7 +915,7 @@ _L_25713:
 # si = -12
 # env = ((str->sym . 0))
 # expr = (closure (str symlist) ((primitive-ref string=?) str->sym) (let ((str str) (symlist symlist)) (if ((primitive-ref string=?) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref str->sym 0) str (cdr symlist))))))
-    movl $_L_25716, 0(%ebp)  # closure label
+    movl $_L_348, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref string=?) not defined in the environmnet
 # emit-variable-ref
 # env=((str->sym . 0))
@@ -926,8 +926,8 @@ _L_25713:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25717            # jump around closure body
-_L_25716:
+    jmp _L_349            # jump around closure body
+_L_348:
 # emit-tail-expr
 # si=-16
 # env=((symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -989,7 +989,7 @@ _L_25716:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25718
+    je _L_350
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1004,8 +1004,8 @@ _L_25716:
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_25719
-_L_25718:
+    jmp _L_351
+_L_350:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1026,7 +1026,7 @@ _L_25718:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25720
+    je _L_352
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1124,8 +1124,8 @@ _L_25718:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_25721
-_L_25720:
+    jmp _L_353
+_L_352:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1175,10 +1175,10 @@ _L_25720:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  size=0   si=-36  delta=20
     jmp *-2(%edi)  # tail-funcall
-_L_25721:
-_L_25719:
+_L_353:
+_L_351:
     .align 4,0x90
-_L_25717:
+_L_349:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1195,7 +1195,7 @@ _L_25717:
 # si = -4
 # env = ((str->sym . 0))
 # expr = (closure (str) (str->sym (primitive-ref symbols)) (let ((str str)) ((vector-ref str->sym 0) str ((primitive-ref symbols)))))
-    movl $_L_25722, 0(%ebp)  # closure label
+    movl $_L_354, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((str->sym . 0))
 # var=str->sym
@@ -1206,8 +1206,8 @@ _L_25717:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25723            # jump around closure body
-_L_25722:
+    jmp _L_355            # jump around closure body
+_L_354:
 # emit-tail-expr
 # si=-12
 # env=((str . -8) ((primitive-ref symbols) . 8) (str->sym . 4) (str->sym . 0))
@@ -1280,7 +1280,7 @@ _L_25722:
 # emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_25723:
+_L_355:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -1311,15 +1311,15 @@ _L_25723:
 # si = 0
 # env = ()
 # expr = (closure (lst elt) (e nil (primitive-ref append1)) (let ((lst lst) (elt elt)) (if (null? lst) (cons e nil) (cons (car lst) ((primitive-ref append1) (cdr lst) elt)))))
-    movl $_L_25724, 0(%ebp)  # closure label
+    movl $_L_356, 0(%ebp)  # closure label
 # WARNING: free var e not defined in the environmnet
 # WARNING: free var nil not defined in the environmnet
 # WARNING: free var (primitive-ref append1) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25725            # jump around closure body
-_L_25724:
+    jmp _L_357            # jump around closure body
+_L_356:
 # emit-tail-expr
 # si=-16
 # env=((elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1361,7 +1361,7 @@ _L_25724:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25726
+    je _L_358
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1390,8 +1390,8 @@ _L_25724:
 # cons end
 #return from tail (cons e nil)
     ret
-    jmp _L_25727
-_L_25726:
+    jmp _L_359
+_L_358:
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1446,9 +1446,9 @@ _L_25726:
 # cons end
 #return from tail (cons (car lst) ((primitive-ref append1) (cdr lst) elt))
     ret
-_L_25727:
+_L_359:
     .align 4,0x90
-_L_25725:
+_L_357:
      movl %eax, append1
 # emit-expr (begin #t)
 # emit-begin

@@ -20,7 +20,7 @@
     [(foreign-call "s_write_foo") => "foo\n#t\n"]
     [(foreign-call "s_write_hello") => "Hello World!\n#t\n"]    
  ;   [(foreign-call "s_exit") => ""]
- ;   [(foreign-call "s_write" 0 "hello world" 11) => "hello world"]
+    [(foreign-call "s_write" 1 "hello world" 11) => "hello world"]
  ;   [(foreign-call "s_write" 0 "hello world" (string-length "hello world")) => "hello world"]
 )
 
