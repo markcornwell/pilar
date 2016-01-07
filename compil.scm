@@ -2526,14 +2526,24 @@
 ;;      (A) Parameter passing to Scheme                (B) Parameter passing to C
 ;;
 ;;                                      fig 4
+;;
+;; If only it were that simple.  OSX throws a wrench in the works by insisting that esp
+;; be aligned on a 16 byte boundary at the time that the call is made.  Since our
+;; call migth be made from anywhere, we need to adjust for the proper alignment at run
+;; time.  But since all the arguments need to evaluated in the original Scheme stack
+;; frame we adopt a simple expedient.  We calcuale all the arguments first, then we shift
+;; them up just before making the call.  Since we are going to need to restore the esp, we
+;; will save that in the stack as well just below the last argument.  Our scheme ends
+;; up looking like this:
+;;
+;;
+;;  (diagram here)
+;;
+;;
 ;;-------------------------------------------------------------------------------------
 
 (define foreign-call-proc second)
 (define foreign-call-args cddr)
-
-
-;; Notes:  It seems important to  preserve the %ebp register accross the call by
-;;         saving it first and then restoring it.
 
 (define (emit-foreign-call si env expr)
   
@@ -2546,7 +2556,7 @@
   (let* ([proc (foreign-call-proc expr)]
 	 [args (foreign-call-args expr)]	 
 	 [argc (length args)]
-	 [pad (- 36 (* 4 argc))])   ;; works for all but exi
+	 [pad (- 36 (* 4 argc))])   ;; works for all up to s_write
     ;; s_once likes a pad of 0    nargs=1
     ;; s_exit likes a pad of 0    
     ;; s_foo likes a pad of 4
@@ -2572,7 +2582,48 @@
     
     ;; restore ecx
    (emit "    movl ~s(%esp),%ecx" si) 
-    ))
+   ))
+
+;; (define (emit-foreign-call si env expr)
+  
+;;   (define (emit-args si env args)
+;;     (unless (null? args)
+;; 	    (emit-expr si env (car args))
+;; 	    (emit "    movl %eax, ~s(%esp)" si)
+;; 	    (emit-args (- si wordsize) env (cdr args))))
+
+;;   (let* ([proc (foreign-call-proc expr)]
+;; 	 [args (foreign-call-args expr)]	 
+;; 	 [argc (length args)]
+;; 	 [pad (- 36 (* 4 argc))])   ;; works for all up to s_write
+;;     ;; s_once likes a pad of 0    nargs=1
+;;     ;; s_exit likes a pad of 0    
+;;     ;; s_foo likes a pad of 4
+
+;;     ;; preserve ecx on stack
+;;    (emit  "    movl %ecx,~s(%esp)" si)
+
+;;     ;; emit args in reverse order skipping 2 slots
+;;     (emit-args (- si pad) env (reverse args))
+
+;;     ;; adjust esp to point to the top argument we pushed
+;;     (emit "    addl $~s,%esp" (- si pad (* wordsize argc)))
+
+;;     ;; now make the call via absolute address
+;;     (emit "    .extern _~a" proc)
+;;     (emit "fcall:") ;; DEBUG
+;;     (emit "    call _~a" proc)
+;;    ; (emit "    xorl %eax,%eax")  ;; from the model; necessary???
+;;     (emit "fret:") ;; DEBUG
+    
+;;     ;; fixup the esp
+;;     (emit "    subl $~s,%esp" (- si pad (* wordsize argc)))
+    
+;;     ;; restore ecx
+;;    (emit "    movl ~s(%esp),%ecx" si) 
+;;    ))
+
+
 
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)

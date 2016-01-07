@@ -264,7 +264,7 @@ int unshift(ptr x) {
   if ((x & fx_mask) == fx_tag)
     return (int)x >> fx_shift;   // add more types as we need them
   else {
-    printf("unrecognized datum in foreign function call: %x; exiting\n",x);
+    printf("unshift: unrecognized datum in foreign function call: %x; exiting\n",x);
     exit(-4);
   }
 }
