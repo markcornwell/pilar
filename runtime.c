@@ -23,7 +23,6 @@
 #define char_tag   0x000F
 #define char_shift  8
 
-
 #define pair_mask  0x0007
 #define pair_tag   0x0001
 
@@ -145,6 +144,8 @@ static void print_vector(vector v) {
   }
 }
 
+// Support for allocation of heap and stack.  Note the allocation of protected
+// pages at the ends to help detect stack/heap overflow.
 static char* allocate_protected_space(int size) {
   int page = getpagesize();
   int status;
@@ -180,9 +181,13 @@ typedef struct {
   void* esp;  /* 28   preserve */
 } context;
 
+
+// dumps heap allocation diagnostics to stderr
+
 static void dump(char *heap, int words) {
    while(words > 0) {
-     fprintf(stderr,"@%8p  %02hhx %02hhx %02hhx %02hhx  %ld\n", heap, heap[3], heap[2], heap[1], heap[0], (long) *heap);
+     fprintf(stderr,"@%8p  %02hhx %02hhx %02hhx %02hhx  %ld\n",
+	     heap, heap[3], heap[2], heap[1], heap[0], (long) *heap);
      words--;
      heap = heap + 4;
    }
@@ -242,3 +247,107 @@ int main(int argc, char** argv){
   deallocate_protected_space(heap, heap_size);
   return 0;
 }
+
+//---------------------------------------------------------------------
+//                       Foreign Functions
+//---------------------------------------------------------------------
+// Wrappers for foreign functions covert scheme datum to corresponding
+// C values.
+//---------------------------------------------------------------------
+
+//---------------------------------------------------------------------
+// Scheme fixum have a 2-bit tag in the low order. Shifting right
+// two bits eliminates the tag, and gets you the corresponding int.
+//---------------------------------------------------------------------
+
+int unshift(ptr x) {
+  if ((x & fx_mask) == fx_tag)
+    return (int)x >> fx_shift;   // add more types as we need them
+  else {
+    printf("unshift: unrecognized datum in foreign function call: %x; exiting\n",x);
+    exit(-4);
+  }
+}
+
+//--------------------------------------------------------------------
+// Since the fixnum tag is 00, shifting left 2 bit converts a C int
+// to a scheme fixnum.
+//--------------------------------------------------------------------
+
+ptr shift(int n) {
+  return ((ptr)(n << fx_shift));
+}
+
+char* string_data(ptr x) {
+  string s = (string) ((int)x - str_tag);
+  return s->ch;
+}
+
+//--------------------------------------------------------------------
+// String data we first verify that the ptr is a string object, then
+// we return the pointer to the start of characters as a char*.
+// Note the sting is *not* 0 terminated.
+//--------------------------------------------------------------------
+
+// gcc -m32 -Wall -S runtime.c
+
+void s_nop() {
+  // nothing - returns whatever is left on top of stack by base.scm
+}
+
+ptr s_42() {
+  return shift(42);
+}
+
+ptr s_true() {
+  return bool_t;
+}
+
+ptr s_false() {
+  return bool_f;
+}
+
+
+ptr s_once(ptr x) {
+  return x;
+}
+
+ptr s_twice(ptr n) {
+  return 2*n;
+}
+
+
+ptr s_foo() {
+  puts("foo");
+  //write(0,"foo\n",4);  
+  return bool_t;
+}
+
+ptr s_write_foo() {
+  write(1,"foo\n",4);
+  return bool_t;
+}
+
+ptr s_write_hello() {
+  write(1,"Hello World!\n",13);
+  return bool_t;
+}
+
+ptr s_exit() {
+  exit(0);
+  return bool_f;
+}
+
+//-------------------------------------------------------------------------
+// The wrapper for the write function.  The argument conversions take place
+// inside the wrapper.
+//-------------------------------------------------------------------------
+
+ptr s_write(ptr fd, ptr str, ptr len) {
+  int bytes = write(unshift(fd),
+                    string_data(str),
+                    unshift(len));
+  return shift(bytes);  // this leaves the bytes in eax?
+}
+
+

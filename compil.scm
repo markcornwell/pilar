@@ -1,13 +1,13 @@
 ;;-----------------------------------------------------------------------------
 ;;
-;;                                 Pilar: A Scheme Compiler
+;;                          Pilar: A Scheme Compiler
 ;;
-;;                                           by
+;;                                     by
 ;;
-;;                                      Mark Cornwell
+;;                                Mark Cornwell
 ;;
 ;;
-;;                        Copyright (C) 2015, All Rights Reserved
+;;                   Copyright (C) 2015, All Rights Reserved
 ;;
 ;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
@@ -17,15 +17,18 @@
 ;;
 ;;  REFERENCES
 ;;
-;; (R5RS) 
+;; (R5RS) KELSEY, R., CLINGER, W., AND (EDITORS), J. R. Revised5 report on the
+;;        algorithmic language Scheme. ACM SIGPLAN Notices 33, 9 (1998), 26–76.
 ;;
 ;; (Ghuloum 2006) Abdulaziz Ghuloum, An Incremental Approach to Compiler
-;;       Development, Proceedings of the 2006 Scheme and Functional
-;;       Programming Workshop, University of Chicago Technical Report
-;;       TR-2006-06.
+;;        Development, Proceedings of the 2006 Scheme and Functional
+;;        Programming Workshop, University of Chicago Technical Report
+;;        TR-2006-06.
 ;;
+;; (ABI)  SCO. System V Application Binary Interface, Intel386TM Architecture
+;;        Processor Supplement Fourth Edition, 1997.
 ;;
-;;  OVERVIEW
+;;  INTRODUCTION
 ;;
 ;;  This compiler translates programs expressed in the Source Language (fig 1)
 ;;  into assembly code that can be run through a conventional assembler and linked
@@ -79,7 +82,6 @@
 ;;   V  ->  variable
 ;;
 ;;                                     Figure 1
-;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
@@ -97,25 +99,29 @@
 ;;   V  ->  variable
 ;;
 ;;                                    Figure 2
-;;
 ;;------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
 ;;  paper (Ghuloum 2006)
 ;;
-;; 2.1 Closure
-;; 1.9.3  String
-;; 1.9.2  Vector
-;; 1.9.1  Pair
-;; 1.9 Heap Allocation
-;; 1.8 Proper Tail Calls
-;; 1.7 Procedures
-;; 1.6 Local Variables
-;; 1.5 Binary Primitives
-;; 1.4 Conditional Expressions
-;; 1.3 Unary Primitives
-;; 1.2 Immediate Constants
-;; 1.1 Integers
+;; 3.1 Integers
+;; 3.2 Immediate Constants
+;; 3.3 Unary Primitives
+;; 3.4 Binary Primitives
+;; 3.5 Local Variables
+;; 3.6 Conditional Expressions
+;; 3.7 Heap Allocation
+;; 1.9.3  String (tutorial)
+;; 1.9.2  Vector (tutorial)
+;; 1.9.1  Pair   (tutorial)
+;; 3.8 Procedure Calls
+;; 3.9 Closures
+;; 3.10 Proper Tail Calls
+;; 3.11 Complex Constants
+;; 3.12 Assignment
+;; 3.13 Extending the Syntax
+;; 3.14 Symbols, Libraries, and Separate Compilation
+;; 3.15 Foreign Functions
 
 ;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
@@ -123,7 +129,7 @@
 
 (load "tests-driver.scm")
 
-;; (load "tests/tests-9.0-square.scm")  ;; define square -- pass 1.8 first
+;; (load "tests/tests-9.0-square.scm")  ;; e5chess define square -- pass 1.8 first
 
 ;; (load "tests/tests-5.6-req.scm")  ;; fxmodulo
 ;; (load "tests/tests-5.3-req.scm")  ;; call/cc
@@ -136,8 +142,8 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-;; (load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
-(load "tests/tests-2.8-req.scm")  ;; symbols       <<<-- WORK IN PROGRESS ----<<<
+(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
@@ -232,7 +238,7 @@
 ;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
-  (memq x '(quote begin if let let* lambda letrec closure)))
+  (memq x '(quote begin if let let* lambda letrec closure foreign-call primitive-ref)))
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Explicit Begins
@@ -1049,6 +1055,9 @@
 (define (primitive-ref? expr)
   (and (pair? expr) (eq? (car expr) 'primitive-ref)))
 
+(define (foreign-call? expr)
+  (and (pair? expr) (eq? (car expr) 'foreign-call)))
+
 (define (emit-expr si env expr)
   (define (variable? expr)
     (and (symbol? expr)
@@ -1061,7 +1070,8 @@
    [(labels? expr)          (emit-labels si env expr)]   ;; labels never in tail position
    [(string? expr)          (emit-string-literal expr)]
    [(variable? expr)        (emit-variable-ref env expr)]
-   [(primitive-ref? expr)   (emit-primitive-ref si env expr)] 
+   [(primitive-ref? expr)   (emit-primitive-ref si env expr)]
+   [(foreign-call? expr)    (emit-foreign-call si env expr)]
    [(begin? expr)           (emit-begin si env expr)]  
    [(closure? expr)         (emit-closure si env expr)]
    [(funcall? expr)         (emit-funcall si env expr)]
@@ -1083,21 +1093,21 @@
   (emit "# env=~s" env)
   (emit "# expr=~s" expr)
   (cond
-   [(primcall? expr)   (emit-tail-primcall si env expr)]   
-   [(immediate? expr)  (emit-tail-immediate expr)]
-   [(labels? expr)      (error 'emit-tail-expr "labels never in tail position")]
-   [(string? expr)     (emit-tail-string-literal)]
-   [(variable? expr)   (emit-tail-variable-ref env expr)]
+   [(primcall? expr)      (emit-tail-primcall si env expr)]   
+   [(immediate? expr)     (emit-tail-immediate expr)]
+   [(labels? expr)        (error 'emit-tail-expr "labels never in tail position")]
+   [(string? expr)        (emit-tail-string-literal)]
+   [(variable? expr)      (emit-tail-variable-ref env expr)]
    [(primitive-ref? expr) (emit-tail-primitive-ref si env expr)]
-   [(begin? expr)      (emit-tail-begin si env expr)]   
-   [(closure? expr)    (emit-tail-closure si env expr)] ;; ???
-   [(funcall? expr)    (emit-tail-funcall si env expr)]
-   [(let? expr)        (emit-tail-let si env (let-bindings expr) (let-body expr))]
-
-   [(if? expr)         (emit-tail-if si env expr)]
-   [(and? expr)        (emit-tail-and si env expr)]
-   [(or? expr)         (emit-tail-or si env expr)]
-   [(pair? expr)       (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
+   [(foreign-call? expr)  (emit-tail-foreign-call si env expr)]
+   [(begin? expr)         (emit-tail-begin si env expr)]   
+   [(closure? expr)       (emit-tail-closure si env expr)]
+   [(funcall? expr)       (emit-tail-funcall si env expr)]
+   [(let? expr)           (emit-tail-let si env (let-bindings expr) (let-body expr))]
+   [(if? expr)            (emit-tail-if si env expr)]
+   [(and? expr)           (emit-tail-and si env expr)]
+   [(or? expr)            (emit-tail-or si env expr)]
+   [(pair? expr)          (emit-tail-funcall si env (cons 'funcall expr))] ;; implicit funcall    
    [else
     (error "emit-tail-expr" "unrecognized form:" expr)]))
 
@@ -1113,8 +1123,8 @@
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
   (emit "    movl $0, %edi  # dummy for debugging")
-  (emit-init (- (* 2 wordsize)) env)
-  (emit-expr (- (* 2 wordsize)) env expr)
+  (emit-init -8 env)       ;; return is at %esp, so start at %esp - 4
+  (emit-expr -8 env expr)  ;; return is at %esp, so start at %esp - 4
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)
@@ -1122,10 +1132,10 @@
   (emit "    movl %esi, 16(%ecx)")
   (emit "    movl %edi, 20(%ecx)")
   (emit "    movl %ebp, 24(%ecx)")
-  (emit "    movl %esp, 28(%ecx)")
+  (emit "    movl %esp, 28(%ecx)")  ;; we really need to perserve ecx
   (emit "    movl 12(%esp), %ebp")  ;; set heap base
   (emit "    movl 8(%esp), %esp")   ;; set stack base
-  (emit "    call _L_scheme_entry") 
+  (emit "    call _L_scheme_entry") ;; %esp, -4(%esp), eip := %esp-4, eip, _L_scheme_entry 
   (emit "    movl 4(%ecx), %ebx")  
   (emit "    movl 16(%ecx), %esi")
   (emit "    movl 20(%ecx), %edi")
@@ -1136,8 +1146,8 @@
 (define (emit-init si env)
   (emit "    .global base_init_callback")
   (emit "    .extern base_init")
-  (emit "    addl $-4,%esp")
-  (emit "    jmp base_init")
+  (emit "    addl $-4,%esp")  ;;
+  (emit "    jmp base_init")  ;;
   (emit "base_init_callback:")
   (emit "    addl $4,%esp"))
 
@@ -1149,7 +1159,8 @@
 
 (define (emit-function-header label)
   (emit "    .text")
-  (emit "    .align 4,0x90")
+ ;(emit "    .align 4,0x90")
+  (emit "    .align 16, 0x90")
   (emit "    .globl ~a" label)
   (emit "~a:" label))
 
@@ -2480,3 +2491,136 @@
     (if (zero? (remainder i 8))
 	i
 	(+ i (- 8 (remainder i 8)))))
+
+;;-------------------------------------------------------------------------------------
+;;                                Foreign functions
+;;-------------------------------------------------------------------------------------
+;;
+;; Our Scheme implementation cannot exist in isolation. It needs a way of interacting
+;; with the host operating system in order to perform Input/Output and many other useful
+;; operations. We now add a very simple way of calling to foreign C procedures.
+;; We add one additional form to our compiler:
+;;    <Expr> ::= (foreign-call <string> <Expr> ...)
+;; The foreign-call form takes a string literal as the first argument. The string
+;; denotes the name of the C procedure that we intend to call. Each of the expressions
+;; are evaluated first and their values are passed as arguments to the C procedure. The
+;; calling convention for C differs from the calling convention that we have been using
+;; for Scheme in that the arguments are placed below the return point and in reverse
+;; order. Figure 4 illustrates the difference.  (Ghuloum 2006)
+;;
+;;                 low addr                                    low addr
+;;               +------------+                             +------------+
+;;               |   ...      |                             |    ...     |
+;;         +--   +------------+                             +------------+
+;;         |     |   arg 3    |  %esp - 12                  |   return   |  %esp
+;;         |     +------------+                             +------------+
+;;      incoming |   arg 2    |  %esp - 8                   |   arg 1    |  %esp - 4    
+;;      args     +------------+                             +------------+
+;;         |     |   arg 1    |  %esp - 4                   |   arg 2    |  %esp - 8  
+;;         +--   +------------+                             +------------+
+;;    base---->  |  return    |  %esp                       |   arg 3    |  %esp - 12        
+;;               +------------+                             +------------+
+;;
+;;      (A) Parameter passing to Scheme                (B) Parameter passing to C
+;;
+;;                                      fig 4
+;;
+;; If only it were that simple.  OSX throws a wrench in the works by insisting that esp
+;; be aligned on a 16 byte boundary at the time that the call is made.  Since our
+;; call migth be made from anywhere, we need to adjust for the proper alignment at run
+;; time.  But since all the arguments need to evaluated in the original Scheme stack
+;; frame we adopt a simple expedient.  We calcuale all the arguments first, then we shift
+;; them up just before making the call.  Since we are going to need to restore the esp, we
+;; will save that in the stack as well just below the last argument.  Our scheme ends
+;; up looking like this:
+;;
+;;
+;;  (diagram here)
+;;
+;;
+;;-------------------------------------------------------------------------------------
+
+(define foreign-call-proc second)
+(define foreign-call-args cddr)
+
+(define (emit-foreign-call si env expr)
+  
+  (define (emit-args si env args)
+    (unless (null? args)
+	    (emit-expr si env (car args))
+	    (emit "    movl %eax, ~s(%esp)" si)
+	    (emit-args (- si wordsize) env (cdr args))))
+
+  (define (shift-frame m n)
+    (unless (> m n)
+	    (emit "    movl ~s(%edi),%eax" m)
+	    (emit "    movl %eax,~s(%esi)" m)
+	    (shift-frame (+ m 4) n)))
+
+  (let* ([proc (foreign-call-proc expr)]
+	 [args (foreign-call-args expr)]	 
+	 [k (length args)])
+
+    ;; preserve ecx on stack at esp - si
+    (emit  "    movl %ecx,~s(%esp)" si)
+
+    ;; push esp on stack at esp-si-4
+    (emit  "    movl %esp,~s(%esp)" (- si wordsize))
+
+    ;; push arg1...argK at esp-si-4-4*1 ... exp-si-4-4*k
+    (emit-args (- si (* 2 wordsize)) env (reverse args))
+
+    ;; set edi to esp-si-4-4*k, where last argument was pushed
+    (emit "    leal ~s(%esp),%edi" (- si 4 (* 4 k)))
+
+    ;; set esi to result of making edi value 16-byte aligned
+    (emit "    movl %edi,%esi")
+    (emit "    andl $-16,%esi")   ;; clear bottom 4 bytes of esi
+
+    ;; shift k+1 values at edi & below, up to esi position.
+    (shift-frame 0 (+ 1 (* 4 k)))
+
+    ;; set esp to esi
+    (emit "    movl %esi,%esp")
+    
+    ;; now make the call
+    (emit "    .extern _~a" proc)
+    (emit "fcall:") ;; DEBUG
+    (emit "    call _~a" proc)
+    ;;(emit "    xorl %eax,%eax")  ;; from the model; necessary???
+    (emit "fret:") ;; DEBUG
+    
+    ;; restore the esp from esi+4*k
+    (emit "    movl ~s(%esi),%esp" (* 4 k))
+    
+    ;; restore ecx
+   (emit "    movl ~s(%esp),%ecx" si) 
+   ))
+
+
+(define (emit-tail-foreign-call si env expr)
+  (emit-foreign-call si env expr)
+  (emit "     ret"))
+
+;;-----------------------------------------------------------------
+;;   Mac OSX System Calls
+;;-----------------------------------------------------------------
+
+;; I’m on a Intel machine, so what we are looking for is the x86 syscall
+;; calling conventions for the OS X or BSD platform. They are pretty
+;; simple:
+;;
+;; arguments passed on the stack, pushed right-to-left
+;; stack 16-bytes aligned
+;; syscall number in the eax register
+;; call by interrupt 0x80
+;; So what we have to do to print a “Hello world” is:
+;;
+;; push the length of the string (int) to the stack
+;; push a pointer to the string to the stack
+;; push the stdout file descriptor (1) to the stack
+;; align the stack by moving the stack pointer 4 more bytes (16 - 4 * 3)
+;; set the eax register to the write syscall number (4)
+;; interrupt 0x80
+
+
