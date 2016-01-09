@@ -334,7 +334,7 @@ ptr s_write_hello() {
 }
 
 ptr s_exit() {
-  exit(-1);
+  exit(0);
   return bool_f;
 }
 
@@ -347,7 +347,7 @@ ptr s_write(ptr fd, ptr str, ptr len) {
   int bytes = write(unshift(fd),
                     string_data(str),
                     unshift(len));
-  return bytes*4;  // this leaves the bytes in eax?
+  return shift(bytes);  // this leaves the bytes in eax?
 }
 
 

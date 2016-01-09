@@ -1,24 +1,24 @@
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == explicit-begins  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-let*  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-shadowing  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == vectorize-letrec  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-set!  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == close-free-variables  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-quote  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-when/unless  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == eliminate-cond  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # == external-symbols  ==>
-# (foreign-call "s_write" 1 "hello world" 11)
+# -536870912
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,32 +31,8 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (foreign-call "s_write" 1 "hello world" 11)
-    movl %ecx,-8(%esp)
-# emit-expr 11
-    movl $44, %eax     # immed 11
-    movl %eax, -32(%esp)
-# emit-expr "hello world"
-# string literal
-    jmp _L_361
-    .align 8,0x90
-_L_360 :
-    .int 44
-    .ascii "hello world"
-_L_361:
-    movl $_L_360, %eax
-    orl $6, %eax
-    movl %eax, -36(%esp)
-# emit-expr 1
-    movl $4, %eax     # immed 1
-    movl %eax, -40(%esp)
-    addl $-44,%esp
-    .extern _s_write
-fcall:
-    call _s_write
-fret:
-    subl $-44,%esp
-    movl -8(%esp),%ecx
+# emit-expr -536870912
+    movl $-2147483648, %eax     # immed -536870912
     ret
     .text
     .align 16, 0x90

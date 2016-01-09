@@ -1123,10 +1123,8 @@
   (emit "# emit-scheme-entry")
   (emit-function-header "_L_scheme_entry")
   (emit "    movl $0, %edi  # dummy for debugging")
-  (emit-init (- (* 2 wordsize)) env)
-  ;(emit-init -4 env)       ;; return is at %esp, so start at %esp - 4
-  (emit-expr (- (* 2 wordsize)) env expr)
-  ;(emit-expr -4 env expr)  ;; return is at %esp, so start at %esp - 4
+  (emit-init -8 env)       ;; return is at %esp, so start at %esp - 4
+  (emit-expr -8 env expr)  ;; return is at %esp, so start at %esp - 4
   (emit "    ret")
   (emit-function-header "_scheme_entry")    
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)
@@ -2553,76 +2551,51 @@
 	    (emit "    movl %eax, ~s(%esp)" si)
 	    (emit-args (- si wordsize) env (cdr args))))
 
+  (define (shift-frame m n)
+    (unless (> m n)
+	    (emit "    movl ~s(%edi),%eax" m)
+	    (emit "    movl %eax,~s(%esi)" m)
+	    (shift-frame (+ m 4) n)))
+
   (let* ([proc (foreign-call-proc expr)]
 	 [args (foreign-call-args expr)]	 
-	 [argc (length args)]
-	 [pad (- 36 (* 4 argc))])   ;; works for all up to s_write
-    ;; s_once likes a pad of 0    nargs=1
-    ;; s_exit likes a pad of 0    
-    ;; s_foo likes a pad of 4
+	 [k (length args)])
 
-    ;; preserve ecx on stack
-   (emit  "    movl %ecx,~s(%esp)" si)
+    ;; preserve ecx on stack at esp - si
+    (emit  "    movl %ecx,~s(%esp)" si)
 
-    ;; emit args in reverse order skipping 2 slots
-    (emit-args (- si pad) env (reverse args))
+    ;; push esp on stack at esp-si-4
+    (emit  "    movl %esp,~s(%esp)" (- si wordsize))
 
-    ;; adjust esp to point to the top argument we pushed
-    (emit "    addl $~s,%esp" (- si pad (* wordsize argc)))
+    ;; push arg1...argK at esp-si-4-4*1 ... exp-si-4-4*k
+    (emit-args (- si (* 2 wordsize)) env (reverse args))
 
-    ;; now make the call via absolute address
+    ;; set edi to esp-si-4-4*k, where last argument was pushed
+    (emit "    leal ~s(%esp),%edi" (- si 4 (* 4 k)))
+
+    ;; set esi to result of making edi value 16-byte aligned
+    (emit "    movl %edi,%esi")
+    (emit "    andl $-16,%esi")   ;; clear bottom 4 bytes of esi
+
+    ;; shift k+1 values at edi & below, up to esi position.
+    (shift-frame 0 (+ 1 (* 4 k)))
+
+    ;; set esp to esi
+    (emit "    movl %esi,%esp")
+    
+    ;; now make the call
     (emit "    .extern _~a" proc)
     (emit "fcall:") ;; DEBUG
     (emit "    call _~a" proc)
-   ; (emit "    xorl %eax,%eax")  ;; from the model; necessary???
+    ;;(emit "    xorl %eax,%eax")  ;; from the model; necessary???
     (emit "fret:") ;; DEBUG
     
-    ;; fixup the esp
-    (emit "    subl $~s,%esp" (- si pad (* wordsize argc)))
+    ;; restore the esp from esi+4*k
+    (emit "    movl ~s(%esi),%esp" (* 4 k))
     
     ;; restore ecx
    (emit "    movl ~s(%esp),%ecx" si) 
    ))
-
-;; (define (emit-foreign-call si env expr)
-  
-;;   (define (emit-args si env args)
-;;     (unless (null? args)
-;; 	    (emit-expr si env (car args))
-;; 	    (emit "    movl %eax, ~s(%esp)" si)
-;; 	    (emit-args (- si wordsize) env (cdr args))))
-
-;;   (let* ([proc (foreign-call-proc expr)]
-;; 	 [args (foreign-call-args expr)]	 
-;; 	 [argc (length args)]
-;; 	 [pad (- 36 (* 4 argc))])   ;; works for all up to s_write
-;;     ;; s_once likes a pad of 0    nargs=1
-;;     ;; s_exit likes a pad of 0    
-;;     ;; s_foo likes a pad of 4
-
-;;     ;; preserve ecx on stack
-;;    (emit  "    movl %ecx,~s(%esp)" si)
-
-;;     ;; emit args in reverse order skipping 2 slots
-;;     (emit-args (- si pad) env (reverse args))
-
-;;     ;; adjust esp to point to the top argument we pushed
-;;     (emit "    addl $~s,%esp" (- si pad (* wordsize argc)))
-
-;;     ;; now make the call via absolute address
-;;     (emit "    .extern _~a" proc)
-;;     (emit "fcall:") ;; DEBUG
-;;     (emit "    call _~a" proc)
-;;    ; (emit "    xorl %eax,%eax")  ;; from the model; necessary???
-;;     (emit "fret:") ;; DEBUG
-    
-;;     ;; fixup the esp
-;;     (emit "    subl $~s,%esp" (- si pad (* wordsize argc)))
-    
-;;     ;; restore ecx
-;;    (emit "    movl ~s(%esp),%ecx" si) 
-;;    ))
-
 
 
 (define (emit-tail-foreign-call si env expr)
