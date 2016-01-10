@@ -307,7 +307,6 @@ ptr s_false() {
   return bool_f;
 }
 
-
 ptr s_once(ptr x) {
   return x;
 }
@@ -316,10 +315,8 @@ ptr s_twice(ptr n) {
   return 2*n;
 }
 
-
 ptr s_foo() {
   puts("foo");
-  //write(0,"foo\n",4);  
   return bool_t;
 }
 

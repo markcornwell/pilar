@@ -1,12 +1,12 @@
 
 (add-tests-with-string-output "exit"
-    [(foreign-call "s_foo") => "foo\n#t\n"]  ;; this is first to break at pad=32, likes pad=36			      
+    [(foreign-call "s_foo") => "foo\n#t\n"]		      
     [(foreign-call "exit" 0) => ""]
- ;   [(foreign-call "exit" 1) => ""]			      
+ ;  [(foreign-call "exit" 1) => ""]			      
 )
 
 (add-tests-with-string-output "write"
- ;    [(foreign-call "s_nop") => "#t\n"]   ;; wierd - see base.scm
+ ;   [(foreign-call "s_nop") => "#t\n"]   ;; wierd - see base.scm
      [(foreign-call "s_42") => "42\n"]
      [(foreign-call "s_true") => "#t\n"]
      [(foreign-call "s_false") => "#f\n"]  
@@ -24,8 +24,32 @@
      [(foreign-call "s_write" 1 "hello world" (string-length "hello world")) => "hello world11\n"]
 )
 
-;; IDEA:  DID ANYTHNG STEP ON ECX?  We need it when we exit!!!
+(add-tests-with-string-output "error"			      
+    [(let* ([write-stderr (lambda (s)
+		     (foreign-call "s_write" 1 s (string-length s)))]
+	    [write-emsg (lambda (sym emsg)
+		       (write-stderr "error:")
+		       (write-stderr (symbol->string sym))
+		       (write-stderr ": ")
+		       (write-stderr emsg)
+		       (write-stderr "\n"))])
+       (write-emsg 'car "argument not a pair")
+       #f) => "error:car: argument not a pair\n#f\n"]
 
+    [(let* ([write-stderr (lambda (s)
+			    (foreign-call "s_write" 1 s (string-length s)))]
+	    [write-emsg (lambda (sym emsg)
+			  (write-stderr "error:")
+			  (write-stderr (symbol->string sym))
+			  (write-stderr ": ")
+			  (write-stderr emsg)
+			  (write-stderr "\n"))])
+       (write-emsg 'car "argument not a pair")
+       (foreign-call "exit" 0)
+       #f) => "error:car: argument not a pair\n"]
+    
+    [(error 'car "argument must be pair") => ""]
+)
 
 ;; (add-tests-with-string-output "S_error"
 ;;  [(let ([error (lambda args
