@@ -79,8 +79,19 @@
      (if (null? lst)
 	 (cons e nil)
 	 (cons (car lst) (append1 (cdr lst) elt))))]
-  )
+
+  [error (let* ([write-stderr (lambda (s)
+				 (foreign-call "s_write" 2 s (string-length s)))]
+	         [write-errmsg (lambda (sym emsg)
+				 (write-stderr "error:")
+				 (write-stderr (symbol->string sym))
+				 (write-stderr ": ")
+				 (write-stderr emsg)
+				 (write-stderr "\n"))])
+		 (lambda (sym emsg)
+		   (write-errmsg sym emsg)
+		   (foreign-call "exit" 0)))]
+
+ ) ; end labels
  
  (begin #t)) 
-
-

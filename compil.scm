@@ -238,7 +238,8 @@
 ;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
-  (memq x '(quote begin if let let* lambda letrec closure foreign-call primitive-ref)))
+  (memq x
+        '(begin closure foreign-call if lambda let let* letrec primitive-ref quote)))
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Explicit Begins
@@ -984,15 +985,21 @@
 (define (external? symbol)
   (getprop symbol '*is-external*))
 
-;; We need to know what symbols come from separately compiled libraries
-;; at compile time.  A transform uses this list to wrap those symbols
-;; in a primitive-ref form, e.g. (primitive-ref string->symbol)
+;;--------------------------------------------------------------------------------
+;; We need to know what symbols come from separately compiled libraries at compile
+;; time.  A transform uses this list to wrap those symbols in a primitive-ref
+;; form, e.g. (primitive-ref string->symbol)
 ;;
-;; Then at code generation time, we recognize those forms and emit
-;; code to fetch the datum from memory using the global labels defined
-;; by the library.
+;; Then at code generation time, we recognize those forms and emit code to fetch
+;; the datum from memory using the global labels defined by the library.
+;;---------------------------------------------------------------------------------
 
-(import-from (base) string->symbol symbols string=? append1)
+(import-from (base)
+	     string->symbol
+	     symbols
+	     string=?
+	     append1
+	     error)
 
 (define-transform (external-symbols expr)
   (cond
@@ -1001,7 +1008,7 @@
    [(pair? expr)
     (cons (external-symbols (car expr))
 	  (external-symbols (cdr expr)))]
-   [else expr]))
+   [else expr])) 
 
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
@@ -2486,7 +2493,7 @@
 	 (+ ci wordsize)
 	 (extend-env ci env (first frev)))])))
 
-
+ 
 (define (align-to-8-bytes i)    ;; rounds i up to next multiple of 8
     (if (zero? (remainder i 8))
 	i
@@ -2535,7 +2542,7 @@
 ;; up looking like this:
 ;;
 ;;
-;;  (diagram here)
+;;  (diagrams go here - pull from notes on yellow pad)
 ;;
 ;;
 ;;-------------------------------------------------------------------------------------
@@ -2585,10 +2592,9 @@
     
     ;; now make the call
     (emit "    .extern _~a" proc)
-    (emit "fcall:") ;; DEBUG
+
     (emit "    call _~a" proc)
     ;;(emit "    xorl %eax,%eax")  ;; from the model; necessary???
-    (emit "fret:") ;; DEBUG
     
     ;; restore the esp from esi+4*k
     (emit "    movl ~s(%esi),%esp" (* 4 k))
@@ -2601,26 +2607,5 @@
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)
   (emit "     ret"))
-
-;;-----------------------------------------------------------------
-;;   Mac OSX System Calls
-;;-----------------------------------------------------------------
-
-;; I’m on a Intel machine, so what we are looking for is the x86 syscall
-;; calling conventions for the OS X or BSD platform. They are pretty
-;; simple:
-;;
-;; arguments passed on the stack, pushed right-to-left
-;; stack 16-bytes aligned
-;; syscall number in the eax register
-;; call by interrupt 0x80
-;; So what we have to do to print a “Hello world” is:
-;;
-;; push the length of the string (int) to the stack
-;; push a pointer to the string to the stack
-;; push the stdout file descriptor (1) to the stack
-;; align the stack by moving the stack pointer 4 more bytes (16 - 4 * 3)
-;; set the eax register to the write syscall number (4)
-;; interrupt 0x80
 
 

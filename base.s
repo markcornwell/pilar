@@ -15,6 +15,10 @@ string$m$gsymbol:
      .align 8
 append1:
      .int 0xFF
+     .global "error"
+     .align 8
+error:
+     .int 0xFF
      .text
      .global base_init
      .align 4
@@ -51,13 +55,13 @@ base_init:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_25887
+    jmp _L_35933
     .align 8,0x90
-_L_25886 :
+_L_35932 :
     .int 12
     .ascii "nil"
-_L_25887:
-    movl $_L_25886, %eax
+_L_35933:
+    movl $_L_35932, %eax
     orl $6, %eax
     movl %eax, 0(%esp)
 # emit-expr ()
@@ -85,7 +89,7 @@ _L_25887:
 # si = -4
 # env = ((interned-symbols . 0))
 # expr = (closure () (interned-symbols) (let () interned-symbols))
-    movl $_L_25888, 0(%ebp)  # closure label
+    movl $_L_35934, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((interned-symbols . 0))
 # var=interned-symbols
@@ -95,8 +99,8 @@ _L_25887:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25889            # jump around closure body
-_L_25888:
+    jmp _L_35935            # jump around closure body
+_L_35934:
 # emit-tail-expr
 # si=-8
 # env=((interned-symbols . 4) (interned-symbols . 0))
@@ -119,7 +123,7 @@ _L_25888:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_25889:
+_L_35935:
      movl %eax, symbols
 # == explicit-begins  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
@@ -223,12 +227,12 @@ _L_25889:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))
-    movl $_L_25890, 0(%ebp)  # closure label
+    movl $_L_35936, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25891            # jump around closure body
-_L_25890:
+    jmp _L_35937            # jump around closure body
+_L_35936:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -282,7 +286,7 @@ _L_25890:
 #return from tail (fx= (string-length s1) (string-length s2))
     ret
     .align 4,0x90
-_L_25891:
+_L_35937:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -306,12 +310,12 @@ _L_25891:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))
-    movl $_L_25892, 0(%ebp)  # closure label
+    movl $_L_35938, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_25893            # jump around closure body
-_L_25892:
+    jmp _L_35939            # jump around closure body
+_L_35938:
 # emit-tail-expr
 # si=-20
 # env=((i . -16) (s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -395,7 +399,7 @@ _L_25892:
 #return from tail (char=? (string-ref s1 i) (string-ref s2 i))
     ret
     .align 4,0x90
-_L_25893:
+_L_35939:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -419,7 +423,7 @@ _L_25893:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i n) (si= si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref si= 0) s1 s2 i) ((vector-ref si<n= 0) s1 s2 (fx+ i 1) n) #f))))
-    movl $_L_25894, 0(%ebp)  # closure label
+    movl $_L_35940, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=si=
@@ -435,8 +439,8 @@ _L_25893:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25895            # jump around closure body
-_L_25894:
+    jmp _L_35941            # jump around closure body
+_L_35940:
 # emit-tail-expr
 # si=-24
 # env=((n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -498,15 +502,15 @@ _L_25894:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25896
+    je _L_35942
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_25897
-_L_25896:
+    jmp _L_35943
+_L_35942:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -556,7 +560,7 @@ _L_25896:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25898
+    je _L_35944
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -629,18 +633,18 @@ _L_25896:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-60  delta=36
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_25899
-_L_25898:
+    jmp _L_35945
+_L_35944:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_25899:
-_L_25897:
+_L_35945:
+_L_35943:
     .align 4,0x90
-_L_25895:
+_L_35941:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -664,7 +668,7 @@ _L_25895:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) (slen= si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref slen= 0) s1 s2) ((vector-ref si<n= 0) s1 s2 0 (string-length s1)) #f)))
-    movl $_L_25900, 0(%ebp)  # closure label
+    movl $_L_35946, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=slen=
@@ -680,8 +684,8 @@ _L_25895:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25901            # jump around closure body
-_L_25900:
+    jmp _L_35947            # jump around closure body
+_L_35946:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -747,7 +751,7 @@ _L_25900:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25902
+    je _L_35948
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -813,17 +817,17 @@ _L_25900:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-44  delta=20
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_25903
-_L_25902:
+    jmp _L_35949
+_L_35948:
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_25903:
+_L_35949:
     .align 4,0x90
-_L_25901:
+_L_35947:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -915,7 +919,7 @@ _L_25901:
 # si = -12
 # env = ((str->sym . 0))
 # expr = (closure (str symlist) ((primitive-ref string=?) str->sym) (let ((str str) (symlist symlist)) (if ((primitive-ref string=?) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref str->sym 0) str (cdr symlist))))))
-    movl $_L_25904, 0(%ebp)  # closure label
+    movl $_L_35950, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref string=?) not defined in the environmnet
 # emit-variable-ref
 # env=((str->sym . 0))
@@ -926,8 +930,8 @@ _L_25901:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25905            # jump around closure body
-_L_25904:
+    jmp _L_35951            # jump around closure body
+_L_35950:
 # emit-tail-expr
 # si=-16
 # env=((symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -989,7 +993,7 @@ _L_25904:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_25906
+    je _L_35952
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1004,8 +1008,8 @@ _L_25904:
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_25907
-_L_25906:
+    jmp _L_35953
+_L_35952:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1026,7 +1030,7 @@ _L_25906:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25908
+    je _L_35954
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1124,8 +1128,8 @@ _L_25906:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_25909
-_L_25908:
+    jmp _L_35955
+_L_35954:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1175,10 +1179,10 @@ _L_25908:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  size=0   si=-36  delta=20
     jmp *-2(%edi)  # tail-funcall
-_L_25909:
-_L_25907:
+_L_35955:
+_L_35953:
     .align 4,0x90
-_L_25905:
+_L_35951:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1195,7 +1199,7 @@ _L_25905:
 # si = -4
 # env = ((str->sym . 0))
 # expr = (closure (str) (str->sym (primitive-ref symbols)) (let ((str str)) ((vector-ref str->sym 0) str ((primitive-ref symbols)))))
-    movl $_L_25910, 0(%ebp)  # closure label
+    movl $_L_35956, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((str->sym . 0))
 # var=str->sym
@@ -1206,8 +1210,8 @@ _L_25905:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25911            # jump around closure body
-_L_25910:
+    jmp _L_35957            # jump around closure body
+_L_35956:
 # emit-tail-expr
 # si=-12
 # env=((str . -8) ((primitive-ref symbols) . 8) (str->sym . 4) (str->sym . 0))
@@ -1280,7 +1284,7 @@ _L_25910:
 # emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_25911:
+_L_35957:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -1311,15 +1315,15 @@ _L_25911:
 # si = 0
 # env = ()
 # expr = (closure (lst elt) (e nil (primitive-ref append1)) (let ((lst lst) (elt elt)) (if (null? lst) (cons e nil) (cons (car lst) ((primitive-ref append1) (cdr lst) elt)))))
-    movl $_L_25912, 0(%ebp)  # closure label
+    movl $_L_35958, 0(%ebp)  # closure label
 # WARNING: free var e not defined in the environmnet
 # WARNING: free var nil not defined in the environmnet
 # WARNING: free var (primitive-ref append1) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_25913            # jump around closure body
-_L_25912:
+    jmp _L_35959            # jump around closure body
+_L_35958:
 # emit-tail-expr
 # si=-16
 # env=((elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1361,7 +1365,7 @@ _L_25912:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_25914
+    je _L_35960
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1390,8 +1394,8 @@ _L_25912:
 # cons end
 #return from tail (cons e nil)
     ret
-    jmp _L_25915
-_L_25914:
+    jmp _L_35961
+_L_35960:
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1446,10 +1450,464 @@ _L_25914:
 # cons end
 #return from tail (cons (car lst) ((primitive-ref append1) (cdr lst) elt))
     ret
-_L_25915:
+_L_35961:
     .align 4,0x90
-_L_25913:
+_L_35959:
      movl %eax, append1
+# == explicit-begins  ==>
+# (let* ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s)))) (write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))
+# == eliminate-let*  ==>
+# (let ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s))))) (let ((write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))))
+# == eliminate-shadowing  ==>
+# (let ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s))))) (let ((write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))))
+# == vectorize-letrec  ==>
+# (let ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s))))) (let ((write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))))
+# == eliminate-set!  ==>
+# (let ((write-stderr (lambda (s) (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (lambda (sym emsg) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (lambda (sym emsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# == close-free-variables  ==>
+# (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# == eliminate-quote  ==>
+# (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# == eliminate-when/unless  ==>
+# (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# == eliminate-cond  ==>
+# (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# == external-symbols  ==>
+# (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# emit-expr (let ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s)))))) (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))))
+# emit-let
+#  si   = 0
+#  env  = ()
+#  bindings = ((write-stderr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s))))))
+#  body = (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))))
+# emit-expr (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s))))
+# emit-closure
+# si = 0
+# env = ()
+# expr = (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s))))
+    movl $_L_35962, 0(%ebp)  # closure label
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $8, %ebp     # bump ebp
+    jmp _L_35963            # jump around closure body
+_L_35962:
+# emit-tail-expr
+# si=-12
+# env=((s . -8))
+# expr=(let ((s s)) (foreign-call "s_write" 2 s (string-length s)))
+# emit-tail-let
+#  si   = -12
+#  env  = ((s . -8))
+#  bindings = ((s s))
+#  body = (foreign-call "s_write" 2 s (string-length s))
+# emit-expr s
+# emit-variable-ref
+# env=((s . -8))
+# var=s
+    movl -8(%esp), %eax  # stack load s
+# end emit-variable-ref
+    movl %eax, -12(%esp)  # stack save
+# emit-tail-expr
+# si=-16
+# env=((s . -12) (s . -8))
+# expr=(foreign-call "s_write" 2 s (string-length s))
+    movl %ecx,-16(%esp)
+    movl %esp,-20(%esp)
+# emit-expr (string-length s)
+# emit-expr s
+# emit-variable-ref
+# env=((s . -12) (s . -8))
+# var=s
+    movl -12(%esp), %eax  # stack load s
+# end emit-variable-ref
+    movl -6(%eax), %eax
+    movl %eax, -24(%esp)
+# emit-expr s
+# emit-variable-ref
+# env=((s . -12) (s . -8))
+# var=s
+    movl -12(%esp), %eax  # stack load s
+# end emit-variable-ref
+    movl %eax, -28(%esp)
+# emit-expr 2
+    movl $8, %eax     # immed 2
+    movl %eax, -32(%esp)
+    leal -32(%esp),%edi
+    movl %edi,%esi
+    andl $-16,%esi
+    movl 0(%edi),%eax
+    movl %eax,0(%esi)
+    movl 4(%edi),%eax
+    movl %eax,4(%esi)
+    movl 8(%edi),%eax
+    movl %eax,8(%esi)
+    movl 12(%edi),%eax
+    movl %eax,12(%esi)
+    movl %esi,%esp
+    .extern _s_write
+    call _s_write
+    movl 12(%esi),%esp
+    movl -16(%esp),%ecx
+     ret
+    .align 4,0x90
+_L_35963:
+    movl %eax, 0(%esp)  # stack save
+# emit-expr (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))))
+# emit-let
+#  si   = -4
+#  env  = ((write-stderr . 0))
+#  bindings = ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))))
+#  body = (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))
+# emit-expr (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))
+# emit-closure
+# si = -4
+# env = ((write-stderr . 0))
+# expr = (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))
+    movl $_L_35964, 0(%ebp)  # closure label
+# emit-variable-ref
+# env=((write-stderr . 0))
+# var=write-stderr
+    movl 0(%esp), %eax  # stack load write-stderr
+# end emit-variable-ref
+   movl  %eax, 4(%ebp)  # write-stderr
+# emit-variable-ref
+# env=((write-stderr . 0))
+# var=write-stderr
+    movl 0(%esp), %eax  # stack load write-stderr
+# end emit-variable-ref
+   movl  %eax, 8(%ebp)  # write-stderr
+# emit-variable-ref
+# env=((write-stderr . 0))
+# var=write-stderr
+    movl 0(%esp), %eax  # stack load write-stderr
+# end emit-variable-ref
+   movl  %eax, 12(%ebp)  # write-stderr
+# emit-variable-ref
+# env=((write-stderr . 0))
+# var=write-stderr
+    movl 0(%esp), %eax  # stack load write-stderr
+# end emit-variable-ref
+   movl  %eax, 16(%ebp)  # write-stderr
+# emit-variable-ref
+# env=((write-stderr . 0))
+# var=write-stderr
+    movl 0(%esp), %eax  # stack load write-stderr
+# end emit-variable-ref
+   movl  %eax, 20(%ebp)  # write-stderr
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $24, %ebp     # bump ebp
+    jmp _L_35965            # jump around closure body
+_L_35964:
+# emit-tail-expr
+# si=-16
+# env=((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))
+# emit-tail-let
+#  si   = -16
+#  env  = ((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#  bindings = ((sym sym) (emsg emsg))
+#  body = (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+# emit-expr sym
+# emit-variable-ref
+# env=((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=sym
+    movl -8(%esp), %eax  # stack load sym
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr emsg
+# emit-variable-ref
+# env=((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=emsg
+    movl -12(%esp), %eax  # stack load emsg
+# end emit-variable-ref
+    movl %eax, -20(%esp)  # stack save
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+# tail-begin (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# emit-expr (write-stderr "error:")
+# funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#    expr = (funcall write-stderr "error:")
+# emit-expr write-stderr
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=write-stderr
+    movl 18(%edi), %eax  # frame load write-stderr
+# end emit-variable-ref
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr "error:"
+# string literal
+    jmp _L_35967
+    .align 8,0x90
+_L_35966 :
+    .int 24
+    .ascii "error:"
+_L_35967:
+    movl $_L_35966, %eax
+    orl $6, %eax
+    mov %eax, -36(%esp)  # arg error:
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(begin (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+# tail-begin (begin (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# emit-expr (write-stderr (symbol->string sym))
+# funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#    expr = (funcall write-stderr (symbol->string sym))
+# emit-expr write-stderr
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=write-stderr
+    movl 18(%edi), %eax  # frame load write-stderr
+# end emit-variable-ref
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr (symbol->string sym)
+# symbol->string sym
+# emit-expr sym
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=sym
+    movl -16(%esp), %eax  # stack load sym
+# end emit-variable-ref
+    movl -3(%eax), %eax
+    mov %eax, -36(%esp)  # arg (symbol->string sym)
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(begin (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+# tail-begin (begin (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# emit-expr (write-stderr ": ")
+# funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#    expr = (funcall write-stderr ": ")
+# emit-expr write-stderr
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=write-stderr
+    movl 18(%edi), %eax  # frame load write-stderr
+# end emit-variable-ref
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr ": "
+# string literal
+    jmp _L_35969
+    .align 8,0x90
+_L_35968 :
+    .int 8
+    .ascii ": "
+_L_35969:
+    movl $_L_35968, %eax
+    orl $6, %eax
+    mov %eax, -36(%esp)  # arg : 
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(begin (write-stderr emsg) (write-stderr "\n"))
+# tail-begin (begin (write-stderr emsg) (write-stderr "\n"))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# emit-expr (write-stderr emsg)
+# funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#    expr = (funcall write-stderr emsg)
+# emit-expr write-stderr
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=write-stderr
+    movl 18(%edi), %eax  # frame load write-stderr
+# end emit-variable-ref
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr emsg
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=emsg
+    movl -20(%esp), %eax  # stack load emsg
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg emsg
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(begin (write-stderr "\n"))
+# tail-begin (begin (write-stderr "\n"))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# expr=(write-stderr "\n")
+# emit-tail-funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+#    expr = (funcall write-stderr "\n")
+# emit-expr write-stderr
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
+# var=write-stderr
+    movl 18(%edi), %eax  # frame load write-stderr
+# end emit-variable-ref
+   movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
+# emit-expr "\n"
+# string literal
+    jmp _L_35971
+    .align 8,0x90
+_L_35970 :
+    .int 4
+    .ascii "\n"
+_L_35971:
+    movl $_L_35970, %eax
+    orl $6, %eax
+    mov %eax, -28(%esp)    # arg 
+
+    movl -24(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=2   si=-24  delta=20
+    mov -24(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=1   si=-28  delta=20
+    mov -28(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=0   si=-32  delta=20
+    jmp *-2(%edi)  # tail-funcall
+     ret   # return thru stack
+    .align 4,0x90
+_L_35965:
+    movl %eax, -4(%esp)  # stack save
+# emit-expr (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))
+# emit-closure
+# si = -8
+# env = ((write-errmsg . -4) (write-stderr . 0))
+# expr = (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0))))
+    movl $_L_35972, 0(%ebp)  # closure label
+# emit-variable-ref
+# env=((write-errmsg . -4) (write-stderr . 0))
+# var=write-errmsg
+    movl -4(%esp), %eax  # stack load write-errmsg
+# end emit-variable-ref
+   movl  %eax, 4(%ebp)  # write-errmsg
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $8, %ebp     # bump ebp
+    jmp _L_35973            # jump around closure body
+_L_35972:
+# emit-tail-expr
+# si=-16
+# env=((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# expr=(let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "exit" 0)))
+# emit-tail-let
+#  si   = -16
+#  env  = ((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+#  bindings = ((sym sym) (emsg emsg))
+#  body = (begin (write-errmsg sym emsg) (foreign-call "exit" 0))
+# emit-expr sym
+# emit-variable-ref
+# env=((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# var=sym
+    movl -8(%esp), %eax  # stack load sym
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr emsg
+# emit-variable-ref
+# env=((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# var=emsg
+    movl -12(%esp), %eax  # stack load emsg
+# end emit-variable-ref
+    movl %eax, -20(%esp)  # stack save
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# expr=(begin (write-errmsg sym emsg) (foreign-call "exit" 0))
+# tail-begin (begin (write-errmsg sym emsg) (foreign-call "exit" 0))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# emit-expr (write-errmsg sym emsg)
+# funcall
+#    si   =-24
+#    env  = ((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+#    expr = (funcall write-errmsg sym emsg)
+# emit-expr write-errmsg
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# var=write-errmsg
+    movl 2(%edi), %eax  # frame load write-errmsg
+# end emit-variable-ref
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr sym
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# var=sym
+    movl -16(%esp), %eax  # stack load sym
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg sym
+# emit-expr emsg
+# emit-variable-ref
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# var=emsg
+    movl -20(%esp), %eax  # stack load emsg
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg emsg
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# expr=(begin (foreign-call "exit" 0))
+# tail-begin (begin (foreign-call "exit" 0))
+#   env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# emit-tail-expr
+# si=-24
+# env=((emsg . -20) (sym . -16) (emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
+# expr=(foreign-call "exit" 0)
+    movl %ecx,-24(%esp)
+    movl %esp,-28(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -32(%esp)
+    leal -32(%esp),%edi
+    movl %edi,%esi
+    andl $-16,%esi
+    movl 0(%edi),%eax
+    movl %eax,0(%esi)
+    movl 4(%edi),%eax
+    movl %eax,4(%esi)
+    movl %esi,%esp
+    .extern _exit
+    call _exit
+    movl 4(%esi),%esp
+    movl -24(%esp),%ecx
+     ret
+     ret   # return thru stack
+    .align 4,0x90
+_L_35973:
+     movl %eax, error
 # emit-expr (begin #t)
 # emit-begin
 #   expr=(begin #t)
