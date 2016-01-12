@@ -290,22 +290,22 @@
 	($diff "wah" "wah" 0)) => "#f\n"] 
 
 
-     [(letrec
-	 ([$slen= (lambda (s1 s2)
-		    (fx= (string-length s1)
-			 (string-length s2)))]
+     ;; [(letrec
+     ;; 	 ([$slen= (lambda (s1 s2)
+     ;; 		    (fx= (string-length s1)
+     ;; 			 (string-length s2)))]
 	  
-	  [$si=  (lambda (s1 s2 i)
-		   (char=? (string-ref s1 i)
-			   (string-ref s2 i)))]
-          [$diff (lambda (s1 s2 i)
-		   (if (fx= i (string-length s1))
-		       #f
-		       (if ($si= s1 s2 i)
-			   ($diff s1 s2 (fx+ i 1))
-			   #t)))])
-	(cons ($diff "wah" "wah" 0)
-	      (cons ($diff "cornwell" "cornwall") ()))) => "(#f #t)\n"] 
+     ;; 	  [$si=  (lambda (s1 s2 i)
+     ;; 		   (char=? (string-ref s1 i)
+     ;; 			   (string-ref s2 i)))]
+     ;;      [$diff (lambda (s1 s2 i)
+     ;; 		   (if (fx= i (string-length s1))
+     ;; 		       #f
+     ;; 		       (if ($si= s1 s2 i)
+     ;; 			   ($diff s1 s2 (fx+ i 1))
+     ;; 			   #t)))])
+     ;; 	(cons ($diff "wah" "wah" 0)
+     ;; 	      (cons ($diff "cornwell" "cornwall") ()))) => "(#f #t)\n"] ;; <<--- arg must be fixnum ??? ---<<<<
 
 
      [(letrec	  

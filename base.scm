@@ -93,8 +93,11 @@
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
   
-  [eh_procedure   (lambda () (error 'funcall "first arg must be a procedure"))]
-
+  [eh_procedure  (lambda () (error 'funcall    "arg 1 must be a procedure"))]
+  [eh_fixnum     (lambda () (error 'primitive  "arg must be a fixnum"))]
+  [eh_string     (lambda () (error 'primitive  "arg must be a string"))]
+  [eh_character  (lambda () (error 'primitive  "arg must be a character"))]
+  
  ) ; end labels
  
  (begin #t)) 

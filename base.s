@@ -23,6 +23,18 @@ error:
      .align 8
 eh$uprocedure:
      .int 0xFF
+     .global "eh$ufixnum"
+     .align 8
+eh$ufixnum:
+     .int 0xFF
+     .global "eh$ustring"
+     .align 8
+eh$ustring:
+     .int 0xFF
+     .global "eh$ucharacter"
+     .align 8
+eh$ucharacter:
+     .int 0xFF
      .text
      .global base_init
      .align 4
@@ -59,13 +71,13 @@ base_init:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_51017
+    jmp _L_79167
     .align 8,0x90
-_L_51016 :
+_L_79166 :
     .int 12
     .ascii "nil"
-_L_51017:
-    movl $_L_51016, %eax
+_L_79167:
+    movl $_L_79166, %eax
     orl $6, %eax
     movl %eax, 0(%esp)
 # emit-expr ()
@@ -93,7 +105,7 @@ _L_51017:
 # si = -4
 # env = ((interned-symbols . 0))
 # expr = (closure () (interned-symbols) (let () interned-symbols))
-    movl $_L_51018, 0(%ebp)  # closure label
+    movl $_L_79168, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((interned-symbols . 0))
 # var=interned-symbols
@@ -103,8 +115,8 @@ _L_51017:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_51019            # jump around closure body
-_L_51018:
+    jmp _L_79169            # jump around closure body
+_L_79168:
 # emit-tail-expr
 # si=-8
 # env=((interned-symbols . 4) (interned-symbols . 0))
@@ -127,7 +139,7 @@ _L_51018:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_51019:
+_L_79169:
      movl %eax, symbols
 # == explicit-begins  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
@@ -231,12 +243,12 @@ _L_51019:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))
-    movl $_L_51020, 0(%ebp)  # closure label
+    movl $_L_79170, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_51021            # jump around closure body
-_L_51020:
+    jmp _L_79171            # jump around closure body
+_L_79170:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -273,6 +285,17 @@ _L_51020:
     movl -20(%esp), %eax  # stack load s2
 # end emit-variable-ref
     movl -6(%eax), %eax
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79172"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79172":
     movl %eax, -24(%esp)
 # emit-expr (string-length s1)
 # emit-expr s1
@@ -282,6 +305,17 @@ _L_51020:
     movl -16(%esp), %eax  # stack load s1
 # end emit-variable-ref
     movl -6(%eax), %eax
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79173"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79173":
     cmp -24(%esp), %eax
     sete %al
     movzbl %al, %eax
@@ -290,7 +324,7 @@ _L_51020:
 #return from tail (fx= (string-length s1) (string-length s2))
     ret
     .align 4,0x90
-_L_51021:
+_L_79171:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -314,12 +348,12 @@ _L_51021:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))
-    movl $_L_51022, 0(%ebp)  # closure label
+    movl $_L_79174, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_51023            # jump around closure body
-_L_51022:
+    jmp _L_79175            # jump around closure body
+_L_79174:
 # emit-tail-expr
 # si=-20
 # env=((i . -16) (s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -375,6 +409,17 @@ _L_51022:
     movl -2(%eax,%esi), %eax
     sal $8, %eax
     or  $15, %eax
+# check the argument is a char
+    movl %eax,%ebx
+    and $255, %bl
+    cmp $15, %bl
+    je "_L_79176"
+# invoke error handler eh_character
+    .extern eh$ucharacter
+    movl eh$ucharacter, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79176":
     movb %ah, -32(%esp)
 # emit-expr (string-ref s2 i)
 # emit-expr s2
@@ -395,6 +440,17 @@ _L_51022:
     movl -2(%eax,%esi), %eax
     sal $8, %eax
     or  $15, %eax
+# check the argument is a char
+    movl %eax,%ebx
+    and $255, %bl
+    cmp $15, %bl
+    je "_L_79177"
+# invoke error handler eh_character
+    .extern eh$ucharacter
+    movl eh$ucharacter, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79177":
     cmp %ah, -32(%esp)
     sete %al
     movzbl %al, %eax
@@ -403,7 +459,7 @@ _L_51022:
 #return from tail (char=? (string-ref s1 i) (string-ref s2 i))
     ret
     .align 4,0x90
-_L_51023:
+_L_79175:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -427,7 +483,7 @@ _L_51023:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i n) (si= si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref si= 0) s1 s2 i) ((vector-ref si<n= 0) s1 s2 (fx+ i 1) n) #f))))
-    movl $_L_51024, 0(%ebp)  # closure label
+    movl $_L_79178, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=si=
@@ -443,8 +499,8 @@ _L_51023:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51025            # jump around closure body
-_L_51024:
+    jmp _L_79179            # jump around closure body
+_L_79178:
 # emit-tail-expr
 # si=-24
 # env=((n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -493,6 +549,17 @@ _L_51024:
 # var=n
     movl -36(%esp), %eax  # stack load n
 # end emit-variable-ref
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79182"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79182":
     movl %eax, -40(%esp)
 # emit-expr i
 # emit-variable-ref
@@ -500,21 +567,32 @@ _L_51024:
 # var=i
     movl -32(%esp), %eax  # stack load i
 # end emit-variable-ref
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79183"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79183":
     cmp -40(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_51026
+    je _L_79180
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_51027
-_L_51026:
+    jmp _L_79181
+_L_79180:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -540,13 +618,13 @@ _L_51026:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51030"
+    je "_L_79186"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51030":
+"_L_79186":
    movl %eax,  -48(%esp)  # stash funcall-oper in closure slot
 # emit-expr s1
 # emit-variable-ref
@@ -575,7 +653,7 @@ _L_51026:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_51028
+    je _L_79184
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -614,6 +692,17 @@ _L_51026:
 # emit-expr (fx+ i 1)
 # emit-expr 1
     movl $4, %eax     # immed 1
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79187"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79187":
     movl %eax, -52(%esp)  # fx+ push arg1
 # emit-expr i
 # emit-variable-ref
@@ -621,6 +710,17 @@ _L_51026:
 # var=i
     movl -32(%esp), %eax  # stack load i
 # end emit-variable-ref
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_79188"
+# invoke error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79188":
     addl -52(%esp), %eax  # fx+ arg1 arg2
     mov %eax, -52(%esp)    # arg (fx+ i 1)
 # emit-expr n
@@ -648,18 +748,18 @@ _L_51026:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-60  delta=36
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_51029
-_L_51028:
+    jmp _L_79185
+_L_79184:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_51029:
-_L_51027:
+_L_79185:
+_L_79181:
     .align 4,0x90
-_L_51025:
+_L_79179:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -683,7 +783,7 @@ _L_51025:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) (slen= si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref slen= 0) s1 s2) ((vector-ref si<n= 0) s1 s2 0 (string-length s1)) #f)))
-    movl $_L_51031, 0(%ebp)  # closure label
+    movl $_L_79189, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=slen=
@@ -699,8 +799,8 @@ _L_51025:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51032            # jump around closure body
-_L_51031:
+    jmp _L_79190            # jump around closure body
+_L_79189:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -749,13 +849,13 @@ _L_51031:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51035"
+    je "_L_79193"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51035":
+"_L_79193":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr s1
 # emit-variable-ref
@@ -777,7 +877,7 @@ _L_51031:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_51033
+    je _L_79191
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -843,17 +943,17 @@ _L_51031:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-44  delta=20
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_51034
-_L_51033:
+    jmp _L_79192
+_L_79191:
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_51034:
+_L_79192:
     .align 4,0x90
-_L_51032:
+_L_79190:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -945,7 +1045,7 @@ _L_51032:
 # si = -12
 # env = ((str->sym . 0))
 # expr = (closure (str symlist) ((primitive-ref string=?) str->sym) (let ((str str) (symlist symlist)) (if ((primitive-ref string=?) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref str->sym 0) str (cdr symlist))))))
-    movl $_L_51036, 0(%ebp)  # closure label
+    movl $_L_79194, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref string=?) not defined in the environmnet
 # emit-variable-ref
 # env=((str->sym . 0))
@@ -956,8 +1056,8 @@ _L_51032:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51037            # jump around closure body
-_L_51036:
+    jmp _L_79195            # jump around closure body
+_L_79194:
 # emit-tail-expr
 # si=-16
 # env=((symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -997,13 +1097,13 @@ _L_51036:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51040"
+    je "_L_79198"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51040":
+"_L_79198":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr str
 # emit-variable-ref
@@ -1030,7 +1130,7 @@ _L_51036:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_51038
+    je _L_79196
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1045,8 +1145,8 @@ _L_51036:
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_51039
-_L_51038:
+    jmp _L_79197
+_L_79196:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1067,7 +1167,7 @@ _L_51038:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_51041
+    je _L_79199
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1165,8 +1265,8 @@ _L_51038:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_51042
-_L_51041:
+    jmp _L_79200
+_L_79199:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1216,10 +1316,10 @@ _L_51041:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  size=0   si=-36  delta=20
     jmp *-2(%edi)  # tail-funcall
-_L_51042:
-_L_51039:
+_L_79200:
+_L_79197:
     .align 4,0x90
-_L_51037:
+_L_79195:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1236,7 +1336,7 @@ _L_51037:
 # si = -4
 # env = ((str->sym . 0))
 # expr = (closure (str) (str->sym (primitive-ref symbols)) (let ((str str)) ((vector-ref str->sym 0) str ((primitive-ref symbols)))))
-    movl $_L_51043, 0(%ebp)  # closure label
+    movl $_L_79201, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((str->sym . 0))
 # var=str->sym
@@ -1247,8 +1347,8 @@ _L_51037:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51044            # jump around closure body
-_L_51043:
+    jmp _L_79202            # jump around closure body
+_L_79201:
 # emit-tail-expr
 # si=-12
 # env=((str . -8) ((primitive-ref symbols) . 8) (str->sym . 4) (str->sym . 0))
@@ -1305,13 +1405,13 @@ _L_51043:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51045"
+    je "_L_79203"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51045":
+"_L_79203":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
@@ -1332,7 +1432,7 @@ _L_51043:
 # emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_51044:
+_L_79202:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -1363,15 +1463,15 @@ _L_51044:
 # si = 0
 # env = ()
 # expr = (closure (lst elt) (e nil (primitive-ref append1)) (let ((lst lst) (elt elt)) (if (null? lst) (cons e nil) (cons (car lst) ((primitive-ref append1) (cdr lst) elt)))))
-    movl $_L_51046, 0(%ebp)  # closure label
+    movl $_L_79204, 0(%ebp)  # closure label
 # WARNING: free var e not defined in the environmnet
 # WARNING: free var nil not defined in the environmnet
 # WARNING: free var (primitive-ref append1) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51047            # jump around closure body
-_L_51046:
+    jmp _L_79205            # jump around closure body
+_L_79204:
 # emit-tail-expr
 # si=-16
 # env=((elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1413,7 +1513,7 @@ _L_51046:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_51048
+    je _L_79206
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1442,8 +1542,8 @@ _L_51046:
 # cons end
 #return from tail (cons e nil)
     ret
-    jmp _L_51049
-_L_51048:
+    jmp _L_79207
+_L_79206:
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1471,13 +1571,13 @@ _L_51048:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51050"
+    je "_L_79208"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51050":
+"_L_79208":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr (cdr lst)
 # emit-expr lst
@@ -1509,9 +1609,9 @@ _L_51048:
 # cons end
 #return from tail (cons (car lst) ((primitive-ref append1) (cdr lst) elt))
     ret
-_L_51049:
+_L_79207:
     .align 4,0x90
-_L_51047:
+_L_79205:
      movl %eax, append1
 # == explicit-begins  ==>
 # (let* ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s)))) (write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
@@ -1544,12 +1644,12 @@ _L_51047:
 # si = 0
 # env = ()
 # expr = (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s))))
-    movl $_L_51051, 0(%ebp)  # closure label
+    movl $_L_79209, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_51052            # jump around closure body
-_L_51051:
+    jmp _L_79210            # jump around closure body
+_L_79209:
 # emit-tail-expr
 # si=-12
 # env=((s . -8))
@@ -1609,7 +1709,7 @@ _L_51051:
     movl -16(%esp),%ecx
      ret
     .align 4,0x90
-_L_51052:
+_L_79210:
     movl %eax, 0(%esp)  # stack save
 # emit-expr (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1)))))
 # emit-let
@@ -1622,7 +1722,7 @@ _L_51052:
 # si = -4
 # env = ((write-stderr . 0))
 # expr = (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))
-    movl $_L_51053, 0(%ebp)  # closure label
+    movl $_L_79211, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((write-stderr . 0))
 # var=write-stderr
@@ -1656,8 +1756,8 @@ _L_51052:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_51054            # jump around closure body
-_L_51053:
+    jmp _L_79212            # jump around closure body
+_L_79211:
 # emit-tail-expr
 # si=-16
 # env=((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
@@ -1702,23 +1802,23 @@ _L_51053:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51055"
+    je "_L_79213"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51055":
+"_L_79213":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr "error:"
 # string literal
-    jmp _L_51057
+    jmp _L_79215
     .align 8,0x90
-_L_51056 :
+_L_79214 :
     .int 24
     .ascii "error:"
-_L_51057:
-    movl $_L_51056, %eax
+_L_79215:
+    movl $_L_79214, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg error:
     movl -32(%esp), %edi   # load new closure to %edi
@@ -1747,13 +1847,13 @@ _L_51057:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51058"
+    je "_L_79216"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51058":
+"_L_79216":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr (symbol->string sym)
 # symbol->string sym
@@ -1791,23 +1891,23 @@ _L_51057:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51059"
+    je "_L_79217"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51059":
+"_L_79217":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr ": "
 # string literal
-    jmp _L_51061
+    jmp _L_79219
     .align 8,0x90
-_L_51060 :
+_L_79218 :
     .int 8
     .ascii ": "
-_L_51061:
-    movl $_L_51060, %eax
+_L_79219:
+    movl $_L_79218, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg : 
     movl -32(%esp), %edi   # load new closure to %edi
@@ -1836,13 +1936,13 @@ _L_51061:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51062"
+    je "_L_79220"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51062":
+"_L_79220":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr emsg
 # emit-variable-ref
@@ -1879,13 +1979,13 @@ _L_51061:
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
 # emit-expr "\n"
 # string literal
-    jmp _L_51064
+    jmp _L_79222
     .align 8,0x90
-_L_51063 :
+_L_79221 :
     .int 4
     .ascii "\n"
-_L_51064:
-    movl $_L_51063, %eax
+_L_79222:
+    movl $_L_79221, %eax
     orl $6, %eax
     mov %eax, -28(%esp)    # arg 
 
@@ -1900,14 +2000,14 @@ _L_51064:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_51054:
+_L_79212:
     movl %eax, -4(%esp)  # stack save
 # emit-expr (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
 # emit-closure
 # si = -8
 # env = ((write-errmsg . -4) (write-stderr . 0))
 # expr = (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
-    movl $_L_51065, 0(%ebp)  # closure label
+    movl $_L_79223, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((write-errmsg . -4) (write-stderr . 0))
 # var=write-errmsg
@@ -1917,8 +2017,8 @@ _L_51054:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_51066            # jump around closure body
-_L_51065:
+    jmp _L_79224            # jump around closure body
+_L_79223:
 # emit-tail-expr
 # si=-16
 # env=((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
@@ -1963,13 +2063,13 @@ _L_51065:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51067"
+    je "_L_79225"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51067":
+"_L_79225":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr sym
 # emit-variable-ref
@@ -2020,58 +2120,58 @@ _L_51065:
      ret
      ret   # return thru stack
     .align 4,0x90
-_L_51066:
+_L_79224:
      movl %eax, error
 # == explicit-begins  ==>
-# (lambda () (error (quote funcall) "first arg must be a procedure"))
+# (lambda () (error (quote funcall) "arg 1 must be a procedure"))
 # == eliminate-let*  ==>
-# (lambda () (error (quote funcall) "first arg must be a procedure"))
+# (lambda () (error (quote funcall) "arg 1 must be a procedure"))
 # == eliminate-shadowing  ==>
-# (lambda () (error (quote funcall) "first arg must be a procedure"))
+# (lambda () (error (quote funcall) "arg 1 must be a procedure"))
 # == vectorize-letrec  ==>
-# (lambda () (error (quote funcall) "first arg must be a procedure"))
+# (lambda () (error (quote funcall) "arg 1 must be a procedure"))
 # == eliminate-set!  ==>
-# (lambda () (let () (error (quote funcall) "first arg must be a procedure")))
+# (lambda () (let () (error (quote funcall) "arg 1 must be a procedure")))
 # == close-free-variables  ==>
-# (closure () (error funcall) (let () (error (quote funcall) "first arg must be a procedure")))
+# (closure () (error funcall) (let () (error (quote funcall) "arg 1 must be a procedure")))
 # == eliminate-quote  ==>
-# (closure () (error funcall) (let () (error (string->symbol "funcall") "first arg must be a procedure")))
+# (closure () (error funcall) (let () (error (string->symbol "funcall") "arg 1 must be a procedure")))
 # == eliminate-when/unless  ==>
-# (closure () (error funcall) (let () (error (string->symbol "funcall") "first arg must be a procedure")))
+# (closure () (error funcall) (let () (error (string->symbol "funcall") "arg 1 must be a procedure")))
 # == eliminate-cond  ==>
-# (closure () (error funcall) (let () (error (string->symbol "funcall") "first arg must be a procedure")))
+# (closure () (error funcall) (let () (error (string->symbol "funcall") "arg 1 must be a procedure")))
 # == external-symbols  ==>
-# (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")))
-# emit-expr (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")))
+# (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")))
+# emit-expr (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")))
-    movl $_L_51068, 0(%ebp)  # closure label
+# expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")))
+    movl $_L_79226, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var funcall not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_51069            # jump around closure body
-_L_51068:
+    jmp _L_79227            # jump around closure body
+_L_79226:
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
-# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure"))
+# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure"))
 # emit-tail-let
 #  si   = -8
 #  env  = ((funcall . 8) ((primitive-ref error) . 4))
 #  bindings = ()
-#  body = ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")
+#  body = ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
-# expr=((primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")
+# expr=((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")
 # emit-tail-funcall
 #    si   =-8
 #    env  = ((funcall . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "funcall") "first arg must be a procedure")
+#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")
 # emit-expr (primitive-ref error)
     .extern error
     movl error,%eax
@@ -2088,23 +2188,23 @@ _L_51068:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_51070"
+    je "_L_79228"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_51070":
+"_L_79228":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "funcall"
 # string literal
-    jmp _L_51072
+    jmp _L_79230
     .align 8,0x90
-_L_51071 :
+_L_79229 :
     .int 28
     .ascii "funcall"
-_L_51072:
-    movl $_L_51071, %eax
+_L_79230:
+    movl $_L_79229, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg funcall
     movl -20(%esp), %edi   # load new closure to %edi
@@ -2113,17 +2213,17 @@ _L_51072:
     add $12, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) funcall)
-# emit-expr "first arg must be a procedure"
+# emit-expr "arg 1 must be a procedure"
 # string literal
-    jmp _L_51074
+    jmp _L_79232
     .align 8,0x90
-_L_51073 :
-    .int 116
-    .ascii "first arg must be a procedure"
-_L_51074:
-    movl $_L_51073, %eax
+_L_79231 :
+    .int 100
+    .ascii "arg 1 must be a procedure"
+_L_79232:
+    movl $_L_79231, %eax
     orl $6, %eax
-    mov %eax, -16(%esp)    # arg first arg must be a procedure
+    mov %eax, -16(%esp)    # arg arg 1 must be a procedure
     movl -8(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-8  delta=4
     mov -8(%esp), %ebx  # shift frame cell
@@ -2137,8 +2237,359 @@ _L_51074:
 # emit-shift-args:  size=0   si=-20  delta=4
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_51069:
+_L_79227:
      movl %eax, eh$uprocedure
+# == explicit-begins  ==>
+# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# == eliminate-let*  ==>
+# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# == eliminate-shadowing  ==>
+# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# == vectorize-letrec  ==>
+# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# == eliminate-set!  ==>
+# (lambda () (let () (error (quote primitive) "arg must be a fixnum")))
+# == close-free-variables  ==>
+# (closure () (error primitive) (let () (error (quote primitive) "arg must be a fixnum")))
+# == eliminate-quote  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# == eliminate-when/unless  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# == eliminate-cond  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# == external-symbols  ==>
+# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
+# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
+# emit-closure
+# si = 0
+# env = ()
+# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
+    movl $_L_79233, 0(%ebp)  # closure label
+# WARNING: free var (primitive-ref error) not defined in the environmnet
+# WARNING: free var primitive not defined in the environmnet
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $16, %ebp     # bump ebp
+    jmp _L_79234            # jump around closure body
+_L_79233:
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum"))
+# emit-tail-let
+#  si   = -8
+#  env  = ((primitive . 8) ((primitive-ref error) . 4))
+#  bindings = ()
+#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+# emit-tail-funcall
+#    si   =-8
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+# emit-expr (primitive-ref error)
+    .extern error
+    movl error,%eax
+   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref string->symbol) "primitive")
+# funcall
+#    si   =-12
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref string->symbol) "primitive")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_79235"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79235":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "primitive"
+# string literal
+    jmp _L_79237
+    .align 8,0x90
+_L_79236 :
+    .int 36
+    .ascii "primitive"
+_L_79237:
+    movl $_L_79236, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg primitive
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+# emit-expr "arg must be a fixnum"
+# string literal
+    jmp _L_79239
+    .align 8,0x90
+_L_79238 :
+    .int 80
+    .ascii "arg must be a fixnum"
+_L_79239:
+    movl $_L_79238, %eax
+    orl $6, %eax
+    mov %eax, -16(%esp)    # arg arg must be a fixnum
+    movl -8(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-8  delta=4
+    mov -8(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-12  delta=4
+    mov -12(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-16  delta=4
+    mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -12(%esp)  # down to base
+# emit-shift-args:  size=0   si=-20  delta=4
+    jmp *-2(%edi)  # tail-funcall
+    .align 4,0x90
+_L_79234:
+     movl %eax, eh$ufixnum
+# == explicit-begins  ==>
+# (lambda () (error (quote primitive) "arg must be a string"))
+# == eliminate-let*  ==>
+# (lambda () (error (quote primitive) "arg must be a string"))
+# == eliminate-shadowing  ==>
+# (lambda () (error (quote primitive) "arg must be a string"))
+# == vectorize-letrec  ==>
+# (lambda () (error (quote primitive) "arg must be a string"))
+# == eliminate-set!  ==>
+# (lambda () (let () (error (quote primitive) "arg must be a string")))
+# == close-free-variables  ==>
+# (closure () (error primitive) (let () (error (quote primitive) "arg must be a string")))
+# == eliminate-quote  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# == eliminate-when/unless  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# == eliminate-cond  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# == external-symbols  ==>
+# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
+# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
+# emit-closure
+# si = 0
+# env = ()
+# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
+    movl $_L_79240, 0(%ebp)  # closure label
+# WARNING: free var (primitive-ref error) not defined in the environmnet
+# WARNING: free var primitive not defined in the environmnet
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $16, %ebp     # bump ebp
+    jmp _L_79241            # jump around closure body
+_L_79240:
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string"))
+# emit-tail-let
+#  si   = -8
+#  env  = ((primitive . 8) ((primitive-ref error) . 4))
+#  bindings = ()
+#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+# emit-tail-funcall
+#    si   =-8
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+# emit-expr (primitive-ref error)
+    .extern error
+    movl error,%eax
+   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref string->symbol) "primitive")
+# funcall
+#    si   =-12
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref string->symbol) "primitive")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_79242"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79242":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "primitive"
+# string literal
+    jmp _L_79244
+    .align 8,0x90
+_L_79243 :
+    .int 36
+    .ascii "primitive"
+_L_79244:
+    movl $_L_79243, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg primitive
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+# emit-expr "arg must be a string"
+# string literal
+    jmp _L_79246
+    .align 8,0x90
+_L_79245 :
+    .int 80
+    .ascii "arg must be a string"
+_L_79246:
+    movl $_L_79245, %eax
+    orl $6, %eax
+    mov %eax, -16(%esp)    # arg arg must be a string
+    movl -8(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-8  delta=4
+    mov -8(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-12  delta=4
+    mov -12(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-16  delta=4
+    mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -12(%esp)  # down to base
+# emit-shift-args:  size=0   si=-20  delta=4
+    jmp *-2(%edi)  # tail-funcall
+    .align 4,0x90
+_L_79241:
+     movl %eax, eh$ustring
+# == explicit-begins  ==>
+# (lambda () (error (quote primitive) "arg must be a character"))
+# == eliminate-let*  ==>
+# (lambda () (error (quote primitive) "arg must be a character"))
+# == eliminate-shadowing  ==>
+# (lambda () (error (quote primitive) "arg must be a character"))
+# == vectorize-letrec  ==>
+# (lambda () (error (quote primitive) "arg must be a character"))
+# == eliminate-set!  ==>
+# (lambda () (let () (error (quote primitive) "arg must be a character")))
+# == close-free-variables  ==>
+# (closure () (error primitive) (let () (error (quote primitive) "arg must be a character")))
+# == eliminate-quote  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# == eliminate-when/unless  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# == eliminate-cond  ==>
+# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# == external-symbols  ==>
+# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
+# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
+# emit-closure
+# si = 0
+# env = ()
+# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
+    movl $_L_79247, 0(%ebp)  # closure label
+# WARNING: free var (primitive-ref error) not defined in the environmnet
+# WARNING: free var primitive not defined in the environmnet
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $16, %ebp     # bump ebp
+    jmp _L_79248            # jump around closure body
+_L_79247:
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character"))
+# emit-tail-let
+#  si   = -8
+#  env  = ((primitive . 8) ((primitive-ref error) . 4))
+#  bindings = ()
+#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+# emit-tail-expr
+# si=-8
+# env=((primitive . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+# emit-tail-funcall
+#    si   =-8
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+# emit-expr (primitive-ref error)
+    .extern error
+    movl error,%eax
+   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref string->symbol) "primitive")
+# funcall
+#    si   =-12
+#    env  = ((primitive . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref string->symbol) "primitive")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_79249"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_79249":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "primitive"
+# string literal
+    jmp _L_79251
+    .align 8,0x90
+_L_79250 :
+    .int 36
+    .ascii "primitive"
+_L_79251:
+    movl $_L_79250, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg primitive
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+# emit-expr "arg must be a character"
+# string literal
+    jmp _L_79253
+    .align 8,0x90
+_L_79252 :
+    .int 92
+    .ascii "arg must be a character"
+_L_79253:
+    movl $_L_79252, %eax
+    orl $6, %eax
+    mov %eax, -16(%esp)    # arg arg must be a character
+    movl -8(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-8  delta=4
+    mov -8(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-12  delta=4
+    mov -12(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-16  delta=4
+    mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -12(%esp)  # down to base
+# emit-shift-args:  size=0   si=-20  delta=4
+    jmp *-2(%edi)  # tail-funcall
+    .align 4,0x90
+_L_79248:
+     movl %eax, eh$ucharacter
 # emit-expr (begin #t)
 # emit-begin
 #   expr=(begin #t)
