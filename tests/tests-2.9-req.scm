@@ -45,10 +45,25 @@
 			  (write-stderr emsg)
 			  (write-stderr "\n"))])
        (write-emsg 'car "argument not a pair")
-       (foreign-call "exit" 0)
-       #f) => "error:car: argument not a pair\n"]
-    
-    [(error 'car "argument must be pair") => ""]
+       (foreign-call "s_exit" 1) ;; must call s_exit to properly convert fixnum 1 to int 1
+       #f) => "error:car: argument not a pair\n"]  
+    [(error 'car "argument must be a pair") => "error:car: argument must be a pair\n"]
+    [(error 'cdr "argument must be a pair") => "error:cdr: argument must be a pair\n"]
+    [(error 'funcall "first arg must be a procedure") => "error:funcall: first arg must be a procedure\n"]
+)
+
+(add-tests-with-string-output "error handlers"			      
+   [(funcall #t) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall 14) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall #\A) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall "foo") => "error:funcall: first arg must be a procedure\n"]
+   [(funcall 'a) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall 'fx+ 13 14) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall 'car) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall 'funcall) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall (let ((x 2)) (fx+ x x))) => "error:funcall: first arg must be a procedure\n"]
+   [(funcall '(a b)) => "error:funcall: first arg must be a procedure\n"]
+   
 )
 
 ;; (add-tests-with-string-output "S_error"

@@ -286,7 +286,7 @@
    [else expr]))
 
 ;;-----------------------------------------------------------------------------------
-;;                     Eliminate-let*
+;;                              Eliminate-let*
 ;;-----------------------------------------------------------------------------------
 ;;  Every let* form can be transformed to an equivalent for of nested let forms
 ;;
@@ -299,8 +299,7 @@
 ;;   (let ((v1 E1))  (let ((v2 E2)) E))
 ;;
 ;;  This generalizes to any number of let* arguments.  Notice our tranformation as
-;;  defined below buys us a little bit of optimization when the list of bindings is
-;;  empty.
+;;  buys us a little bit of optimization when the list of bindings is empty.
 ;;
 ;;  (let* () E) ==[eliminate-let*]==> E
 ;;-----------------------------------------------------------------------------------
@@ -930,7 +929,7 @@
 ;;-----------------------------------------------------------------------------------
 ;; External symbols have their values stored in memory at locations denoted by
 ;; global labels that are defined in separately linked library files.
-;;------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; asmify maps scheme identifiers to assembler identifiers by substituting legal
 ;; escape sequences for illegal special characters.
 ;;
@@ -942,7 +941,7 @@
 ;;
 ;;            ! $ % & * + - . / : < = > ? @ ^ _ ~
 ;;
-;;------------------------------------------------------------------------------
+;;----------------------------------------------------------------------------------
 
 (define (asmify s)
   (list->string (asmify1 (string->list (symbol->string s)))))
@@ -993,13 +992,20 @@
 ;; Then at code generation time, we recognize those forms and emit code to fetch
 ;; the datum from memory using the global labels defined by the library.
 ;;---------------------------------------------------------------------------------
+;;
+;; ISSUE: Should we provide a way to pull this list from a header file or the
+;; library's published interface?
+;;
+;; There are decent reasons for enumerating imports as we do here.  Makes it
+;; explicit what we are importing and from where we import it.
 
 (import-from (base)
 	     string->symbol
 	     symbols
 	     string=?
 	     append1
-	     error)
+	     error
+	     eh_procedure)
 
 (define-transform (external-symbols expr)
   (cond
@@ -1013,6 +1019,13 @@
 ;;-----------------------------------------------------------------------------------
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
+
+;; Some options to govern code generation
+
+(define *safe-procedures* #t)  ;; check attempts to call non-procedures
+;(define *safe-arg-counts* #t)  ;; check number of arguments passed at run time
+;(define *safe-primitives* #t)  ;; check types on arguments passed to primitives
+
 
 
 
@@ -2239,7 +2252,6 @@
 (define funcall-args cddr)
 (define funcall-oper cadr)
 
-
 (define (emit-funcall si env expr)
   
   (define (emit-arguments si env args)
@@ -2260,6 +2272,12 @@
   ;; Evaluate the funcall-oper and stash it esp+si+8
   ;; This becomes the next frame's closure slot.  See figure 3. (B)(C)
   (emit-expr (- si 8) env (funcall-oper expr))
+
+  ;; check that funcall-oper is a procedure and if not call error handler
+  ;; uses ebx as a scratch register.
+  (emit-check-procedure)
+
+
   (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
 
   ;; evaluate the arguments ar1 ... argN and push on stack
@@ -2607,5 +2625,81 @@
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)
   (emit "     ret"))
+
+;;---------------------------------------------------------------------------
+;;                      Error Checking and Safe Primitives
+;;---------------------------------------------------------------------------
+;; Using our newly acquired ability to write and exit, we can define a simple
+;; error procedure that takes two arguments: a symbol (denoting the caller of
+;; error), and a string (describing the error). The error procedure would
+;; write an error message to the console, then causes the program to exit.
+
+;; With error, we can secure some parts of our implementation to provide
+;; better debugging facilities. Better debugging allows us to progress with
+;; implementing the rest of the system more quickly since we won’t have to
+;; hunt for the causes of segfaults.
+;;
+;; There are three main causes of fatal errors:
+;;
+;; 1. Attempting to call non-procedures.
+;;
+;; 2. Passing an incorrect number of arguments to a procedure.
+;;
+;; 3. Calling primitives with invalid arguments.  For example: performing
+;;    (car 5) causes an immediate segfault. Worse, performing vector-set! with
+;;    an index that’s out of range causes other parts of the system to get corrupted,
+;;    resulting in hard-to- debug errors.
+;;
+;; Calling nonprocedures can be handled by performing a procedure check before
+;; making the procedure call. If the operator is not a procedure, control is
+;; transferred to an error handler label that sets up a call to a procedure that
+;; reports the error and exits.
+;;
+;; Passing an incorrect number of arguments to a procedure can be handled by a
+;; collaboration from the caller and the callee. The caller, once it performs
+;; the procedure check, sets the value of the %eax register to be the number of
+;; arguments passed. The callee checks that the value of %eax is consistent with
+;; the number of arguments it expects. Invalid arguments cause a jump to a label
+;; that calls a procedure that reports the error and exits.
+;;
+;; For primitive calls, we can modify the compiler to insert explicit checks at
+;; every primitive call. For example, car translates to:
+;;
+;;    movl %eax, %ebx
+;;    andl $7, %ebx
+;;    cmpl $1, %ebx
+;;    jne L_car_error
+;;    movl -1(%eax), %eax
+;;    ...
+;; L_car_error:
+;;    movl car_err_proc, %edi  # load handler
+;;    movl $0, %eax            # set arg-count
+;;    jmp *-3(%edi)            # call the handler
+;;    ...
+;;
+;; Another approach is to restrict the compiler to unsafe primitives. Calls to
+;; safe primitives are not open-coded by the compiler, instead, a procedure call
+;; to the safe primitive is issued. The safe primitives are defined to perform
+;; the error checks themselves. Although this strategy is less efficient than
+;; open-coding the safe primitives, the implementation is much simpler and less
+;; error-prone.
+;;                                             Quoted from (Ghuloum 2006)
+;;------------------------------------------------------------------------------
+
+(define (emit-check-procedure)  ;; uses ebx as a scratch register
+  (when *safe-procedures*
+	(let ([cont (unique-label)])
+	  (emit "# check the funcall op is a procedure")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" closure-mask)
+	  (emit "    cmp $~s, %bl" closure-tag)
+	  (emit "    je ~s" cont)
+          (emit "# invoke error handler funcall_non_procedure")
+	  (emit "    .extern eh_procedure")
+          (emit "    movl ~a, %edi  # load handler" (asmify 'eh_procedure))
+          (emit "    movl $0, %eax  # set arg count")
+          (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~s:" cont))))
+
 
 

@@ -41,9 +41,14 @@
   (unless (zero? (system "clang -m32 -Wall -Wl,-no_pie runtime.c pgm.o base.o -o stst"))
      (error 'build "produced program failed to link")))
 
+;; (define (execute)
+;;   (unless (zero? (system "./stst -d 2> stst.heap > stst.out"))
+;; 	  (error 'execute "produced program exited abnormally")))
+
 (define (execute)
-  (unless (zero? (system "./stst -d 2> stst.heap > stst.out"))
-	  (error 'execute "produced program exited abnormally")))
+  (let ([rc (system "./stst &> stst.out")])
+    (unless (memq rc '(0 1))
+	    (error 'execute "produced program exited abnormally"))))
 
 (define (test-one test-id test)
   (let ([expr (car test)]
