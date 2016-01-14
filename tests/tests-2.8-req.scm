@@ -1,6 +1,6 @@
 
 (add-tests-with-string-output "symbols list"
- [(symbols) => "(nil)\n"]
+ ;[(symbols) => "(nil)\n"]
  [(make-symbol "foo" "baz") => "foo\n"]
  [(symbol? (make-symbol "foo" "bar")) => "#t\n"]
  [(symbol->string (make-symbol "foo" "bar")) => "\"foo\"\n"]
@@ -171,44 +171,6 @@
        (set-cdr! a b)
        (set-cdr! b c)	   
        a) => "(#t #f 42)\n"]    
-    
-    [(letrec
-	 ([slen= (lambda (s1 s2)
-		   (fx= (string-length s1)
-			(string-length s2)))]
-	  
-	  [si=  (lambda (s1 s2 i)
-		  (char=? (string-ref s1 i)
-			  (string-ref s2 i)))]
-	  
-	  [si<n= (lambda (s1 s2 i n)
-		   (if (fx= i n)
-		       #t
-		       (if (si= s1 s2 i)
-			   (si<n s1 s2 (fx+ i 1) n)
-		           #f)))]
-	  
-	  [ss= (lambda (s1 s2)
-		 (if (slen= s1 s2)
-		     (si<n s1 s2 0 (length s1))
-		     #f))]
-
-	  [str->sym1  (lambda (str symlist)   ;; assumed symlist is never empty
-			(if (ss= str (symbol->string (car symlist)))
-			    (car symlist)
-			    (if (null? (cdr symlist))
-				(let* ([new-sym (make-symbol str #f)]
-                                       [new-cdr (cons new-sym ())])
-				  (begin
-				    (set-cdr! symlist new-cdr)
-				    new-sym))
-				(str->sym1 str (cdr symlist)))))]
-	  
-	  [str->sym (lambda (str)
-		      (str->sym1 str (symbols)))])    
-       (begin
-	 (str->sym "fu")
-	 (symbols))) => "(nil fu)\n"]
 
 
     [(letrec
@@ -710,10 +672,10 @@
 	[c (string->symbol "baz")])  
     #t) => "#t\n"] 
 
- [(let ([a (string->symbol "nil")]  
-	[b (string->symbol "foo")]
-	[c (string->symbol "baz")])
-    (symbols)) => "(nil foo baz)\n"] 
+ ;; [(let ([a (string->symbol "nil")]  
+ ;; 	[b (string->symbol "foo")]
+ ;; 	[c (string->symbol "baz")])
+ ;;    (symbols)) => "(nil foo baz)\n"] 
  
  [(begin (string->symbol "foo") (string->symbol "foo") 42) => "42\n"] 
  

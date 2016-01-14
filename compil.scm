@@ -1005,7 +1005,9 @@
 	     string=?
 	     append1
 	     error
-	     eh_procedure)
+	     eh_procedure
+	     primitives
+	     list-ref)
 
 (define-transform (external-symbols expr)
   (cond
@@ -1265,9 +1267,15 @@
 ;; information such as the number of parameters and procedure to emit code for the
 ;; primitive.  'primcall' relies on this information to generate code for primitive
 ;; calls.
+;;
+;; To support error handling, we keep a list of all primitives assigning each a
+;; unique fixnum code corresponding to its ordinal position in the list.
 ;;-----------------------------------------------------------------------------------
 
-;(define *primitive-count* 0)
+(define *primitive-count* 0)
+(define *primitive-names* '())
+(define (primitive-code name)
+  (getprop name '*primitive-code*))
 
 (define-syntax define-primitive
   (syntax-rules ()
@@ -1276,8 +1284,9 @@
        (putprop 'prim-name '*is-prim* #t)
        (putprop 'prim-name '*arg-count*
 		(length '(arg* ...)))
-;       (set! *primitive-count* (+ 1 *primitive-count*))
-;       (putprop 'prim-name '*code* *primitive-count*)
+       (set! *primitive-names* (cons 'prim-name *primitive-names*))
+       (putprop 'prim-name '*primitive-code* *primitive-count*)
+       (set! *primitive-count* (+ 1 *primitive-count*))        
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
@@ -1287,13 +1296,13 @@
 
 (define-primitive (fixnum->char si env arg)
   (emit-expr si env arg)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fixnum->char)
   (emit "    shll $~s, %eax" (- char-shift fixnum-shift))
   (emit "    orl $~s, %eax" char-tag))
 
 (define-primitive (char->fixnum si env arg)
   (emit-expr si env arg)
-  (emit-check-character)
+  (emit-check-character 'char->fixnum)
   (emit "   shrl $~s, %eax" char-shift)
   (emit "   shll $~s, %eax" fixnum-shift))
 
@@ -1373,10 +1382,10 @@
 (define-primitive (char=? si env c1 c2)
   (emit "# char= c1=~s c2=~s" c1 c2)
   (emit-expr si env c1)                ;; eax = c1
-  (emit-check-character)
+  (emit-check-character 'char=?)
   (emit "    movb %ah, ~s(%esp)" si)   ;; save c1
   (emit-expr (- si wordsize) env c2)   ;; eax = c2
-  (emit-check-character)
+  (emit-check-character 'char=?)
   (emit "    cmp %ah, ~s(%esp)" si)    ;; compare c1 c2
   ;; convert the cc to a boolean
   (emit "    sete %al")
@@ -1392,24 +1401,24 @@
 
 (define-primitive (fxlognot si env arg)
   (emit-expr si env arg)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxlognot)
   (emit "    or $~s, %al" fixnum-mask)
   (emit "    notl %eax"))
 
 (define-primitive (fxlogand si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxlogand)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxlogand)
   (emit "    and ~s(%esp), %eax" si))
 
 (define-primitive (fxlogor si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxlogor)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxlogor)
   (emit "    or ~s(%esp), %eax" si))
 
 ;;-----------------------------------------------------------------------------------
@@ -1427,19 +1436,19 @@
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxadd1)
   (emit "     addl $~s, %eax" (immediate-rep 1)))
 
 (define-primitive (fxsub1 si env arg)
   (emit-expr si env arg)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fxsub1)
   (emit "    addl $~s, %eax" (immediate-rep -1)))
 
 ;;-----------------------------------------------------------------------------------
 
 (define-primitive (fxzero? si env arg)
   (emit-expr si env arg)
-    (emit-check-fixnum)
+    (emit-check-fixnum 'fxzero?)
     (emit "    cmp $0, %eax")
     ;; convert the cc to a boolean
     (emit "    sete %al")
@@ -1449,10 +1458,10 @@
 
 (define-primitive (fx= si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    sete %al")
@@ -1462,10 +1471,10 @@
 
 (define-primitive (fx< si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx<)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx<)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setl %al")
@@ -1475,10 +1484,10 @@
 
 (define-primitive (fx<= si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx<=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx<=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setle %al")
@@ -1488,10 +1497,10 @@
 
 (define-primitive (fx> si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx>)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx>)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setg %al")
@@ -1501,10 +1510,10 @@
 
 (define-primitive (fx>= si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx>=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx>=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setge %al")
@@ -1516,27 +1525,27 @@
 
 (define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx+)
   (emit "    movl %eax, ~s(%esp)  # fx+ push arg1" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx+)
   (emit "    addl ~s(%esp), %eax  # fx+ arg1 arg2" si))
 
 (define-primitive (fx- si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx-)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx-)
   (emit "    subl ~s(%esp), %eax" si))
 
 (define-primitive (fx* si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx*)
   (emit "    sar $~s, %eax" fixnum-shift)   ;; 4x/4
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
-  (emit-check-fixnum)
+  (emit-check-fixnum 'fx*)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
 ;; ---------------- Error checks inserted up to here -----------
@@ -2732,9 +2741,7 @@
           (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
 
-
-
-(define (emit-check-fixnum)  ;; uses ebx as a scratch register to check eax
+(define (emit-check-fixnum f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
 	(let ([cont (unique-label)]
 	      [eh (asmify 'eh_fixnum)])
@@ -2743,14 +2750,16 @@
 	  (emit "    and $~s, %bl" fixnum-mask)
 	  (emit "    cmp $~s, %bl" fixnum-tag)
 	  (emit "    je ~s" cont)
-          (emit "# invoke error handler eh_fixnum")
+          (emit "# error handler eh_fixnum")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count") 
+	  (emit "    movl $0, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
 
-(define (emit-check-character)  ;; uses ebx as a scratch register to check eax
+(define (emit-check-character f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
 	(let ([cont (unique-label)]
 	      [eh (asmify 'eh_character)])
@@ -2762,11 +2771,13 @@
           (emit "# invoke error handler eh_character")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count") 
+	  (emit "    movl $0, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
 
-(define (emit-check-string)  ;; uses ebx as a scratch register to check eax
+(define (emit-check-string f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
 	(let ([cont (unique-label)]
 	      [eh (asmify 'eh_string)])
@@ -2778,8 +2789,18 @@
           (emit "# invoke error handler eh_string")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count") 
+	  (emit "    movl $0, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
 
 
+;; Generate code for function that evaluates to the list of primitives
+;; used by the error handlers
+
+(define (generate-primitives)
+  `(primitives (let ((p nil))
+		 ,@(map (lambda (f) `(set! p (cons (quote ,f) p)))
+			*primitive-names*)
+		 (lambda () p))))

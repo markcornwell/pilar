@@ -15,9 +15,17 @@ string$m$gsymbol:
      .align 8
 append1:
      .int 0xFF
+     .global "list$mref"
+     .align 8
+list$mref:
+     .int 0xFF
      .global "error"
      .align 8
 error:
+     .int 0xFF
+     .global "primitives"
+     .align 8
+primitives:
      .int 0xFF
      .global "eh$uprocedure"
      .align 8
@@ -71,13 +79,13 @@ base_init:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_79167
+    jmp _L_207618
     .align 8,0x90
-_L_79166 :
+_L_207617 :
     .int 12
     .ascii "nil"
-_L_79167:
-    movl $_L_79166, %eax
+_L_207618:
+    movl $_L_207617, %eax
     orl $6, %eax
     movl %eax, 0(%esp)
 # emit-expr ()
@@ -105,7 +113,7 @@ _L_79167:
 # si = -4
 # env = ((interned-symbols . 0))
 # expr = (closure () (interned-symbols) (let () interned-symbols))
-    movl $_L_79168, 0(%ebp)  # closure label
+    movl $_L_207619, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((interned-symbols . 0))
 # var=interned-symbols
@@ -115,8 +123,8 @@ _L_79167:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_79169            # jump around closure body
-_L_79168:
+    jmp _L_207620            # jump around closure body
+_L_207619:
 # emit-tail-expr
 # si=-8
 # env=((interned-symbols . 4) (interned-symbols . 0))
@@ -139,7 +147,7 @@ _L_79168:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_79169:
+_L_207620:
      movl %eax, symbols
 # == explicit-begins  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
@@ -243,12 +251,12 @@ _L_79169:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) () (let ((s1 s1) (s2 s2)) (fx= (string-length s1) (string-length s2))))
-    movl $_L_79170, 0(%ebp)  # closure label
+    movl $_L_207621, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_79171            # jump around closure body
-_L_79170:
+    jmp _L_207622            # jump around closure body
+_L_207621:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -289,13 +297,14 @@ _L_79170:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79172"
-# invoke error handler eh_fixnum
+    je "_L_207623"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79172":
+"_L_207623":
     movl %eax, -24(%esp)
 # emit-expr (string-length s1)
 # emit-expr s1
@@ -309,13 +318,14 @@ _L_79170:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79173"
-# invoke error handler eh_fixnum
+    je "_L_207624"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79173":
+"_L_207624":
     cmp -24(%esp), %eax
     sete %al
     movzbl %al, %eax
@@ -324,7 +334,7 @@ _L_79170:
 #return from tail (fx= (string-length s1) (string-length s2))
     ret
     .align 4,0x90
-_L_79171:
+_L_207622:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -348,12 +358,12 @@ _L_79171:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i) () (let ((s1 s1) (s2 s2) (i i)) (char=? (string-ref s1 i) (string-ref s2 i))))
-    movl $_L_79174, 0(%ebp)  # closure label
+    movl $_L_207625, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_79175            # jump around closure body
-_L_79174:
+    jmp _L_207626            # jump around closure body
+_L_207625:
 # emit-tail-expr
 # si=-20
 # env=((i . -16) (s2 . -12) (s1 . -8) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -413,13 +423,14 @@ _L_79174:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_79176"
+    je "_L_207627"
 # invoke error handler eh_character
     .extern eh$ucharacter
     movl eh$ucharacter, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $32,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79176":
+"_L_207627":
     movb %ah, -32(%esp)
 # emit-expr (string-ref s2 i)
 # emit-expr s2
@@ -444,13 +455,14 @@ _L_79174:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_79177"
+    je "_L_207628"
 # invoke error handler eh_character
     .extern eh$ucharacter
     movl eh$ucharacter, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $32,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79177":
+"_L_207628":
     cmp %ah, -32(%esp)
     sete %al
     movzbl %al, %eax
@@ -459,7 +471,7 @@ _L_79174:
 #return from tail (char=? (string-ref s1 i) (string-ref s2 i))
     ret
     .align 4,0x90
-_L_79175:
+_L_207626:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -483,7 +495,7 @@ _L_79175:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2 i n) (si= si<n=) (let ((s1 s1) (s2 s2) (i i) (n n)) (if (fx= i n) #t (if ((vector-ref si= 0) s1 s2 i) ((vector-ref si<n= 0) s1 s2 (fx+ i 1) n) #f))))
-    movl $_L_79178, 0(%ebp)  # closure label
+    movl $_L_207629, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=si=
@@ -499,8 +511,8 @@ _L_79175:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79179            # jump around closure body
-_L_79178:
+    jmp _L_207630            # jump around closure body
+_L_207629:
 # emit-tail-expr
 # si=-24
 # env=((n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -553,13 +565,14 @@ _L_79178:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79182"
-# invoke error handler eh_fixnum
+    je "_L_207633"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79182":
+"_L_207633":
     movl %eax, -40(%esp)
 # emit-expr i
 # emit-variable-ref
@@ -571,28 +584,29 @@ _L_79178:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79183"
-# invoke error handler eh_fixnum
+    je "_L_207634"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79183":
+"_L_207634":
     cmp -40(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_79180
+    je _L_207631
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_79181
-_L_79180:
+    jmp _L_207632
+_L_207631:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -618,13 +632,13 @@ _L_79180:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79186"
+    je "_L_207637"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79186":
+"_L_207637":
    movl %eax,  -48(%esp)  # stash funcall-oper in closure slot
 # emit-expr s1
 # emit-variable-ref
@@ -653,7 +667,7 @@ _L_79180:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_79184
+    je _L_207635
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -696,13 +710,14 @@ _L_79180:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79187"
-# invoke error handler eh_fixnum
+    je "_L_207638"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79187":
+"_L_207638":
     movl %eax, -52(%esp)  # fx+ push arg1
 # emit-expr i
 # emit-variable-ref
@@ -714,13 +729,14 @@ _L_79180:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_79188"
-# invoke error handler eh_fixnum
+    je "_L_207639"
+# error handler eh_fixnum
     .extern eh$ufixnum
     movl eh$ufixnum, %edi  # load handler
     movl $0, %eax  # set arg count
+    movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-"_L_79188":
+"_L_207639":
     addl -52(%esp), %eax  # fx+ arg1 arg2
     mov %eax, -52(%esp)    # arg (fx+ i 1)
 # emit-expr n
@@ -748,18 +764,18 @@ _L_79180:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-60  delta=36
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_79185
-_L_79184:
+    jmp _L_207636
+_L_207635:
 # emit-tail-expr
 # si=-40
 # env=((n . -36) (i . -32) (s2 . -28) (s1 . -24) (n . -20) (i . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (si= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_79185:
-_L_79181:
+_L_207636:
+_L_207632:
     .align 4,0x90
-_L_79179:
+_L_207630:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -783,7 +799,7 @@ _L_79179:
 # si = -24
 # env = ((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr = (closure (s1 s2) (slen= si<n=) (let ((s1 s1) (s2 s2)) (if ((vector-ref slen= 0) s1 s2) ((vector-ref si<n= 0) s1 s2 0 (string-length s1)) #f)))
-    movl $_L_79189, 0(%ebp)  # closure label
+    movl $_L_207640, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # var=slen=
@@ -799,8 +815,8 @@ _L_79179:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79190            # jump around closure body
-_L_79189:
+    jmp _L_207641            # jump around closure body
+_L_207640:
 # emit-tail-expr
 # si=-16
 # env=((s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -849,13 +865,13 @@ _L_79189:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79193"
+    je "_L_207644"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79193":
+"_L_207644":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr s1
 # emit-variable-ref
@@ -877,7 +893,7 @@ _L_79189:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_79191
+    je _L_207642
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
@@ -943,17 +959,17 @@ _L_79189:
     mov %ebx, -20(%esp)  # down to base
 # emit-shift-args:  size=0   si=-44  delta=20
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_79192
-_L_79191:
+    jmp _L_207643
+_L_207642:
 # emit-tail-expr
 # si=-24
 # env=((s2 . -20) (s1 . -16) (s2 . -12) (s1 . -8) (si<n= . 8) (slen= . 4) (ss= . -12) (si<n= . -8) (si= . -4) (slen= . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_79192:
+_L_207643:
     .align 4,0x90
-_L_79190:
+_L_207641:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1045,7 +1061,7 @@ _L_79190:
 # si = -12
 # env = ((str->sym . 0))
 # expr = (closure (str symlist) ((primitive-ref string=?) str->sym) (let ((str str) (symlist symlist)) (if ((primitive-ref string=?) str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) ((vector-ref str->sym 0) str (cdr symlist))))))
-    movl $_L_79194, 0(%ebp)  # closure label
+    movl $_L_207645, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref string=?) not defined in the environmnet
 # emit-variable-ref
 # env=((str->sym . 0))
@@ -1056,8 +1072,8 @@ _L_79190:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79195            # jump around closure body
-_L_79194:
+    jmp _L_207646            # jump around closure body
+_L_207645:
 # emit-tail-expr
 # si=-16
 # env=((symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1097,13 +1113,13 @@ _L_79194:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79198"
+    je "_L_207649"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79198":
+"_L_207649":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr str
 # emit-variable-ref
@@ -1130,7 +1146,7 @@ _L_79194:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_79196
+    je _L_207647
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1145,8 +1161,8 @@ _L_79194:
     movl -1(%eax), %eax
 #return from tail (car symlist)
     ret
-    jmp _L_79197
-_L_79196:
+    jmp _L_207648
+_L_207647:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1167,7 +1183,7 @@ _L_79196:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_79199
+    je _L_207650
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1265,8 +1281,8 @@ _L_79196:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_79200
-_L_79199:
+    jmp _L_207651
+_L_207650:
 # emit-tail-expr
 # si=-24
 # env=((symlist . -20) (str . -16) (symlist . -12) (str . -8) (str->sym . 8) ((primitive-ref string=?) . 4) (str->sym . 0))
@@ -1316,10 +1332,10 @@ _L_79199:
     mov %ebx, -12(%esp)  # down to base
 # emit-shift-args:  size=0   si=-36  delta=20
     jmp *-2(%edi)  # tail-funcall
-_L_79200:
-_L_79197:
+_L_207651:
+_L_207648:
     .align 4,0x90
-_L_79195:
+_L_207646:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1336,7 +1352,7 @@ _L_79195:
 # si = -4
 # env = ((str->sym . 0))
 # expr = (closure (str) (str->sym (primitive-ref symbols)) (let ((str str)) ((vector-ref str->sym 0) str ((primitive-ref symbols)))))
-    movl $_L_79201, 0(%ebp)  # closure label
+    movl $_L_207652, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((str->sym . 0))
 # var=str->sym
@@ -1347,8 +1363,8 @@ _L_79195:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79202            # jump around closure body
-_L_79201:
+    jmp _L_207653            # jump around closure body
+_L_207652:
 # emit-tail-expr
 # si=-12
 # env=((str . -8) ((primitive-ref symbols) . 8) (str->sym . 4) (str->sym . 0))
@@ -1405,13 +1421,13 @@ _L_79201:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79203"
+    je "_L_207654"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79203":
+"_L_207654":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
@@ -1432,7 +1448,7 @@ _L_79201:
 # emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_79202:
+_L_207653:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -1463,15 +1479,15 @@ _L_79202:
 # si = 0
 # env = ()
 # expr = (closure (lst elt) (e nil (primitive-ref append1)) (let ((lst lst) (elt elt)) (if (null? lst) (cons e nil) (cons (car lst) ((primitive-ref append1) (cdr lst) elt)))))
-    movl $_L_79204, 0(%ebp)  # closure label
+    movl $_L_207655, 0(%ebp)  # closure label
 # WARNING: free var e not defined in the environmnet
 # WARNING: free var nil not defined in the environmnet
 # WARNING: free var (primitive-ref append1) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79205            # jump around closure body
-_L_79204:
+    jmp _L_207656            # jump around closure body
+_L_207655:
 # emit-tail-expr
 # si=-16
 # env=((elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1513,7 +1529,7 @@ _L_79204:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_79206
+    je _L_207657
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1542,8 +1558,8 @@ _L_79204:
 # cons end
 #return from tail (cons e nil)
     ret
-    jmp _L_79207
-_L_79206:
+    jmp _L_207658
+_L_207657:
 # emit-tail-expr
 # si=-24
 # env=((elt . -20) (lst . -16) (elt . -12) (lst . -8) ((primitive-ref append1) . 12) (nil . 8) (e . 4))
@@ -1571,13 +1587,13 @@ _L_79206:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79208"
+    je "_L_207659"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79208":
+"_L_207659":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr (cdr lst)
 # emit-expr lst
@@ -1609,10 +1625,199 @@ _L_79206:
 # cons end
 #return from tail (cons (car lst) ((primitive-ref append1) (cdr lst) elt))
     ret
-_L_79207:
+_L_207658:
     .align 4,0x90
-_L_79205:
+_L_207656:
      movl %eax, append1
+# == explicit-begins  ==>
+# (lambda (lst k) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1))))
+# == eliminate-let*  ==>
+# (lambda (lst k) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1))))
+# == eliminate-shadowing  ==>
+# (lambda (lst k) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1))))
+# == vectorize-letrec  ==>
+# (lambda (lst k) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1))))
+# == eliminate-set!  ==>
+# (lambda (lst k) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1)))))
+# == close-free-variables  ==>
+# (closure (lst k) (list-ref) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1)))))
+# == eliminate-quote  ==>
+# (closure (lst k) (list-ref) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1)))))
+# == eliminate-when/unless  ==>
+# (closure (lst k) (list-ref) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1)))))
+# == eliminate-cond  ==>
+# (closure (lst k) (list-ref) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) (list-ref (cdr lst) (fx- k 1)))))
+# == external-symbols  ==>
+# (closure (lst k) ((primitive-ref list-ref)) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1)))))
+# emit-expr (closure (lst k) ((primitive-ref list-ref)) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1)))))
+# emit-closure
+# si = 0
+# env = ()
+# expr = (closure (lst k) ((primitive-ref list-ref)) (let ((lst lst) (k k)) (if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1)))))
+    movl $_L_207660, 0(%ebp)  # closure label
+# WARNING: free var (primitive-ref list-ref) not defined in the environmnet
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $8, %ebp     # bump ebp
+    jmp _L_207661            # jump around closure body
+_L_207660:
+# emit-tail-expr
+# si=-16
+# env=((k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# expr=(let ((lst lst) (k k)) (if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1))))
+# emit-tail-let
+#  si   = -16
+#  env  = ((k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+#  bindings = ((lst lst) (k k))
+#  body = (if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1)))
+# emit-expr lst
+# emit-variable-ref
+# env=((k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=lst
+    movl -8(%esp), %eax  # stack load lst
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr k
+# emit-variable-ref
+# env=((k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=k
+    movl -12(%esp), %eax  # stack load k
+# end emit-variable-ref
+    movl %eax, -20(%esp)  # stack save
+# emit-tail-expr
+# si=-24
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# expr=(if (fx= k 0) (car lst) ((primitive-ref list-ref) (cdr lst) (fx- k 1)))
+# emit-expr (fx= k 0)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_207664"
+# error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+"_L_207664":
+    movl %eax, -24(%esp)
+# emit-expr k
+# emit-variable-ref
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=k
+    movl -20(%esp), %eax  # stack load k
+# end emit-variable-ref
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_207665"
+# error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    movl $60,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+"_L_207665":
+    cmp -24(%esp), %eax
+    sete %al
+    movzbl %al, %eax
+    sal $6, %al
+    or $47, %al
+    cmp $47, %al
+    je _L_207662
+# emit-tail-expr
+# si=-24
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# expr=(car lst)
+# tail primcall
+# emit-expr lst
+# emit-variable-ref
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=lst
+    movl -16(%esp), %eax  # stack load lst
+# end emit-variable-ref
+    movl -1(%eax), %eax
+#return from tail (car lst)
+    ret
+    jmp _L_207663
+_L_207662:
+# emit-tail-expr
+# si=-24
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# expr=((primitive-ref list-ref) (cdr lst) (fx- k 1))
+# emit-tail-funcall
+#    si   =-24
+#    env  = ((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+#    expr = (funcall (primitive-ref list-ref) (cdr lst) (fx- k 1))
+# emit-expr (primitive-ref list-ref)
+    .extern list$mref
+    movl list$mref,%eax
+   movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
+# emit-expr (cdr lst)
+# emit-expr lst
+# emit-variable-ref
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=lst
+    movl -16(%esp), %eax  # stack load lst
+# end emit-variable-ref
+    movl 3(%eax), %eax
+    mov %eax, -28(%esp)    # arg (cdr lst)
+# emit-expr (fx- k 1)
+# emit-expr 1
+    movl $4, %eax     # immed 1
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_207666"
+# error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    movl $84,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+"_L_207666":
+    movl %eax, -32(%esp)
+# emit-expr k
+# emit-variable-ref
+# env=((k . -20) (lst . -16) (k . -12) (lst . -8) ((primitive-ref list-ref) . 4))
+# var=k
+    movl -20(%esp), %eax  # stack load k
+# end emit-variable-ref
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_207667"
+# error handler eh_fixnum
+    .extern eh$ufixnum
+    movl eh$ufixnum, %edi  # load handler
+    movl $0, %eax  # set arg count
+    movl $84,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+"_L_207667":
+    subl -32(%esp), %eax
+    mov %eax, -32(%esp)    # arg (fx- k 1)
+    movl -24(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-24  delta=20
+    mov -24(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-28  delta=20
+    mov -28(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-32  delta=20
+    mov -32(%esp), %ebx  # shift frame cell
+    mov %ebx, -12(%esp)  # down to base
+# emit-shift-args:  size=0   si=-36  delta=20
+    jmp *-2(%edi)  # tail-funcall
+_L_207663:
+    .align 4,0x90
+_L_207661:
+     movl %eax, list$mref
 # == explicit-begins  ==>
 # (let* ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s)))) (write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
 # == eliminate-let*  ==>
@@ -1644,12 +1849,12 @@ _L_79205:
 # si = 0
 # env = ()
 # expr = (closure (s) () (let ((s s)) (foreign-call "s_write" 2 s (string-length s))))
-    movl $_L_79209, 0(%ebp)  # closure label
+    movl $_L_207668, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_79210            # jump around closure body
-_L_79209:
+    jmp _L_207669            # jump around closure body
+_L_207668:
 # emit-tail-expr
 # si=-12
 # env=((s . -8))
@@ -1709,7 +1914,7 @@ _L_79209:
     movl -16(%esp),%ecx
      ret
     .align 4,0x90
-_L_79210:
+_L_207669:
     movl %eax, 0(%esp)  # stack save
 # emit-expr (let ((write-errmsg (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))))) (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1)))))
 # emit-let
@@ -1722,7 +1927,7 @@ _L_79210:
 # si = -4
 # env = ((write-stderr . 0))
 # expr = (closure (sym emsg) (write-stderr write-stderr write-stderr write-stderr write-stderr) (let ((sym sym) (emsg emsg)) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))
-    movl $_L_79211, 0(%ebp)  # closure label
+    movl $_L_207670, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((write-stderr . 0))
 # var=write-stderr
@@ -1756,8 +1961,8 @@ _L_79210:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_79212            # jump around closure body
-_L_79211:
+    jmp _L_207671            # jump around closure body
+_L_207670:
 # emit-tail-expr
 # si=-16
 # env=((emsg . -12) (sym . -8) (write-stderr . 20) (write-stderr . 16) (write-stderr . 12) (write-stderr . 8) (write-stderr . 4) (write-stderr . 0))
@@ -1802,23 +2007,23 @@ _L_79211:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79213"
+    je "_L_207672"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79213":
+"_L_207672":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr "error:"
 # string literal
-    jmp _L_79215
+    jmp _L_207674
     .align 8,0x90
-_L_79214 :
+_L_207673 :
     .int 24
     .ascii "error:"
-_L_79215:
-    movl $_L_79214, %eax
+_L_207674:
+    movl $_L_207673, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg error:
     movl -32(%esp), %edi   # load new closure to %edi
@@ -1847,13 +2052,13 @@ _L_79215:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79216"
+    je "_L_207675"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79216":
+"_L_207675":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr (symbol->string sym)
 # symbol->string sym
@@ -1891,23 +2096,23 @@ _L_79215:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79217"
+    je "_L_207676"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79217":
+"_L_207676":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr ": "
 # string literal
-    jmp _L_79219
+    jmp _L_207678
     .align 8,0x90
-_L_79218 :
+_L_207677 :
     .int 8
     .ascii ": "
-_L_79219:
-    movl $_L_79218, %eax
+_L_207678:
+    movl $_L_207677, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg : 
     movl -32(%esp), %edi   # load new closure to %edi
@@ -1936,13 +2141,13 @@ _L_79219:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79220"
+    je "_L_207679"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79220":
+"_L_207679":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr emsg
 # emit-variable-ref
@@ -1979,13 +2184,13 @@ _L_79219:
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
 # emit-expr "\n"
 # string literal
-    jmp _L_79222
+    jmp _L_207681
     .align 8,0x90
-_L_79221 :
+_L_207680 :
     .int 4
     .ascii "\n"
-_L_79222:
-    movl $_L_79221, %eax
+_L_207681:
+    movl $_L_207680, %eax
     orl $6, %eax
     mov %eax, -28(%esp)    # arg 
 
@@ -2000,14 +2205,14 @@ _L_79222:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_79212:
+_L_207671:
     movl %eax, -4(%esp)  # stack save
 # emit-expr (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
 # emit-closure
 # si = -8
 # env = ((write-errmsg . -4) (write-stderr . 0))
 # expr = (closure (sym emsg) (write-errmsg) (let ((sym sym) (emsg emsg)) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1))))
-    movl $_L_79223, 0(%ebp)  # closure label
+    movl $_L_207682, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((write-errmsg . -4) (write-stderr . 0))
 # var=write-errmsg
@@ -2017,8 +2222,8 @@ _L_79212:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_79224            # jump around closure body
-_L_79223:
+    jmp _L_207683            # jump around closure body
+_L_207682:
 # emit-tail-expr
 # si=-16
 # env=((emsg . -12) (sym . -8) (write-errmsg . 4) (write-errmsg . -4) (write-stderr . 0))
@@ -2063,13 +2268,13 @@ _L_79223:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79225"
+    je "_L_207684"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79225":
+"_L_207684":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr sym
 # emit-variable-ref
@@ -2120,8 +2325,3681 @@ _L_79223:
      ret
      ret   # return thru stack
     .align 4,0x90
-_L_79224:
+_L_207683:
      movl %eax, error
+# == explicit-begins  ==>
+# (let ((p (quote ()))) (begin (set! p (cons (quote procedure?) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote symbol-value) p)) (set! p (cons (quote symbol->string) p)) (set! p (cons (quote make-symbol) p)) (set! p (cons (quote symbol?) p)) (set! p (cons (quote string-set!) p)) (set! p (cons (quote string-ref) p)) (set! p (cons (quote string-length) p)) (set! p (cons (quote string?) p)) (set! p (cons (quote make-string) p)) (set! p (cons (quote vector) p)) (set! p (cons (quote vector-ref) p)) (set! p (cons (quote vector-set!) p)) (set! p (cons (quote vector-length) p)) (set! p (cons (quote make-vector) p)) (set! p (cons (quote vector?) p)) (set! p (cons (quote set-cdr!) p)) (set! p (cons (quote set-car!) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote cons) p)) (set! p (cons (quote pair?) p)) (set! p (cons (quote fx*) p)) (set! p (cons (quote fx-) p)) (set! p (cons (quote fx+) p)) (set! p (cons (quote fx>=) p)) (set! p (cons (quote fx>) p)) (set! p (cons (quote fx<=) p)) (set! p (cons (quote fx<) p)) (set! p (cons (quote fx=) p)) (set! p (cons (quote fxzero?) p)) (set! p (cons (quote fxsub1) p)) (set! p (cons (quote fxadd1) p)) (set! p (cons (quote fxlogor) p)) (set! p (cons (quote fxlogand) p)) (set! p (cons (quote fxlognot) p)) (set! p (cons (quote char=?) p)) (set! p (cons (quote eq?) p)) (set! p (cons (quote not) p)) (set! p (cons (quote boolean?) p)) (set! p (cons (quote fixnum?) p)) (set! p (cons (quote char?) p)) (set! p (cons (quote null?) p)) (set! p (cons (quote char->fixnum) p)) (set! p (cons (quote fixnum->char) p)) (lambda () p)))
+# == eliminate-let*  ==>
+# (let ((p (quote ()))) (begin (set! p (cons (quote procedure?) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote symbol-value) p)) (set! p (cons (quote symbol->string) p)) (set! p (cons (quote make-symbol) p)) (set! p (cons (quote symbol?) p)) (set! p (cons (quote string-set!) p)) (set! p (cons (quote string-ref) p)) (set! p (cons (quote string-length) p)) (set! p (cons (quote string?) p)) (set! p (cons (quote make-string) p)) (set! p (cons (quote vector) p)) (set! p (cons (quote vector-ref) p)) (set! p (cons (quote vector-set!) p)) (set! p (cons (quote vector-length) p)) (set! p (cons (quote make-vector) p)) (set! p (cons (quote vector?) p)) (set! p (cons (quote set-cdr!) p)) (set! p (cons (quote set-car!) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote cons) p)) (set! p (cons (quote pair?) p)) (set! p (cons (quote fx*) p)) (set! p (cons (quote fx-) p)) (set! p (cons (quote fx+) p)) (set! p (cons (quote fx>=) p)) (set! p (cons (quote fx>) p)) (set! p (cons (quote fx<=) p)) (set! p (cons (quote fx<) p)) (set! p (cons (quote fx=) p)) (set! p (cons (quote fxzero?) p)) (set! p (cons (quote fxsub1) p)) (set! p (cons (quote fxadd1) p)) (set! p (cons (quote fxlogor) p)) (set! p (cons (quote fxlogand) p)) (set! p (cons (quote fxlognot) p)) (set! p (cons (quote char=?) p)) (set! p (cons (quote eq?) p)) (set! p (cons (quote not) p)) (set! p (cons (quote boolean?) p)) (set! p (cons (quote fixnum?) p)) (set! p (cons (quote char?) p)) (set! p (cons (quote null?) p)) (set! p (cons (quote char->fixnum) p)) (set! p (cons (quote fixnum->char) p)) (lambda () p)))
+# == eliminate-shadowing  ==>
+# (let ((p (quote ()))) (begin (set! p (cons (quote procedure?) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote symbol-value) p)) (set! p (cons (quote symbol->string) p)) (set! p (cons (quote make-symbol) p)) (set! p (cons (quote symbol?) p)) (set! p (cons (quote string-set!) p)) (set! p (cons (quote string-ref) p)) (set! p (cons (quote string-length) p)) (set! p (cons (quote string?) p)) (set! p (cons (quote make-string) p)) (set! p (cons (quote vector) p)) (set! p (cons (quote vector-ref) p)) (set! p (cons (quote vector-set!) p)) (set! p (cons (quote vector-length) p)) (set! p (cons (quote make-vector) p)) (set! p (cons (quote vector?) p)) (set! p (cons (quote set-cdr!) p)) (set! p (cons (quote set-car!) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote cons) p)) (set! p (cons (quote pair?) p)) (set! p (cons (quote fx*) p)) (set! p (cons (quote fx-) p)) (set! p (cons (quote fx+) p)) (set! p (cons (quote fx>=) p)) (set! p (cons (quote fx>) p)) (set! p (cons (quote fx<=) p)) (set! p (cons (quote fx<) p)) (set! p (cons (quote fx=) p)) (set! p (cons (quote fxzero?) p)) (set! p (cons (quote fxsub1) p)) (set! p (cons (quote fxadd1) p)) (set! p (cons (quote fxlogor) p)) (set! p (cons (quote fxlogand) p)) (set! p (cons (quote fxlognot) p)) (set! p (cons (quote char=?) p)) (set! p (cons (quote eq?) p)) (set! p (cons (quote not) p)) (set! p (cons (quote boolean?) p)) (set! p (cons (quote fixnum?) p)) (set! p (cons (quote char?) p)) (set! p (cons (quote null?) p)) (set! p (cons (quote char->fixnum) p)) (set! p (cons (quote fixnum->char) p)) (lambda () p)))
+# == vectorize-letrec  ==>
+# (let ((p (quote ()))) (begin (set! p (cons (quote procedure?) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote symbol-value) p)) (set! p (cons (quote symbol->string) p)) (set! p (cons (quote make-symbol) p)) (set! p (cons (quote symbol?) p)) (set! p (cons (quote string-set!) p)) (set! p (cons (quote string-ref) p)) (set! p (cons (quote string-length) p)) (set! p (cons (quote string?) p)) (set! p (cons (quote make-string) p)) (set! p (cons (quote vector) p)) (set! p (cons (quote vector-ref) p)) (set! p (cons (quote vector-set!) p)) (set! p (cons (quote vector-length) p)) (set! p (cons (quote make-vector) p)) (set! p (cons (quote vector?) p)) (set! p (cons (quote set-cdr!) p)) (set! p (cons (quote set-car!) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote cons) p)) (set! p (cons (quote pair?) p)) (set! p (cons (quote fx*) p)) (set! p (cons (quote fx-) p)) (set! p (cons (quote fx+) p)) (set! p (cons (quote fx>=) p)) (set! p (cons (quote fx>) p)) (set! p (cons (quote fx<=) p)) (set! p (cons (quote fx<) p)) (set! p (cons (quote fx=) p)) (set! p (cons (quote fxzero?) p)) (set! p (cons (quote fxsub1) p)) (set! p (cons (quote fxadd1) p)) (set! p (cons (quote fxlogor) p)) (set! p (cons (quote fxlogand) p)) (set! p (cons (quote fxlognot) p)) (set! p (cons (quote char=?) p)) (set! p (cons (quote eq?) p)) (set! p (cons (quote not) p)) (set! p (cons (quote boolean?) p)) (set! p (cons (quote fixnum?) p)) (set! p (cons (quote char?) p)) (set! p (cons (quote null?) p)) (set! p (cons (quote char->fixnum) p)) (set! p (cons (quote fixnum->char) p)) (lambda () p)))
+# == eliminate-set!  ==>
+# (let ((p (vector (quote ())))) (begin (vector-set! p 0 (cons (quote procedure?) (vector-ref p 0))) (vector-set! p 0 (cons (quote cdr) (vector-ref p 0))) (vector-set! p 0 (cons (quote car) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol-value) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol->string) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-symbol) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol?) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-set!) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-ref) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-length) (vector-ref p 0))) (vector-set! p 0 (cons (quote string?) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-string) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-ref) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-set!) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-length) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-vector) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector?) (vector-ref p 0))) (vector-set! p 0 (cons (quote set-cdr!) (vector-ref p 0))) (vector-set! p 0 (cons (quote set-car!) (vector-ref p 0))) (vector-set! p 0 (cons (quote cdr) (vector-ref p 0))) (vector-set! p 0 (cons (quote car) (vector-ref p 0))) (vector-set! p 0 (cons (quote cons) (vector-ref p 0))) (vector-set! p 0 (cons (quote pair?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx*) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx-) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx+) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx>=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx>) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx<=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx<) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxzero?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxsub1) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxadd1) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlogor) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlogand) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlognot) (vector-ref p 0))) (vector-set! p 0 (cons (quote char=?) (vector-ref p 0))) (vector-set! p 0 (cons (quote eq?) (vector-ref p 0))) (vector-set! p 0 (cons (quote not) (vector-ref p 0))) (vector-set! p 0 (cons (quote boolean?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fixnum?) (vector-ref p 0))) (vector-set! p 0 (cons (quote char?) (vector-ref p 0))) (vector-set! p 0 (cons (quote null?) (vector-ref p 0))) (vector-set! p 0 (cons (quote char->fixnum) (vector-ref p 0))) (vector-set! p 0 (cons (quote fixnum->char) (vector-ref p 0))) (lambda () (let () (vector-ref p 0)))))
+# == close-free-variables  ==>
+# (let ((p (vector (quote ())))) (begin (vector-set! p 0 (cons (quote procedure?) (vector-ref p 0))) (vector-set! p 0 (cons (quote cdr) (vector-ref p 0))) (vector-set! p 0 (cons (quote car) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol-value) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol->string) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-symbol) (vector-ref p 0))) (vector-set! p 0 (cons (quote symbol?) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-set!) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-ref) (vector-ref p 0))) (vector-set! p 0 (cons (quote string-length) (vector-ref p 0))) (vector-set! p 0 (cons (quote string?) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-string) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-ref) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-set!) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector-length) (vector-ref p 0))) (vector-set! p 0 (cons (quote make-vector) (vector-ref p 0))) (vector-set! p 0 (cons (quote vector?) (vector-ref p 0))) (vector-set! p 0 (cons (quote set-cdr!) (vector-ref p 0))) (vector-set! p 0 (cons (quote set-car!) (vector-ref p 0))) (vector-set! p 0 (cons (quote cdr) (vector-ref p 0))) (vector-set! p 0 (cons (quote car) (vector-ref p 0))) (vector-set! p 0 (cons (quote cons) (vector-ref p 0))) (vector-set! p 0 (cons (quote pair?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx*) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx-) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx+) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx>=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx>) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx<=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx<) (vector-ref p 0))) (vector-set! p 0 (cons (quote fx=) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxzero?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxsub1) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxadd1) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlogor) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlogand) (vector-ref p 0))) (vector-set! p 0 (cons (quote fxlognot) (vector-ref p 0))) (vector-set! p 0 (cons (quote char=?) (vector-ref p 0))) (vector-set! p 0 (cons (quote eq?) (vector-ref p 0))) (vector-set! p 0 (cons (quote not) (vector-ref p 0))) (vector-set! p 0 (cons (quote boolean?) (vector-ref p 0))) (vector-set! p 0 (cons (quote fixnum?) (vector-ref p 0))) (vector-set! p 0 (cons (quote char?) (vector-ref p 0))) (vector-set! p 0 (cons (quote null?) (vector-ref p 0))) (vector-set! p 0 (cons (quote char->fixnum) (vector-ref p 0))) (vector-set! p 0 (cons (quote fixnum->char) (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# == eliminate-quote  ==>
+# (let ((p (vector ()))) (begin (vector-set! p 0 (cons (string->symbol "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cons") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "pair?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx*") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx-") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx+") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char=?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "eq?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "not") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "null?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# == eliminate-when/unless  ==>
+# (let ((p (vector ()))) (begin (vector-set! p 0 (cons (string->symbol "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cons") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "pair?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx*") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx-") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx+") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char=?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "eq?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "not") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "null?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# == eliminate-cond  ==>
+# (let ((p (vector ()))) (begin (vector-set! p 0 (cons (string->symbol "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "string?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-string") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "vector?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cdr") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "car") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "cons") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "pair?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx*") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx-") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx+") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx>") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx<") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fx=") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char=?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "eq?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "not") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "null?") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons (string->symbol "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# == external-symbols  ==>
+# (let ((p (vector ()))) (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# emit-expr (let ((p (vector ()))) (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0)))))
+# emit-let
+#  si   = 0
+#  env  = ()
+#  bindings = ((p (vector ())))
+#  body = (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-expr (vector ())
+# emit-expr (make-vector 1)
+# make-vector 1
+# emit-expr 1
+    movl $4, %eax     # immed 1
+    movl %eax, %esi
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    orl  $5, %eax
+    addl $4, %esi
+    addl $4, %esi
+    andl $-8, %esi
+    addl %esi, %ebp
+    movl %eax, 0(%esp)
+# emit-expr ()
+    movl $63, %eax     # immed ()
+    movl  %eax, %ebx
+    movl 0(%esp), %eax
+    movl %ebx, -1(%eax)
+    movl %eax, 0(%esp)  # stack save
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "procedure?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "procedure?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "procedure?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "procedure?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207685"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207685":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "procedure?"
+# string literal
+    jmp _L_207687
+    .align 8,0x90
+_L_207686 :
+    .int 40
+    .ascii "procedure?"
+_L_207687:
+    movl $_L_207686, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg procedure?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "cdr") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "cdr")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "cdr")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207688"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207688":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "cdr"
+# string literal
+    jmp _L_207690
+    .align 8,0x90
+_L_207689 :
+    .int 12
+    .ascii "cdr"
+_L_207690:
+    movl $_L_207689, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg cdr
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "car") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "car")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "car")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207691"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207691":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "car"
+# string literal
+    jmp _L_207693
+    .align 8,0x90
+_L_207692 :
+    .int 12
+    .ascii "car"
+_L_207693:
+    movl $_L_207692, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg car
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "symbol-value") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "symbol-value")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "symbol-value")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207694"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207694":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "symbol-value"
+# string literal
+    jmp _L_207696
+    .align 8,0x90
+_L_207695 :
+    .int 48
+    .ascii "symbol-value"
+_L_207696:
+    movl $_L_207695, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg symbol-value
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "symbol->string") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "symbol->string")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "symbol->string")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207697"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207697":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "symbol->string"
+# string literal
+    jmp _L_207699
+    .align 8,0x90
+_L_207698 :
+    .int 56
+    .ascii "symbol->string"
+_L_207699:
+    movl $_L_207698, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg symbol->string
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "make-symbol") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "make-symbol")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "make-symbol")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207700"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207700":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "make-symbol"
+# string literal
+    jmp _L_207702
+    .align 8,0x90
+_L_207701 :
+    .int 44
+    .ascii "make-symbol"
+_L_207702:
+    movl $_L_207701, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg make-symbol
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "symbol?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "symbol?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "symbol?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "symbol?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207703"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207703":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "symbol?"
+# string literal
+    jmp _L_207705
+    .align 8,0x90
+_L_207704 :
+    .int 28
+    .ascii "symbol?"
+_L_207705:
+    movl $_L_207704, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg symbol?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "string-set!") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "string-set!") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "string-set!")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "string-set!")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207706"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207706":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "string-set!"
+# string literal
+    jmp _L_207708
+    .align 8,0x90
+_L_207707 :
+    .int 44
+    .ascii "string-set!"
+_L_207708:
+    movl $_L_207707, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg string-set!
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "string-ref") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "string-ref") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "string-ref")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "string-ref")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207709"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207709":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "string-ref"
+# string literal
+    jmp _L_207711
+    .align 8,0x90
+_L_207710 :
+    .int 40
+    .ascii "string-ref"
+_L_207711:
+    movl $_L_207710, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg string-ref
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "string-length") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "string-length") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "string-length")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "string-length")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207712"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207712":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "string-length"
+# string literal
+    jmp _L_207714
+    .align 8,0x90
+_L_207713 :
+    .int 52
+    .ascii "string-length"
+_L_207714:
+    movl $_L_207713, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg string-length
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "string?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "string?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "string?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "string?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207715"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207715":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "string?"
+# string literal
+    jmp _L_207717
+    .align 8,0x90
+_L_207716 :
+    .int 28
+    .ascii "string?"
+_L_207717:
+    movl $_L_207716, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg string?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "make-string") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "make-string") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "make-string")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "make-string")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207718"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207718":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "make-string"
+# string literal
+    jmp _L_207720
+    .align 8,0x90
+_L_207719 :
+    .int 44
+    .ascii "make-string"
+_L_207720:
+    movl $_L_207719, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg make-string
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "vector") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "vector") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "vector")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "vector")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207721"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207721":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "vector"
+# string literal
+    jmp _L_207723
+    .align 8,0x90
+_L_207722 :
+    .int 24
+    .ascii "vector"
+_L_207723:
+    movl $_L_207722, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg vector
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "vector-ref") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "vector-ref")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "vector-ref")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207724"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207724":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "vector-ref"
+# string literal
+    jmp _L_207726
+    .align 8,0x90
+_L_207725 :
+    .int 40
+    .ascii "vector-ref"
+_L_207726:
+    movl $_L_207725, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg vector-ref
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "vector-set!") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "vector-set!")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "vector-set!")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207727"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207727":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "vector-set!"
+# string literal
+    jmp _L_207729
+    .align 8,0x90
+_L_207728 :
+    .int 44
+    .ascii "vector-set!"
+_L_207729:
+    movl $_L_207728, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg vector-set!
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "vector-length") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "vector-length") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "vector-length")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "vector-length")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207730"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207730":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "vector-length"
+# string literal
+    jmp _L_207732
+    .align 8,0x90
+_L_207731 :
+    .int 52
+    .ascii "vector-length"
+_L_207732:
+    movl $_L_207731, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg vector-length
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "make-vector") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "make-vector") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "make-vector")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "make-vector")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207733"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207733":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "make-vector"
+# string literal
+    jmp _L_207735
+    .align 8,0x90
+_L_207734 :
+    .int 44
+    .ascii "make-vector"
+_L_207735:
+    movl $_L_207734, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg make-vector
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "vector?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "vector?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "vector?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "vector?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207736"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207736":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "vector?"
+# string literal
+    jmp _L_207738
+    .align 8,0x90
+_L_207737 :
+    .int 28
+    .ascii "vector?"
+_L_207738:
+    movl $_L_207737, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg vector?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "set-cdr!") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "set-cdr!")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "set-cdr!")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207739"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207739":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "set-cdr!"
+# string literal
+    jmp _L_207741
+    .align 8,0x90
+_L_207740 :
+    .int 32
+    .ascii "set-cdr!"
+_L_207741:
+    movl $_L_207740, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg set-cdr!
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "set-car!") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "set-car!") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "set-car!")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "set-car!")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207742"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207742":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "set-car!"
+# string literal
+    jmp _L_207744
+    .align 8,0x90
+_L_207743 :
+    .int 32
+    .ascii "set-car!"
+_L_207744:
+    movl $_L_207743, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg set-car!
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "cdr") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "cdr") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "cdr")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "cdr")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207745"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207745":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "cdr"
+# string literal
+    jmp _L_207747
+    .align 8,0x90
+_L_207746 :
+    .int 12
+    .ascii "cdr"
+_L_207747:
+    movl $_L_207746, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg cdr
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "car") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "car") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "car") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "car")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "car")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207748"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207748":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "car"
+# string literal
+    jmp _L_207750
+    .align 8,0x90
+_L_207749 :
+    .int 12
+    .ascii "car"
+_L_207750:
+    movl $_L_207749, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg car
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "cons") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "cons") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "cons")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "cons")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207751"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207751":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "cons"
+# string literal
+    jmp _L_207753
+    .align 8,0x90
+_L_207752 :
+    .int 16
+    .ascii "cons"
+_L_207753:
+    movl $_L_207752, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg cons
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "pair?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "pair?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "pair?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "pair?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207754"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207754":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "pair?"
+# string literal
+    jmp _L_207756
+    .align 8,0x90
+_L_207755 :
+    .int 20
+    .ascii "pair?"
+_L_207756:
+    movl $_L_207755, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg pair?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx*") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx*") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx*")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx*")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207757"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207757":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx*"
+# string literal
+    jmp _L_207759
+    .align 8,0x90
+_L_207758 :
+    .int 12
+    .ascii "fx*"
+_L_207759:
+    movl $_L_207758, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx*
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx-") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx-") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx-")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx-")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207760"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207760":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx-"
+# string literal
+    jmp _L_207762
+    .align 8,0x90
+_L_207761 :
+    .int 12
+    .ascii "fx-"
+_L_207762:
+    movl $_L_207761, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx-
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx+") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx+") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx+")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx+")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207763"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207763":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx+"
+# string literal
+    jmp _L_207765
+    .align 8,0x90
+_L_207764 :
+    .int 12
+    .ascii "fx+"
+_L_207765:
+    movl $_L_207764, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx+
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx>=") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx>=") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx>=")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx>=")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207766"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207766":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx>="
+# string literal
+    jmp _L_207768
+    .align 8,0x90
+_L_207767 :
+    .int 16
+    .ascii "fx>="
+_L_207768:
+    movl $_L_207767, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx>=
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx>") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx>") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx>")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx>")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207769"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207769":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx>"
+# string literal
+    jmp _L_207771
+    .align 8,0x90
+_L_207770 :
+    .int 12
+    .ascii "fx>"
+_L_207771:
+    movl $_L_207770, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx>
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx<=") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx<=") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx<=")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx<=")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207772"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207772":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx<="
+# string literal
+    jmp _L_207774
+    .align 8,0x90
+_L_207773 :
+    .int 16
+    .ascii "fx<="
+_L_207774:
+    movl $_L_207773, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx<=
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx<") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx<") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx<")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx<")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207775"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207775":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx<"
+# string literal
+    jmp _L_207777
+    .align 8,0x90
+_L_207776 :
+    .int 12
+    .ascii "fx<"
+_L_207777:
+    movl $_L_207776, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx<
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fx=") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fx=") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fx=")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fx=")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207778"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207778":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fx="
+# string literal
+    jmp _L_207780
+    .align 8,0x90
+_L_207779 :
+    .int 12
+    .ascii "fx="
+_L_207780:
+    movl $_L_207779, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fx=
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxzero?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxzero?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxzero?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207781"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207781":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxzero?"
+# string literal
+    jmp _L_207783
+    .align 8,0x90
+_L_207782 :
+    .int 28
+    .ascii "fxzero?"
+_L_207783:
+    movl $_L_207782, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxzero?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxsub1") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxsub1")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxsub1")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207784"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207784":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxsub1"
+# string literal
+    jmp _L_207786
+    .align 8,0x90
+_L_207785 :
+    .int 24
+    .ascii "fxsub1"
+_L_207786:
+    movl $_L_207785, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxsub1
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxadd1") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxadd1")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxadd1")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207787"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207787":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxadd1"
+# string literal
+    jmp _L_207789
+    .align 8,0x90
+_L_207788 :
+    .int 24
+    .ascii "fxadd1"
+_L_207789:
+    movl $_L_207788, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxadd1
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxlogor") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxlogor")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxlogor")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207790"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207790":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxlogor"
+# string literal
+    jmp _L_207792
+    .align 8,0x90
+_L_207791 :
+    .int 28
+    .ascii "fxlogor"
+_L_207792:
+    movl $_L_207791, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxlogor
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxlogand") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxlogand")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxlogand")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207793"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207793":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxlogand"
+# string literal
+    jmp _L_207795
+    .align 8,0x90
+_L_207794 :
+    .int 32
+    .ascii "fxlogand"
+_L_207795:
+    movl $_L_207794, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxlogand
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fxlognot") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fxlognot")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fxlognot")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207796"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207796":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fxlognot"
+# string literal
+    jmp _L_207798
+    .align 8,0x90
+_L_207797 :
+    .int 32
+    .ascii "fxlognot"
+_L_207798:
+    movl $_L_207797, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fxlognot
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "char=?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "char=?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "char=?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "char=?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207799"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207799":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "char=?"
+# string literal
+    jmp _L_207801
+    .align 8,0x90
+_L_207800 :
+    .int 24
+    .ascii "char=?"
+_L_207801:
+    movl $_L_207800, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg char=?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "eq?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "eq?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "eq?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "eq?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207802"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207802":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "eq?"
+# string literal
+    jmp _L_207804
+    .align 8,0x90
+_L_207803 :
+    .int 12
+    .ascii "eq?"
+_L_207804:
+    movl $_L_207803, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg eq?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "not") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "not") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "not") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "not")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "not")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207805"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207805":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "not"
+# string literal
+    jmp _L_207807
+    .align 8,0x90
+_L_207806 :
+    .int 12
+    .ascii "not"
+_L_207807:
+    movl $_L_207806, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg not
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "boolean?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "boolean?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "boolean?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "boolean?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207808"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207808":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "boolean?"
+# string literal
+    jmp _L_207810
+    .align 8,0x90
+_L_207809 :
+    .int 32
+    .ascii "boolean?"
+_L_207810:
+    movl $_L_207809, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg boolean?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fixnum?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fixnum?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fixnum?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207811"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207811":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fixnum?"
+# string literal
+    jmp _L_207813
+    .align 8,0x90
+_L_207812 :
+    .int 28
+    .ascii "fixnum?"
+_L_207813:
+    movl $_L_207812, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fixnum?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "char?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "char?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "char?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "char?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207814"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207814":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "char?"
+# string literal
+    jmp _L_207816
+    .align 8,0x90
+_L_207815 :
+    .int 20
+    .ascii "char?"
+_L_207816:
+    movl $_L_207815, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg char?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "null?") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "null?") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "null?")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "null?")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207817"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207817":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "null?"
+# string literal
+    jmp _L_207819
+    .align 8,0x90
+_L_207818 :
+    .int 20
+    .ascii "null?"
+_L_207819:
+    movl $_L_207818, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg null?
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))) (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "char->fixnum") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "char->fixnum")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "char->fixnum")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207820"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207820":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "char->fixnum"
+# string literal
+    jmp _L_207822
+    .align 8,0x90
+_L_207821 :
+    .int 48
+    .ascii "char->fixnum"
+_L_207822:
+    movl $_L_207821, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg char->fixnum
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))) (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (vector-set! p 0 (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0)))
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -4(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl %eax, -8(%esp)
+# emit-expr (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref p 0))
+# cons arg1=((primitive-ref string->symbol) "fixnum->char") arg2=(vector-ref p 0)
+# emit-expr ((primitive-ref string->symbol) "fixnum->char")
+# funcall
+#    si   =-12
+#    env  = ((p . 0))
+#    expr = (funcall (primitive-ref string->symbol) "fixnum->char")
+# emit-expr (primitive-ref string->symbol)
+    .extern string$m$gsymbol
+    movl string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207823"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207823":
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "fixnum->char"
+# string literal
+    jmp _L_207825
+    .align 8,0x90
+_L_207824 :
+    .int 48
+    .ascii "fixnum->char"
+_L_207825:
+    movl $_L_207824, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg fixnum->char
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -12(%esp)
+# emit-expr (vector-ref p 0)
+# emit-expr p
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+    movl %eax, -16(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -16(%esp), %esi
+    movl -1(%eax,%esi), %eax
+    movl %eax, 4(%ebp)
+    movl -12(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl -4(%esp), %ebx
+    movl -8(%esp), %esi
+    movl %eax, -1(%ebx,%esi)
+# emit-expr (begin (closure () (p) (let () (vector-ref p 0))))
+# emit-begin
+#   expr=(begin (closure () (p) (let () (vector-ref p 0))))
+#   env=((p . 0))
+# emit-expr (closure () (p) (let () (vector-ref p 0)))
+# emit-closure
+# si = -4
+# env = ((p . 0))
+# expr = (closure () (p) (let () (vector-ref p 0)))
+    movl $_L_207826, 0(%ebp)  # closure label
+# emit-variable-ref
+# env=((p . 0))
+# var=p
+    movl 0(%esp), %eax  # stack load p
+# end emit-variable-ref
+   movl  %eax, 4(%ebp)  # p
+    movl %ebp, %eax   # get the base ptr
+    add $2, %eax     # add the closure tag
+    add $8, %ebp     # bump ebp
+    jmp _L_207827            # jump around closure body
+_L_207826:
+# emit-tail-expr
+# si=-8
+# env=((p . 4) (p . 0))
+# expr=(let () (vector-ref p 0))
+# emit-tail-let
+#  si   = -8
+#  env  = ((p . 4) (p . 0))
+#  bindings = ()
+#  body = (vector-ref p 0)
+# emit-tail-expr
+# si=-8
+# env=((p . 4) (p . 0))
+# expr=(vector-ref p 0)
+# tail primcall
+# emit-expr p
+# emit-variable-ref
+# env=((p . 4) (p . 0))
+# var=p
+    movl 2(%edi), %eax  # frame load p
+# end emit-variable-ref
+    movl %eax, -8(%esp)
+# emit-expr 0
+    movl $0, %eax     # immed 0
+    movl -8(%esp), %esi
+    movl -1(%eax,%esi), %eax
+#return from tail (vector-ref p 0)
+    ret
+    .align 4,0x90
+_L_207827:
+# emit-expr (begin)
+# emit-begin
+#   expr=(begin)
+#   env=((p . 0))
+     movl %eax, primitives
 # == explicit-begins  ==>
 # (lambda () (error (quote funcall) "arg 1 must be a procedure"))
 # == eliminate-let*  ==>
@@ -2147,14 +6025,14 @@ _L_79224:
 # si = 0
 # env = ()
 # expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")))
-    movl $_L_79226, 0(%ebp)  # closure label
+    movl $_L_207828, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var funcall not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79227            # jump around closure body
-_L_79226:
+    jmp _L_207829            # jump around closure body
+_L_207828:
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
@@ -2188,23 +6066,23 @@ _L_79226:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79228"
+    je "_L_207830"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79228":
+"_L_207830":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "funcall"
 # string literal
-    jmp _L_79230
+    jmp _L_207832
     .align 8,0x90
-_L_79229 :
+_L_207831 :
     .int 28
     .ascii "funcall"
-_L_79230:
-    movl $_L_79229, %eax
+_L_207832:
+    movl $_L_207831, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg funcall
     movl -20(%esp), %edi   # load new closure to %edi
@@ -2215,13 +6093,13 @@ _L_79230:
     mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) funcall)
 # emit-expr "arg 1 must be a procedure"
 # string literal
-    jmp _L_79232
+    jmp _L_207834
     .align 8,0x90
-_L_79231 :
+_L_207833 :
     .int 100
     .ascii "arg 1 must be a procedure"
-_L_79232:
-    movl $_L_79231, %eax
+_L_207834:
+    movl $_L_207833, %eax
     orl $6, %eax
     mov %eax, -16(%esp)    # arg arg 1 must be a procedure
     movl -8(%esp), %edi   # load new closure to %edi
@@ -2237,358 +6115,448 @@ _L_79232:
 # emit-shift-args:  size=0   si=-20  delta=4
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_79227:
+_L_207829:
      movl %eax, eh$uprocedure
 # == explicit-begins  ==>
-# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a fixnum"))
 # == eliminate-let*  ==>
-# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a fixnum"))
 # == eliminate-shadowing  ==>
-# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a fixnum"))
 # == vectorize-letrec  ==>
-# (lambda () (error (quote primitive) "arg must be a fixnum"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a fixnum"))
 # == eliminate-set!  ==>
-# (lambda () (let () (error (quote primitive) "arg must be a fixnum")))
+# (lambda (i) (let ((i i)) (error (list-ref (primitives) i) "arg must be a fixnum")))
 # == close-free-variables  ==>
-# (closure () (error primitive) (let () (error (quote primitive) "arg must be a fixnum")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a fixnum")))
 # == eliminate-quote  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a fixnum")))
 # == eliminate-when/unless  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a fixnum")))
 # == eliminate-cond  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a fixnum")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a fixnum")))
 # == external-symbols  ==>
-# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
-# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
+# (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")))
+# emit-expr (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")))
-    movl $_L_79233, 0(%ebp)  # closure label
+# expr = (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")))
+    movl $_L_207835, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
-# WARNING: free var primitive not defined in the environmnet
+# WARNING: free var (primitive-ref list-ref) not defined in the environmnet
+# WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79234            # jump around closure body
-_L_79233:
+    jmp _L_207836            # jump around closure body
+_L_207835:
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum"))
+# si=-12
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=(let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum"))
 # emit-tail-let
-#  si   = -8
-#  env  = ((primitive . 8) ((primitive-ref error) . 4))
-#  bindings = ()
-#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+#  si   = -12
+#  env  = ((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#  bindings = ((i i))
+#  body = ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")
+# emit-expr i
+# emit-variable-ref
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -8(%esp), %eax  # stack load i
+# end emit-variable-ref
+    movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+# si=-16
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")
 # emit-tail-funcall
-#    si   =-8
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a fixnum")
+#    si   =-16
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a fixnum")
 # emit-expr (primitive-ref error)
     .extern error
     movl error,%eax
-   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
-# emit-expr ((primitive-ref string->symbol) "primitive")
+   movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # funcall
-#    si   =-12
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref string->symbol) "primitive")
-# emit-expr (primitive-ref string->symbol)
-    .extern string$m$gsymbol
-    movl string$m$gsymbol,%eax
+#    si   =-20
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref list-ref) ((primitive-ref primitives)) i)
+# emit-expr (primitive-ref list-ref)
+    .extern list$mref
+    movl list$mref,%eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79235"
+    je "_L_207837"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79235":
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-# emit-expr "primitive"
-# string literal
-    jmp _L_79237
-    .align 8,0x90
-_L_79236 :
-    .int 36
-    .ascii "primitive"
-_L_79237:
-    movl $_L_79236, %eax
-    orl $6, %eax
-    mov %eax, -24(%esp)  # arg primitive
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp   # adjust base
+"_L_207837":
+   movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
+# emit-expr ((primitive-ref primitives))
+# funcall
+#    si   =-32
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref primitives))
+# emit-expr (primitive-ref primitives)
+    .extern primitives
+    movl primitives,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207838"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207838":
+   movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
+    movl -40(%esp), %edi   # load new closure to %edi
+    add $-32, %esp   # adjust base
     call *-2(%edi)        # call thru closure ptr
-    add $12, %esp   # adjust base
+    add $32, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+    mov %eax, -32(%esp)  # arg ((primitive-ref primitives))
+# emit-expr i
+# emit-variable-ref
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -12(%esp), %eax  # stack load i
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg i
+    movl -28(%esp), %edi   # load new closure to %edi
+    add $-20, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $20, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # emit-expr "arg must be a fixnum"
 # string literal
-    jmp _L_79239
+    jmp _L_207840
     .align 8,0x90
-_L_79238 :
+_L_207839 :
     .int 80
     .ascii "arg must be a fixnum"
-_L_79239:
-    movl $_L_79238, %eax
+_L_207840:
+    movl $_L_207839, %eax
     orl $6, %eax
-    mov %eax, -16(%esp)    # arg arg must be a fixnum
-    movl -8(%esp), %edi   # load new closure to %edi
-# emit-shift-args:  size=3   si=-8  delta=4
-    mov -8(%esp), %ebx  # shift frame cell
-    mov %ebx, -4(%esp)  # down to base
-# emit-shift-args:  size=2   si=-12  delta=4
-    mov -12(%esp), %ebx  # shift frame cell
-    mov %ebx, -8(%esp)  # down to base
-# emit-shift-args:  size=1   si=-16  delta=4
+    mov %eax, -24(%esp)    # arg arg must be a fixnum
+    movl -16(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-20  delta=12
+    mov -20(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-24  delta=12
+    mov -24(%esp), %ebx  # shift frame cell
     mov %ebx, -12(%esp)  # down to base
-# emit-shift-args:  size=0   si=-20  delta=4
+# emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_79234:
+_L_207836:
      movl %eax, eh$ufixnum
 # == explicit-begins  ==>
-# (lambda () (error (quote primitive) "arg must be a string"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a string"))
 # == eliminate-let*  ==>
-# (lambda () (error (quote primitive) "arg must be a string"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a string"))
 # == eliminate-shadowing  ==>
-# (lambda () (error (quote primitive) "arg must be a string"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a string"))
 # == vectorize-letrec  ==>
-# (lambda () (error (quote primitive) "arg must be a string"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a string"))
 # == eliminate-set!  ==>
-# (lambda () (let () (error (quote primitive) "arg must be a string")))
+# (lambda (i) (let ((i i)) (error (list-ref (primitives) i) "arg must be a string")))
 # == close-free-variables  ==>
-# (closure () (error primitive) (let () (error (quote primitive) "arg must be a string")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a string")))
 # == eliminate-quote  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a string")))
 # == eliminate-when/unless  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a string")))
 # == eliminate-cond  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a string")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a string")))
 # == external-symbols  ==>
-# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
-# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
+# (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")))
+# emit-expr (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")))
-    movl $_L_79240, 0(%ebp)  # closure label
+# expr = (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")))
+    movl $_L_207841, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
-# WARNING: free var primitive not defined in the environmnet
+# WARNING: free var (primitive-ref list-ref) not defined in the environmnet
+# WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79241            # jump around closure body
-_L_79240:
+    jmp _L_207842            # jump around closure body
+_L_207841:
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string"))
+# si=-12
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=(let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string"))
 # emit-tail-let
-#  si   = -8
-#  env  = ((primitive . 8) ((primitive-ref error) . 4))
-#  bindings = ()
-#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+#  si   = -12
+#  env  = ((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#  bindings = ((i i))
+#  body = ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")
+# emit-expr i
+# emit-variable-ref
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -8(%esp), %eax  # stack load i
+# end emit-variable-ref
+    movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+# si=-16
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")
 # emit-tail-funcall
-#    si   =-8
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a string")
+#    si   =-16
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a string")
 # emit-expr (primitive-ref error)
     .extern error
     movl error,%eax
-   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
-# emit-expr ((primitive-ref string->symbol) "primitive")
+   movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # funcall
-#    si   =-12
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref string->symbol) "primitive")
-# emit-expr (primitive-ref string->symbol)
-    .extern string$m$gsymbol
-    movl string$m$gsymbol,%eax
+#    si   =-20
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref list-ref) ((primitive-ref primitives)) i)
+# emit-expr (primitive-ref list-ref)
+    .extern list$mref
+    movl list$mref,%eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79242"
+    je "_L_207843"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79242":
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-# emit-expr "primitive"
-# string literal
-    jmp _L_79244
-    .align 8,0x90
-_L_79243 :
-    .int 36
-    .ascii "primitive"
-_L_79244:
-    movl $_L_79243, %eax
-    orl $6, %eax
-    mov %eax, -24(%esp)  # arg primitive
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp   # adjust base
+"_L_207843":
+   movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
+# emit-expr ((primitive-ref primitives))
+# funcall
+#    si   =-32
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref primitives))
+# emit-expr (primitive-ref primitives)
+    .extern primitives
+    movl primitives,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207844"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207844":
+   movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
+    movl -40(%esp), %edi   # load new closure to %edi
+    add $-32, %esp   # adjust base
     call *-2(%edi)        # call thru closure ptr
-    add $12, %esp   # adjust base
+    add $32, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+    mov %eax, -32(%esp)  # arg ((primitive-ref primitives))
+# emit-expr i
+# emit-variable-ref
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -12(%esp), %eax  # stack load i
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg i
+    movl -28(%esp), %edi   # load new closure to %edi
+    add $-20, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $20, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # emit-expr "arg must be a string"
 # string literal
-    jmp _L_79246
+    jmp _L_207846
     .align 8,0x90
-_L_79245 :
+_L_207845 :
     .int 80
     .ascii "arg must be a string"
-_L_79246:
-    movl $_L_79245, %eax
+_L_207846:
+    movl $_L_207845, %eax
     orl $6, %eax
-    mov %eax, -16(%esp)    # arg arg must be a string
-    movl -8(%esp), %edi   # load new closure to %edi
-# emit-shift-args:  size=3   si=-8  delta=4
-    mov -8(%esp), %ebx  # shift frame cell
-    mov %ebx, -4(%esp)  # down to base
-# emit-shift-args:  size=2   si=-12  delta=4
-    mov -12(%esp), %ebx  # shift frame cell
-    mov %ebx, -8(%esp)  # down to base
-# emit-shift-args:  size=1   si=-16  delta=4
+    mov %eax, -24(%esp)    # arg arg must be a string
+    movl -16(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-20  delta=12
+    mov -20(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-24  delta=12
+    mov -24(%esp), %ebx  # shift frame cell
     mov %ebx, -12(%esp)  # down to base
-# emit-shift-args:  size=0   si=-20  delta=4
+# emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_79241:
+_L_207842:
      movl %eax, eh$ustring
 # == explicit-begins  ==>
-# (lambda () (error (quote primitive) "arg must be a character"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a character"))
 # == eliminate-let*  ==>
-# (lambda () (error (quote primitive) "arg must be a character"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a character"))
 # == eliminate-shadowing  ==>
-# (lambda () (error (quote primitive) "arg must be a character"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a character"))
 # == vectorize-letrec  ==>
-# (lambda () (error (quote primitive) "arg must be a character"))
+# (lambda (i) (error (list-ref (primitives) i) "arg must be a character"))
 # == eliminate-set!  ==>
-# (lambda () (let () (error (quote primitive) "arg must be a character")))
+# (lambda (i) (let ((i i)) (error (list-ref (primitives) i) "arg must be a character")))
 # == close-free-variables  ==>
-# (closure () (error primitive) (let () (error (quote primitive) "arg must be a character")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a character")))
 # == eliminate-quote  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a character")))
 # == eliminate-when/unless  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a character")))
 # == eliminate-cond  ==>
-# (closure () (error primitive) (let () (error (string->symbol "primitive") "arg must be a character")))
+# (closure (i) (error list-ref primitives) (let ((i i)) (error (list-ref (primitives) i) "arg must be a character")))
 # == external-symbols  ==>
-# (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
-# emit-expr (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
+# (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")))
+# emit-expr (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure () ((primitive-ref error) primitive) (let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")))
-    movl $_L_79247, 0(%ebp)  # closure label
+# expr = (closure (i) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")))
+    movl $_L_207847, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
-# WARNING: free var primitive not defined in the environmnet
+# WARNING: free var (primitive-ref list-ref) not defined in the environmnet
+# WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_79248            # jump around closure body
-_L_79247:
+    jmp _L_207848            # jump around closure body
+_L_207847:
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=(let () ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character"))
+# si=-12
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=(let ((i i)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character"))
 # emit-tail-let
-#  si   = -8
-#  env  = ((primitive . 8) ((primitive-ref error) . 4))
-#  bindings = ()
-#  body = ((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+#  si   = -12
+#  env  = ((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#  bindings = ((i i))
+#  body = ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")
+# emit-expr i
+# emit-variable-ref
+# env=((i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -8(%esp), %eax  # stack load i
+# end emit-variable-ref
+    movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
-# si=-8
-# env=((primitive . 8) ((primitive-ref error) . 4))
-# expr=((primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+# si=-16
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# expr=((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")
 # emit-tail-funcall
-#    si   =-8
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "primitive") "arg must be a character")
+#    si   =-16
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) i) "arg must be a character")
 # emit-expr (primitive-ref error)
     .extern error
     movl error,%eax
-   movl %eax,  -8(%esp)  # stash funcall-oper in next closure slot
-# emit-expr ((primitive-ref string->symbol) "primitive")
+   movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
+# emit-expr ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # funcall
-#    si   =-12
-#    env  = ((primitive . 8) ((primitive-ref error) . 4))
-#    expr = (funcall (primitive-ref string->symbol) "primitive")
-# emit-expr (primitive-ref string->symbol)
-    .extern string$m$gsymbol
-    movl string$m$gsymbol,%eax
+#    si   =-20
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref list-ref) ((primitive-ref primitives)) i)
+# emit-expr (primitive-ref list-ref)
+    .extern list$mref
+    movl list$mref,%eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_79249"
+    je "_L_207849"
 # invoke error handler funcall_non_procedure
     .extern eh_procedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_79249":
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-# emit-expr "primitive"
-# string literal
-    jmp _L_79251
-    .align 8,0x90
-_L_79250 :
-    .int 36
-    .ascii "primitive"
-_L_79251:
-    movl $_L_79250, %eax
-    orl $6, %eax
-    mov %eax, -24(%esp)  # arg primitive
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp   # adjust base
+"_L_207849":
+   movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
+# emit-expr ((primitive-ref primitives))
+# funcall
+#    si   =-32
+#    env  = ((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+#    expr = (funcall (primitive-ref primitives))
+# emit-expr (primitive-ref primitives)
+    .extern primitives
+    movl primitives,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_207850"
+# invoke error handler funcall_non_procedure
+    .extern eh_procedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_207850":
+   movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
+    movl -40(%esp), %edi   # load new closure to %edi
+    add $-32, %esp   # adjust base
     call *-2(%edi)        # call thru closure ptr
-    add $12, %esp   # adjust base
+    add $32, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) primitive)
+    mov %eax, -32(%esp)  # arg ((primitive-ref primitives))
+# emit-expr i
+# emit-variable-ref
+# env=((i . -12) (i . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
+# var=i
+    movl -12(%esp), %eax  # stack load i
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg i
+    movl -28(%esp), %edi   # load new closure to %edi
+    add $-20, %esp   # adjust base
+    call *-2(%edi)        # call thru closure ptr
+    add $20, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) i)
 # emit-expr "arg must be a character"
 # string literal
-    jmp _L_79253
+    jmp _L_207852
     .align 8,0x90
-_L_79252 :
+_L_207851 :
     .int 92
     .ascii "arg must be a character"
-_L_79253:
-    movl $_L_79252, %eax
+_L_207852:
+    movl $_L_207851, %eax
     orl $6, %eax
-    mov %eax, -16(%esp)    # arg arg must be a character
-    movl -8(%esp), %edi   # load new closure to %edi
-# emit-shift-args:  size=3   si=-8  delta=4
-    mov -8(%esp), %ebx  # shift frame cell
-    mov %ebx, -4(%esp)  # down to base
-# emit-shift-args:  size=2   si=-12  delta=4
-    mov -12(%esp), %ebx  # shift frame cell
-    mov %ebx, -8(%esp)  # down to base
-# emit-shift-args:  size=1   si=-16  delta=4
+    mov %eax, -24(%esp)    # arg arg must be a character
+    movl -16(%esp), %edi   # load new closure to %edi
+# emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
+    mov %ebx, -4(%esp)  # down to base
+# emit-shift-args:  size=2   si=-20  delta=12
+    mov -20(%esp), %ebx  # shift frame cell
+    mov %ebx, -8(%esp)  # down to base
+# emit-shift-args:  size=1   si=-24  delta=12
+    mov -24(%esp), %ebx  # shift frame cell
     mov %ebx, -12(%esp)  # down to base
-# emit-shift-args:  size=0   si=-20  delta=4
+# emit-shift-args:  size=0   si=-28  delta=12
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_79248:
+_L_207848:
      movl %eax, eh$ucharacter
 # emit-expr (begin #t)
 # emit-begin

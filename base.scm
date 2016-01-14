@@ -80,6 +80,12 @@
 	 (cons e nil)
 	 (cons (car lst) (append1 (cdr lst) elt))))]
 
+  [list-ref
+   (lambda (lst k)
+     (if (fx= k 0)
+	 (car lst)
+	 (list-ref (cdr lst) (fx- k 1))))]
+
   [error
    (let* ([write-stderr (lambda (s)
 			  (foreign-call "s_write" 2 s (string-length s)))]
@@ -92,11 +98,63 @@
      (lambda (sym emsg)
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
+
+;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
+  [primitives
+   (let ([p '()])
+     (set! p (cons 'procedure? p))
+     (set! p (cons 'cdr p))
+     (set! p (cons 'car p))
+     (set! p (cons 'symbol-value p))
+     (set! p (cons 'symbol->string p))
+     (set! p (cons 'make-symbol p))
+     (set! p (cons 'symbol? p))
+     (set! p (cons 'string-set! p))
+     (set! p (cons 'string-ref p))
+     (set! p (cons 'string-length p))
+     (set! p (cons 'string? p))
+     (set! p (cons 'make-string p))
+     (set! p (cons 'vector p))
+     (set! p (cons 'vector-ref p))
+     (set! p (cons 'vector-set! p))
+     (set! p (cons 'vector-length p))
+     (set! p (cons 'make-vector p))
+     (set! p (cons 'vector? p))
+     (set! p (cons 'set-cdr! p))
+     (set! p (cons 'set-car! p))
+     (set! p (cons 'cdr p))
+     (set! p (cons 'car p))
+     (set! p (cons 'cons p))
+     (set! p (cons 'pair? p))
+     (set! p (cons 'fx* p))
+     (set! p (cons 'fx- p))
+     (set! p (cons 'fx+ p))
+     (set! p (cons 'fx>= p))
+     (set! p (cons 'fx> p))
+     (set! p (cons 'fx<= p))
+     (set! p (cons 'fx< p))
+     (set! p (cons 'fx= p))
+     (set! p (cons 'fxzero? p))
+     (set! p (cons 'fxsub1 p))
+     (set! p (cons 'fxadd1 p))
+     (set! p (cons 'fxlogor p))
+     (set! p (cons 'fxlogand p))
+     (set! p (cons 'fxlognot p))
+     (set! p (cons 'char=? p))
+     (set! p (cons 'eq? p))
+     (set! p (cons 'not p))
+     (set! p (cons 'boolean? p))
+     (set! p (cons 'fixnum? p))
+     (set! p (cons 'char? p))
+     (set! p (cons 'null? p))
+     (set! p (cons 'char->fixnum p))
+     (set! p (cons 'fixnum->char p))
+     (lambda () p))]
   
   [eh_procedure  (lambda () (error 'funcall    "arg 1 must be a procedure"))]
-  [eh_fixnum     (lambda () (error 'primitive  "arg must be a fixnum"))]
-  [eh_string     (lambda () (error 'primitive  "arg must be a string"))]
-  [eh_character  (lambda () (error 'primitive  "arg must be a character"))]
+  [eh_fixnum     (lambda (i) (error (list-ref (primitives) i)  "arg must be a fixnum"))]
+  [eh_string     (lambda (i) (error (list-ref (primitives) i)  "arg must be a string"))]
+  [eh_character  (lambda (i) (error (list-ref (primitives) i)  "arg must be a character"))]
   
  ) ; end labels
  
