@@ -142,7 +142,7 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+;(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
@@ -2272,7 +2272,7 @@
 ;;        The callee simply returns and does not mess with the closure slot
 ;;
 ;;                                              figure 3
-;;-----------------------------------------------------------------------------------------------------------
+;;-------------------------------------------------------------------------------------------------------
 
 ;;-----------------------------------------------------------------------------------
 ;;   Invariants
@@ -2284,8 +2284,8 @@
 ;;  esp - 4 - 4N - i  local var i... (optional)
 ;;  esp - 4 - 4N      local argN     (optional)
 ;;  esp - 8           local arg 1    (optional)
-;;  esp - 4           closure pointer   |  used to restore ecp when callee returns
-;;  esp - 0           return pointer    |  when the frame goes away
+;;  esp - 4           closure pointer |  used to restore ecp when callee returns
+;;  esp - 0           return pointer  |  when the frame goes away
 ;;
 ;;-----------------------------------------------------------------------------------
 
@@ -2754,7 +2754,7 @@
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
 	  (emit "    movl $0, %eax  # set arg count")
-	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
@@ -2772,7 +2772,7 @@
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
 	  (emit "    movl $0, %eax  # set arg count")
-	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
@@ -2790,7 +2790,7 @@
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
 	  (emit "    movl $0, %eax  # set arg count")
-	  ;; step on arg1 -- its ok, exiting ... all bets are off 
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
