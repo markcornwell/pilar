@@ -142,7 +142,7 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-;(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
@@ -1006,6 +1006,7 @@
 	     append1
 	     error
 	     eh_procedure
+	     eh_argcount
 	     primitives
 	     list-ref)
 
@@ -1022,10 +1023,23 @@
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 
-;; Some options to govern code generation
+;;-----------------------------------------------------------------------------------
+;;                       Switches for Optional Run-time Checks
+;;-----------------------------------------------------------------------------------
+;;  Robust error checking is essential for development.  Debugging goes faster
+;;  when you have a useful error message than it does when you have to track down
+;;  a segfault using the llvm debugger.
+;;
+;;  But you also want the ability to turn off runtime checking when speed is
+;;  critical, say, in move tree search of a chess program.
+;;
+;;  The following switches enable and disable the generation of code that performs
+;;  runtime error checking.  See the section Error Checking and Safe Primitives
+;;  for details.
+;;-----------------------------------------------------------------------------------
 
 (define *safe-procedures* #t)  ;; check attempts to call non-procedures
-;(define *safe-arg-counts* #t)  ;; check number of arguments passed at run time
+(define *safe-arg-counts* #t)  ;; check number of arguments passed at run time
 (define *safe-primitives* #t)  ;; check types on arguments passed to primitives
 
 ;;-----------------------------------------------------------------------------------
@@ -2237,31 +2251,31 @@
 
 (define empty? null?)
 
-;;-------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;      Procedure Call           (funcall f arg* ...)
-;;-------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;  
-;;     +--  +------------+         si           +--    +------------+
-;;     |    |   arg 3    |         |            |      |   arg 3    |                (si - 20) -> si' - 16
-;;     |    +------------+         V            |      +------------+
-;; outgoing |   arg 2    |  %esp - 32        incoming  |   arg 2    |  %esp - 12     (si - 16) -> si' - 12
-;; args     +------------+                   args      +------------+
-;;     |    |   arg 1    |  %esp - 28           |      |   arg 1    |  %esp - 8      (si - 12) -> si' - 8
-;;     +--  +------------+                      +--    +------------+
-;;          |            |  %esp - 24                  |  closure   |  %esp - 4      (si - 8)  -> si' - 4
-;;          +------------+                             +------------+
-;;          |            |  %esp - 20        base -->  |  return    |  %esp          (si + 4)  -> si'
-;;     +--  +------------+                             +------------+
-;;     |    |  local 3   |  %esp - 16    +---------->                              (C) How callee's frame
-;;     |    +------------+               |                                             looks to caller
-;;  locals  |  local 2   |  %esp - 12    |          (B)  Callee's view                 with respect to si
-;;     |    +------------+               |                                               
-;;     |    |  local 1   |  %esp - 8     si        old eip = return point
-;;     +--  +------------+               |         old edi = saved closure ptr
-;;          |  closure   |  %esp - 4     |         Note that args/locals
-;;          +------------+               |           start at %esp - 8
-;; base --> |  return    |  %esp    <----+
-;;          +------------+                         si = offset to top stack elt when funcall happens
+;;     +--  +------------+         si          +--    +------------+
+;;     |    |   arg 3    |         |           |      |   arg 3    |            (si-20)->si'-16
+;;     |    +------------+         V           |      +------------+
+;; outgoing |   arg 2    |  esp - 32        incoming  |   arg 2    |  esp - 12  (si-16)->si'-12
+;; args     +------------+                  args      +------------+
+;;     |    |   arg 1    |  esp - 28           |      |   arg 1    |  esp - 8   (si-12)->si'-8
+;;     +--  +------------+                     +--    +------------+
+;;          |            |  esp - 24                  |  closure   |  esp - 4   (si-8)->si'-4
+;;          +------------+                            +------------+
+;;          |            |  esp - 20        base -->  |  return    |  esp       (si+4)->si'
+;;     +--  +------------+                            +------------+
+;;     |    |  local 3   |  esp - 16    +---------->                       (C) How callee frame
+;;     |    +------------+              |                                      looks to caller
+;;  locals  |  local 2   |  esp - 12    |          (B)  Callee's view          wrt si
+;;     |    +------------+              |                                               
+;;     |    |  local 1   |  esp - 8    si        old eip = return point
+;;     +--  +------------+              |         old edi = saved closure ptr
+;;          |  closure   |  esp - 4     |         Note that args/locals
+;;          +------------+              |           start at %esp - 8
+;; base --> |  return    |  esp    <----+
+;;          +------------+                         si = offset to top stack elt at funcall
 ;;           high address                               (in this example -16)  
 ;;                       
 ;;        (A) Caller's view                        si-8 = amount to shift the stack base
@@ -2272,7 +2286,7 @@
 ;;        The callee simply returns and does not mess with the closure slot
 ;;
 ;;                                              figure 3
-;;-------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 
 ;;-----------------------------------------------------------------------------------
 ;;   Invariants
@@ -2328,6 +2342,9 @@
 
   (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
+  ;; save argument count where called function can check it
+  (emit-save-arg-count (length (funcall-args expr)))
+  
   ;; call first bumps %esp by 4 and then saves %eip at 0(%esp).  
   (emit "    call *-2(%edi)        # call thru closure ptr")
                                    ;; closure ptr in %eax since arg1 emitted last
@@ -2380,6 +2397,9 @@
   (emit-shift-frame (1+ (length (funcall-args expr)))  ;; size
 		    si                                 ;; si
 		    (- (abs si) 4))                    ;; delta
+
+  ;; save argument count where called function can check it
+  (emit-save-arg-count (length (funcall-args expr)))
   
   (emit "    jmp *-2(%edi)  # tail-funcall")
   )  ;; jump to closure entry point
@@ -2505,6 +2525,7 @@
     ;;------------------------------------------------------------------
     
     (emit "~a:" entry-point)         ;; this is the label that we put in the closure
+    (emit-check-arg-count (length formals))
     (let f ([fmls formals]
 	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
 	    [env closed-env])      
@@ -2753,11 +2774,11 @@
           (emit "# error handler eh_fixnum")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~s:" cont))))
+	  (emit "~a:" cont))))
 
 (define (emit-check-character f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
@@ -2771,11 +2792,11 @@
           (emit "# invoke error handler eh_character")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~s:" cont))))
+	  (emit "~a:" cont))))
 
 (define (emit-check-string f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
@@ -2785,7 +2806,7 @@
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" string-mask)
 	  (emit "    cmp $~s, %bl" string-tag)
-	  (emit "    je ~s" cont)
+	  (emit "    je ~a" cont)
           (emit "# invoke error handler eh_string")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
@@ -2793,8 +2814,25 @@
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~s:" cont))))
+	  (emit "~a:" cont))))
 
+(define (emit-save-arg-count argc)
+  (when *safe-arg-counts*
+	(emit "    movl $~s,%eax   # save arg count" (* 4 argc))))
+
+(define (emit-check-arg-count argc)
+  (when *safe-arg-counts*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_argcount)])
+	  (emit "# check argument count")
+	  (emit "    cmp $~s,%eax" (* 4 argc))
+	  (emit "    je ~a" cont)
+	  (emit "# invoke error handler eh_argcount")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    jmp *~s(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
 
 ;; Generate code for function that evaluates to the list of primitives
 ;; used by the error handlers

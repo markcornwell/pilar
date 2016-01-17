@@ -98,6 +98,8 @@
    [(fx- 3 #t) => "error:fx-: arg must be a fixnum\n"]
    [(fx* #f 3) => "error:fx*: arg must be a fixnum\n"]
    [(fx* 3 #t) => "error:fx*: arg must be a fixnum\n"]
+   [((lambda (x y)(cons x y)) 1 2 3) => "error:funcall: wrong number of args\n"]
+   [((lambda (x y)(cons x y)) 1) => "error:funcall: wrong number of args\n"]   
 )
 
 ;; (add-tests-with-string-output "S_error"

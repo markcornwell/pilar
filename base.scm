@@ -1,4 +1,8 @@
 ;;--------------------------------------------------------------------------------------
+;;
+;;
+;;
+;;--------------------------------------------------------------------------------------
 ;;                                Symbols libary
 ;;--------------------------------------------------------------------------------------
 ;;
@@ -26,7 +30,8 @@
 ;;
 ;; To read:     (with-input-from-file "symbol.scm" (lambda () (read))
 ;; To compile:  (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
-;; (with-output-to-file "symbol.s" (lambda () (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))))
+;; (with-output-to-file "symbol.s"
+;;     (lambda () (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))))
 ;; To compile this file (run-compil-lib)   ;; see tests-driver.scm
 ;;
 
@@ -151,11 +156,12 @@
      (set! p (cons 'fixnum->char p))
      (lambda () p))]
   
-  [eh_procedure  (lambda () (error 'funcall    "arg 1 must be a procedure"))]
+  [eh_procedure  (lambda ()  (error 'funcall    "arg 1 must be a procedure"))]
   [eh_fixnum     (lambda (i) (error (list-ref (primitives) i)  "arg must be a fixnum"))]
   [eh_string     (lambda (i) (error (list-ref (primitives) i)  "arg must be a string"))]
   [eh_character  (lambda (i) (error (list-ref (primitives) i)  "arg must be a character"))]
-  
+  [eh_argcount   (lambda ()  (error 'funcall "wrong number of args"))]
+ ;; [eh_argcount   (lambda ()  (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar
  ) ; end labels
  
  (begin #t)) 
