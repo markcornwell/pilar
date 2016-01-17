@@ -1,24 +1,24 @@
-# -536870912
+# (make-vector #t)
 # == explicit-begins  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-let*  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-shadowing  ==>
-# -536870912
+# (make-vector #t)
 # == vectorize-letrec  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-set!  ==>
-# -536870912
+# (make-vector #t)
 # == close-free-variables  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-quote  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-when/unless  ==>
-# -536870912
+# (make-vector #t)
 # == eliminate-cond  ==>
-# -536870912
+# (make-vector #t)
 # == external-symbols  ==>
-# -536870912
+# (make-vector #t)
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,8 +31,30 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr -536870912
-    movl $-2147483648, %eax     # immed -536870912
+# emit-expr (make-vector #t)
+# make-vector #t
+# emit-expr #t
+    movl $111, %eax     # immed #t
+# check the argument is a fixnum >= 0
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je _L_21559
+# invoke error handler eh_length
+    .extern eh$ulength
+    movl eh$ulength, %edi  # load handler
+    movl $0, %eax  # set arg count
+    movl $120,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+_L_21559:
+    movl %eax, %esi
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    orl  $5, %eax
+    addl $4, %esi
+    addl $4, %esi
+    andl $-8, %esi
+    addl %esi, %ebp
     ret
     .text
     .align 16, 0x90

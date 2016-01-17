@@ -1609,14 +1609,17 @@
 
 (define-primitive (car si env arg)
   (emit-expr si env arg)
+  (emit-check-pair 'car)
   (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
 
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
+  (emit-check-pair 'cdr)
   (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
 
 (define-primitive (set-car! si env u obj)
   (emit-expr si env u)
+  (emit-check-pair 'set-car!)
   (emit "    movl %eax, ~s(%esp)" si)  ;; save u
   (emit-expr (- si wordsize) env obj)  ;; eax = obj
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
@@ -1624,6 +1627,7 @@
 
 (define-primitive (set-cdr! si env u obj)
   (emit-expr si env u)
+  (emit-check-pair 'set-cdr!)
   (emit "    movl %eax, ~s(%esp)" si)  ;; save u
   (emit-expr (- si wordsize) env obj)  ;; eax = obj
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
@@ -1680,6 +1684,7 @@
 (define-primitive (make-vector si env length)
   (emit "# make-vector ~s" length)
   (emit-expr si env length)
+  (emit-check-length 'make-vector)
   (emit "    movl %eax, %esi")             ;; save length in esi as offset (not yet aliged)
   (emit "    movl %eax, 0(%ebp)")          ;; set the vector length field 
   (emit "    movl %ebp, %eax")             ;; save the base pointer as return value
@@ -1692,6 +1697,7 @@
 
 (define-primitive (vector-length si env v)
   (emit-expr si env v)                ;; eax <- vector + 5
+  (emit-check-vector 'vector-length)
   (emit "andl $-8, %eax")             ;; clear 3-bit tag to select 8-byte aligned value
   (emit "movl 0(%eax), %eax")         ;; follow pointer to get length
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
@@ -1941,14 +1947,6 @@
 (define-primitive (symbol-value si env arg)
   (emit-expr si env arg)
   (emit "    movl ~s(%eax), %eax" (- value-offset symbol-tag))) 
-
-(define-primitive (car si env arg)
-  (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
-
-(define-primitive (cdr si env arg)
-  (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
    
 ;;-----------------------------------------------------------------------------------
 ;;                            procedures and closures
@@ -2798,6 +2796,42 @@
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
+(define (emit-check-pair f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_pair)])
+	  (emit "# check the argument is a pair")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" pair-mask)
+	  (emit "    cmp $~s, %bl" pair-tag)
+	  (emit "    je ~a" cont)
+          (emit "# invoke error handler eh_pair")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-vector f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_vector)])
+	  (emit "# check the argument is a vector")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" vector-mask)
+	  (emit "    cmp $~s, %bl" vector-tag)
+	  (emit "    je ~a" cont)
+          (emit "# invoke error handler eh_vector")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
 (define (emit-check-string f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
 	(let ([cont (unique-label)]
@@ -2808,6 +2842,24 @@
 	  (emit "    cmp $~s, %bl" string-tag)
 	  (emit "    je ~a" cont)
           (emit "# invoke error handler eh_string")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $0, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-length f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_length)])
+	  (emit "# check the argument is a fixnum >= 0")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" fixnum-mask)
+	  (emit "    cmp $~s, %bl" fixnum-tag)
+	  (emit "    je ~a" cont)   
+          (emit "# invoke error handler eh_length")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
 	  (emit "    movl $0, %eax  # set arg count")

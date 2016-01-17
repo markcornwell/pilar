@@ -99,7 +99,14 @@
    [(fx* #f 3) => "error:fx*: arg must be a fixnum\n"]
    [(fx* 3 #t) => "error:fx*: arg must be a fixnum\n"]
    [((lambda (x y)(cons x y)) 1 2 3) => "error:funcall: wrong number of args\n"]
-   [((lambda (x y)(cons x y)) 1) => "error:funcall: wrong number of args\n"]   
+   [((lambda (x y)(cons x y)) 1) => "error:funcall: wrong number of args\n"]
+   [(cons 1 1) => "(1 . 1)\n"]
+   [(car #f) => "error:car: arg must be a pair\n"]
+   [(cdr 43) => "error:cdr: arg must be a pair\n"]
+   [(set-car! "foo" 42) => "error:set-car!: arg must be a pair\n"]
+   [(set-cdr! #\A #f) => "error:set-cdr!: arg must be a pair\n"]
+   [(make-vector #t) => "error:make-vector: length must be a fixnum >= 0\n"]
+   [(vector-length 43) => "error:vector-length: arg must be a vector\n"]
 )
 
 ;; (add-tests-with-string-output "S_error"

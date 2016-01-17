@@ -161,6 +161,9 @@
   [eh_string     (lambda (i) (error (list-ref (primitives) i)  "arg must be a string"))]
   [eh_character  (lambda (i) (error (list-ref (primitives) i)  "arg must be a character"))]
   [eh_argcount   (lambda ()  (error 'funcall "wrong number of args"))]
+  [eh_pair       (lambda (i) (error (list-ref (primitives) i)  "arg must be a pair"))]
+  [eh_vector     (lambda (i) (error (list-ref (primitives) i)  "arg must be a vector"))]
+  [eh_length     (lambda (i) (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
  ;; [eh_argcount   (lambda ()  (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar
  ) ; end labels
  
