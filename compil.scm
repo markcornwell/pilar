@@ -1159,7 +1159,7 @@
   (emit-init -8 env)       ;; return is at %esp, so start at %esp - 4
   (emit-expr -8 env expr)  ;; return is at %esp, so start at %esp - 4
   (emit "    ret")
-  (emit-function-header "_scheme_entry")    
+  (emit-function-header "_scheme_entry")
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)
   (emit "    movl %ebx, 4(%ecx)")
   (emit "    movl %esi, 16(%ecx)")
@@ -1684,7 +1684,8 @@
 (define-primitive (make-vector si env length)
   (emit "# make-vector ~s" length)
   (emit-expr si env length)
-  (emit-check-length 'make-vector)
+  (emit-check-fixnum 'make-vector)
+  (emit-check-nonneg 'make-vector)
   (emit "    movl %eax, %esi")             ;; save length in esi as offset (not yet aliged)
   (emit "    movl %eax, 0(%ebp)")          ;; set the vector length field 
   (emit "    movl %ebp, %eax")             ;; save the base pointer as return value
@@ -1704,8 +1705,11 @@
 
 (define-primitive (vector-set! si env vector k object)
   (emit-expr si env vector)
+  (emit-check-vector 'vector-set!)
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the vector
   (emit-expr (- si wordsize) env k)                 ;; eax <- k
+  (emit-check-fixnum 'vector-set!)
+  (emit-check-vector-index si 'vector-set!)         ;; check 0 <= k length(vector)
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
   (emit-expr (- si (* 2 wordsize)) env object)      ;; eax <- object
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
@@ -1715,8 +1719,10 @@
 
 (define-primitive (vector-ref si env vector k)
   (emit-expr si env vector)
+  (emit-check-vector 'vector-ref)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
   (emit-expr (- si wordsize) env k)      ;; eax <- k
+  (emit-check-vector-index si 'vector-ref)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
@@ -2793,7 +2799,7 @@
 	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
-	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
 (define (emit-check-pair f)  ;; uses ebx as a scratch register to check eax
@@ -2811,7 +2817,7 @@
 	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
-	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
 (define (emit-check-vector f)  ;; uses ebx as a scratch register to check eax
@@ -2829,7 +2835,7 @@
 	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
-	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
 (define (emit-check-string f)  ;; uses ebx as a scratch register to check eax
@@ -2847,25 +2853,44 @@
 	  (emit "    movl $0, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
-	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
-(define (emit-check-length f)  ;; uses ebx as a scratch register to check eax
-  (when *safe-primitives*
+(define (emit-check-nonneg f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*      ;; assumes length is a fixnum, checks if >= 0
 	(let ([cont (unique-label)]
 	      [eh (asmify 'eh_length)])
 	  (emit "# check the argument is a fixnum >= 0")
-	  (emit "    movl %eax,%ebx")
-	  (emit "    and $~s, %bl" fixnum-mask)
-	  (emit "    cmp $~s, %bl" fixnum-tag)
-	  (emit "    je ~a" cont)   
+	  (emit "    cmp $0,%eax")
+	  (emit "    jge ~a" cont)   
           (emit "# invoke error handler eh_length")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
-	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define  (emit-check-vector-index si f)  ;; vector at %esp+si, fixnum index in %eax
+  (when *safe-primitives*                ;; uses ebx as a scratch register
+	(let ([cont (unique-label)]
+	      [out-of-bounds (unique-label)]
+	      [eh (asmify 'eh_vector_index)])
+	  (emit "# check bounds on vector index")
+	  (emit "    movl ~s(%esp), %ebx" si)
+	  (emit "    cmp  %eax,~s(%ebx) " (- vector-tag))  
+	  (emit "    jle ~a" out-of-bounds)
+          (emit "    cmp  $0,%eax")  
+          (emit "    jge ~a" cont)
+	  (emit "~a:" out-of-bounds)
+	  (emit "# invoke error handler eh_vector_index")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a,%edi   # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 - pass the primitive index to identify the call
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
 (define (emit-save-arg-count argc)

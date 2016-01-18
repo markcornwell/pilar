@@ -1,6 +1,11 @@
 ;;--------------------------------------------------------------------------------------
-;;
-;;
+;;                              Base Runtime Library
+;;--------------------------------------------------------------------------------------
+;; This file is written in pilar scheme.  Instead of using petite scheme we use pilar
+;; compile this file into a assembly that we later will assemble and link as part of
+;; the compiled program.  Parts of the compiler itself us this library for basic
+;; capabilties such as managing symbols as runtime objects and managing error handling.
+;; Also core library functions are implemented here such string=? and list-ref.
 ;;
 ;;--------------------------------------------------------------------------------------
 ;;                                Symbols libary
@@ -31,9 +36,11 @@
 ;; To read:     (with-input-from-file "symbol.scm" (lambda () (read))
 ;; To compile:  (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
 ;; (with-output-to-file "symbol.s"
-;;     (lambda () (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))))
+;;     (lambda ()
+;;         (with-input-from-file "symbol.scm"
+;;                               (lambda () (emit-labels 0 '() (read))))))
 ;; To compile this file (run-compil-lib)   ;; see tests-driver.scm
-;;
+;;-------------------------------------------------------------------------------------
 
 (labels
  ([symbols
@@ -79,6 +86,10 @@
      (lambda (str)
        (str->sym str (symbols))))]
 
+;;----------------------------------------------------------------------------------
+;;                                      Lists
+;;----------------------------------------------------------------------------------
+
   [append1
    (lambda (lst elt)
      (if (null? lst)
@@ -86,10 +97,14 @@
 	 (cons (car lst) (append1 (cdr lst) elt))))]
 
   [list-ref
-   (lambda (lst k)
+   (lambda (l k)
      (if (fx= k 0)
-	 (car lst)
-	 (list-ref (cdr lst) (fx- k 1))))]
+	 (car l)
+	 (list-ref (cdr l) (fx- k 1))))]
+
+;;----------------------------------------------------------------------------------
+;;                         Handlers for Runtime Errors
+;;----------------------------------------------------------------------------------
 
   [error
    (let* ([write-stderr (lambda (s)
@@ -104,7 +119,10 @@
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
 
+;;--------------------------------------------------------------------------------------
 ;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
+;;--------------------------------------------------------------------------------------
+  
   [primitives
    (let ([p '()])
      (set! p (cons 'procedure? p))
@@ -156,15 +174,16 @@
      (set! p (cons 'fixnum->char p))
      (lambda () p))]
   
-  [eh_procedure  (lambda ()  (error 'funcall    "arg 1 must be a procedure"))]
-  [eh_fixnum     (lambda (i) (error (list-ref (primitives) i)  "arg must be a fixnum"))]
-  [eh_string     (lambda (i) (error (list-ref (primitives) i)  "arg must be a string"))]
-  [eh_character  (lambda (i) (error (list-ref (primitives) i)  "arg must be a character"))]
-  [eh_argcount   (lambda ()  (error 'funcall "wrong number of args"))]
-  [eh_pair       (lambda (i) (error (list-ref (primitives) i)  "arg must be a pair"))]
-  [eh_vector     (lambda (i) (error (list-ref (primitives) i)  "arg must be a vector"))]
-  [eh_length     (lambda (i) (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
- ;; [eh_argcount   (lambda ()  (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar
+  [eh_procedure    (lambda ()    (error 'funcall "arg 1 must be a procedure"))]
+  [eh_argcount     (lambda ()    (error 'funcall "wrong number of args"))]
+ ;[eh_argcount     (lambda ()    (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar  
+  [eh_fixnum       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a fixnum"))]
+  [eh_string       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a string"))]
+  [eh_character    (lambda (i)   (error (list-ref (primitives) i)  "arg must be a character"))]
+  [eh_pair         (lambda (i)   (error (list-ref (primitives) i)  "arg must be a pair"))]
+  [eh_vector       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a vector"))]
+  [eh_length       (lambda (i)   (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
+  [eh_vector_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
  ) ; end labels
  
  (begin #t)) 
