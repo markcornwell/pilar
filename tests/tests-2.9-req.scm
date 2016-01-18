@@ -5,10 +5,24 @@
    [(make-vector -1) => "error:make-vector: length must be a fixnum >= 0\n"]
    [(vector-length (make-vector 1)) => "1\n"]
    [(vector-length (make-vector 666)) => "666\n"]
-   [(vector-set! (make-vector 1) 1 #t) => "error:vector-set!: index out of bounds\n"] ;; <<-- segfault
+   [(vector-set! (make-vector 1) 1 #t) => "error:vector-set!: index out of bounds\n"]
    [(let ([v (make-vector 1)]) (vector-set! v 1 #t)) => "error:vector-set!: index out of bounds\n"]
    [(let ([v (make-vector 5)]) (vector-set! v -1 42)) => "error:vector-set!: index out of bounds\n"]
    [(let ([v (make-vector 2)]) (vector-set! v #f 3)) => "error:vector-set!: arg must be a fixnum\n"]
+   [(let ([v (make-vector 1)]) (vector-ref v 1)) => "error:vector-ref: index out of bounds\n"]
+   [(let ([v (make-vector 5)]) (vector-ref v -4)) => "error:vector-ref: index out of bounds\n"]
+   [(let ([v (make-vector 2)]) (vector-ref v #\Z)) => "error:vector-ref: arg must be a fixnum\n"]
+   [(make-string #t) => "error:make-string: arg must be a fixnum\n"]
+   [(make-string -42) => "error:make-string: length must be a fixnum >= 0\n"]
+   [(string-ref (make-string 2) 2) => "error:string-ref: index out of bounds\n"]
+   [(string-ref (make-string 2) -1) => "error:string-ref: index out of bounds\n"]
+   [(string-ref #t -1) => "error:string-ref: arg must be a string\n"]
+   [(string-length #t) => "error:string-length: arg must be a string\n"]
+   [(string-set! (make-string 2) 2 #\A) => "error:string-ref: index out of bounds\n"]
+   [(string-set! (make-string 2) -1 #\A) => "error:string-ref: index out of bounds\n"]
+   [(string-set! #t -1 #\A) => "error:string-ref: arg must be a string\n"]   
+   [(string-set! (make-string 2) #t #\A) => "error:string-ref: arg must be a fixnum\n"]
+   [(string-set! (make-string 2) 0 #f) => "error:string-ref: arg must be a character\n"]
 )
 
 (add-tests-with-string-output "error handlers"			      

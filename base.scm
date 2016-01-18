@@ -184,6 +184,7 @@
   [eh_vector       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a vector"))]
   [eh_length       (lambda (i)   (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
   [eh_vector_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
+  [eh_string_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
  ) ; end labels
  
  (begin #t)) 

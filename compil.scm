@@ -1722,6 +1722,7 @@
   (emit-check-vector 'vector-ref)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
   (emit-expr (- si wordsize) env k)      ;; eax <- k
+  (emit-check-fixnum 'vector-ref)
   (emit-check-vector-index si 'vector-ref)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
@@ -1747,6 +1748,8 @@
 (define-primitive (make-string si env len)
    (emit "# make-string len=~s" len)
    (emit-expr si env len)
+   (emit-check-fixnum 'make-string)
+   (emit-check-nonneg 'make-string)
    (emit "    movl %eax, %esi")           ;; esi = length (bytes x 4)
    (emit "    movl %eax, 0(%ebp)")        ;; set string-length field (bytes x 4)
    (emit "    movl %ebp, %eax")           ;; save the base pointer as return value
@@ -1771,12 +1774,16 @@
 
 (define-primitive (string-length si env str)
     (emit-expr si env str)
+    (emit-check-string 'string-length)
     (emit "    movl ~s(%eax), %eax" (- string-tag)))
 
 (define-primitive (string-ref si env str k)
   (emit-expr si env str)
+  (emit-check-string 'string-ref)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the string
   (emit-expr si env k)                   ;; eax = k (4 x bytes)
+  (emit-check-fixnum 'string-ref)
+  (emit-check-string-index si 'string-ref)
   (emit "    sar $~s, %eax" fixnum-shift)     ;; eax = k (bytes)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
   (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
@@ -1785,10 +1792,14 @@
    
 (define-primitive (string-set! si env str k char)
   (emit-expr si env str)
+  (emit-check-string 'string-set!)
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the string
-  (emit-expr si env k)                              ;; eax = k (4 x bytes)  
+  (emit-expr si env k)                              ;; eax = k (4 x bytes)
+  (emit-check-fixnum 'string-set!)
+  (emit-check-string-index si 'string-set!)
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
   (emit-expr (- si (* 2 wordsize)) env char)        ;; eax <- char
+  (emit-check-character 'string-set!)
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx <- string + 6
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k (4 x bytes)
   (emit "    sar $~s, %esi" fixnum-shift)                ;; esi = k bytes
@@ -2885,6 +2896,27 @@
           (emit "    jge ~a" cont)
 	  (emit "~a:" out-of-bounds)
 	  (emit "# invoke error handler eh_vector_index")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a,%edi   # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 - pass the primitive index to identify the call
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define  (emit-check-string-index si f)  ;; string at %esp+si, fixnum index in %eax
+  (when *safe-primitives*                ;; uses ebx as a scratch register
+	(let ([cont (unique-label)]
+	      [out-of-bounds (unique-label)]
+	      [eh (asmify 'eh_string_index)])
+	  (emit "# check bounds on string index")
+	  (emit "    movl ~s(%esp), %ebx" si)
+	  (emit "    cmp  %eax,~s(%ebx) " (- string-tag))  
+	  (emit "    jle ~a" out-of-bounds)
+          (emit "    cmp  $0,%eax")  
+          (emit "    jge ~a" cont)
+	  (emit "~a:" out-of-bounds)
+	  (emit "# invoke error handler eh_string_index")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a,%edi   # load handler" eh)
 	  (emit "    movl $4, %eax  # set arg count")
