@@ -1,5 +1,5 @@
 
-(add-tests-with-string-output "error handlers for vector primitives"
+(add-tests-with-string-output "error handlers for vectors"
    [(make-vector #t) => "error:make-vector: arg must be a fixnum\n"]
    [(vector-length 43) => "error:vector-length: arg must be a vector\n"]
    [(make-vector -1) => "error:make-vector: length must be a fixnum >= 0\n"]
@@ -12,20 +12,23 @@
    [(let ([v (make-vector 1)]) (vector-ref v 1)) => "error:vector-ref: index out of bounds\n"]
    [(let ([v (make-vector 5)]) (vector-ref v -4)) => "error:vector-ref: index out of bounds\n"]
    [(let ([v (make-vector 2)]) (vector-ref v #\Z)) => "error:vector-ref: arg must be a fixnum\n"]
+   )
+
+(add-tests-with-string-output "error handlers for strings"
    [(make-string #t) => "error:make-string: arg must be a fixnum\n"]
    [(make-string -42) => "error:make-string: length must be a fixnum >= 0\n"]
    [(string-ref (make-string 2) 2) => "error:string-ref: index out of bounds\n"]
    [(string-ref (make-string 2) -1) => "error:string-ref: index out of bounds\n"]
    [(string-ref #t -1) => "error:string-ref: arg must be a string\n"]
    [(string-length #t) => "error:string-length: arg must be a string\n"]
-   [(string-set! (make-string 2) 2 #\A) => "error:string-ref: index out of bounds\n"]
-   [(string-set! (make-string 2) -1 #\A) => "error:string-ref: index out of bounds\n"]
-   [(string-set! #t -1 #\A) => "error:string-ref: arg must be a string\n"]   
-   [(string-set! (make-string 2) #t #\A) => "error:string-ref: arg must be a fixnum\n"]
-   [(string-set! (make-string 2) 0 #f) => "error:string-ref: arg must be a character\n"]
-)
+   [(string-set! (make-string 2) 2 #\A) => "error:string-set!: index out of bounds\n"]
+   [(string-set! (make-string 2) -1 #\A) => "error:string-set!: index out of bounds\n"]
+   [(string-set! #t -1 #\A) => "error:string-set!: arg must be a string\n"]   
+   [(string-set! (make-string 2) #t #\A) => "error:string-set!: arg must be a fixnum\n"]
+   [(string-set! (make-string 2) 0 #f) => "error:string-set!: arg must be a character\n"]
+   )
 
-(add-tests-with-string-output "error handlers"			      
+(add-tests-with-string-output "error handlers for funcall"
    [(funcall #t) => "error:funcall: arg 1 must be a procedure\n"]
    [(funcall 14) => "error:funcall: arg 1 must be a procedure\n"]
    [(funcall #\A) => "error:funcall: arg 1 must be a procedure\n"]
@@ -36,11 +39,12 @@
    [(funcall 'funcall) => "error:funcall: arg 1 must be a procedure\n"]
    [(funcall (let ((x 2)) (fx+ x x))) => "error:funcall: arg 1 must be a procedure\n"]
    [(funcall '(a b)) => "error:funcall: arg 1 must be a procedure\n"]
+   [((lambda (x y)(cons x y)) 1 2 3) => "error:funcall: wrong number of args\n"]
+   [((lambda (x y)(cons x y)) 1) => "error:funcall: wrong number of args\n"] 
+   )
+
+(add-tests-with-string-output "error handlers for fixnum"			      
    [(fixnum->char #t) => "error:fixnum->char: arg must be a fixnum\n"]
-   [(char->fixnum 42) => "error:char->fixnum: arg must be a character\n"]
-   [(char=? #\A #t) => "error:char=?: arg must be a character\n"]
-   [(char=? #f #\B) => "error:char=?: arg must be a character\n"]   
-   [(char=? #t 14) => "error:char=?: arg must be a character\n"]
    [(fxlognot #t) => "error:fxlognot: arg must be a fixnum\n"]
    [(fxlogand #t #f) => "error:fxlogand: arg must be a fixnum\n"]
    [(fxlogor #t 12) => "error:fxlogor: arg must be a fixnum\n"]
@@ -63,14 +67,24 @@
    [(fx- 3 #t) => "error:fx-: arg must be a fixnum\n"]
    [(fx* #f 3) => "error:fx*: arg must be a fixnum\n"]
    [(fx* 3 #t) => "error:fx*: arg must be a fixnum\n"]
-   [((lambda (x y)(cons x y)) 1 2 3) => "error:funcall: wrong number of args\n"]
-   [((lambda (x y)(cons x y)) 1) => "error:funcall: wrong number of args\n"]
+   )
+
+(add-tests-with-string-output "error handlers for pair"
    [(cons 1 1) => "(1 . 1)\n"]
    [(car #f) => "error:car: arg must be a pair\n"]
    [(cdr 43) => "error:cdr: arg must be a pair\n"]
    [(set-car! "foo" 42) => "error:set-car!: arg must be a pair\n"]
    [(set-cdr! #\A #f) => "error:set-cdr!: arg must be a pair\n"]
-)
+   [(cons #t (car #f)) => "error:car: arg must be a pair\n"]
+   )
+
+
+(add-tests-with-string-output "error handlers for char"
+  [(char->fixnum 42) => "error:char->fixnum: arg must be a character\n"]
+   [(char=? #\A #t) => "error:char=?: arg must be a character\n"]
+   [(char=? #f #\B) => "error:char=?: arg must be a character\n"]   
+   [(char=? #t 14) => "error:char=?: arg must be a character\n"]
+   )
 
 (add-tests-with-string-output "exit"
     [(foreign-call "s_foo") => "foo\n#t\n"]		      

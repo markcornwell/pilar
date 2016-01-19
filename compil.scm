@@ -57,10 +57,10 @@
 ;;
 ;;             +--------------+         +-----------+           +-----------+
 ;;             |   Source     |         |  Code     |           |   GNU     |
-;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |-->
 ;;     SL      |  Transforms  |         |           |    ASM    |           |
 ;;             +--------------+         +-----------+           +-----------+
-;;                Stage  I                Stage II
+;;                Stage  I                Stage II               Stage III
 ;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
@@ -89,7 +89,7 @@
 ;;       |  (begin E ...)
 ;;       |  (if E E E)
 ;;       |  (P E E* ...)        
-;;       |  (E E E* ...)        
+;;       |  (E E E* ...)      
 ;;       |  (closure (V ...) (V...) E)
 ;;       |  (let ((V E) ...) E)
 ;;       |  (labels ((V E) ...) E)
@@ -124,6 +124,30 @@
 ;; 3.15 Foreign Functions
 
 ;;------------------------------------------------------------------------------
+;;                               Compiler Options
+;;------------------------------------------------------------------------------
+
+;;------------------------------------------------------------------------------
+;;                        Generation of Run-time Checks
+;;------------------------------------------------------------------------------
+;;  Robust error checking is essential for development.  Debugging goes faster
+;;  when you have a useful error message than it does when you have to track down
+;;  a segfault using the llvm debugger.
+;;
+;;  You also want the ability to turn off generation of unnecessary runtime checks
+;;  when speed is critical, say, in move tree search of a chess program.
+;;
+;;  The following switches enable and disable the generation of code that performs
+;;  runtime error checking.  See the section Error Checking and Safe Primitives
+;;  for details.  They are all interpreted by the Code Generation Stage.
+;;------------------------------------------------------------------------------
+
+(define *safe* #f)
+(define *safe-procedures* *safe*)  ;; check attempts to call non-procedures
+(define *safe-arg-counts* *safe*)  ;; check number of arguments passed at run time
+(define *safe-primitives* *safe*)  ;; check valid arguments passed to primitives
+
+;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
 ;;------------------------------------------------------------------------------
 
@@ -142,7 +166,7 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(if *safe* (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
@@ -1023,24 +1047,7 @@
 ;;                              PART II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 
-;;-----------------------------------------------------------------------------------
-;;                       Switches for Optional Run-time Checks
-;;-----------------------------------------------------------------------------------
-;;  Robust error checking is essential for development.  Debugging goes faster
-;;  when you have a useful error message than it does when you have to track down
-;;  a segfault using the llvm debugger.
-;;
-;;  But you also want the ability to turn off runtime checking when speed is
-;;  critical, say, in move tree search of a chess program.
-;;
-;;  The following switches enable and disable the generation of code that performs
-;;  runtime error checking.  See the section Error Checking and Safe Primitives
-;;  for details.
-;;-----------------------------------------------------------------------------------
 
-(define *safe-procedures* #t)  ;; check attempts to call non-procedures
-(define *safe-arg-counts* #t)  ;; check number of arguments passed at run time
-(define *safe-primitives* #t)  ;; check types on arguments passed to primitives
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Proper Tail Recursion
@@ -2764,15 +2771,16 @@
 
 (define (emit-check-procedure)  ;; uses ebx as a scratch register to check eax
   (when *safe-procedures*
-	(let ([cont (unique-label)])
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_procedure)])
 	  (emit "# check the funcall op is a procedure")
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" closure-mask)
 	  (emit "    cmp $~s, %bl" closure-tag)
 	  (emit "    je ~s" cont)
           (emit "# invoke error handler funcall_non_procedure")
-	  (emit "    .extern eh_procedure")
-          (emit "    movl ~a, %edi  # load handler" (asmify 'eh_procedure))
+	  (emit "    .extern ~a" eh)
+          (emit "    movl ~a, %edi  # load handler" eh)
           (emit "    movl $0, %eax  # set arg count")
           (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
 	  (emit "~s:" cont))))
@@ -2861,7 +2869,7 @@
           (emit "# invoke error handler eh_string")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
-	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    movl $4, %eax  # set arg count")
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
