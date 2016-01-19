@@ -111,9 +111,9 @@
 ;; 3.5 Local Variables
 ;; 3.6 Conditional Expressions
 ;; 3.7 Heap Allocation
-;; 1.9.3  String (tutorial)
-;; 1.9.2  Vector (tutorial)
 ;; 1.9.1  Pair   (tutorial)
+;; 1.9.2  Vector (tutorial)
+;; 1.9.3  String (tutorial)
 ;; 3.8 Procedure Calls
 ;; 3.9 Closures
 ;; 3.10 Proper Tail Calls
@@ -122,6 +122,8 @@
 ;; 3.13 Extending the Syntax
 ;; 3.14 Symbols, Libraries, and Separate Compilation
 ;; 3.15 Foreign Functions
+;; 3.16 Error Handling and Safe Primitives
+;; 3.17 Variable-arity Procedures
 
 ;;------------------------------------------------------------------------------
 ;;                               Compiler Options
