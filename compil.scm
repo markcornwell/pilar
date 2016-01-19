@@ -142,7 +142,7 @@
 ;;  for details.  They are all interpreted by the Code Generation Stage.
 ;;------------------------------------------------------------------------------
 
-(define *safe* #f)
+(define *safe* #t)
 (define *safe-procedures* *safe*)  ;; check attempts to call non-procedures
 (define *safe-arg-counts* *safe*)  ;; check number of arguments passed at run time
 (define *safe-primitives* *safe*)  ;; check valid arguments passed to primitives
