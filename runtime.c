@@ -50,7 +50,7 @@ static void print_symbol (symbol y);
 
 static void print_ptr(ptr x) {
   
-   fprintf(stderr,"print_ptr %x\n", x);  /* DEBUG */
+  // fprintf(stderr,"print_ptr %x\n", x);  /* DEBUG */
    
    if ((x & fx_mask) == fx_tag) {
        printf("%d", ((int) x) >> fx_shift);
@@ -97,7 +97,7 @@ static void print_ptr(ptr x) {
 }
 
 static void print_string (string s) {
-  fprintf(stderr,"print_string %p", s);
+  //fprintf(stderr,"print_string %p", s);
   if (((int) s & -4) != (int) s)  {
     printf("error: print_string: s=%x must be 8-byte aligned\n", (unsigned int) s);
     exit(-1);
@@ -117,7 +117,7 @@ static void print_symbol (symbol y) {
 }
 
 static void print_pairs (pair p) {
-  fprintf(stderr,"print_pairs %p (car=%x  cdr=%x)\n", p ,p->car, p->cdr);
+  //fprintf(stderr,"print_pairs %p (car=%x  cdr=%x)\n", p ,p->car, p->cdr);
   if (((int) p & -8) != (int) p)  {
     printf("error: print_pairs p=%x must be 8-byte aligned\n", (unsigned int) p);
     exit(-1);
@@ -136,7 +136,7 @@ static void print_pairs (pair p) {
 
 static void print_vector(vector v) {
   unsigned int len = (v->len)/4;
-  fprintf(stderr,"print_vector %p\n", v);
+  //fprintf(stderr,"print_vector %p\n", v);
   for (int i=0; i< len ; i++) {
     //fprintf(stderr,"print_vector{len=%i,i=%i}\n",len,i);  /* DEBUG */
     print_ptr(v->elt[i]);

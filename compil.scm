@@ -57,10 +57,10 @@
 ;;
 ;;             +--------------+         +-----------+           +-----------+
 ;;             |   Source     |         |  Code     |           |   GNU     |
-;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |
+;;   Source -->|  to Source   |-->IL -->| Generator |--> x86 -->| Assembler |-->
 ;;     SL      |  Transforms  |         |           |    ASM    |           |
 ;;             +--------------+         +-----------+           +-----------+
-;;                Stage  I                Stage II
+;;                Stage  I                Stage II               Stage III
 ;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
@@ -89,7 +89,7 @@
 ;;       |  (begin E ...)
 ;;       |  (if E E E)
 ;;       |  (P E E* ...)        
-;;       |  (E E E* ...)        
+;;       |  (E E E* ...)      
 ;;       |  (closure (V ...) (V...) E)
 ;;       |  (let ((V E) ...) E)
 ;;       |  (labels ((V E) ...) E)
@@ -111,9 +111,9 @@
 ;; 3.5 Local Variables
 ;; 3.6 Conditional Expressions
 ;; 3.7 Heap Allocation
-;; 1.9.3  String (tutorial)
-;; 1.9.2  Vector (tutorial)
 ;; 1.9.1  Pair   (tutorial)
+;; 1.9.2  Vector (tutorial)
+;; 1.9.3  String (tutorial)
 ;; 3.8 Procedure Calls
 ;; 3.9 Closures
 ;; 3.10 Proper Tail Calls
@@ -122,6 +122,32 @@
 ;; 3.13 Extending the Syntax
 ;; 3.14 Symbols, Libraries, and Separate Compilation
 ;; 3.15 Foreign Functions
+;; 3.16 Error Handling and Safe Primitives
+;; 3.17 Variable-arity Procedures
+
+;;------------------------------------------------------------------------------
+;;                               Compiler Options
+;;------------------------------------------------------------------------------
+
+;;------------------------------------------------------------------------------
+;;                        Generation of Run-time Checks
+;;------------------------------------------------------------------------------
+;;  Robust error checking is essential for development.  Debugging goes faster
+;;  when you have a useful error message than it does when you have to track down
+;;  a segfault using the llvm debugger.
+;;
+;;  You also want the ability to turn off generation of unnecessary runtime checks
+;;  when speed is critical, say, in move tree search of a chess program.
+;;
+;;  The following switches enable and disable the generation of code that performs
+;;  runtime error checking.  See the section Error Checking and Safe Primitives
+;;  for details.  They are all interpreted by the Code Generation Stage.
+;;------------------------------------------------------------------------------
+
+(define *safe* #t)
+(define *safe-procedures* *safe*)  ;; check attempts to call non-procedures
+(define *safe-arg-counts* *safe*)  ;; check number of arguments passed at run time
+(define *safe-primitives* *safe*)  ;; check valid arguments passed to primitives
 
 ;;------------------------------------------------------------------------------
 ;;                                 REGRESSION  TEST
@@ -142,7 +168,7 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
-(load "tests/tests-2.9-req.scm")  ;; foreign calls exit, S_error
+(if *safe* (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
 ;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 
@@ -286,7 +312,7 @@
    [else expr]))
 
 ;;-----------------------------------------------------------------------------------
-;;                     Eliminate-let*
+;;                              Eliminate-let*
 ;;-----------------------------------------------------------------------------------
 ;;  Every let* form can be transformed to an equivalent for of nested let forms
 ;;
@@ -299,8 +325,7 @@
 ;;   (let ((v1 E1))  (let ((v2 E2)) E))
 ;;
 ;;  This generalizes to any number of let* arguments.  Notice our tranformation as
-;;  defined below buys us a little bit of optimization when the list of bindings is
-;;  empty.
+;;  buys us a little bit of optimization when the list of bindings is empty.
 ;;
 ;;  (let* () E) ==[eliminate-let*]==> E
 ;;-----------------------------------------------------------------------------------
@@ -930,7 +955,7 @@
 ;;-----------------------------------------------------------------------------------
 ;; External symbols have their values stored in memory at locations denoted by
 ;; global labels that are defined in separately linked library files.
-;;------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------
 ;; asmify maps scheme identifiers to assembler identifiers by substituting legal
 ;; escape sequences for illegal special characters.
 ;;
@@ -942,7 +967,7 @@
 ;;
 ;;            ! $ % & * + - . / : < = > ? @ ^ _ ~
 ;;
-;;------------------------------------------------------------------------------
+;;----------------------------------------------------------------------------------
 
 (define (asmify s)
   (list->string (asmify1 (string->list (symbol->string s)))))
@@ -993,13 +1018,23 @@
 ;; Then at code generation time, we recognize those forms and emit code to fetch
 ;; the datum from memory using the global labels defined by the library.
 ;;---------------------------------------------------------------------------------
+;;
+;; ISSUE: Should we provide a way to pull this list from a header file or the
+;; library's published interface?
+;;
+;; There are decent reasons for enumerating imports as we do here.  Makes it
+;; explicit what we are importing and from where we import it.
 
 (import-from (base)
 	     string->symbol
 	     symbols
 	     string=?
 	     append1
-	     error)
+	     error
+	     eh_procedure
+	     eh_argcount
+	     primitives
+	     list-ref)
 
 (define-transform (external-symbols expr)
   (cond
@@ -1133,7 +1168,7 @@
   (emit-init -8 env)       ;; return is at %esp, so start at %esp - 4
   (emit-expr -8 env expr)  ;; return is at %esp, so start at %esp - 4
   (emit "    ret")
-  (emit-function-header "_scheme_entry")    
+  (emit-function-header "_scheme_entry")
   (emit "    movl 4(%esp), %ecx")   ;; linkage assume i386 (32 bit)
   (emit "    movl %ebx, 4(%ecx)")
   (emit "    movl %esi, 16(%ecx)")
@@ -1187,13 +1222,13 @@
 ;;-----------------------------------------------------------------------------------
 ;;  Constants
 
-(define fxshift         2)
-(define fxmask       #b00000011)   ; #x03
-(define fxtag        #b00000000)   ; #x00
+(define fixnum-shift         2)
+(define fixnum-mask       #b00000011)   ; #x03
+(define fixnum-tag        #b00000000)   ; #x00
 
-(define cshift          8)
-(define ctag         #b00001111) ; #x0F
-(define cmask        #b11111111)
+(define char-shift          8)
+(define char-tag         #b00001111) ; #x0F
+(define char-mask        #b11111111)
 
 (define bool-f       #b00101111) ; #x2F
 (define bool-t       #b01101111) ; #x6F
@@ -1229,7 +1264,7 @@
 (define nil-value    #b00111111) ; #x3F)
 (define wordsize        4) ; bytes
 
-(define fixnum-bits (- (* wordsize 8) fxshift))
+(define fixnum-bits (- (* wordsize 8) fixnum-shift))
 
 (define fxlower (- (expt 2 (- fixnum-bits 1))))
 
@@ -1243,9 +1278,9 @@
 
 (define (immediate-rep x)
    (cond
-      [(fixnum? x) (ash x fxshift)]
+      [(fixnum? x) (ash x fixnum-shift)]
       [(boolean? x) (if x bool-t bool-f) ]
-      [(char? x) (logor (ash (char->integer x) cshift) ctag) ]
+      [(char? x) (logor (ash (char->integer x) char-shift) char-tag) ]
       [(null? x) nil-value ]))
 
 ;;-----------------------------------------------------------------------------------
@@ -1255,7 +1290,15 @@
 ;; information such as the number of parameters and procedure to emit code for the
 ;; primitive.  'primcall' relies on this information to generate code for primitive
 ;; calls.
+;;
+;; To support error handling, we keep a list of all primitives assigning each a
+;; unique fixnum code corresponding to its ordinal position in the list.
 ;;-----------------------------------------------------------------------------------
+
+(define *primitive-count* 0)
+(define *primitive-names* '())
+(define (primitive-code name)
+  (getprop name '*primitive-code*))
 
 (define-syntax define-primitive
   (syntax-rules ()
@@ -1263,7 +1306,10 @@
      (begin
        (putprop 'prim-name '*is-prim* #t)
        (putprop 'prim-name '*arg-count*
-            (length '(arg* ...)))
+		(length '(arg* ...)))
+       (set! *primitive-names* (cons 'prim-name *primitive-names*))
+       (putprop 'prim-name '*primitive-code* *primitive-count*)
+       (set! *primitive-count* (+ 1 *primitive-count*))        
        (putprop 'prim-name '*emitter*
 		(lambda (si env arg* ...) b b* ...)))]))
 
@@ -1273,13 +1319,15 @@
 
 (define-primitive (fixnum->char si env arg)
   (emit-expr si env arg)
-  (emit "    shll $~s, %eax" (- cshift fxshift))
-  (emit "    orl $~s, %eax" ctag))
+  (emit-check-fixnum 'fixnum->char)
+  (emit "    shll $~s, %eax" (- char-shift fixnum-shift))
+  (emit "    orl $~s, %eax" char-tag))
 
 (define-primitive (char->fixnum si env arg)
-    (emit-expr si env arg)
-    (emit "   shrl $~s, %eax" cshift)
-    (emit "   shll $~s, %eax" fxshift))
+  (emit-expr si env arg)
+  (emit-check-character 'char->fixnum)
+  (emit "   shrl $~s, %eax" char-shift)
+  (emit "   shll $~s, %eax" fixnum-shift))
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Disjoint Types
@@ -1297,8 +1345,8 @@
 
 (define-primitive (char? si env arg)
     (emit-expr si env arg)
-    (emit "    and $~s, %eax" cmask)
-    (emit "    cmp $~s, %eax" ctag)
+    (emit "    and $~s, %eax" char-mask)
+    (emit "    cmp $~s, %eax" char-tag)
      ;; convert the cc to a boolean
     (emit "    sete %al")
     (emit "    movzbl %al, %eax")
@@ -1307,8 +1355,8 @@
 
 (define-primitive (fixnum? si env arg)
   (emit-expr si env arg)
-  (emit "    and $~s, %al" fxmask)
-  (emit "    cmp $~s, %al" fxtag)
+  (emit "    and $~s, %al" fixnum-mask)
+  (emit "    cmp $~s, %al" fixnum-tag)
   (emit "    sete %al")
   (emit "    movzbl %al, %eax")
   (emit "    sal $~s, %al" bool-bit)
@@ -1357,8 +1405,10 @@
 (define-primitive (char=? si env c1 c2)
   (emit "# char= c1=~s c2=~s" c1 c2)
   (emit-expr si env c1)                ;; eax = c1
+  (emit-check-character 'char=?)
   (emit "    movb %ah, ~s(%esp)" si)   ;; save c1
   (emit-expr (- si wordsize) env c2)   ;; eax = c2
+  (emit-check-character 'char=?)
   (emit "    cmp %ah, ~s(%esp)" si)    ;; compare c1 c2
   ;; convert the cc to a boolean
   (emit "    sete %al")
@@ -1374,19 +1424,24 @@
 
 (define-primitive (fxlognot si env arg)
   (emit-expr si env arg)
-  (emit "    or $~s, %al" fxmask)
+  (emit-check-fixnum 'fxlognot)
+  (emit "    or $~s, %al" fixnum-mask)
   (emit "    notl %eax"))
 
 (define-primitive (fxlogand si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fxlogand)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fxlogand)
   (emit "    and ~s(%esp), %eax" si))
 
 (define-primitive (fxlogor si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fxlogor)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fxlogor)
   (emit "    or ~s(%esp), %eax" si))
 
 ;;-----------------------------------------------------------------------------------
@@ -1404,16 +1459,19 @@
 
 (define-primitive (fxadd1 si env arg)
   (emit-expr si env arg)
+  (emit-check-fixnum 'fxadd1)
   (emit "     addl $~s, %eax" (immediate-rep 1)))
 
 (define-primitive (fxsub1 si env arg)
-    (emit-expr si env arg)
-    (emit "    addl $~s, %eax" (immediate-rep -1)))
+  (emit-expr si env arg)
+  (emit-check-fixnum 'fxsub1)
+  (emit "    addl $~s, %eax" (immediate-rep -1)))
 
 ;;-----------------------------------------------------------------------------------
 
 (define-primitive (fxzero? si env arg)
-    (emit-expr si env arg)
+  (emit-expr si env arg)
+    (emit-check-fixnum 'fxzero?)
     (emit "    cmp $0, %eax")
     ;; convert the cc to a boolean
     (emit "    sete %al")
@@ -1423,8 +1481,10 @@
 
 (define-primitive (fx= si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    sete %al")
@@ -1434,8 +1494,10 @@
 
 (define-primitive (fx< si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx<)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx<)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setl %al")
@@ -1445,8 +1507,10 @@
 
 (define-primitive (fx<= si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx<=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx<=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setle %al")
@@ -1456,8 +1520,10 @@
 
 (define-primitive (fx> si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx>)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx>)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setg %al")
@@ -1467,8 +1533,10 @@
 
 (define-primitive (fx>= si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx>=)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx>=)
   (emit "    cmp ~s(%esp), %eax" si)
   ;; convert the cc to a boolean
   (emit "    setge %al")
@@ -1480,22 +1548,30 @@
 
 (define-primitive (fx+ si env arg1 arg2)  ;; swaped arg eval order
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx+)
   (emit "    movl %eax, ~s(%esp)  # fx+ push arg1" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx+)
   (emit "    addl ~s(%esp), %eax  # fx+ arg1 arg2" si))
 
 (define-primitive (fx- si env arg1 arg2)
   (emit-expr si env arg2)
+  (emit-check-fixnum 'fx-)
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx-)
   (emit "    subl ~s(%esp), %eax" si))
 
 (define-primitive (fx* si env arg1 arg2)
   (emit-expr si env arg2)
-  (emit "    sar $~s, %eax" fxshift)   ;; 4x/4
+  (emit-check-fixnum 'fx*)
+  (emit "    sar $~s, %eax" fixnum-shift)   ;; 4x/4
   (emit "    movl %eax, ~s(%esp)" si)
   (emit-expr (- si wordsize) env arg1)
+  (emit-check-fixnum 'fx*)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
+
+;; ---------------- Error checks inserted up to here -----------
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Pairs
@@ -1542,14 +1618,17 @@
 
 (define-primitive (car si env arg)
   (emit-expr si env arg)
+  (emit-check-pair 'car)
   (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
 
 (define-primitive (cdr si env arg)
   (emit-expr si env arg)
+  (emit-check-pair 'cdr)
   (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
 
 (define-primitive (set-car! si env u obj)
   (emit-expr si env u)
+  (emit-check-pair 'set-car!)
   (emit "    movl %eax, ~s(%esp)" si)  ;; save u
   (emit-expr (- si wordsize) env obj)  ;; eax = obj
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
@@ -1557,6 +1636,7 @@
 
 (define-primitive (set-cdr! si env u obj)
   (emit-expr si env u)
+  (emit-check-pair 'set-cdr!)
   (emit "    movl %eax, ~s(%esp)" si)  ;; save u
   (emit-expr (- si wordsize) env obj)  ;; eax = obj
   (emit "    movl ~s(%esp), %ebx" si)  ;; ebx = u
@@ -1613,6 +1693,8 @@
 (define-primitive (make-vector si env length)
   (emit "# make-vector ~s" length)
   (emit-expr si env length)
+  (emit-check-fixnum 'make-vector)
+  (emit-check-nonneg 'make-vector)
   (emit "    movl %eax, %esi")             ;; save length in esi as offset (not yet aliged)
   (emit "    movl %eax, 0(%ebp)")          ;; set the vector length field 
   (emit "    movl %ebp, %eax")             ;; save the base pointer as return value
@@ -1625,14 +1707,18 @@
 
 (define-primitive (vector-length si env v)
   (emit-expr si env v)                ;; eax <- vector + 5
+  (emit-check-vector 'vector-length)
   (emit "andl $-8, %eax")             ;; clear 3-bit tag to select 8-byte aligned value
   (emit "movl 0(%eax), %eax")         ;; follow pointer to get length
   )   ;; length always 4-byte aligned, coincidentally already a fixnum
 
 (define-primitive (vector-set! si env vector k object)
   (emit-expr si env vector)
+  (emit-check-vector 'vector-set!)
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the vector
   (emit-expr (- si wordsize) env k)                 ;; eax <- k
+  (emit-check-fixnum 'vector-set!)
+  (emit-check-vector-index si 'vector-set!)         ;; check 0 <= k length(vector)
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
   (emit-expr (- si (* 2 wordsize)) env object)      ;; eax <- object
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx = vector + 5
@@ -1642,8 +1728,11 @@
 
 (define-primitive (vector-ref si env vector k)
   (emit-expr si env vector)
+  (emit-check-vector 'vector-ref)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector
   (emit-expr (- si wordsize) env k)      ;; eax <- k
+  (emit-check-fixnum 'vector-ref)
+  (emit-check-vector-index si 'vector-ref)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
@@ -1668,11 +1757,13 @@
 (define-primitive (make-string si env len)
    (emit "# make-string len=~s" len)
    (emit-expr si env len)
+   (emit-check-fixnum 'make-string)
+   (emit-check-nonneg 'make-string)
    (emit "    movl %eax, %esi")           ;; esi = length (bytes x 4)
    (emit "    movl %eax, 0(%ebp)")        ;; set string-length field (bytes x 4)
    (emit "    movl %ebp, %eax")           ;; save the base pointer as return value
    (emit "    orl $~s, %eax" string-tag)  ;; set the tag in the lower 3 bits   
-   (emit "    sar $~s, %esi" fxshift)     ;; esi = divide by 4 to get length (bytes)
+   (emit "    sar $~s, %esi" fixnum-shift)     ;; esi = divide by 4 to get length (bytes)
    (emit "    add $~s, %esi" wordsize)    ;; account for length field (4 bytes)
                                           ;; align esi to 8-bytes:
    (emit "    add $7, %esi")              ;;    first add 7
@@ -1692,27 +1783,35 @@
 
 (define-primitive (string-length si env str)
     (emit-expr si env str)
+    (emit-check-string 'string-length)
     (emit "    movl ~s(%eax), %eax" (- string-tag)))
 
 (define-primitive (string-ref si env str k)
   (emit-expr si env str)
+  (emit-check-string 'string-ref)
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the string
   (emit-expr si env k)                   ;; eax = k (4 x bytes)
-  (emit "    sar $~s, %eax" fxshift)     ;; eax = k (bytes)
+  (emit-check-fixnum 'string-ref)
+  (emit-check-string-index si 'string-ref)
+  (emit "    sar $~s, %eax" fixnum-shift)     ;; eax = k (bytes)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
   (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
-  (emit "    sal $~s, %eax" cshift)      ;; shift char to content position
-  (emit "    or  $~s, %eax" ctag))       ;; affix the tag
+  (emit "    sal $~s, %eax" char-shift)      ;; shift char to content position
+  (emit "    or  $~s, %eax" char-tag))       ;; affix the tag
    
 (define-primitive (string-set! si env str k char)
   (emit-expr si env str)
+  (emit-check-string 'string-set!)
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the string
-  (emit-expr si env k)                              ;; eax = k (4 x bytes)  
+  (emit-expr si env k)                              ;; eax = k (4 x bytes)
+  (emit-check-fixnum 'string-set!)
+  (emit-check-string-index si 'string-set!)
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
   (emit-expr (- si (* 2 wordsize)) env char)        ;; eax <- char
+  (emit-check-character 'string-set!)
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx <- string + 6
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k (4 x bytes)
-  (emit "    sar $~s, %esi" fxshift)                ;; esi = k bytes
+  (emit "    sar $~s, %esi" fixnum-shift)                ;; esi = k bytes
   (emit "    movb  %ah, -2(%ebx,%esi)"))            ;; s[k] <- object  -2  tag(-6) + lenfield_size(4)
 
 ;;-----------------------------------------------------------------------------------
@@ -1874,14 +1973,6 @@
 (define-primitive (symbol-value si env arg)
   (emit-expr si env arg)
   (emit "    movl ~s(%eax), %eax" (- value-offset symbol-tag))) 
-
-(define-primitive (car si env arg)
-  (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- car-offset pair-tag)))
-
-(define-primitive (cdr si env arg)
-  (emit-expr si env arg)
-  (emit "    movl ~s(%eax), %eax" (- cdr-offset pair-tag)))
    
 ;;-----------------------------------------------------------------------------------
 ;;                            procedures and closures
@@ -2184,31 +2275,31 @@
 
 (define empty? null?)
 
-;;-------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;      Procedure Call           (funcall f arg* ...)
-;;-------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;  
-;;     +--  +------------+         si           +--    +------------+
-;;     |    |   arg 3    |         |            |      |   arg 3    |                (si - 20) -> si' - 16
-;;     |    +------------+         V            |      +------------+
-;; outgoing |   arg 2    |  %esp - 32        incoming  |   arg 2    |  %esp - 12     (si - 16) -> si' - 12
-;; args     +------------+                   args      +------------+
-;;     |    |   arg 1    |  %esp - 28           |      |   arg 1    |  %esp - 8      (si - 12) -> si' - 8
-;;     +--  +------------+                      +--    +------------+
-;;          |            |  %esp - 24                  |  closure   |  %esp - 4      (si - 8)  -> si' - 4
-;;          +------------+                             +------------+
-;;          |            |  %esp - 20        base -->  |  return    |  %esp          (si + 4)  -> si'
-;;     +--  +------------+                             +------------+
-;;     |    |  local 3   |  %esp - 16    +---------->                              (C) How callee's frame
-;;     |    +------------+               |                                             looks to caller
-;;  locals  |  local 2   |  %esp - 12    |          (B)  Callee's view                 with respect to si
-;;     |    +------------+               |                                               
-;;     |    |  local 1   |  %esp - 8     si        old eip = return point
-;;     +--  +------------+               |         old edi = saved closure ptr
-;;          |  closure   |  %esp - 4     |         Note that args/locals
-;;          +------------+               |           start at %esp - 8
-;; base --> |  return    |  %esp    <----+
-;;          +------------+                         si = offset to top stack elt when funcall happens
+;;     +--  +------------+         si          +--    +------------+
+;;     |    |   arg 3    |         |           |      |   arg 3    |            (si-20)->si'-16
+;;     |    +------------+         V           |      +------------+
+;; outgoing |   arg 2    |  esp - 32        incoming  |   arg 2    |  esp - 12  (si-16)->si'-12
+;; args     +------------+                  args      +------------+
+;;     |    |   arg 1    |  esp - 28           |      |   arg 1    |  esp - 8   (si-12)->si'-8
+;;     +--  +------------+                     +--    +------------+
+;;          |            |  esp - 24                  |  closure   |  esp - 4   (si-8)->si'-4
+;;          +------------+                            +------------+
+;;          |            |  esp - 20        base -->  |  return    |  esp       (si+4)->si'
+;;     +--  +------------+                            +------------+
+;;     |    |  local 3   |  esp - 16    +---------->                       (C) How callee frame
+;;     |    +------------+              |                                      looks to caller
+;;  locals  |  local 2   |  esp - 12    |          (B)  Callee's view          wrt si
+;;     |    +------------+              |                                               
+;;     |    |  local 1   |  esp - 8    si        old eip = return point
+;;     +--  +------------+              |         old edi = saved closure ptr
+;;          |  closure   |  esp - 4     |         Note that args/locals
+;;          +------------+              |           start at %esp - 8
+;; base --> |  return    |  esp    <----+
+;;          +------------+                         si = offset to top stack elt at funcall
 ;;           high address                               (in this example -16)  
 ;;                       
 ;;        (A) Caller's view                        si-8 = amount to shift the stack base
@@ -2219,7 +2310,7 @@
 ;;        The callee simply returns and does not mess with the closure slot
 ;;
 ;;                                              figure 3
-;;-----------------------------------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 
 ;;-----------------------------------------------------------------------------------
 ;;   Invariants
@@ -2231,14 +2322,13 @@
 ;;  esp - 4 - 4N - i  local var i... (optional)
 ;;  esp - 4 - 4N      local argN     (optional)
 ;;  esp - 8           local arg 1    (optional)
-;;  esp - 4           closure pointer   |  used to restore ecp when callee returns
-;;  esp - 0           return pointer    |  when the frame goes away
+;;  esp - 4           closure pointer |  used to restore ecp when callee returns
+;;  esp - 0           return pointer  |  when the frame goes away
 ;;
 ;;-----------------------------------------------------------------------------------
 
 (define funcall-args cddr)
 (define funcall-oper cadr)
-
 
 (define (emit-funcall si env expr)
   
@@ -2260,6 +2350,12 @@
   ;; Evaluate the funcall-oper and stash it esp+si+8
   ;; This becomes the next frame's closure slot.  See figure 3. (B)(C)
   (emit-expr (- si 8) env (funcall-oper expr))
+
+  ;; check that funcall-oper is a procedure and if not call error handler
+  ;; uses ebx as a scratch register.
+  (emit-check-procedure)
+
+
   (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
 
   ;; evaluate the arguments ar1 ... argN and push on stack
@@ -2270,6 +2366,9 @@
 
   (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
+  ;; save argument count where called function can check it
+  (emit-save-arg-count (length (funcall-args expr)))
+  
   ;; call first bumps %esp by 4 and then saves %eip at 0(%esp).  
   (emit "    call *-2(%edi)        # call thru closure ptr")
                                    ;; closure ptr in %eax since arg1 emitted last
@@ -2322,6 +2421,9 @@
   (emit-shift-frame (1+ (length (funcall-args expr)))  ;; size
 		    si                                 ;; si
 		    (- (abs si) 4))                    ;; delta
+
+  ;; save argument count where called function can check it
+  (emit-save-arg-count (length (funcall-args expr)))
   
   (emit "    jmp *-2(%edi)  # tail-funcall")
   )  ;; jump to closure entry point
@@ -2447,6 +2549,7 @@
     ;;------------------------------------------------------------------
     
     (emit "~a:" entry-point)         ;; this is the label that we put in the closure
+    (emit-check-arg-count (length formals))
     (let f ([fmls formals]
 	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
 	    [env closed-env])      
@@ -2608,4 +2711,253 @@
   (emit-foreign-call si env expr)
   (emit "     ret"))
 
+;;---------------------------------------------------------------------------
+;;                      Error Checking and Safe Primitives
+;;---------------------------------------------------------------------------
+;; Using our newly acquired ability to write and exit, we can define a simple
+;; error procedure that takes two arguments: a symbol (denoting the caller of
+;; error), and a string (describing the error). The error procedure would
+;; write an error message to the console, then causes the program to exit.
 
+;; With error, we can secure some parts of our implementation to provide
+;; better debugging facilities. Better debugging allows us to progress with
+;; implementing the rest of the system more quickly since we won’t have to
+;; hunt for the causes of segfaults.
+;;
+;; There are three main causes of fatal errors:
+;;
+;; 1. Attempting to call non-procedures.
+;;
+;; 2. Passing an incorrect number of arguments to a procedure.
+;;
+;; 3. Calling primitives with invalid arguments.  For example: performing
+;;    (car 5) causes an immediate segfault. Worse, performing vector-set! with
+;;    an index that’s out of range causes other parts of the system to get corrupted,
+;;    resulting in hard-to- debug errors.
+;;
+;; Calling nonprocedures can be handled by performing a procedure check before
+;; making the procedure call. If the operator is not a procedure, control is
+;; transferred to an error handler label that sets up a call to a procedure that
+;; reports the error and exits.
+;;
+;; Passing an incorrect number of arguments to a procedure can be handled by a
+;; collaboration from the caller and the callee. The caller, once it performs
+;; the procedure check, sets the value of the %eax register to be the number of
+;; arguments passed. The callee checks that the value of %eax is consistent with
+;; the number of arguments it expects. Invalid arguments cause a jump to a label
+;; that calls a procedure that reports the error and exits.
+;;
+;; For primitive calls, we can modify the compiler to insert explicit checks at
+;; every primitive call. For example, car translates to:
+;;
+;;    movl %eax, %ebx
+;;    andl $7, %ebx
+;;    cmpl $1, %ebx
+;;    jne L_car_error
+;;    movl -1(%eax), %eax
+;;    ...
+;; L_car_error:
+;;    movl car_err_proc, %edi  # load handler
+;;    movl $0, %eax            # set arg-count
+;;    jmp *-3(%edi)            # call the handler
+;;    ...
+;;
+;; Another approach is to restrict the compiler to unsafe primitives. Calls to
+;; safe primitives are not open-coded by the compiler, instead, a procedure call
+;; to the safe primitive is issued. The safe primitives are defined to perform
+;; the error checks themselves. Although this strategy is less efficient than
+;; open-coding the safe primitives, the implementation is much simpler and less
+;; error-prone.
+;;                                             Quoted from (Ghuloum 2006)
+;;------------------------------------------------------------------------------
+
+(define (emit-check-procedure)  ;; uses ebx as a scratch register to check eax
+  (when *safe-procedures*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_procedure)])
+	  (emit "# check the funcall op is a procedure")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" closure-mask)
+	  (emit "    cmp $~s, %bl" closure-tag)
+	  (emit "    je ~s" cont)
+          (emit "# invoke error handler funcall_non_procedure")
+	  (emit "    .extern ~a" eh)
+          (emit "    movl ~a, %edi  # load handler" eh)
+          (emit "    movl $0, %eax  # set arg count")
+          (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~s:" cont))))
+
+(define (emit-check-fixnum f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_fixnum)])
+	  (emit "# check the argument is a fixnum")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" fixnum-mask)
+	  (emit "    cmp $~s, %bl" fixnum-tag)
+	  (emit "    je ~s" cont)
+          (emit "# error handler eh_fixnum")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-character f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_character)])
+	  (emit "# check the argument is a char")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" char-mask)
+	  (emit "    cmp $~s, %bl" char-tag)
+	  (emit "    je ~s" cont)
+          (emit "# invoke error handler eh_character")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-pair f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_pair)])
+	  (emit "# check the argument is a pair")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" pair-mask)
+	  (emit "    cmp $~s, %bl" pair-tag)
+	  (emit "    je ~a" cont)
+          (emit "# invoke error handler eh_pair")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-vector f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_vector)])
+	  (emit "# check the argument is a vector")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" vector-mask)
+	  (emit "    cmp $~s, %bl" vector-tag)
+	  (emit "    je ~a" cont)
+          (emit "# invoke error handler eh_vector")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-string f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_string)])
+	  (emit "# check the argument is a string")
+	  (emit "    movl %eax,%ebx")
+	  (emit "    and $~s, %bl" string-mask)
+	  (emit "    cmp $~s, %bl" string-tag)
+	  (emit "    je ~a" cont)
+          (emit "# invoke error handler eh_string")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-check-nonneg f)  ;; uses ebx as a scratch register to check eax
+  (when *safe-primitives*      ;; assumes length is a fixnum, checks if >= 0
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_length)])
+	  (emit "# check the argument is a fixnum >= 0")
+	  (emit "    cmp $0,%eax")
+	  (emit "    jge ~a" cont)   
+          (emit "# invoke error handler eh_length")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define  (emit-check-vector-index si f)  ;; vector at %esp+si, fixnum index in %eax
+  (when *safe-primitives*                ;; uses ebx as a scratch register
+	(let ([cont (unique-label)]
+	      [out-of-bounds (unique-label)]
+	      [eh (asmify 'eh_vector_index)])
+	  (emit "# check bounds on vector index")
+	  (emit "    movl ~s(%esp), %ebx" si)
+	  (emit "    cmp  %eax,~s(%ebx) " (- vector-tag))  
+	  (emit "    jle ~a" out-of-bounds)
+          (emit "    cmp  $0,%eax")  
+          (emit "    jge ~a" cont)
+	  (emit "~a:" out-of-bounds)
+	  (emit "# invoke error handler eh_vector_index")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a,%edi   # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 - pass the primitive index to identify the call
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define  (emit-check-string-index si f)  ;; string at %esp+si, fixnum index in %eax
+  (when *safe-primitives*                ;; uses ebx as a scratch register
+	(let ([cont (unique-label)]
+	      [out-of-bounds (unique-label)]
+	      [eh (asmify 'eh_string_index)])
+	  (emit "# check bounds on string index")
+	  (emit "    movl ~s(%esp), %ebx" si)
+	  (emit "    cmp  %eax,~s(%ebx) " (- string-tag))  
+	  (emit "    jle ~a" out-of-bounds)
+          (emit "    cmp  $0,%eax")  
+          (emit "    jge ~a" cont)
+	  (emit "~a:" out-of-bounds)
+	  (emit "# invoke error handler eh_string_index")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a,%edi   # load handler" eh)
+	  (emit "    movl $4, %eax  # set arg count")
+	  ;; step on arg1 - pass the primitive index to identify the call
+	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
+	  (emit "    jmp *~a(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+(define (emit-save-arg-count argc)
+  (when *safe-arg-counts*
+	(emit "    movl $~s,%eax   # save arg count" (* 4 argc))))
+
+(define (emit-check-arg-count argc)
+  (when *safe-arg-counts*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_argcount)])
+	  (emit "# check argument count")
+	  (emit "    cmp $~s,%eax" (* 4 argc))
+	  (emit "    je ~a" cont)
+	  (emit "# invoke error handler eh_argcount")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    jmp *~s(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
+;; Generate code for function that evaluates to the list of primitives
+;; used by the error handlers
+
+(define (generate-primitives)
+  `(primitives (let ((p nil))
+		 ,@(map (lambda (f) `(set! p (cons (quote ,f) p)))
+			*primitive-names*)
+		 (lambda () p))))
