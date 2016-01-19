@@ -2961,3 +2961,83 @@
 		 ,@(map (lambda (f) `(set! p (cons (quote ,f) p)))
 			*primitive-names*)
 		 (lambda () p))))
+
+;;----------------------------------------------------------------------------------------
+;;                              Variable-arity Procedures
+;;----------------------------------------------------------------------------------------
+;; Scheme procedures that accept a variable number of arguments are easy to implement in
+;; the architecture we defined so far. Suppose a procedure is defined to accept two or
+;; more arguments as in the following example:
+;;
+;;     (let ((f (lambda (a b . c) (vector a b c))))
+;;         (f 1 2 3 4))
+;;
+;; The call to f passes four arguments in the stack locations %esp-4, %esp-8, %esp-12,
+;; and %esp-16 in addition to the number of arguments in %eax. Upon entry of f, and after
+;; performing the argument check, f enters a loop that constructs a list of the arguments
+;; last to front.
+;;
+;; Implementing variable-arity procedures allows us to define many library procedures that
+;; accept any number of arguments including +, -, *, =, <, ..., char=?, char<?, ...,
+;; string=?, string<?, . . . , list, vector, string, and append.
+;;
+;; Other variations of lambda such as case-lambda, which allows us to dispatch different
+;; parts of the code depending on the number of actual arguments, can be implemented easily
+;; and efficiently by a series of comparisons and conditional jumps.
+;;----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+;;----------------------------------------------------------------------------------------
+;;                                           Apply
+;;----------------------------------------------------------------------------------------
+;; The implementation of the apply primitive is analogous to the implementation of
+;; variable-arity procedures. Procedures accepting variable number of arguments convert
+;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
+;; splices a list of arguments onto the stack.
+;;
+;; When the code generator encounters an apply call, it generates the code in the same
+;; manner as if it were a regular procedure call. The operands are evaluated and saved in
+;; their appropriate stack locations as usual. The operator is evaluated and checked. In
+;; case of nontail calls, the current closure pointer is saved and the stack pointer is
+;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
+;; The number of arguments is placed in %eax as usual. The only difference is that instead
+;; of calling the procedure directly, we call/jmp to the L apply label which splices the
+;; last argument on the stack before transferring control to the destination procedure.
+;;
+;; Implementing apply makes it possible to define the library procedures that take a
+;; function as well as an arbitrary number of arguments such as map and for-each.
+;;----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+;;----------------------------------------------------------------------------------------
+;;                                      Output Ports
+;;----------------------------------------------------------------------------------------
+;; The functionality provided by our compiler so far allows us to implement output ports
+;; easily in Scheme. We represent output ports by vector containing the following fields:
+;;
+;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
+;; 1. A string denoting the file name associated with the port.
+;; 2. A file-descriptor associated with the opened file.
+;; 3. A string that serves as an output buffer.
+;; 4. An index pointing to the next position in the buffer.
+;; 5. The size of the buffer.
+;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
+;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
+;; reduce the num- ber of trips to the operating system. The procedure write-char writes
+;; to the buffer, increments the index, and if the index of the port reaches its size, the
+;; contents of the buffer are flushed us- ing s write (from 3.15) and the index is reset.
+;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
+;; are also implemented.
+;;----------------------------------------------------------------------------------------
