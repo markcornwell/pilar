@@ -168,10 +168,10 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
+
+(load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 (if *safe* (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
-;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
-
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
@@ -2501,7 +2501,10 @@
 ;;
 ;; Consider that set! will not work since a variable introduced by let or lambda
 ;; might be stored both in the closure and on the stack.  Use Dybvig's rewrite to
-;; replace any such variables with singleton vectors to solve this. 
+;; replace any such variables with singleton vectors to solve this.
+;;-----------------------------------------------------------------------------------
+;;  TBD: Variable number of args must be implemented here.  Caller supplies the
+;;  argument count in %eax.  Compiler must recongize  args  and (a b . args) forms
 ;;-----------------------------------------------------------------------------------
 
 (define (closure? expr)
@@ -2511,12 +2514,12 @@
 (define closure-freevars third)
 (define closure-body fourth)
 
-(define (emit-closure si env expr)
+(define (emit-closure si env expr)         ;;  TBD variable number args goes in here
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
   (emit "# expr = ~s" expr)  
-  (let* ([formals (closure-formals expr)]
+  (let* ([formals (closure-formals expr)]    ;; TBD  generalized <formals>
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
 	 [closed-env (extend-closure-env env freevars)]
@@ -2550,11 +2553,11 @@
     
     (emit "~a:" entry-point)         ;; this is the label that we put in the closure
     (emit-check-arg-count (length formals))
-    (let f ([fmls formals]
+    (let f ([fmls formals]                  ;; <<<<---------- formals -------<<<<
 	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
 	    [env closed-env])      
       (cond
-       [(empty? fmls)
+       [(empty? fmls)                      ;; <<<<---------- formals -------<<<<
 	(emit-tail-expr si env body)]
        [else
 	(f (rest fmls)
@@ -2568,7 +2571,7 @@
   (emit-closure si env expr)
   (emit "   ret"))
 
- (define (extend-formals-env env fmsl)
+ (define (extend-formals-env env fmsl)   ;; <<<<---------- formals -------<<<<
    (let f ([fmls fmsl] [ci (* -2 wordsize)] [env env])  ;; Why -2 * wordsize??  = -8
     (cond
      [(empty? fmls) env]
@@ -2965,6 +2968,30 @@
 ;;----------------------------------------------------------------------------------------
 ;;                              Variable-arity Procedures
 ;;----------------------------------------------------------------------------------------
+;;
+;;  (lambda <formals> <body>)
+;;
+;;  Syntax: <Formals> should be a formal arguments list as described below, and ⟨body⟩
+;;  should be a sequence of one or more expressions.
+;;
+;;  <Formals> should have one of the following forms:
+;;
+;;  o (<variable1> ...): The procedure takes a fixed number of arguments; when the
+;;    procedure is called, the arguments will be stored in the bindings of the
+;;    corresponding variables.
+;;
+;; o  <variable>: The procedure takes any number of arguments; when the procedure is
+;;    called, the sequence of actual arguments is converted into a newly allocated list
+;;    and the list is stored in the binding of the ⟨variable⟩.
+;;
+;; o  (<variable 1> ... <variable n> ⟩ . <variable n+1>): If a space-delimited period
+;;    precedes the last variable, then the procedure takes n or more arguments, where
+;;    n is the number of formal arguments before the period (there must be at least one).
+;;    The value stored in the binding of the last variable will be a newly allocated
+;;    list of the actual arguments left over after all the other actual arguments have
+;;    been matched up against the other formal arguments.
+;;                                                                 (R5RS, p.9)
+;;----------------------------------------------------------------------------------------
 ;; Scheme procedures that accept a variable number of arguments are easy to implement in
 ;; the architecture we defined so far. Suppose a procedure is defined to accept two or
 ;; more arguments as in the following example:
@@ -2984,11 +3011,14 @@
 ;; Other variations of lambda such as case-lambda, which allows us to dispatch different
 ;; parts of the code depending on the number of actual arguments, can be implemented easily
 ;; and efficiently by a series of comparisons and conditional jumps.
+;;                                                                        (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
-
-
-
-
+;;  Two aspects -- (a) code generation and (b) pre-processing steps
+;;
+;;  code generation seems to be confined to emit-closure, best I can tell.
+;;  pre-processing assumptions ??  look for closure formals in transforms.   (MRC)
+;;  fix up the grammers in comments as needed
+;;----------------------------------------------------------------------------------------
 
 
 
@@ -3011,6 +3041,7 @@
 ;;
 ;; Implementing apply makes it possible to define the library procedures that take a
 ;; function as well as an arbitrary number of arguments such as map and for-each.
+;; (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
 
 
@@ -3039,5 +3070,5 @@
 ;; to the buffer, increments the index, and if the index of the port reaches its size, the
 ;; contents of the buffer are flushed us- ing s write (from 3.15) and the index is reset.
 ;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
-;; are also implemented.
+;; are also implemented. (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
