@@ -508,6 +508,9 @@
 ;;     (closure (y) (x)
 ;;         (closure () (x y) (fx+ x y))))
 ;;
+;;
+;; <formals> ::=  (v1...vk) | args | (v1...vk . args)
+;;
 ;;-----------------------------------------------------------------------------------
 
 (define (lambda? expr)
@@ -521,14 +524,22 @@
       (error 'lambda-body "ill-formed lambda expression")))
 
 (define-transform (close-free-variables expr)
-   (close-free '() expr))
+  (close-free '() expr))
+
+(define (flatten-formals formals)
+  (cond
+   [(null? formals) '()]
+   [(symbol? formals) (list formals)]
+   [(pair? formals) (cons (car formals) (flatten-formals (cdr formals)))]
+   [else (error 'flatten-formals "ill-formed formal parameters list")]))
 
 (define (close-free bound-vars expr)
   (cond
    [(lambda? expr)
-    (let* ([formals (lambda-formals expr)]
-	   [freevars (free-variables formals (lambda-body expr))]
-	   [body (close-free formals (lambda-body expr))])
+    (let* ([formals (lambda-formals expr)]   ;; <--- formals
+	   [flat-formals (flatten-formals formals)]
+	   [freevars (free-variables flat-formals (lambda-body expr))] ;; <--- formals
+	   [body (close-free flat-formals (lambda-body expr))])  ;; <---- formals
       (list 'closure formals freevars body))]
    [(let? expr)
     (let* ([bindings (let-bindings expr)]
@@ -602,7 +613,7 @@
 			 '()
 			 (list expr))]
    [(lambda? expr)
-      (free-variables (merg (lambda-formals expr)
+      (free-variables (merg (flatten-formals (lambda-formals expr))
 			      bound-vars)
 		      (lambda-body expr))]
    [(let? expr)
@@ -1089,7 +1100,10 @@
 	     eh_procedure
 	     eh_argcount
 	     primitives
-	     list-ref)
+	     list-ref
+	     list-length
+	    ;; vector
+	     )
 
 (define-transform (external-symbols expr)
   (cond
@@ -1791,6 +1805,11 @@
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
+
+;; moved to library base.scm
+;;
+;; TBD: integrate it back in as a special case
+;;
 (define-primitive (vector si env x)
   (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector+5
@@ -2644,39 +2663,88 @@
     (emit "    .align 4,0x90")
     (emit "~a:" exit-point)))
 
-;; At runtime build a list of the extended arguments.  Given arglist
-;; of form (v1...vk . args) observe that eax is the total number of
-;; args.  We already checked that eax >= k. Recall eax is already
-;; scaled as a fixnum.  si is the offset from %esp we used to bind
-;; the variable that will get assigned the args list.
+;;----------------------------------------------------------------------------------------
+;; At runtime build a list of the extended arguments.  Given arglist of form
+;; (v1...vk . args) observe that eax is the total number of args.  We already checked that
+;; eax >= k. Recall eax is already scaled as a fixnum.  si is the offset from %esp we used
+;; to bind the variable that will get assigned the args list.
+;;
+;;              +-------------+                             +-----------+
+;;              |   arg K+N   | <--- esp-si-8-              |  arg K+N  |<-+
+;;              +-------------+                             +-----------+  |
+;;              |   arg K+2   |                             |     ()    |  |
+;;              +-------------+                             +-----------+  | 
+;;              |   arg K+1   |                         +-->|  arg K+2  |  |
+;;              +-------------+                         |   +-----------+  |
+;;    esp - si  |    arg K    |                         |   |     *-----|--+
+;;              +-------------+                         |   +-----------+
+;;              |     ...     |                         |   |  arg K+1  |
+;;              +-------------+                         |   +-----------+
+;;              |    arg 1    |                         +---|-----*     |  <---- esi - pair-tag
+;;              +-------------+                             +-----------+
+;;              |   closure   |                             |           |  <---- ebp
+;;              +-------------+                             +-----------+
+;;      esp  -->|   return    |
+;;              +-------------+      Initially  eax = 4 * (K+N)
+;;
+;;
+;;----------------------------------------------------------------------------------------
+
+
+;; What is the loop invariant?
+;;
+;;
+;;
+
+;; (define (emit-build-varargs-list si env formals)
+;;   (let ([cont (unique-label)]
+;; 	[loop (unique-label)])
+;;     (emit "# emit-build-varargs-list")
+;;     (emit "    movl $~a, %esi # args <- () " nil-value si) ;; collect args in esi
+;;     (emit "~a:" loop)
+;;     (emit "# while (eax > min number of formals)")
+;;     (emit "    cmpl $~s,%eax" (* 4 (varargs-min formals)))
+;;     (emit "    je ~a" cont)
+;;     (emit "# put args into cdr[new]")
+;;     (emit "    movl ~s(%esp),%ebx" si)  
+;;     (emit "    movl %ebx, ~s(%ebp)" cdr-offset)     ;; args -> cdr[new]
+;;     (emit "# put arg[eax] into car[new]")    
+;;     (emit "    movl %esp, %ebx")                    ;; esp-eax-4 -> ebx
+;;     (emit "    subl %eax, %ebx")                    ;;  " 
+;;     (emit "    subl $4, %ebx")
+;;     (emit "    movl 0(%ebx), %ebx")
+;;     (emit "    movl %ebx, ~s(%ebp)" car-offset)     ;; arg[eax] -> car[new]
+;;     (emit "    movl %ebp, %ebx")                    ;; get ptr to cons'd pair
+;;     (emit "    orl   $~s, %ebx" pair-tag)             ;; or in the pair tag
+;;     (emit "    addl  $~s, %ebp" size-pair)          ;; bump heap ptr
+;;     (emit "# args <- new")
+;;     (emit "    movl %ebx, ~s(%esp)" si)             ;; new -> args
+;;     (emit "# decrement eax")
+;;     (emit "    subl $4, %eax")                      ;; eax <- eax-4
+;;     (emit "    jmp ~a" loop)
+;;     (emit "~a:" cont)))
 
 (define (emit-build-varargs-list si env formals)
   (let ([cont (unique-label)]
 	[loop (unique-label)])
     (emit "# emit-build-varargs-list")
-    (emit "    movl $~a,~s(%esp) # args <- () "  nil-value si)
+    (emit "    movl $~a, %esi       # args <- () " nil-value) ;; collect args in %esi
+    (emit "    lea -8(%eax),%edi    # edi <- exp-8-eax")
+    (emit "    subl %esp, %edi")
     (emit "~a:" loop)
-    (emit "# while (eax > min number of formals)")
-    (emit "    cmpl $~s,%eax" (* 4 (varargs-min formals)))
+    (emit "    lea ~s(%esp),%ebx" si)
+    (emit "    cmp %edi, %ebx       # while edi <> esp-si")
     (emit "    je ~a" cont)
-    (emit "# put args into cdr[new]")
-    (emit "    movl ~s(%esp),%ebx" si)  
-    (emit "    movl %ebx, ~s(%ebp)" cdr-offset)     ;; args -> cdr[new]
-    (emit "# put arg[eax] into car[new]")    
-    (emit "    movl %esp, %ebx")                    ;; esp-eax-4 -> ebx
-    (emit "    subl %eax, %ebx")                    ;;  " 
-    (emit "    subl $4, %ebx")
-    (emit "    movl 0(%ebx), %ebx")
-    (emit "    movl %ebx, ~s(%ebp)" car-offset)     ;; arg[eax] -> car[new]
-    (emit "    movl %ebp, %ebx")                    ;; get ptr to cons'd pair
-    (emit "    orl   $~s, %ebx" pair-tag)             ;; or in the pair tag
-    (emit "    addl  $~s, %ebp" size-pair)          ;; bump heap ptr
-    (emit "# args <- new")
-    (emit "    movl %ebx, ~s(%esp)" si)             ;; new -> args
-    (emit "# decrement eax")
-    (emit "    subl $4, %eax")                      ;; eax <- eax-4
+    (emit "    movl (%edi),%ebx     # arg i -> car")   ;; <<<--- blows here
+    (emit "    movl %ebx, ~s(%ebp)" car-offset)
+    (emit "    movl %esi, ~s(%ebp)  # esi -> cdr" cdr-offset)
+    (emit "    movl %ebp, %esi")
+    (emit "    addl $~s, %esi       # bump heap ptr" pair-tag)
+    (emit "    addl $8,%ebp")
+    (emit "    subl $4,%edi")
     (emit "    jmp ~a" loop)
-    (emit "~a:" cont)))
+    (emit "~a:" cont)
+    (emit "    movl %esi, ~s(%esp)  # set args" si)))
 
 ;; (define-primitive (cons si env arg1 arg2)
 ;;   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
