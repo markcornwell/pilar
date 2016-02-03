@@ -1805,11 +1805,12 @@
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
 
-
+;;
 ;; moved to library base.scm
 ;;
 ;; TBD: integrate it back in as a special case
 ;;
+
 (define-primitive (vector si env x)
   (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector+5
@@ -2654,7 +2655,7 @@
 	(emit-tail-expr si env body)]
        [(symbol? fmls)                      ;; works for both args and (a b . args)
 	(let ([env (extend-env si env fmls)])
-	  (emit-build-varargs-list si env formals)
+	  (emit-build-varargs-list si env)
 	  (emit-tail-expr (- si wordsize) env body))]
        [else
 	(f (rest fmls)
@@ -2666,82 +2667,61 @@
 ;;----------------------------------------------------------------------------------------
 ;; At runtime build a list of the extended arguments.  Given arglist of form
 ;; (v1...vk . args) observe that eax is the total number of args.  We already checked that
-;; eax >= k. Recall eax is already scaled as a fixnum.  si is the offset from %esp we used
-;; to bind the variable that will get assigned the args list.
-;;
+;; eax >= k. Recall eax is already scaled to 4 bytes because we represent it as a fixnum.
+;; si is the offset from %esp we used to bind the variable that will get assigned the args
+;; list.  Recall si<0 is a negative number.  So adding it to esp grows stack towards low
+;; addresses.
+;;                low addr                                    low addr
 ;;              +-------------+                             +-----------+
-;;              |   arg K+N   | <--- esp-si-8-              |  arg K+N  |<-+
+;;              |   arg K+N   |<-- esp-4-eax <-- edi        |  arg K+N  |<-+
 ;;              +-------------+                             +-----------+  |
 ;;              |   arg K+2   |                             |     ()    |  |
-;;              +-------------+                             +-----------+  | 
-;;              |   arg K+1   |                         +-->|  arg K+2  |  |
+;;              +-------------+                             +-----------+  |
+;;    esp+si   |   arg K+1   |  args                   +-->|  arg K+2  |  |
 ;;              +-------------+                         |   +-----------+  |
-;;    esp - si  |    arg K    |                         |   |     *-----|--+
+;;  esp+(si+4)  |    arg K    |                         |   |     *-----|--+
 ;;              +-------------+                         |   +-----------+
-;;              |     ...     |                         |   |  arg K+1  |
+;;              |     ...     |                         |   |  arg K+1  |  <--- esi - pair-tag
 ;;              +-------------+                         |   +-----------+
-;;              |    arg 1    |                         +---|-----*     |  <---- esi - pair-tag
+;;   esp - 8    |    arg 1    |                         +---|-----*     |
 ;;              +-------------+                             +-----------+
-;;              |   closure   |                             |           |  <---- ebp
+;;   esp - 4    |   closure   |                             |           |  <---- ebp
 ;;              +-------------+                             +-----------+
-;;      esp  -->|   return    |
-;;              +-------------+      Initially  eax = 4 * (K+N)
+;;      esp  -->|   return    |                               high addr
+;;              +-------------+
+;;                high addr
 ;;
-;;
+;;  Initially  eax = 4*(K+N) ~~ caller's arg count as a fixnum
+;;  Initially  esi = nil-value  ~~ the datum representing empty list
+;;  Use esi to build up args list from pairs. (arg[K+1] ... arg[K+N])
+;;  Use edi to step down the args on the stack starting with arg[K+N]
+;;  Use ebx as a scratch register.  Recall si<0 by convention.
+;;  Note the terminiating condition on our loop is edi<>esp+(si+4).
+;;  Consider boundary conditions.
+;;  If there are no extended arguments (ie. N=0), the terminating condition
+;;  is met immediately and we skip the body of the loop.  Since esi was
+;;  initialized to () it holds right value for args, where args is our
+;;  varying list of extended arguments.
 ;;----------------------------------------------------------------------------------------
 
-
-;; What is the loop invariant?
-;;
-;;
-;;
-
-;; (define (emit-build-varargs-list si env formals)
-;;   (let ([cont (unique-label)]
-;; 	[loop (unique-label)])
-;;     (emit "# emit-build-varargs-list")
-;;     (emit "    movl $~a, %esi # args <- () " nil-value si) ;; collect args in esi
-;;     (emit "~a:" loop)
-;;     (emit "# while (eax > min number of formals)")
-;;     (emit "    cmpl $~s,%eax" (* 4 (varargs-min formals)))
-;;     (emit "    je ~a" cont)
-;;     (emit "# put args into cdr[new]")
-;;     (emit "    movl ~s(%esp),%ebx" si)  
-;;     (emit "    movl %ebx, ~s(%ebp)" cdr-offset)     ;; args -> cdr[new]
-;;     (emit "# put arg[eax] into car[new]")    
-;;     (emit "    movl %esp, %ebx")                    ;; esp-eax-4 -> ebx
-;;     (emit "    subl %eax, %ebx")                    ;;  " 
-;;     (emit "    subl $4, %ebx")
-;;     (emit "    movl 0(%ebx), %ebx")
-;;     (emit "    movl %ebx, ~s(%ebp)" car-offset)     ;; arg[eax] -> car[new]
-;;     (emit "    movl %ebp, %ebx")                    ;; get ptr to cons'd pair
-;;     (emit "    orl   $~s, %ebx" pair-tag)             ;; or in the pair tag
-;;     (emit "    addl  $~s, %ebp" size-pair)          ;; bump heap ptr
-;;     (emit "# args <- new")
-;;     (emit "    movl %ebx, ~s(%esp)" si)             ;; new -> args
-;;     (emit "# decrement eax")
-;;     (emit "    subl $4, %eax")                      ;; eax <- eax-4
-;;     (emit "    jmp ~a" loop)
-;;     (emit "~a:" cont)))
-
-(define (emit-build-varargs-list si env formals)
+(define (emit-build-varargs-list si env)
   (let ([cont (unique-label)]
-	[loop (unique-label)])
+        [loop (unique-label)])
     (emit "# emit-build-varargs-list")
     (emit "    movl $~a, %esi       # args <- () " nil-value) ;; collect args in %esi
-    (emit "    lea -8(%eax),%edi    # edi <- exp-8-eax")
-    (emit "    subl %esp, %edi")
+    (emit "    lea -4(%esp),%edi    # edi <- esp-4")
+    (emit "    subl %eax, %edi      # edi <- esp-4-eax    addr of arg[K+N] on stack")
     (emit "~a:" loop)
-    (emit "    lea ~s(%esp),%ebx" si)
-    (emit "    cmp %edi, %ebx       # while edi <> esp-si")
+    (emit "    lea ~s(%esp),%ebx    # addr of arg[K] on stack" (+ si 4))
+    (emit "    cmp %edi, %ebx       # while edi <> esp+(si+4)")
     (emit "    je ~a" cont)
-    (emit "    movl (%edi),%ebx     # arg i -> car")   ;; <<<--- blows here
+    (emit "    movl (%edi),%ebx     # arg i -> car")  ;;  <<---- BLOWS HERE
     (emit "    movl %ebx, ~s(%ebp)" car-offset)
     (emit "    movl %esi, ~s(%ebp)  # esi -> cdr" cdr-offset)
     (emit "    movl %ebp, %esi")
-    (emit "    addl $~s, %esi       # bump heap ptr" pair-tag)
-    (emit "    addl $8,%ebp")
-    (emit "    subl $4,%edi")
+    (emit "    addl $~s, %esi       # tag as pair" pair-tag)
+    (emit "    addl $8,%ebp         # bump heap ptr")
+    (emit "    addl $4,%edi         # move to next previous arg from the end")
     (emit "    jmp ~a" loop)
     (emit "~a:" cont)
     (emit "    movl %esi, ~s(%esp)  # set args" si)))
