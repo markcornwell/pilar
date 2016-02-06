@@ -126,6 +126,23 @@
   	   (fill-vector v 0 args))))]
 
 ;;----------------------------------------------------------------------------------
+;;                                     Strings
+;;----------------------------------------------------------------------------------
+
+  [string
+   (letrec
+       ([fill-string
+  	 (lambda (s k args)
+  	   (if (null? args)
+  	       s
+  	       (begin
+  		 (string-set! s k (car args))
+  		 (fill-string s (fxadd1 k) (cdr args)))))])	
+     (lambda args
+       (let ([s (make-string (list-length args))])
+  	   (fill-string s 0 args))))]
+  
+;;----------------------------------------------------------------------------------
 ;;                         Handlers for Runtime Errors
 ;;----------------------------------------------------------------------------------
 

@@ -1072,7 +1072,8 @@
 	     primitives
 	     list-ref
 	     list-length
-	     vector     ;; experimental
+	     vector
+	     string
 	     )
 
 (define-transform (external-symbols expr)

@@ -1,24 +1,24 @@
-# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
+# -536870912
 # == explicit-begins  ==>
-# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
+# -536870912
 # == eliminate-let*  ==>
-# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
+# -536870912
 # == uniquify-variables  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == vectorize-letrec  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == eliminate-set!  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == close-free-variables  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == eliminate-quote  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == eliminate-when/unless  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == eliminate-cond  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # == external-symbols  ==>
-# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# -536870912
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,15 +31,25 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ((f1078 (string #\a #\b #\c)) (f1077 12))
-#  body = (string-set! f1078 0 f1077)
-# emit-expr (string #\a #\b #\c)
-# funcall
-#    si   =-8
-#    env  = ()
-#    expr = (funcall string #\a #\b #\c)
-# emit-expr string
+# emit-expr -536870912
+    movl $-2147483648, %eax     # immed -536870912
+    ret
+    .text
+    .align 16, 0x90
+    .globl _scheme_entry
+_scheme_entry:
+    movl 4(%esp), %ecx
+    movl %ebx, 4(%ecx)
+    movl %esi, 16(%ecx)
+    movl %edi, 20(%ecx)
+    movl %ebp, 24(%ecx)
+    movl %esp, 28(%ecx)
+    movl 12(%esp), %ebp
+    movl 8(%esp), %esp
+    call _L_scheme_entry
+    movl 4(%ecx), %ebx
+    movl 16(%ecx), %esi
+    movl 20(%ecx), %edi
+    movl 24(%ecx), %ebp
+    movl 28(%ecx), %esp
+    ret
