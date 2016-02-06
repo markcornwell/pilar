@@ -44,21 +44,21 @@
      (f x 8 y))) => ""]
      
   [(let ([x 12])
-     (string-set! x 0 #\a)) => ""]
+     (string-set! x 0 #\a)) => "error:string-set!: arg must be a string\n"]
   [(let ([x (string #\a #\b #\c)]
          [y 12])
-     (string-set! x 0 y)) => ""]
+     (string-set! x 0 y)) => "error:string-set!: arg must be a character\n"]
   [(let ([x (string #\a #\b #\c)]
          [y 12])
-     (string-set! x 8 y)) => ""]
+     (string-set! x 8 y)) => "error:string-set!: index out of bounds\n"]
   [(let ([x (string #\a #\b #\c)]
          [y #\a])
-     (string-set! x 8 y)) => ""]
+     (string-set! x 8 y)) => "error:string-set!: index out of bounds\n"]
   [(let ([x (string #\a #\b #\c)])
-     (string-set! x 8 #\a)) => ""]
+     (string-set! x 8 #\a)) => "error:string-set!: index out of bounds\n"]
   [(let ([x (string #\a #\b #\c)]
          [y #\a])
-     (string-set! x -1 y)) => ""]
+     (string-set! x -1 y)) => "error:string-set!: index out of bounds\n"]
  ; next the general case
  ;;; 6 kinds of errors:
  ;;;   string is either: 
@@ -76,85 +76,84 @@
  [(let ([s (string #\a #\b #\c)] [i 1]) (string-set! s i #\X) s) 
   => "\"aXc\"\n"]
  [(let ([s (string #\a #\b #\c)] [i 1] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a character\n"]
 
  [(let ([s (string #\a #\b #\c)] [i 1] [c #\X]) (string-set! s 1 c) s) 
   => "\"aXc\"\n"]
  [(let ([s (string #\a #\b #\c)] [i 1]) (string-set! s 1 #\X) s) 
   => "\"aXc\"\n"]
  [(let ([s (string #\a #\b #\c)] [i 1] [c 'X]) (string-set! s 1 c) s) 
-  => ""]
+  => "error:string-set!: arg must be a character\n"]
  
  [(let ([s (string #\a #\b #\c)] [i 3] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  =>"error:string-set!: index out of bounds\n"]
  [(let ([s (string #\a #\b #\c)] [i 3]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: index out of bounds\n"]
  [(let ([s (string #\a #\b #\c)] [i 3] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  =>  "error:string-set!: index out of bounds\n"]
  
  [(let ([s (string #\a #\b #\c)] [i -10] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  =>  "error:string-set!: index out of bounds\n"]
  [(let ([s (string #\a #\b #\c)] [i -11]) (string-set! s i #\X) s) 
-  => ""]
+  =>  "error:string-set!: index out of bounds\n"]
  [(let ([s (string #\a #\b #\c)] [i -1] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  =>  "error:string-set!: index out of bounds\n"]
  
  [(let ([s (string #\a #\b #\c)] [i 'foo] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a fixnum\n"]
  [(let ([s (string #\a #\b #\c)] [i 'foo]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a fixnum\n"]
  [(let ([s (string #\a #\b #\c)] [i 'foo] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a fixnum\n"]
 
- 
- 
+
  [(let ([s '(string #\a #\b #\c)] [i 1] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 1]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 1] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
 
  [(let ([s '(string #\a #\b #\c)] [i 1] [c #\X]) (string-set! s 1 c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 1]) (string-set! s 1 #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 1] [c 'X]) (string-set! s 1 c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  
  [(let ([s '(string #\a #\b #\c)] [i 3] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 3]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 3] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  =>"error:string-set!: arg must be a string\n"]
  
  [(let ([s '(string #\a #\b #\c)] [i -10] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i -11]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i -1] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  
  [(let ([s '(string #\a #\b #\c)] [i 'foo] [c #\X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 'foo]) (string-set! s i #\X) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
  [(let ([s '(string #\a #\b #\c)] [i 'foo] [c 'X]) (string-set! s i c) s) 
-  => ""]
+  => "error:string-set!: arg must be a string\n"]
 )
 
-#!eof  
+;; #!eof  
  
 (add-tests-with-string-output "string errors"
   [(let ([f (lambda (a b c) (string a b c))])
      (f #\a #\b #\c)) => "\"abc\"\n"]
   [(let ([f (lambda (a b c) (string a b c))])
-     (f #\a 12 #\c)) => ""]
+     (f #\a 12 #\c)) => "error:string-set!: arg must be a character\n"]
   [(let ([f string])
      (f #\a #\b #\c)) => "\"abc\"\n"]
   [(let ([f string])
-     (f #\a #\b 'x)) =>  ""]
+     (f #\a #\b 'x)) =>  "error:string-set!: arg must be a character\n"]
   [(string #\a #\b #\c) => "\"abc\"\n"] 
-  [(string #\a #\b #t) => ""] 
+  [(string #\a #\b #t) => "error:string-set!: arg must be a character\n"] 
 )

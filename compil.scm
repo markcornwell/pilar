@@ -165,8 +165,8 @@
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
 ;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 ;; (load "tests/tests-3.4-req.scm")  ;; apply
-;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
-;;(load "tests/tests-3.2-req.scm")  ;; error, argcheck
+(load "tests/tests-3.3-req.scm")  ;; string-set! errors
+(load "tests/tests-3.2-req.scm")  ;; error, argcheck
 (load "tests/tests-3.1-req.scm")  ;; vector
 
 (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
@@ -1072,7 +1072,8 @@
 	     primitives
 	     list-ref
 	     list-length
-	     vector     ;; experimental
+	     vector
+	     string
 	     )
 
 (define-transform (external-symbols expr)
