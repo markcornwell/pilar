@@ -1,24 +1,24 @@
-# (cons 1 2 3)
+# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
 # == explicit-begins  ==>
-# (cons 1 2 3)
+# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
 # == eliminate-let*  ==>
-# (cons 1 2 3)
+# (let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y))
 # == uniquify-variables  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == vectorize-letrec  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == eliminate-set!  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == close-free-variables  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == eliminate-quote  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == eliminate-when/unless  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == eliminate-cond  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # == external-symbols  ==>
-# (cons 1 2 3)
+# (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,4 +31,15 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (cons 1 2 3)
+# emit-expr (let ((f1078 (string #\a #\b #\c)) (f1077 12)) (string-set! f1078 0 f1077))
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((f1078 (string #\a #\b #\c)) (f1077 12))
+#  body = (string-set! f1078 0 f1077)
+# emit-expr (string #\a #\b #\c)
+# funcall
+#    si   =-8
+#    env  = ()
+#    expr = (funcall string #\a #\b #\c)
+# emit-expr string

@@ -44,7 +44,7 @@
      (f x 8 y))) => ""]
      
   [(let ([x 12])
-     (string-set! x 0 #\a)) => ""]
+     (string-set! x 0 #\a)) => "error:string-set!: arg must be a string\n"]
   [(let ([x (string #\a #\b #\c)]
          [y 12])
      (string-set! x 0 y)) => ""]

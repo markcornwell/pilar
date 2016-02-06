@@ -1,1 +1,1 @@
-#(a b (c d))
+error:string-set!: arg must be a string
