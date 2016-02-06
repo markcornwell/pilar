@@ -225,4 +225,768 @@ test 203:(letrec ((f 12) (g (lambda (n) (set! f n)))) (g 130) f) ... ok
 test 204:(letrec ((f (lambda (g) (set! f g) (f)))) (f (lambda () 12))) ... ok
 test 205:(letrec ((f (cons (lambda () f) (lambda (x) (set! f x))))) (let ((g (car f))) ((cdr f) 100) (g))) ... ok
 test 206:(letrec ((f (letrec ((g (lambda (x) (fx* x 2)))) (lambda (n) (g (fx* n 2)))))) (f 12)) ... ok
-test 207:(letrec ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ...> 
+test 207:(let ((f (make-vector 1))) (vector-set! f 0 42) (vector-ref f 0)) ... ok
+test 208:(let ((f (make-vector 1))) (begin (begin (vector-set! f 0 (closure (g n) () (if (fxzero? n) 1 (fx* n (g g (fxsub1 n))))))) ((vector-ref f 0) (vector-ref f 0) 5))) ... ok
+test 209:(letrec ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ... ok
+test 210:(let ((f (lambda (f) (lambda (n) (if (fxzero? n) 1 (fx* n (f (fxsub1 n)))))))) (letrec ((fix (lambda (f) (f (lambda (n) ((fix f) n)))))) ((fix f) 5))) ... ok
+Performing and/or tests ...
+test 211:(and) ... ok
+test 212:(and 5) ... ok
+test 213:(and #f) ... ok
+test 214:(and 5 6) ... ok
+test 215:(and #f ((lambda (x) (x x)) (lambda (x) (x x)))) ... ok
+test 216:(or) ... ok
+test 217:(or #t) ... ok
+test 218:(or 5) ... ok
+test 219:(or 1 2 3) ... ok
+test 220:(or (cons 1 2) ((lambda (x) (x x)) (lambda (x) (x x)))) ... ok
+test 221:(let ((if 12)) (or if 17)) ... ok
+test 222:(let ((if 12)) (and if 17)) ... ok
+test 223:(let ((t 1)) (and (begin (set! t (fxadd1 t)) t) t)) ... ok
+test 224:(let ((t 1)) (or (begin (set! t (fxadd1 t)) t) t)) ... ok
+Performing when/unless tests ...
+test 225:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 226:(let ((x (cons 1 2))) (when (pair? x) (set-car! x (fx+ (car x) (cdr x))) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 227:(let ((x (cons 1 2))) (unless (fixnum? x) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+test 228:(let ((x (cons 1 2))) (unless (fixnum? x) (set-car! x (fx+ (car x) (cdr x))) (set-car! x (fx+ (car x) (cdr x)))) x) ... ok
+Performing cond tests ...
+test 229:(cond (1 2) (else 3)) ... ok
+test 230:(cond (1 1) (else 13)) ... ok
+test 231:(cond (#f #t) (#t #f)) ... ok
+test 232:(cond (else 17)) ... ok
+test 233:(cond (#f 42) (#f 12) (12 13)) ... ok
+test 234:(cond (#t ((lambda (x) (cdr x)) (cons 1 2)))) ... ok
+test 235:(let ((else #t)) (cond (else 1287))) ... ok
+test 236:(let ((else 17)) (cond (else else))) ... ok
+test 237:(let ((=> 12)) (cond (12 14) (else 17))) ... ok
+test 238:(let ((=> 12)) (cond (=> =>))) ... ok
+Performing sting literals tests ...
+test 239:"hello" ... ok
+test 240:"" ... ok
+test 241:"When in the course of human events..." ... ok
+Performing simple quote tests ...
+test 242:(quote #t) ... ok
+test 243:(quote #f) ... ok
+test 244:(quote #\A) ... ok
+test 245:(quote 4) ... ok
+test 246:(quote -42) ... ok
+test 247:(quote "hello") ... ok
+test 248:(quote "When in the course of human events...") ... ok
+Performing complex constants tests ...
+test 249:(quote 42) ... ok
+test 250:(quote (1 . 2)) ... ok
+test 251:(quote (1 2 3)) ... ok
+test 252:(let ((x (quote (1 2 3)))) x) ... ok
+test 253:(let ((f (lambda () (quote (1 2 3))))) (f)) ... ok
+test 254:(let ((f (lambda () (lambda () (quote (1 2 3)))))) ((f))) ... ok
+test 255:"Hello World" ... ok
+test 256:(quote ("Hello" "World")) ... ok
+Performing vector constructor tests ...
+test 257:(vector-length (vector 10)) ... ok
+test 258:(let ((v (vector 11))) (vector-length v)) ... ok
+test 259:(let ((v (vector 12))) (vector-ref v 0)) ... ok
+test 260:(let ((v (vector 13))) (vector-set! v 0 99) (vector-ref v 0)) ... ok
+test 261:(let ((v (vector 14))) (vector-set! v 0 #t) (vector-ref v 0)) ... ok
+Performing set! tests ...
+test 262:(let ((x 12)) (set! x 13) x) ... ok
+test 263:(let ((x 12)) (set! x (fxadd1 x)) x) ... ok
+test 264:(let ((x 12)) (let ((x #f)) (set! x 14)) x) ... ok
+test 265:(let ((x 12)) (let ((y (let ((x #f)) (set! x 14)))) x)) ... ok
+test 266:(let ((f #f)) (let ((g (lambda () f))) (set! f 10) (g))) ... ok
+test 267:(let ((f (lambda (x) (set! x (fxadd1 x)) x))) (f 12)) ... ok
+test 268:(let ((x 10)) (let ((f (lambda (x) (set! x (fxadd1 x)) x))) (cons x (f x)))) ... ok
+test 269:(let ((t #f)) (let ((locative (cons (lambda () t) (lambda (n) (set! t n))))) ((cdr locative) 17) ((car locative)))) ... ok
+test 270:(let ((locative (let ((t #f)) (cons (lambda () t) (lambda (n) (set! t n)))))) ((cdr locative) 17) ((car locative))) ... ok
+test 271:(let ((make-counter (lambda () (let ((counter -1)) (lambda () (set! counter (fxadd1 counter)) counter))))) (let ((c0 (make-counter)) (c1 (make-counter))) (c0) (cons (c0) (c1)))) ... ok
+test 272:(let ((fact #f)) (set! fact (lambda (n) (if (fxzero? n) 1 (fx* n (fact (fxsub1 n)))))) (fact 5)) ... ok
+test 273:(let ((fact #f)) ((begin (set! fact (lambda (n) (if (fxzero? n) 1 (fx* n (fact (fxsub1 n)))))) fact) 5)) ... ok
+Performing procedure? tests ...
+test 274:(procedure? (lambda (x) x)) ... ok
+test 275:(let ((f (lambda (x) x))) (procedure? f)) ... ok
+test 276:(procedure? (make-vector 0)) ... ok
+test 277:(procedure? (make-string 0)) ... ok
+test 278:(procedure? (cons 1 2)) ... ok
+test 279:(procedure? #\S) ... ok
+test 280:(procedure? ()) ... ok
+test 281:(procedure? #t) ... ok
+test 282:(procedure? #f) ... ok
+test 283:(string? (lambda (x) x)) ... ok
+test 284:(vector? (lambda (x) x)) ... ok
+test 285:(boolean? (lambda (x) x)) ... ok
+test 286:(null? (lambda (x) x)) ... ok
+test 287:(not (lambda (x) x)) ... ok
+Performing applying thunks tests ...
+test 288:(let ((f (lambda () 12))) (f)) ... ok
+test 289:(let ((f (lambda () (fx+ 12 13)))) (f)) ... ok
+test 290:(let ((f (lambda () 13))) (fx+ (f) (f))) ... ok
+test 291:(let ((f (lambda () (let ((g (lambda () (fx+ 2 3)))) (fx* (g) (g)))))) (fx+ (f) (f))) ... ok
+test 292:(let ((f (lambda () (let ((f (lambda () (fx+ 2 3)))) (fx* (f) (f)))))) (fx+ (f) (f))) ... ok
+test 293:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
+Performing parameter passing tests ...
+test 294:(let ((f (lambda (x) x))) (f 12)) ... ok
+test 295:(let ((f (lambda (x y) (fx+ x y)))) (f 12 13)) ... ok
+test 296:(let ((f (lambda (z) (let ((g (lambda (x y) (fx+ x y)))) (g z 100))))) (f 1002)) ... ok
+test 297:(let ((f (lambda (x) (let ((g (lambda (x y) (fx+ x y)))) (g x 100))))) (f 1001)) ... ok
+test 298:(let ((f (lambda (x) (let ((g (lambda (x y) (fx+ x y)))) (g x 100))))) (f 1000)) ... ok
+test 299:(let ((f (lambda (g) (g 2 13)))) (f (lambda (n m) (fx* n m)))) ... ok
+test 300:(let ((f (lambda (g) (fx+ (g 10) (g 100))))) (f (lambda (x) (fx* x x)))) ... ok
+test 301:(let ((f (lambda (f n m) (if (fxzero? n) m (f f (fxsub1 n) (fx* n m)))))) (f f 5 1)) ... ok
+test 302:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)) ... ok
+Performing closures tests ...
+test 303:(let ((n 12)) (let ((f (lambda () n))) (f))) ... ok
+test 304:(let ((n 12)) (let ((f (lambda (m) (fx+ n m)))) (f 100))) ... ok
+test 305:(let ((f (lambda (f n m) (if (fxzero? n) m (f (fxsub1 n) (fx* n m)))))) (let ((g (lambda (g n m) (f (lambda (n m) (g g n m)) n m)))) (g g 5 1))) ... ok
+test 306:(let ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f (fxsub1 n))))))) (let ((g (lambda (g n) (f (lambda (n) (g g n)) n)))) (g g 5))) ... ok
+Performing begin/implicit-begin tests ...
+test 307:(begin 12) ... ok
+test 308:(begin 13 122) ... ok
+test 309:(begin 123 2343 #t) ... ok
+test 310:(let ((t (begin 12 (cons 1 2)))) (begin t t)) ... ok
+test 311:(let ((t (begin 13 (cons 1 2)))) (cons 1 t) t) ... ok
+test 312:(let ((t (cons 1 2))) (if (pair? t) (begin t) 12)) ... ok
+Performing set-car! set-cdr! tests ...
+test 313:(let ((x (cons 1 2))) (begin (set-cdr! x ()) x)) ... ok
+test 314:(let ((x (cons 1 2))) (set-cdr! x ()) x) ... ok
+test 315:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) x) ... ok
+test 316:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) y) ... ok
+test 317:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! y x) x) ... ok
+test 318:(let ((x (cons 12 13)) (y (cons 14 15))) (set-cdr! x y) y) ... ok
+test 319:(let ((x (let ((x (cons 1 2))) (set-car! x #t) (set-cdr! x #f) x))) (cons x x) x) ... ok
+test 320:(let ((x (cons 1 2))) (set-cdr! x x) (set-car! (cdr x) x) (cons (eq? x (car x)) (eq? x (cdr x)))) ... ok
+test 321:(let ((x #f)) (if (pair? x) (set-car! x 12) #f) x) ... ok
+test 322:(let ((x #f)) (if (pair? #f) (set-car! #f 12) #f) x) ... ok
+Performing eq? tests ...
+test 323:(eq? 1 1) ... ok
+test 324:(eq? 1 2) ... ok
+test 325:(eq? #t 2) ... ok
+test 326:(eq? #t #t) ... ok
+test 327:(eq? () ()) ... ok
+test 328:(eq? (cons 1 2) (cons 1 2)) ... ok
+test 329:(let ((v (cons 1 2))) (eq? v v)) ... ok
+Performing vectors tests ...
+test 330:(vector? (make-vector 0)) ... ok
+test 331:(vector-length (make-vector 12)) ... ok
+test 332:(vector? (cons 1 2)) ... ok
+test 333:(vector? 1287) ... ok
+test 334:(vector? ()) ... ok
+test 335:(vector? #t) ... ok
+test 336:(vector? #f) ... ok
+test 337:(pair? (make-vector 12)) ... ok
+test 338:(null? (make-vector 12)) ... ok
+test 339:(boolean? (make-vector 12)) ... ok
+test 340:(make-vector 0) ... ok
+test 341:(let ((v (make-vector 1))) (vector-set! v 0 #t) v) ... ok
+test 342:(let ((v (make-vector 2))) (vector-set! v 0 #t) (vector-set! v 1 #f) v) ... ok
+test 343:(let ((v (make-vector 2))) (vector-set! v 0 v) (vector-set! v 1 v) (eq? (vector-ref v 0) (vector-ref v 1))) ... ok
+test 344:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (eq? y (vector-ref v 0))) ... ok
+test 345:(cons 1 2) ... ok
+test 346:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (pair? w)) ... ok
+test 347:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (pair? w) (pair? (car w)))) ... ok
+test 348:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (cdr w)) ... ok
+test 349:(let ((w (let ((v (make-vector 1)) (y (cons 96 2))) y))) w) ... ok
+test 350:(let ((w (let ((v (make-vector 1)) (y (cons 97 2))) (cons y (eq? y 0)) y))) w) ... ok
+test 351:(let ((w (let ((v (make-vector 1)) (y (cons 97 3))) (vector-set! v 0 y) y))) w) ... ok
+test 352:(let ((w (let ((v (make-vector 1)) (y (cons 98 2))) (vector-set! v 0 y) (cons y (eq? y 0)) y))) w) ... ok
+test 353:(let ((w (let ((v (make-vector 1)) (y (cons 99 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (car w)) ... ok
+test 354:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (eq? (car (car w)) 1)) ... ok
+test 355:(let ((w (let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))))) (and (eq? (car (car w)) 1) (eq? (cdr (car w)) 2) (eq? (cdr w) #f))) ... ok
+test 356:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y 0))) ... ok
+test 357:(let ((v (make-vector 1)) (y (cons 1 2))) (vector-set! v 0 y) (cons y (eq? y (vector-ref v 0)))) ... ok
+test 358:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector? v1))) ... ok
+test 359:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (and (vector? v0) (vector? v1)))) ... ok
+test 360:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (and (vector? v0) (vector? v1)))) ... ok
+test 361:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v0)) ... ok
+test 362:(vector-length (make-vector 1)) ... ok
+test 363:(let ((v0 (make-vector 2))) (vector-length v0)) ... ok
+test 364:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-length v0)) ... ok
+test 365:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-length v1))) ... ok
+test 366:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) v1)) ... ok
+test 367:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (car (cons v0 v1)))) ... ok
+test 368:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cdr (cons v0 v1)))) ... ok
+test 369:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons v0 ())) ... ok
+test 370:(let ((v0 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (cons #t v0)) ... ok
+test 371:(let ((v0 (make-vector 2))) (let ((v1 (make-vector 2))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1))) ... ok
+test 372:(let ((v0 (make-vector 3))) (let ((v1 (make-vector 3))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v0 2 150) (vector-set! v1 0 300) (vector-set! v1 1 400) (vector-set! v1 2 350) (cons v0 v1))) ... ok
+test 373:(let ((n 2)) (let ((v0 (make-vector n))) (let ((v1 (make-vector n))) (vector-set! v0 0 100) (vector-set! v0 1 200) (vector-set! v1 0 300) (vector-set! v1 1 400) (cons v0 v1)))) ... ok
+test 374:(let ((n 3)) (let ((v0 (make-vector n))) (let ((v1 (make-vector (vector-length v0)))) (vector-set! v0 (fx- (vector-length v0) 3) 100) (vector-set! v0 (fx- (vector-length v1) 2) 200) (vector-set! v0 (fx- (vector-length v0) 1) 150) (vector-set! v1 (fx- (vector-length v1) 3) 300) (vector-set! v1 (fx- (vector-length v0) 2) 400) (vector-set! v1 (fx- (vector-length v1) 1) 350) (cons v0 v1)))) ... ok
+test 375:(let ((n 1)) (vector-set! (make-vector n) (fxsub1 n) (fx* n n)) n) ... ok
+test 376:(let ((n 1)) (let ((v (make-vector 1))) (vector-set! v (fxsub1 n) n) (vector-ref v (fxsub1 n)))) ... ok
+test 377:(let ((v0 (make-vector 1))) (vector-set! v0 0 1) (let ((v1 (make-vector 1))) (vector-set! v1 0 13) (vector-set! (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1))) (fxadd1 (vector-ref (if (vector? v0) v0 v1) (fxsub1 (vector-length (if (vector? v0) v0 v1)))))) (cons v0 v1))) ... ok
+Performing strings tests ...
+test 378:(make-string 0) ... ok
+test 379:(string? (make-string 0)) ... ok
+test 380:(let ((s (make-string 1))) (string-set! s 0 #\a) (string-ref s 0)) ... ok
+test 381:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-ref s 1)) ... ok
+test 382:(let ((s (make-string 3))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-ref s 2)) ... ok
+test 383:(let ((s (make-string 4))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-ref s 3)) ... ok
+test 384:(let ((s (make-string 5))) (string-set! s 0 #\a) (string-set! s 1 #\b) (string-set! s 2 #\c) (string-set! s 3 #\d) (string-set! s 4 #\e) (string-ref s 3)) ... ok
+test 385:(cons 1 2) ... ok
+test 386:(cons (make-string 0) ()) ... ok
+test 387:(let ((s (make-string 2))) (string-set! s 0 #\a) (string-set! s 1 #\b) (cons (string-ref s 0) (string-ref s 1))) ... ok
+test 388:(let ((i 0)) (let ((s (make-string 1))) (string-set! s i #\a) (string-ref s i))) ... ok
+test 389:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (string-ref s i))) ... ok
+test 390:(let ((i 0) (j 1)) (let ((s (make-string 2))) (string-set! s i #\a) (string-set! s j #\b) (cons (string-ref s i) (string-ref s j)))) ... ok
+test 391:(let ((i 0) (c #\a)) (let ((s (make-string 1))) (string-set! s i c) (string-ref s i))) ... ok
+test 392:(string-length (make-string 12)) ... ok
+test 393:(string? (make-vector 12)) ... ok
+test 394:(string? (cons 1 2)) ... ok
+test 395:(string? 1287) ... ok
+test 396:(string? ()) ... ok
+test 397:(string? #t) ... ok
+test 398:(string? #f) ... ok
+test 399:(pair? (make-string 12)) ... ok
+test 400:(null? (make-string 12)) ... ok
+test 401:(boolean? (make-string 12)) ... ok
+test 402:(vector? (make-string 12)) ... ok
+test 403:(make-string 0) ... ok
+test 404:(let ((v (make-string 2))) (string-set! v 0 #\t) (string-set! v 1 #\f) v) ... ok
+test 405:(let ((v (make-string 2))) (string-set! v 0 #\x) (string-set! v 1 #\x) (char=? (string-ref v 0) (string-ref v 1))) ... ok
+test 406:(let ((v0 (make-string 3))) (let ((v1 (make-string 3))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v0 2 #\c) (string-set! v1 0 #\d) (string-set! v1 1 #\e) (string-set! v1 2 #\f) (cons v0 v1))) ... ok
+test 407:(let ((n 2)) (let ((v0 (make-string n))) (let ((v1 (make-string n))) (string-set! v0 0 #\a) (string-set! v0 1 #\b) (string-set! v1 0 #\c) (string-set! v1 1 #\d) (cons v0 v1)))) ... ok
+test 408:(let ((n 1)) (string-set! (make-string n) (fxsub1 n) (fixnum->char 34)) n) ... ok
+test 409:(let ((n 1)) (let ((v (make-string 1))) (string-set! v (fxsub1 n) (fixnum->char n)) (char->fixnum (string-ref v (fxsub1 n))))) ... ok
+test 410:(let ((v0 (make-string 1))) (string-set! v0 0 #\a) (let ((v1 (make-string 1))) (string-set! v1 0 #\A) (string-set! (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1))) (fixnum->char (fxadd1 (char->fixnum (string-ref (if (string? v0) v0 v1) (fxsub1 (string-length (if (string? v0) v0 v1)))))))) (cons v0 v1))) ... ok
+test 411:(let ((s (make-string 1))) (string-set! s 0 #\") s) ... ok
+test 412:(let ((s (make-string 1))) (string-set! s 0 #\\) s) ... ok
+Performing cons tests ...
+test 413:(fxadd1 0) ... ok
+test 414:(pair? 12) ... ok
+test 415:(pair? #t) ... ok
+test 416:(pair? #f) ... ok
+test 417:(pair? ()) ... ok
+test 418:(cons 1 2) ... ok
+test 419:(pair? (cons 1 2)) ... ok
+test 420:(fixnum? (cons 12 43)) ... ok
+test 421:(boolean? (cons 12 43)) ... ok
+test 422:(null? (cons 12 43)) ... ok
+test 423:(not (cons 12 43)) ... ok
+test 424:(if (cons 12 43) 32 43) ... ok
+test 425:(car (cons 1 23)) ... ok
+test 426:(cdr (cons 43 123)) ... ok
+test 427:(cons #t #f) ... ok
+test 428:(car (cons #t #f)) ... ok
+test 429:(cons 1 ()) ... ok
+test 430:(cons 1 (cons 2 ())) ... ok
+test 431:(cons (cons 12 3) (cons 45 6)) ... ok
+test 432:(cons (cons 12 3) (cons #t #f)) ... ok
+test 433:(car (car (cons (cons 12 3) (cons #t #f)))) ... ok
+test 434:(cdr (car (cons (cons 12 3) (cons #t #f)))) ... ok
+test 435:(car (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
+test 436:(cdr (cdr (cons (cons 12 3) (cons #t #f)))) ... ok
+test 437:(cons 1 (cons 2 (cons 3 ()))) ... ok
+test 438:(let ((x (let ((y (fx+ 1 2))) (fx* y y)))) (cons x (fx+ x x))) ... ok
+test 439:(let ((t0 (cons 1 2)) (t1 (cons 3 4))) (let ((a0 (car t0)) (a1 (car t1)) (d0 (cdr t0)) (d1 (cdr t1))) (let ((t0 (cons a0 d1)) (t1 (cons a1 d0))) (cons t0 t1)))) ... ok
+test 440:(let ((t (cons 1 2))) (let ((t t)) (let ((t t)) (let ((t t)) t)))) ... ok
+test 441:(let ((t (let ((t (let ((t (let ((t (cons 1 2))) t))) t))) t))) t) ... ok
+test 442:(let ((x ())) (let ((x (cons x x))) (let ((x (cons x x))) (let ((x (cons x x))) (cons x x))))) ... ok
+test 443:(cons (let ((x #t)) (let ((y (cons x x))) (cons x y))) (cons (let ((x #f)) (let ((y (cons x x))) (cons y x))) ())) ... ok
+Performing procedures tests ...
+test 444:(letrec () 12) ... ok
+test 445:(letrec () (let ((x 5)) (fx+ x x))) ... ok
+test 446:(letrec ((f (lambda () 5))) 7) ... ok
+test 447:(letrec ((f (lambda () 5))) (let ((x 12)) x)) ... ok
+test 448:(letrec ((f (lambda () 5))) (app f)) ... ok
+test 449:(letrec ((f (lambda () 5))) (f)) ... ok
+test 450:(letrec ((f (lambda () 5))) (let ((x (f))) x)) ... ok
+test 451:(letrec ((f (lambda () 5))) (fx+ 6 (app f))) ... ok
+test 452:(letrec ((f (lambda () 5))) (fx+ (app f) 6)) ... ok
+test 453:(letrec ((f (lambda () 5))) (fx+ (f) 6)) ... ok
+test 454:(letrec ((f (lambda () 5))) (fx- 20 (f))) ... ok
+test 455:(letrec ((f (lambda () 5))) (fx+ (f) (f))) ... ok
+test 456:(letrec ((f (lambda () (fx+ 5 7))) (g (lambda () 13))) (fx+ (f) (g))) ... ok
+test 457:(letrec ((f (lambda (x) (fx+ x 12)))) (f 13)) ... ok
+test 458:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f 10))) ... ok
+test 459:(letrec ((f (lambda (x) (fx+ x 12)))) (f (f (f 0)))) ... ok
+test 460:(letrec ((f (lambda (x y) (fx+ x y))) (g (lambda (x) (fx+ x 12)))) (f 16 (f (g 0) (fx+ 1 (g 0))))) ... ok
+test 461:(letrec ((g (lambda (x y) (fx+ x y))) (f (lambda (x) (g x x)))) (f 12)) ... ok
+test 462:(letrec ((f (lambda (x) (g x x))) (g (lambda (x y) (fx+ x y)))) (f 12)) ... ok
+test 463:(let ((f (make-vector 1)) (g (make-vector 1))) (vector-set! f 0 (closure (x) (g) ((vector-ref g 0) x x))) (vector-set! g 0 (closure (x y) () (fx+ x y))) ((vector-ref f 0) 12)) ... ok
+test 464:(letrec ((f (lambda (x) (if (fxzero? x) 1 (fx* x (f (fxsub1 x))))))) (f 5)) ... ok
+test 465:(let ((f (make-vector 1))) (vector-set! f 0 (closure (x) (f) (if (fxzero? x) 1 (fx* x ((vector-ref f 0) (fxsub1 x)))))) ((vector-ref f 0) 5)) ... ok
+test 466:(let ((e (make-vector 1)) (o (make-vector 1))) (vector-set! e 0 (closure (x) (o) (if (fxzero? x) #t ((vector-ref o 0) (fxsub1 x))))) (vector-set! o 0 (closure (x) (e) (if (fxzero? x) #f ((vector-ref e 0) (fxsub1 x))))) ((vector-ref e 0) 25)) ... ok
+Performing deeply nested procedures tests ...
+test 467:(letrec ((sum (lambda (n ac) (if (fxzero? n) ac (sum (fxsub1 n) (fx+ n ac)))))) (sum 10 0)) ... ok
+test 468:(letrec ((sum (lambda (n ac) (if (fxzero? n) ac (sum (fxsub1 n) (fx+ n ac)))))) (sum 100 0)) ... ok
+test 469:(letrec ((sum (lambda (n ac) (if (fxzero? n) ac (sum (fxsub1 n) (fx+ n ac)))))) (sum 1000 0)) ... ok
+test 470:(letrec ((sum (lambda (n ac) (if (fxzero? n) ac (sum (fxsub1 n) (fx+ n ac)))))) (sum 10000 0)) ... ok
+Performing binary primitives tests ...
+test 471:(fxlognot -7) ... ok
+test 472:(fxlognot (fxlogor (fxlognot 7) 1)) ... ok
+test 473:(fxlognot (fxlogor (fxlognot 7) (fxlognot 2))) ... ok
+test 474:(fxlogand (fxlognot (fxlognot 12)) (fxlognot (fxlognot 12))) ... ok
+test 475:(fx+ (fx+ 1 2) (fx+ 3 4)) ... ok
+test 476:(fx+ (fx+ 1 2) (fx+ 3 -4)) ... ok
+test 477:(fx+ (fx+ 1 2) (fx+ -3 4)) ... ok
+test 478:(fx+ (fx+ 1 2) (fx+ -3 -4)) ... ok
+test 479:(fx+ (fx+ 1 -2) (fx+ 3 4)) ... ok
+test 480:(fx+ (fx+ 1 -2) (fx+ 3 -4)) ... ok
+test 481:(fx+ (fx+ 1 -2) (fx+ -3 4)) ... ok
+test 482:(fx+ (fx+ 1 -2) (fx+ -3 -4)) ... ok
+test 483:(fx+ (fx+ -1 2) (fx+ 3 4)) ... ok
+test 484:(fx+ (fx+ -1 2) (fx+ 3 -4)) ... ok
+test 485:(fx+ (fx+ -1 2) (fx+ -3 4)) ... ok
+test 486:(fx+ (fx+ -1 2) (fx+ -3 -4)) ... ok
+test 487:(fx+ (fx+ -1 -2) (fx+ 3 4)) ... ok
+test 488:(fx+ (fx+ -1 -2) (fx+ 3 -4)) ... ok
+test 489:(fx+ (fx+ -1 -2) (fx+ -3 4)) ... ok
+test 490:(fx+ (fx+ -1 -2) (fx+ -3 -4)) ... ok
+test 491:(fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 492:(fx+ 1 (fx+ 2 (fx+ 3 (fx+ 4 (fx+ 5 (fx+ 6 (fx+ 7 (fx+ 8 9)))))))) ... ok
+test 493:(fx+ (fx+ (fx+ (fx+ 1 2) (fx+ 3 4)) (fx+ (fx+ 5 6) (fx+ 7 8))) (fx+ (fx+ (fx+ 9 10) (fx+ 11 12)) (fx+ (fx+ 13 14) (fx+ 15 16)))) ... ok
+test 494:(fx- (fx- 1 2) (fx- 3 4)) ... ok
+test 495:(fx- (fx- 1 2) (fx- 3 -4)) ... ok
+test 496:(fx- (fx- 1 2) (fx- -3 4)) ... ok
+test 497:(fx- (fx- 1 2) (fx- -3 -4)) ... ok
+test 498:(fx- (fx- 1 -2) (fx- 3 4)) ... ok
+test 499:(fx- (fx- 1 -2) (fx- 3 -4)) ... ok
+test 500:(fx- (fx- 1 -2) (fx- -3 4)) ... ok
+test 501:(fx- (fx- 1 -2) (fx- -3 -4)) ... ok
+test 502:(fx- (fx- -1 2) (fx- 3 4)) ... ok
+test 503:(fx- (fx- -1 2) (fx- 3 -4)) ... ok
+test 504:(fx- (fx- -1 2) (fx- -3 4)) ... ok
+test 505:(fx- (fx- -1 2) (fx- -3 -4)) ... ok
+test 506:(fx- (fx- -1 -2) (fx- 3 4)) ... ok
+test 507:(fx- (fx- -1 -2) (fx- 3 -4)) ... ok
+test 508:(fx- (fx- -1 -2) (fx- -3 4)) ... ok
+test 509:(fx- (fx- -1 -2) (fx- -3 -4)) ... ok
+test 510:(fx- (fx- (fx- (fx- (fx- (fx- (fx- (fx- 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 511:(fx- 1 (fx- 2 (fx- 3 (fx- 4 (fx- 5 (fx- 6 (fx- 7 (fx- 8 9)))))))) ... ok
+test 512:(fx- (fx- (fx- (fx- 1 2) (fx- 3 4)) (fx- (fx- 5 6) (fx- 7 8))) (fx- (fx- (fx- 9 10) (fx- 11 12)) (fx- (fx- 13 14) (fx- 15 16)))) ... ok
+test 513:(fx* (fx* (fx* (fx* 2 3) (fx* 4 5)) (fx* (fx* 6 7) (fx* 8 9))) (fx* (fx* (fx* 2 3) (fx* 2 3)) (fx* (fx* 2 3) (fx* 2 3)))) ... ok
+test 514:(fxlognot (fxlogor (fxlognot 7) 1)) ... ok
+test 515:(fxlognot (fxlogor (fxlognot 7) (fxlognot 2))) ... ok
+test 516:(fxlogand (fxlognot (fxlognot 12)) (fxlognot (fxlognot 12))) ... ok
+test 517:(fx= (fx+ 13 3) (fx+ 10 6)) ... ok
+test 518:(fx= (fx+ 13 0) (fx+ 10 6)) ... ok
+test 519:(fx= (fx+ 12 1) (fx+ -12 -1)) ... ok
+test 520:(fx< (fx+ 10 6) (fx+ 13 1)) ... ok
+test 521:(fx< (fx+ 10 6) (fx+ 13 3)) ... ok
+test 522:(fx< (fx+ 10 6) (fx+ 13 31)) ... ok
+test 523:(fx< (fx+ 12 1) (fx+ -12 -1)) ... ok
+test 524:(fx< (fx+ -12 -1) (fx+ 12 1)) ... ok
+test 525:(fx<= (fx+ 10 6) (fx+ 13 1)) ... ok
+test 526:(fx<= (fx+ 10 6) (fx+ 13 3)) ... ok
+test 527:(fx<= (fx+ 10 6) (fx+ 13 31)) ... ok
+test 528:(fx<= (fx+ 12 1) (fx+ -12 -1)) ... ok
+test 529:(fx<= (fx+ -12 -1) (fx+ 12 1)) ... ok
+test 530:(fx> (fx+ 10 6) (fx+ 13 1)) ... ok
+test 531:(fx> (fx+ 10 6) (fx+ 13 3)) ... ok
+test 532:(fx> (fx+ 10 6) (fx+ 13 31)) ... ok
+test 533:(fx> (fx+ 12 1) (fx+ -12 -1)) ... ok
+test 534:(fx> (fx+ -12 -1) (fx+ 12 1)) ... ok
+test 535:(fx>= (fx+ 10 6) (fx+ 13 1)) ... ok
+test 536:(fx>= (fx+ 10 6) (fx+ 13 3)) ... ok
+test 537:(fx>= (fx+ 10 6) (fx+ 13 31)) ... ok
+test 538:(fx>= (fx+ 12 1) (fx+ -12 -1)) ... ok
+test 539:(fx>= (fx+ -12 -1) (fx+ 12 1)) ... ok
+Performing let tests ...
+test 540:(let ((x 5)) x) ... ok
+test 541:(let ((x (fx+ 1 2))) x) ... ok
+test 542:(let ((x (fx+ 1 2))) (let ((y (fx+ 3 4))) (fx+ x y))) ... ok
+test 543:(let ((x (fx+ 1 2))) (let ((y (fx+ 3 4))) (fx- y x))) ... ok
+test 544:(let ((x (fx+ 1 2)) (y (fx+ 3 4))) (fx- y x)) ... ok
+test 545:(let ((x (let ((y (fx+ 1 2))) (fx* y y)))) (fx+ x x)) ... ok
+test 546:(let ((x (fx+ 1 2))) (let ((x (fx+ 3 4))) x)) ... ok
+test 547:(let ((x (fx+ 1 2))) (let ((x (fx+ x 4))) x)) ... ok
+test 548:(let ((t (let ((t (let ((t (let ((t (fx+ 1 2))) t))) t))) t))) t) ... ok
+test 549:(let ((x 12)) (let ((x (fx+ x x))) (let ((x (fx+ x x))) (let ((x (fx+ x x))) (fx+ x x))))) ... ok
+Performing let* tests ...
+test 550:(let* ((x 5)) x) ... ok
+test 551:(let ((x 1)) (let ((x (fx+ x 1)) (y (fx+ x 1))) y)) ... ok
+test 552:(let* ((x 1)) (let* ((x (fx+ x 1)) (y (fx+ x 1))) y)) ... ok
+Performing fx+ tests ...
+test 553:(fx+ 1 2) ... ok
+test 554:(fx+ 1 -2) ... ok
+test 555:(fx+ -1 2) ... ok
+test 556:(fx+ -1 -2) ... ok
+test 557:(fx+ 536870911 -1) ... ok
+test 558:(fx+ 536870910 1) ... ok
+test 559:(fx+ -536870912 1) ... ok
+test 560:(fx+ -536870911 -1) ... ok
+test 561:(fx+ 536870911 -536870912) ... ok
+test 562:(fx+ 1 (fx+ 2 3)) ... ok
+test 563:(fx+ 1 (fx+ 2 -3)) ... ok
+test 564:(fx+ 1 (fx+ -2 3)) ... ok
+test 565:(fx+ 1 (fx+ -2 -3)) ... ok
+test 566:(fx+ -1 (fx+ 2 3)) ... ok
+test 567:(fx+ -1 (fx+ 2 -3)) ... ok
+test 568:(fx+ -1 (fx+ -2 3)) ... ok
+test 569:(fx+ -1 (fx+ -2 -3)) ... ok
+test 570:(fx+ (fx+ 1 2) 3) ... ok
+test 571:(fx+ (fx+ 1 2) -3) ... ok
+test 572:(fx+ (fx+ 1 -2) 3) ... ok
+test 573:(fx+ (fx+ 1 -2) -3) ... ok
+test 574:(fx+ (fx+ -1 2) 3) ... ok
+test 575:(fx+ (fx+ -1 2) -3) ... ok
+test 576:(fx+ (fx+ -1 -2) 3) ... ok
+test 577:(fx+ (fx+ -1 -2) -3) ... ok
+test 578:(fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ (fx+ 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 579:(fx+ 1 (fx+ 2 (fx+ 3 (fx+ 4 (fx+ 5 (fx+ 6 (fx+ 7 (fx+ 8 9)))))))) ... ok
+Performing fx- tests ...
+test 580:(fx- 1 2) ... ok
+test 581:(fx- 1 -2) ... ok
+test 582:(fx- -1 2) ... ok
+test 583:(fx- -1 -2) ... ok
+test 584:(fx- 536870910 -1) ... ok
+test 585:(fx- 536870911 1) ... ok
+test 586:(fx- -536870911 1) ... ok
+test 587:(fx- -536870912 -1) ... ok
+test 588:(fx- 1 536870911) ... ok
+test 589:(fx- -1 536870911) ... ok
+test 590:(fx- 1 -536870910) ... ok
+test 591:(fx- -1 -536870912) ... ok
+test 592:(fx- 536870911 536870911) ... ok
+test 593:(fx- -536870911 -536870912) ... ok
+test 594:(fx- 1 (fx- 2 3)) ... ok
+test 595:(fx- 1 (fx- 2 -3)) ... ok
+test 596:(fx- 1 (fx- -2 3)) ... ok
+test 597:(fx- 1 (fx- -2 -3)) ... ok
+test 598:(fx- -1 (fx- 2 3)) ... ok
+test 599:(fx- -1 (fx- 2 -3)) ... ok
+test 600:(fx- -1 (fx- -2 3)) ... ok
+test 601:(fx- -1 (fx- -2 -3)) ... ok
+test 602:(fx- 0 (fx- -2 -3)) ... ok
+test 603:(fx- (fx- 1 2) 3) ... ok
+test 604:(fx- (fx- 1 2) -3) ... ok
+test 605:(fx- (fx- 1 -2) 3) ... ok
+test 606:(fx- (fx- 1 -2) -3) ... ok
+test 607:(fx- (fx- -1 2) 3) ... ok
+test 608:(fx- (fx- -1 2) -3) ... ok
+test 609:(fx- (fx- -1 -2) 3) ... ok
+test 610:(fx- (fx- -1 -2) -3) ... ok
+test 611:(fx- (fx- (fx- (fx- (fx- (fx- (fx- (fx- 1 2) 3) 4) 5) 6) 7) 8) 9) ... ok
+test 612:(fx- 1 (fx- 2 (fx- 3 (fx- 4 (fx- 5 (fx- 6 (fx- 7 (fx- 8 9)))))))) ... ok
+Performing fx* tests ...
+test 613:(fx* 2 3) ... ok
+test 614:(fx* 2 -3) ... ok
+test 615:(fx* -2 3) ... ok
+test 616:(fx* -2 -3) ... ok
+test 617:(fx* 536870911 1) ... ok
+test 618:(fx* 536870911 -1) ... ok
+test 619:(fx* -536870912 1) ... ok
+test 620:(fx* -536870911 -1) ... ok
+test 621:(fx* 2 (fx* 3 4)) ... ok
+test 622:(fx* (fx* 2 3) 4) ... ok
+test 623:(fx* (fx* (fx* (fx* (fx* 2 3) 4) 5) 6) 7) ... ok
+test 624:(fx* 2 (fx* 3 (fx* 4 (fx* 5 (fx* 6 7))))) ... ok
+Performing fxlogand and fxlogor tests ...
+test 625:(fxlogor 3 16) ... ok
+test 626:(fxlogor 3 5) ... ok
+test 627:(fxlogor 3 7) ... ok
+test 628:(fxlognot (fxlogor (fxlognot 7) 1)) ... ok
+test 629:(fxlognot (fxlogor 1 (fxlognot 7))) ... ok
+test 630:(fxlogand 3 7) ... ok
+test 631:(fxlogand 3 5) ... ok
+test 632:(fxlogand 2346 (fxlognot 2346)) ... ok
+test 633:(fxlogand (fxlognot 2346) 2346) ... ok
+test 634:(fxlogand 2376 2376) ... ok
+Performing fx= tests ...
+test 635:(fx= 12 13) ... ok
+test 636:(fx= 12 12) ... ok
+test 637:(fx= 16 (fx+ 13 3)) ... ok
+test 638:(fx= 16 (fx+ 13 13)) ... ok
+test 639:(fx= (fx+ 13 3) 16) ... ok
+test 640:(fx= (fx+ 13 13) 16) ... ok
+Performing fx< tests ...
+test 641:(fx< 12 13) ... ok
+test 642:(fx< 12 12) ... ok
+test 643:(fx< 13 12) ... ok
+test 644:(fx< 16 (fx+ 13 1)) ... ok
+test 645:(fx< 16 (fx+ 13 3)) ... ok
+test 646:(fx< 16 (fx+ 13 13)) ... ok
+test 647:(fx< (fx+ 13 1) 16) ... ok
+test 648:(fx< (fx+ 13 3) 16) ... ok
+test 649:(fx< (fx+ 13 13) 16) ... ok
+Performing fx<= tests ...
+test 650:(fx<= 12 13) ... ok
+test 651:(fx<= 12 12) ... ok
+test 652:(fx<= 13 12) ... ok
+test 653:(fx<= 16 (fx+ 13 1)) ... ok
+test 654:(fx<= 16 (fx+ 13 3)) ... ok
+test 655:(fx<= 16 (fx+ 13 13)) ... ok
+test 656:(fx<= (fx+ 13 1) 16) ... ok
+test 657:(fx<= (fx+ 13 3) 16) ... ok
+test 658:(fx<= (fx+ 13 13) 16) ... ok
+Performing fx> tests ...
+test 659:(fx> 12 13) ... ok
+test 660:(fx> 12 12) ... ok
+test 661:(fx> 13 12) ... ok
+test 662:(fx> 16 (fx+ 13 1)) ... ok
+test 663:(fx> 16 (fx+ 13 3)) ... ok
+test 664:(fx> 16 (fx+ 13 13)) ... ok
+test 665:(fx> (fx+ 13 1) 16) ... ok
+test 666:(fx> (fx+ 13 3) 16) ... ok
+test 667:(fx> (fx+ 13 13) 16) ... ok
+Performing fx>= tests ...
+test 668:(fx>= 12 13) ... ok
+test 669:(fx>= 12 12) ... ok
+test 670:(fx>= 13 12) ... ok
+test 671:(fx>= 16 (fx+ 13 1)) ... ok
+test 672:(fx>= 16 (fx+ 13 3)) ... ok
+test 673:(fx>= 16 (fx+ 13 13)) ... ok
+test 674:(fx>= (fx+ 13 1) 16) ... ok
+test 675:(fx>= (fx+ 13 3) 16) ... ok
+test 676:(fx>= (fx+ 13 13) 16) ... ok
+Performing if tests ...
+test 677:(if (fx= 12 13) 12 13) ... ok
+test 678:(if (fx= 12 12) 13 14) ... ok
+test 679:(if (fx< 12 13) 12 13) ... ok
+test 680:(if (fx< 12 12) 13 14) ... ok
+test 681:(if (fx< 13 12) 13 14) ... ok
+test 682:(if (fx<= 12 13) 12 13) ... ok
+test 683:(if (fx<= 12 12) 12 13) ... ok
+test 684:(if (fx<= 13 12) 13 14) ... ok
+test 685:(if (fx> 12 13) 12 13) ... ok
+test 686:(if (fx> 12 12) 12 13) ... ok
+test 687:(if (fx> 13 12) 13 14) ... ok
+test 688:(if (fx>= 12 13) 12 13) ... ok
+test 689:(if (fx>= 12 12) 12 13) ... ok
+test 690:(if (fx>= 13 12) 13 14) ... ok
+Performing if tests ...
+test 691:(if #t 12 13) ... ok
+test 692:(if #f 12 13) ... ok
+test 693:(if 0 12 13) ... ok
+test 694:(if () 43 ()) ... ok
+test 695:(if #t (if 12 13 4) 17) ... ok
+test 696:(if #f 12 (if #f 13 4)) ... ok
+test 697:(if #\X (if 1 2 3) (if 4 5 6)) ... ok
+test 698:(if (not (boolean? #t)) 15 (boolean? #f)) ... ok
+test 699:(if (if (char? #\a) (boolean? #\b) (fixnum? #\c)) 119 -23) ... ok
+test 700:(if (if (if (not 1) (not 2) (not 3)) 4 5) 6 7) ... ok
+test 701:(if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7) ... ok
+test 702:(not (if (not (if (if (not 1) (not 2) (not 3)) 4 5)) 6 7)) ... ok
+test 703:(if (char? 12) 13 14) ... ok
+test 704:(if (char? #\a) 13 14) ... ok
+test 705:(fxadd1 (if (fxsub1 1) (fxsub1 13) 14)) ... ok
+Performing and tests ...
+test 706:(and) ... ok
+test 707:(and #t) ... ok
+test 708:(and #f) ... ok
+test 709:(and #t #t) ... ok
+test 710:(and #t #f) ... ok
+test 711:(and #t #t #t) ... ok
+test 712:(and #t #t #t #t #t #t #t) ... ok
+test 713:(and #t #t #t #f #t #t #t) ... ok
+test 714:(and (char? 12) (boolean? #f)) ... ok
+test 715:(and (char? #\a) (boolean? #f)) ... ok
+test 716:(and (char? #\newline) (not #f)) ... ok
+test 717:(and (char? #\newline) (not #f) (not ())) ... ok
+Performing or tests ...
+test 718:(or) ... ok
+test 719:(or #t) ... ok
+test 720:(or #f) ... ok
+test 721:(or #t #f) ... ok
+test 722:(or #f #t) ... ok
+test 723:(or #f #f #f #f #f #f #f #f #f #f #f #t) ... ok
+test 724:(or #f #f #f #f #f (char? 14) (boolean? #\a)) ... ok
+test 725:(and (or (char? 12) (char? #\a)) (or (boolean? 13) (boolean? #f))) ... ok
+test 726:(or (char? #\a) (boolean? #f)) ... ok
+Performing fxadd1 tests ...
+test 727:(fxadd1 0) ... ok
+test 728:(fxadd1 -1) ... ok
+test 729:(fxadd1 1) ... ok
+test 730:(fxadd1 -100) ... ok
+test 731:(fxadd1 1000) ... ok
+test 732:(fxadd1 536870910) ... ok
+test 733:(fxadd1 -536870912) ... ok
+test 734:(fxadd1 (fxadd1 0)) ... ok
+test 735:(fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 (fxadd1 12)))))) ... ok
+Performing fixnum->char and char->fixnum tests ...
+test 736:(fixnum->char 65) ... ok
+test 737:(fixnum->char 97) ... ok
+test 738:(fixnum->char 122) ... ok
+test 739:(fixnum->char 90) ... ok
+test 740:(fixnum->char 48) ... ok
+test 741:(fixnum->char 57) ... ok
+test 742:(char->fixnum #\A) ... ok
+test 743:(char->fixnum #\a) ... ok
+test 744:(char->fixnum #\z) ... ok
+test 745:(char->fixnum #\Z) ... ok
+test 746:(char->fixnum #\0) ... ok
+test 747:(char->fixnum #\9) ... ok
+test 748:(char->fixnum (fixnum->char 12)) ... ok
+test 749:(fixnum->char (char->fixnum #\x)) ... ok
+Performing fixnum? tests ...
+test 750:(fixnum? 0) ... ok
+test 751:(fixnum? 1) ... ok
+test 752:(fixnum? -1) ... ok
+test 753:(fixnum? 37287) ... ok
+test 754:(fixnum? -23873) ... ok
+test 755:(fixnum? 536870911) ... ok
+test 756:(fixnum? -536870912) ... ok
+test 757:(fixnum? #t) ... ok
+test 758:(fixnum? #f) ... ok
+test 759:(fixnum? ()) ... ok
+test 760:(fixnum? #\Q) ... ok
+test 761:(fixnum? (fixnum? 12)) ... ok
+test 762:(fixnum? (fixnum? #f)) ... ok
+test 763:(fixnum? (fixnum? #\A)) ... ok
+test 764:(fixnum? (char->fixnum #\r)) ... ok
+test 765:(fixnum? (fixnum->char 12)) ... ok
+Performing fxzero? tests ...
+test 766:(fxzero? 0) ... ok
+test 767:(fxzero? 1) ... ok
+test 768:(fxzero? -1) ... ok
+Performing null? tests ...
+test 769:(null? ()) ... ok
+test 770:(null? #f) ... ok
+test 771:(null? #t) ... ok
+test 772:(null? (null? ())) ... ok
+test 773:(null? #\a) ... ok
+test 774:(null? 0) ... ok
+test 775:(null? -10) ... ok
+test 776:(null? 10) ... ok
+Performing boolean? tests ...
+test 777:(boolean? #t) ... ok
+test 778:(boolean? #f) ... ok
+test 779:(boolean? 0) ... ok
+test 780:(boolean? 1) ... ok
+test 781:(boolean? -1) ... ok
+test 782:(boolean? ()) ... ok
+test 783:(boolean? #\a) ... ok
+test 784:(boolean? (boolean? 0)) ... ok
+test 785:(boolean? (fixnum? (boolean? 0))) ... ok
+Performing char? tests ...
+test 786:(char? #\a) ... ok
+test 787:(char? #\Z) ... ok
+test 788:(char? #\newline) ... ok
+test 789:(char? #t) ... ok
+test 790:(char? #f) ... ok
+test 791:(char? ()) ... ok
+test 792:(char? (char? #t)) ... ok
+test 793:(char? 0) ... ok
+test 794:(char? 23870) ... ok
+test 795:(char? -23789) ... ok
+Performing not tests ...
+test 796:(not #t) ... ok
+test 797:(not #f) ... ok
+test 798:(not 15) ... ok
+test 799:(not ()) ... ok
+test 800:(not #\A) ... ok
+test 801:(not (not #t)) ... ok
+test 802:(not (not #f)) ... ok
+test 803:(not (not 15)) ... ok
+test 804:(not (fixnum? 15)) ... ok
+test 805:(not (fixnum? #f)) ... ok
+Performing fxlognot tests ...
+test 806:(fxlognot 0) ... ok
+test 807:(fxlognot -1) ... ok
+test 808:(fxlognot 1) ... ok
+test 809:(fxlognot -2) ... ok
+test 810:(fxlognot 536870911) ... ok
+test 811:(fxlognot -536870912) ... ok
+test 812:(fxlognot (fxlognot 237463)) ... ok
+Performing immediate constants tests ...
+test 813:#f ... ok
+test 814:#t ... ok
+test 815:() ... ok
+test 816:#\tab ... ok
+test 817:#\newline ... ok
+test 818:#\return ... ok
+test 819:#\space ... ok
+test 820:#\! ... ok
+test 821:#\" ... ok
+test 822:#\# ... ok
+test 823:#\$ ... ok
+test 824:#\% ... ok
+test 825:#\& ... ok
+test 826:#\' ... ok
+test 827:#\( ... ok
+test 828:#\) ... ok
+test 829:#\* ... ok
+test 830:#\+ ... ok
+test 831:#\, ... ok
+test 832:#\- ... ok
+test 833:#\. ... ok
+test 834:#\/ ... ok
+test 835:#\0 ... ok
+test 836:#\1 ... ok
+test 837:#\2 ... ok
+test 838:#\3 ... ok
+test 839:#\4 ... ok
+test 840:#\5 ... ok
+test 841:#\6 ... ok
+test 842:#\7 ... ok
+test 843:#\8 ... ok
+test 844:#\9 ... ok
+test 845:#\: ... ok
+test 846:#\; ... ok
+test 847:#\< ... ok
+test 848:#\= ... ok
+test 849:#\> ... ok
+test 850:#\? ... ok
+test 851:#\@ ... ok
+test 852:#\A ... ok
+test 853:#\B ... ok
+test 854:#\C ... ok
+test 855:#\D ... ok
+test 856:#\E ... ok
+test 857:#\F ... ok
+test 858:#\G ... ok
+test 859:#\H ... ok
+test 860:#\I ... ok
+test 861:#\J ... ok
+test 862:#\K ... ok
+test 863:#\L ... ok
+test 864:#\M ... ok
+test 865:#\N ... ok
+test 866:#\O ... ok
+test 867:#\P ... ok
+test 868:#\Q ... ok
+test 869:#\R ... ok
+test 870:#\S ... ok
+test 871:#\T ... ok
+test 872:#\U ... ok
+test 873:#\V ... ok
+test 874:#\W ... ok
+test 875:#\X ... ok
+test 876:#\Y ... ok
+test 877:#\Z ... ok
+test 878:#\[ ... ok
+test 879:#\\ ... ok
+test 880:#\] ... ok
+test 881:#\^ ... ok
+test 882:#\_ ... ok
+test 883:#\` ... ok
+test 884:#\a ... ok
+test 885:#\b ... ok
+test 886:#\c ... ok
+test 887:#\d ... ok
+test 888:#\e ... ok
+test 889:#\f ... ok
+test 890:#\g ... ok
+test 891:#\h ... ok
+test 892:#\i ... ok
+test 893:#\j ... ok
+test 894:#\k ... ok
+test 895:#\l ... ok
+test 896:#\m ... ok
+test 897:#\n ... ok
+test 898:#\o ... ok
+test 899:#\p ... ok
+test 900:#\q ... ok
+test 901:#\r ... ok
+test 902:#\s ... ok
+test 903:#\t ... ok
+test 904:#\u ... ok
+test 905:#\v ... ok
+test 906:#\w ... ok
+test 907:#\x ... ok
+test 908:#\y ... ok
+test 909:#\z ... ok
+test 910:#\{ ... ok
+test 911:#\| ... ok
+test 912:#\} ... ok
+test 913:#\~ ... ok
+Performing integers tests ...
+test 914:0 ... ok
+test 915:1 ... ok
+test 916:-1 ... ok
+test 917:10 ... ok
+test 918:-10 ... ok
+test 919:2736 ... ok
+test 920:-2736 ... ok
+test 921:536870911 ... ok
+test 922:-536870912 ... ok
+passed all 923 tests
+> 

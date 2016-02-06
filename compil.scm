@@ -7,7 +7,7 @@
 ;;                                Mark Cornwell
 ;;
 ;;
-;;                   Copyright (C) 2015, All Rights Reserved
+;;                Copyright (C) 2015,2016  All Rights Reserved
 ;;
 ;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
@@ -216,7 +216,8 @@
 (define *transform-list*         ;; all transforms get applied in the order below
   (list 'explicit-begins         ;; add implicit begin to make bodies a single expression
 	'eliminate-let*          ;; transform all let* to nested lets	
-	'eliminate-shadowing     ;; rename variables to make names unique
+;	'eliminate-shadowing     ;; rename variables to make names unique
+	'uniquify-variables           ;; uniquely rename all lambda variables
 	'vectorize-letrec        ;; rewrite letrec as let with vars transformed to vectors
 	'eliminate-set!          ;; rewrite settable variables as vectors
 	'close-free-variables    ;; do free variable analysis, rewrite lambdas as closures
@@ -353,141 +354,97 @@
 	  (eliminate-let* (cdr expr)))]
    [else expr]))
 
-;;-----------------------------------------------------------------------------------
-;;                     Eliminate variable name shadowing
-;;-----------------------------------------------------------------------------------
-;; Other transforms are made simpler if we give variables unique names elimating the
-;; compexities of shadowing.  Otherwise we would have to keep track of an environment
-;; in every transform that recursively descended into the code just to keep the
-;; variables straight.  This way we recur tracking a list bound variables and when
-;; instances of shadowing are found we substitue new unique names that eliminate any
-;; shadowing.
-;;
-;; This will be done after eliminate-multi-element-body so we can assume singleton
-;; body on let and lamba forms.
-;;
-;; Variable are intoduced by let and lambda. Pay careful attention to the difference
-;; in variable scope rules for each of these forms. See (R5RS) for details.
-;;
-;; Recall lambda expressions can take 3 forms:
-;;
-;;  (lambda (v1...vk) body)
-;;  (lambda args body)
-;;  (lambda (v1...vk . args) body)
-;;
-;;-----------------------------------------------------------------------------------
 
-(define *global-names* '())
-
-(define-transform (eliminate-shadowing expr)
-  (uniquely-rename-variables *global-names* expr))
-
-;; (define (varargs? u)   ;; like a list but ends in a symbol not a ()
-;;   (cond
-;;    [(null? u) #f]
-;;    [(symbol? u) #t]
-;;    [(and (pair? u) (symbol? (car u))) (varargs? (cdr u))]))
+;;--------------------------------------------------------------------------------------
+;;                                Uniquify-variables
+;;--------------------------------------------------------------------------------------
+;;  Unique renaming for all variables introduced by lambda, let, letrec
 ;;
-;; Now formals can be (v1...vk) | args | (v1...vk . args)
-;; Immitiate the structure of (varargs? ...) above
+;;  Notice we can't separate out renaming of lambda introduce vars from vars introduced
+;;  by let, since each can shadow the other.
+;;
+;;  Key idea, as we recurse downward, when we encournter a lambda/let we stop to rename
+;;  the internal formals of the lambda/let before we apply the renaming from outside.
+;;  We start with a null map at the toplevel.
+;;---------------------------------------------------------------------------------------
+;;
+;;  T[m](lambda args body)       =>  (lambda T[m]T(m(args)){args} T[m]T[m(args)]{body})
+;;
+;;  T[m](let ((V E) ...) body)   =>  (let ((T[mV]{V} T[m]{E})...) T[m]T[mV]{body})
+;;
+;;  T[m](letrec ((V E)...) body) =>  (letrec ((T[mV]{V} T[m]T[mV]{E})...) T[m]T[mV]{body})
+;;
+;;  T[m](x . y)                  =>  (T[m]{x} . T[m]{y})
+;;
+;;  T[m]a                        =>  m[a] or a 
+;; -------------------------------------------------------------------------------------- 
 
-(define (find-name-collision formals bound-vars)
+(define-transform (uniquify-variables expr)
+  (unique-T '() expr))
+
+(define (unique-T m expr)
   (cond
-   [(null? formals) #f]
-   [(null? bound-vars) #f]
-   [(symbol? formals) (memq formals bound-vars) formals]
-   [else (find-name-collision (cdr formals) bound-vars)]))
-
-;; (define (find-name-collision vars bound-vars)
-;;   (cond
-;;    [(null? vars) #f]
-;;    [(null? bound-vars) #f]
-;;    [(memq (car vars) bound-vars) (car vars)]
-;;    [else (find-name-collision (cdr vars) bound-vars)]))
-
-(define unique-rename
-  (let ([count 0])
-    (lambda (old-name)
-      (let ([name (format "~a$~a" old-name count)])
-    (set! count (add1 count))
-    (string->symbol name)))))
-
-(define (remove-name-conflict old-name expr)
-  (let ([new-name (unique-rename old-name)])
-    (rename-variable old-name new-name expr)))
-
-(define (rename-variable old-name new-name expr)
-  (cond
-   [(null? expr) '()]
-   [(eq? expr old-name) new-name]
-   [(pair? expr)
-    (cons (rename-variable old-name new-name (car expr))
-	  (rename-variable old-name new-name (cdr expr)))]
-   [else expr]))
-
-(define (uniquely-rename-variables-in-let*-bindings bound-vars vars exprs)
-  (if (null? vars)
-      '()
-      (cons (list (car vars)
-		  (uniquely-rename-variables bound-vars (car exprs)))
-	    (uniquely-rename-variables-in-let*-bindings (cons (car vars) bound-vars)
-							(cdr vars)
-							(cdr exprs)))))
-
-(define (rename-let-formal name-conflict let-expr)
-  (let* ([letform (car let-expr)]
-	 [bindings (let-bindings let-expr)]
-	 [vars (map first bindings)]
-	 [exprs (map second bindings)]
-	 [body (let-body let-expr)]
-	 [new-name (unique-rename name-conflict)]
-	 [new-vars (rename-variable name-conflict new-name vars)]
-	 [new-body (rename-variable name-conflict new-name body)]
-	 [new-bindings (map list new-vars exprs)])
-    (list letform new-bindings new-body)))
-
-(define (add-formals formals bound-vars)
-  (cond
-   [(null? formals) bound-vars]
-   [(symbol? formals) (cons formals bound-vars)]
-   [(pair? formals) (add-formals (cdr formals) (cons (car formals) bound-vars))]
-   [else (error 'add-formals "ill formed formals")]))
-	    
-(define (uniquely-rename-variables bound-vars expr)
-  (cond
-   [(lambda? expr)
-    (let* ([formals (lambda-formals expr)]  ;; <<-- formals
+   ;;  T[m](lambda args body) => (lambda T[m]T(m(args)){args} T[m]T[m(args)]{body})
+   [(lambda? expr) 
+    (let* ([args (lambda-formals expr)]
 	   [body (lambda-body expr)]
-	   [name-conflict (find-name-collision formals bound-vars)])  ;; <<--- formal
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
-	  (list 'lambda formals (uniquely-rename-variables (add-formals formals bound-vars) body))))] ;; <<--
-   [(letrec? expr)
-    (let* ([bindings (letrec-bindings expr)]
-	   [vars (map first bindings)]
-	   [exprs (map second bindings)]
-	   [body (letrec-body expr)]
-	   [name-conflict (find-name-collision vars bound-vars)])
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
-	  (list 'letrec
-		(map list vars (uniquely-rename-variables (append vars bound-vars) exprs))
-		(uniquely-rename-variables (append vars bound-vars) body))))]
+	   [margs (map-lambda-args args)]
+	   [new-args (unique-T margs args)]
+	   [new-body (unique-T margs body)])
+      (list 'lambda
+	    (unique-T m new-args)
+	    (unique-T m new-body)))]
+   ;;  T[m](let ((V E) ...) body) => (let ((T[mV]{V} T[m]{E})...) T[m]T[mV]{body})   
    [(let? expr)
     (let* ([bindings (let-bindings expr)]
-	   [vars (map first bindings)]
-	   [exprs (map second bindings)]
 	   [body (let-body expr)]
-	   [name-conflict (find-name-collision vars bound-vars)])
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (rename-let-formal name-conflict expr)) ;;
-	  (list 'let
-		(map list vars (uniquely-rename-variables bound-vars exprs))
-		(uniquely-rename-variables (append vars bound-vars) body))))]
+	   [V* (map car bindings)]	   
+	   [E* (map cadr bindings)]
+	   [mV (map (lambda (v) (cons v (unique-lvar))) V*)]
+           [new-V* (map (lambda (v) (unique-T mV v)) V*)]
+	   [new-E* (map (lambda (e) (unique-T m e)) E*)]
+	   [new-bindings (map (lambda (v e)(list v e)) new-V* new-E*)]
+	   [new-body (unique-T m (unique-T mV body))])
+      (list 'let
+	    new-bindings
+	    new-body))]
+   ;;  T[m](letrec ((V E)...) body) =>  (letrec ((T[mV]{V} T[m]T[mV]{E})...) T[m]T[mV]{body})
+   [(letrec? expr)
+    (let* ([bindings (letrec-bindings expr)]
+	   [body (letrec-body expr)]
+	   [V* (map car bindings)]
+	   [E* (map cadr bindings)]
+	   [mV (map (lambda (v) (cons v (unique-lvar))) V*)]
+	   [new-V* (map (lambda (v) (unique-T mV v)) V*)]
+	   [new-E* (map (lambda (e) (unique-T m e))
+			(map (lambda (e) (unique-T mV e)) E*))]
+	   [new-bindings (map (lambda (v e) (list v e)) new-V* new-E*)]
+	   [new-body (unique-T m (unique-T mV body))])
+      (list 'letrec
+	    new-bindings
+	    new-body))]
+   ;;  T[m](x . y) => (T[m]{x} . T[m]{y})   
    [(pair? expr)
-    (cons (uniquely-rename-variables bound-vars (car expr))
-	  (uniquely-rename-variables bound-vars (cdr expr)))]
+    (cons (unique-T m (car expr))
+	  (unique-T m (cdr expr)))]
+   ;;  T[m]a =>  m[a] or a
+   [(symbol? expr)
+    (let ([v (assoc expr m)])
+      (if v (cdr v) expr))]
+   ;; T[m]{x} => x  otherwise
    [else expr]))
+
+(define (map-lambda-args formals)  ;; returns an alist
+  (cond
+   [(null? formals)
+    formals]
+   [(symbol? formals)
+    (list (cons formals (unique-lvar)))]
+   [(pair? formals)
+    (cons (cons (car formals)
+		(unique-lvar))
+	  (map-lambda-args (cdr formals)))]))
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Close-free-variables      
@@ -654,7 +611,7 @@
 ;;          E[vi->(vector-ref vi)]))
 ;;
 ;;-----------------------------------------------------------------------------------
-
+;;
 ;; ISSUE: Rewrite this comment.
 ;;
 ;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
@@ -680,6 +637,8 @@
 ;;      T(vi)[v]                         => (vector-ref vi 0)       if v in vi
 ;;      T(vi)[vj]                        => v                       o/w
 ;;
+;;      T(vi)[(lambda args x)]           => (lambda args T(vi)[x])
+;;
 ;;      T(vi)[(x . y)]                   => (T(vi)[x] . T(vi)[y])
 ;;
 ;;      T(vi)[a]                         => a
@@ -688,6 +647,8 @@
 ;; After using the above notation to clarify my thinking, re-implemented vectorize
 ;; from scratch and it worked the first time.  Good notation helps you think!
 ;;-----------------------------------------------------------------------------------
+
+(define t1 '(letrec ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)))
 
 (define-transform (vectorize-letrec exp)
   (vectorize-T '() exp))
@@ -721,10 +682,14 @@
     (if (memq exp ui)
 	(list 'vector-ref exp 0)
 	exp)]
+   [(lambda? exp)
+    (list 'lambda (lambda-formals exp) (vectorize-T ui (lambda-body exp)))]
    [(pair? exp)
     (cons (vectorize-T ui (car exp))
 	  (vectorize-T ui (cdr exp)))]
    [else exp]))
+
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment
@@ -838,6 +803,13 @@
     (cons (vectorize svars (car expr))
 	  (vectorize svars (cdr expr)))]
    [else expr]))
+
+(define unique-rename
+  (let ([count 0])
+    (lambda (old-name)
+      (let ([name (format "~a$~a" old-name count)])
+    (set! count (add1 count))
+    (string->symbol name)))))
 
 ;; a mapper that applies to the structure of lambda formals
 (define (map-formals f formals)
@@ -2627,13 +2599,12 @@
     (emit "    add $~s, %ebp     # bump ebp" (align-to-8-bytes size))
     (emit "    jmp ~a            # jump around closure body"  exit-point) 
 
-    ;;------------------------------------------------------------------
-    ;; Build the code to execute the closure body using the closed
-    ;; environment so any free variable references all resolve to cells
-    ;; in the closure object
-    ;;------------------------------------------------------------------
+    ;;------------------------------------------------------------------------------
+    ;; Build the code to execute the closure body using the closed environment so any
+    ;; free variable references all resolve to cells in the closure object
+    ;;------------------------------------------------------------------------------
     
-    (emit "~a:" entry-point)                ;; this is the label that we put in the closure
+    (emit "~a:" entry-point)     ;; this is the label that we put in the closure
     ;; (lambda (v1 v2 ...) body
     ;; (lambda args body)
     ;; (lambda (v1..vk . args) body)
@@ -2829,7 +2800,7 @@
 ;;                                      fig 4
 ;;
 ;; If only it were that simple.  OSX throws a wrench in the works by insisting that esp
-;; be aligned on a 16 byte boundary at the time that the call is made.  Since our
+;; be aligned on a 16 byte boundary at the time the caller makes the call.  Since our
 ;; call migth be made from anywhere, we need to adjust for the proper alignment at run
 ;; time.  But since all the arguments need to evaluated in the original Scheme stack
 ;; frame we adopt a simple expedient.  We calcuale all the arguments first, then we shift

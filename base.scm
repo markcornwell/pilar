@@ -203,7 +203,7 @@
   [eh_procedure    (lambda ()    (error 'funcall "arg 1 must be a procedure"))]
   [eh_argcount     (lambda ()    (error 'funcall "wrong number of args"))]
   [eh_argcount_min (lambda ()    (error 'funcall "too few args"))]
- ;[eh_argcount     (lambda ()    (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar  
+  ;[eh_argcount     (lambda ()    (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar  
   [eh_fixnum       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a fixnum"))]
   [eh_string       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a string"))]
   [eh_character    (lambda (i)   (error (list-ref (primitives) i)  "arg must be a character"))]
