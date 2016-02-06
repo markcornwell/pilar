@@ -102,6 +102,32 @@
 	 (car l)
 	 (list-ref (cdr l) (fx- k 1))))]
 
+  [list-length
+   (lambda (l)
+     (if (null? l)
+	 0
+	 (fxadd1 (list-length (cdr l)))))]
+
+;;----------------------------------------------------------------------------------
+;;                                     Vectors
+;;----------------------------------------------------------------------------------
+
+  ;; [vector
+  ;;  (letrec
+  ;;      ([fill-vector
+  ;; 	 (lambda (v k args)
+  ;; 	   (if (null? args)
+  ;; 	       v
+  ;; 	       (begin
+  ;; 		 (vector-set! v k (car args))
+  ;; 		 (fill-vector v (fxadd1 k) (cdr args)))))])	
+  ;;    (lambda args
+  ;;      (if (fx= (list-length args) 1)
+  ;; 	   (vector1 (car args))
+  ;; 	   (fill-vector (make-vector (list-length args))
+  ;; 			0
+  ;; 			args))))]
+
 ;;----------------------------------------------------------------------------------
 ;;                         Handlers for Runtime Errors
 ;;----------------------------------------------------------------------------------
@@ -176,7 +202,8 @@
   
   [eh_procedure    (lambda ()    (error 'funcall "arg 1 must be a procedure"))]
   [eh_argcount     (lambda ()    (error 'funcall "wrong number of args"))]
- ;[eh_argcount     (lambda ()    (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar  
+  [eh_argcount_min (lambda ()    (error 'funcall "too few args"))]
+  ;[eh_argcount     (lambda ()    (error 'lambda "wrong number of args"))]  ;; lambda confuses pilar  
   [eh_fixnum       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a fixnum"))]
   [eh_string       (lambda (i)   (error (list-ref (primitives) i)  "arg must be a string"))]
   [eh_character    (lambda (i)   (error (list-ref (primitives) i)  "arg must be a character"))]

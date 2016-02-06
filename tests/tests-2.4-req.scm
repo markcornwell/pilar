@@ -31,12 +31,32 @@
       (g))) => "100\n"]
   [(letrec ([f (letrec ([g (lambda (x) (fx* x 2))])
                   (lambda (n) (g (fx* n 2))))])
-      (f 12)) => "48\n"]
-  [(letrec ([f (lambda (f n)
+     (f 12)) => "48\n"]
+
+  [(let ((f (make-vector 1)))
+     (vector-set! f 0 42)
+     (vector-ref f 0)) => "42\n"]
+
+  [(let
+       ((f (make-vector 1)))
+     (begin
+       (begin
+  	 (vector-set! f
+  		      0
+  		      (closure (g n)   ;;;  <<<------ we just unshadowed f right here
+  			       ()
+			       (if (fxzero? n)
+				   1
+				   (fx* n (g g (fxsub1 n)))))))  ;; <<--- and here
+       ((vector-ref f 0) (vector-ref f 0) 5))) => "120\n"]
+  
+  
+  [(letrec ([f (lambda (f n)   ;; Problem is variable shadowing. Fix by using unique rename lambda vars.
                   (if (fxzero? n)
                       1
                       (fx* n (f f (fxsub1 n)))))])
-      (f f 5)) => "120\n"]
+     (f f 5)) => "120\n"]
+  
   [(let ([f (lambda (f)
               (lambda (n)
                  (if (fxzero? n)

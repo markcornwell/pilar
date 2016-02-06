@@ -3,7 +3,7 @@
 # -536870912
 # == eliminate-let*  ==>
 # -536870912
-# == eliminate-shadowing  ==>
+# == uniquify-variables  ==>
 # -536870912
 # == vectorize-letrec  ==>
 # -536870912

@@ -7,7 +7,7 @@
 ;;                                Mark Cornwell
 ;;
 ;;
-;;                   Copyright (C) 2015, All Rights Reserved
+;;                Copyright (C) 2015,2016  All Rights Reserved
 ;;
 ;;------------------------------------------------------------------------------
 ;;                   Think first, then try.     -- The Little Schemer.
@@ -168,10 +168,10 @@
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 ;; (load "tests/tests-3.1-req.scm")  ;; vector
+
+(load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 (if *safe* (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
 (load "tests/tests-2.8-req.scm")  ;; symbols
-;; (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
-
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
@@ -216,7 +216,8 @@
 (define *transform-list*         ;; all transforms get applied in the order below
   (list 'explicit-begins         ;; add implicit begin to make bodies a single expression
 	'eliminate-let*          ;; transform all let* to nested lets	
-	'eliminate-shadowing     ;; rename variables to make names unique
+;	'eliminate-shadowing     ;; rename variables to make names unique
+	'uniquify-variables           ;; uniquely rename all lambda variables
 	'vectorize-letrec        ;; rewrite letrec as let with vars transformed to vectors
 	'eliminate-set!          ;; rewrite settable variables as vectors
 	'close-free-variables    ;; do free variable analysis, rewrite lambdas as closures
@@ -353,111 +354,97 @@
 	  (eliminate-let* (cdr expr)))]
    [else expr]))
 
-;;-----------------------------------------------------------------------------------
-;;                     Eliminate variable name shadowing
-;;-----------------------------------------------------------------------------------
-;; Other transforms are made simpler if we give variables unique names elimating the
-;; compexities of shadowing.  Otherwise we would have to keep track of an environment
-;; in every transform that recursively descended into the code just to keep the
-;; variables straight.  This way we recur tracking a list bound variables and when
-;; instances of shadowing are found we substitue new unique names that eliminate any
-;; shadowing.
+
+;;--------------------------------------------------------------------------------------
+;;                                Uniquify-variables
+;;--------------------------------------------------------------------------------------
+;;  Unique renaming for all variables introduced by lambda, let, letrec
 ;;
-;; This will be done after eliminate-multi-element-body so we can assume singleton
-;; body on let and lamba forms.
+;;  Notice we can't separate out renaming of lambda introduce vars from vars introduced
+;;  by let, since each can shadow the other.
 ;;
-;; Variable are intoduced by let and lambda. Pay careful attention to the difference
-;; in variable scope rules for each of these forms. See (R5RS) for details.
-;;-----------------------------------------------------------------------------------
+;;  Key idea, as we recurse downward, when we encournter a lambda/let we stop to rename
+;;  the internal formals of the lambda/let before we apply the renaming from outside.
+;;  We start with a null map at the toplevel.
+;;---------------------------------------------------------------------------------------
+;;
+;;  T[m](lambda args body)       =>  (lambda T[m]T(m(args)){args} T[m]T[m(args)]{body})
+;;
+;;  T[m](let ((V E) ...) body)   =>  (let ((T[mV]{V} T[m]{E})...) T[m]T[mV]{body})
+;;
+;;  T[m](letrec ((V E)...) body) =>  (letrec ((T[mV]{V} T[m]T[mV]{E})...) T[m]T[mV]{body})
+;;
+;;  T[m](x . y)                  =>  (T[m]{x} . T[m]{y})
+;;
+;;  T[m]a                        =>  m[a] or a 
+;; -------------------------------------------------------------------------------------- 
 
-(define *global-names* '())
+(define-transform (uniquify-variables expr)
+  (unique-T '() expr))
 
-(define-transform (eliminate-shadowing expr)
-  (uniquely-rename-variables *global-names* expr))
-
-(define (find-name-collision vars bound-vars)
+(define (unique-T m expr)
   (cond
-   [(null? vars) #f]
-   [(null? bound-vars) #f]
-   [(memq (car vars) bound-vars) (car vars)]
-   [else (find-name-collision (cdr vars) bound-vars)]))
-
-(define unique-rename
-  (let ([count 0])
-    (lambda (old-name)
-      (let ([name (format "~a$~a" old-name count)])
-    (set! count (add1 count))
-    (string->symbol name)))))
-
-(define (remove-name-conflict old-name expr)
-  (let ([new-name (unique-rename old-name)])
-    (rename-variable old-name new-name expr)))
-
-(define (rename-variable old-name new-name expr)
-  (cond
-   [(null? expr) '()]
-   [(eq? expr old-name) new-name]
-   [(pair? expr)
-    (cons (rename-variable old-name new-name (car expr))
-	  (rename-variable old-name new-name (cdr expr)))]
-   [else expr]))
-
-(define (uniquely-rename-variables-in-let*-bindings bound-vars vars exprs)
-  (if (null? vars)
-      '()
-      (cons (list (car vars)
-		  (uniquely-rename-variables bound-vars (car exprs)))
-	    (uniquely-rename-variables-in-let*-bindings (cons (car vars) bound-vars)
-							(cdr vars)
-							(cdr exprs)))))
-
-(define (rename-let-formal name-conflict let-expr)
-  (let* ([letform (car let-expr)]
-	 [bindings (let-bindings let-expr)]
-	 [vars (map first bindings)]
-	 [exprs (map second bindings)]
-	 [body (let-body let-expr)]
-	 [new-name (unique-rename name-conflict)]
-	 [new-vars (rename-variable name-conflict new-name vars)]
-	 [new-body (rename-variable name-conflict new-name body)]
-	 [new-bindings (map list new-vars exprs)])
-  (list letform new-bindings new-body)))
-	    
-(define (uniquely-rename-variables bound-vars expr)
-  (cond
-   [(lambda? expr)
-    (let* ([formals (lambda-formals expr)]
+   ;;  T[m](lambda args body) => (lambda T[m]T(m(args)){args} T[m]T[m(args)]{body})
+   [(lambda? expr) 
+    (let* ([args (lambda-formals expr)]
 	   [body (lambda-body expr)]
-	   [name-conflict (find-name-collision formals bound-vars)])
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
-	  (list 'lambda formals (uniquely-rename-variables (append formals bound-vars) body))))]
-   [(letrec? expr)
-    (let* ([bindings (letrec-bindings expr)]
-	   [vars (map first bindings)]
-	   [exprs (map second bindings)]
-	   [body (letrec-body expr)]
-	   [name-conflict (find-name-collision vars bound-vars)])
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (remove-name-conflict name-conflict expr))
-	  (list 'letrec
-		(map list vars (uniquely-rename-variables (append vars bound-vars) exprs))
-		(uniquely-rename-variables (append vars bound-vars) body))))]
+	   [margs (map-lambda-args args)]
+	   [new-args (unique-T margs args)]
+	   [new-body (unique-T margs body)])
+      (list 'lambda
+	    (unique-T m new-args)
+	    (unique-T m new-body)))]
+   ;;  T[m](let ((V E) ...) body) => (let ((T[mV]{V} T[m]{E})...) T[m]T[mV]{body})   
    [(let? expr)
     (let* ([bindings (let-bindings expr)]
-	   [vars (map first bindings)]
-	   [exprs (map second bindings)]
 	   [body (let-body expr)]
-	   [name-conflict (find-name-collision vars bound-vars)])
-      (if name-conflict
-	  (uniquely-rename-variables bound-vars (rename-let-formal name-conflict expr)) ;;
-	  (list 'let
-		(map list vars (uniquely-rename-variables bound-vars exprs))
-		(uniquely-rename-variables (append vars bound-vars) body))))]
+	   [V* (map car bindings)]	   
+	   [E* (map cadr bindings)]
+	   [mV (map (lambda (v) (cons v (unique-lvar))) V*)]
+           [new-V* (map (lambda (v) (unique-T mV v)) V*)]
+	   [new-E* (map (lambda (e) (unique-T m e)) E*)]
+	   [new-bindings (map (lambda (v e)(list v e)) new-V* new-E*)]
+	   [new-body (unique-T m (unique-T mV body))])
+      (list 'let
+	    new-bindings
+	    new-body))]
+   ;;  T[m](letrec ((V E)...) body) =>  (letrec ((T[mV]{V} T[m]T[mV]{E})...) T[m]T[mV]{body})
+   [(letrec? expr)
+    (let* ([bindings (letrec-bindings expr)]
+	   [body (letrec-body expr)]
+	   [V* (map car bindings)]
+	   [E* (map cadr bindings)]
+	   [mV (map (lambda (v) (cons v (unique-lvar))) V*)]
+	   [new-V* (map (lambda (v) (unique-T mV v)) V*)]
+	   [new-E* (map (lambda (e) (unique-T m e))
+			(map (lambda (e) (unique-T mV e)) E*))]
+	   [new-bindings (map (lambda (v e) (list v e)) new-V* new-E*)]
+	   [new-body (unique-T m (unique-T mV body))])
+      (list 'letrec
+	    new-bindings
+	    new-body))]
+   ;;  T[m](x . y) => (T[m]{x} . T[m]{y})   
    [(pair? expr)
-    (cons (uniquely-rename-variables bound-vars (car expr))
-	  (uniquely-rename-variables bound-vars (cdr expr)))]
+    (cons (unique-T m (car expr))
+	  (unique-T m (cdr expr)))]
+   ;;  T[m]a =>  m[a] or a
+   [(symbol? expr)
+    (let ([v (assoc expr m)])
+      (if v (cdr v) expr))]
+   ;; T[m]{x} => x  otherwise
    [else expr]))
+
+(define (map-lambda-args formals)  ;; returns an alist
+  (cond
+   [(null? formals)
+    formals]
+   [(symbol? formals)
+    (list (cons formals (unique-lvar)))]
+   [(pair? formals)
+    (cons (cons (car formals)
+		(unique-lvar))
+	  (map-lambda-args (cdr formals)))]))
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Close-free-variables      
@@ -478,6 +465,9 @@
 ;;     (closure (y) (x)
 ;;         (closure () (x y) (fx+ x y))))
 ;;
+;;
+;; <formals> ::=  (v1...vk) | args | (v1...vk . args)
+;;
 ;;-----------------------------------------------------------------------------------
 
 (define (lambda? expr)
@@ -491,14 +481,22 @@
       (error 'lambda-body "ill-formed lambda expression")))
 
 (define-transform (close-free-variables expr)
-   (close-free '() expr))
+  (close-free '() expr))
+
+(define (flatten-formals formals)
+  (cond
+   [(null? formals) '()]
+   [(symbol? formals) (list formals)]
+   [(pair? formals) (cons (car formals) (flatten-formals (cdr formals)))]
+   [else (error 'flatten-formals "ill-formed formal parameters list")]))
 
 (define (close-free bound-vars expr)
   (cond
    [(lambda? expr)
-    (let* ([formals (lambda-formals expr)]
-	   [freevars (free-variables formals (lambda-body expr))]
-	   [body (close-free formals (lambda-body expr))])
+    (let* ([formals (lambda-formals expr)]   ;; <--- formals
+	   [flat-formals (flatten-formals formals)]
+	   [freevars (free-variables flat-formals (lambda-body expr))] ;; <--- formals
+	   [body (close-free flat-formals (lambda-body expr))])  ;; <---- formals
       (list 'closure formals freevars body))]
    [(let? expr)
     (let* ([bindings (let-bindings expr)]
@@ -572,7 +570,7 @@
 			 '()
 			 (list expr))]
    [(lambda? expr)
-      (free-variables (merg (lambda-formals expr)
+      (free-variables (merg (flatten-formals (lambda-formals expr))
 			      bound-vars)
 		      (lambda-body expr))]
    [(let? expr)
@@ -613,7 +611,7 @@
 ;;          E[vi->(vector-ref vi)]))
 ;;
 ;;-----------------------------------------------------------------------------------
-
+;;
 ;; ISSUE: Rewrite this comment.
 ;;
 ;; (set! z1 '(letrec () 12)) (vectorize-letrec z)
@@ -639,6 +637,8 @@
 ;;      T(vi)[v]                         => (vector-ref vi 0)       if v in vi
 ;;      T(vi)[vj]                        => v                       o/w
 ;;
+;;      T(vi)[(lambda args x)]           => (lambda args T(vi)[x])
+;;
 ;;      T(vi)[(x . y)]                   => (T(vi)[x] . T(vi)[y])
 ;;
 ;;      T(vi)[a]                         => a
@@ -647,6 +647,8 @@
 ;; After using the above notation to clarify my thinking, re-implemented vectorize
 ;; from scratch and it worked the first time.  Good notation helps you think!
 ;;-----------------------------------------------------------------------------------
+
+(define t1 '(letrec ((f (lambda (f n) (if (fxzero? n) 1 (fx* n (f f (fxsub1 n))))))) (f f 5)))
 
 (define-transform (vectorize-letrec exp)
   (vectorize-T '() exp))
@@ -680,10 +682,14 @@
     (if (memq exp ui)
 	(list 'vector-ref exp 0)
 	exp)]
+   [(lambda? exp)
+    (list 'lambda (lambda-formals exp) (vectorize-T ui (lambda-body exp)))]
    [(pair? exp)
     (cons (vectorize-T ui (car exp))
 	  (vectorize-T ui (cdr exp)))]
    [else exp]))
+
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment
@@ -769,18 +775,26 @@
 			      new-exprs)])
       (list 'let new-bindings new-body))]
    [(lambda? expr)
+    ;;
+    ;; with new grammar     formals := (v1...vk) | args | (v1..vK . args)
+    ;; NOTE: extended args variable is *not* assignable
+    ;;
+    ;(format #t "lambda~%")
     (let* ([formals (lambda-formals expr)]
-	   [new-formals (map (lambda (v) (if (memq v svars)
+	   [new-formals (map-formals (lambda (v) (if (memq v svars)
 					     (unique-rename v)
 					     v))
 			     formals)]
 	   [new-let-bindings (map (lambda (v nf) (if (memq v svars)
 						     (list v (list 'vector nf))
 						     (list v v)))
-				  formals
-				  new-formals)]
+					;; formals
+				  (base-formals formals)
+					;; new-formals)
+				  (base-formals new-formals))]
 	   [body (lambda-body expr)]
 	   [new-body (vectorize svars body)])
+     ; (format #t "formals ~s" formals)  ;; DEBUG
       (list
        'lambda new-formals (list 'let new-let-bindings new-body)))]
    [(and (symbol? expr) (memq expr svars)) 
@@ -789,6 +803,30 @@
     (cons (vectorize svars (car expr))
 	  (vectorize svars (cdr expr)))]
    [else expr]))
+
+(define unique-rename
+  (let ([count 0])
+    (lambda (old-name)
+      (let ([name (format "~a$~a" old-name count)])
+    (set! count (add1 count))
+    (string->symbol name)))))
+
+;; a mapper that applies to the structure of lambda formals
+(define (map-formals f formals)
+  (cond
+   [(null? formals) formals]
+   [(symbol? formals) (f formals)]
+   [(pair? formals) (cons (f (car formals)) (map-formals f (cdr formals)))]
+   [else (error 'eliminate-set! "ill-formed formals")]))
+
+;; just the base formals without extended args.
+;;  (base-formals '(v1...vK . args)) => (v1...vK)
+(define (base-formals formals)
+  (cond
+   [(null? formals) formals]
+   [(symbol? formals) '()]
+   [(pair? formals) (cons (car formals) (base-formals (cdr formals)))]
+   [else (error 'base-formals "ill formed formals")]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                               Complex Constants
@@ -1034,7 +1072,10 @@
 	     eh_procedure
 	     eh_argcount
 	     primitives
-	     list-ref)
+	     list-ref
+	     list-length
+	    ;; vector
+	     )
 
 (define-transform (external-symbols expr)
   (cond
@@ -1735,6 +1776,12 @@
   (emit-check-vector-index si 'vector-ref)
   (emit "    movl ~s(%esp), %esi" si)    ;; esi <- vector + tag(5)
   (emit "    movl -1(%eax,%esi), %eax"))  ;; eax <- v[k]  -1 = tag(-5) + lenfield_size(4)
+
+;;
+;; moved to library base.scm
+;;
+;; TBD: integrate it back in as a special case
+;;
 
 (define-primitive (vector si env x)
   (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
@@ -2501,7 +2548,17 @@
 ;;
 ;; Consider that set! will not work since a variable introduced by let or lambda
 ;; might be stored both in the closure and on the stack.  Use Dybvig's rewrite to
-;; replace any such variables with singleton vectors to solve this. 
+;; replace any any variables that get with vectors of size one.  That way anyone
+;; setting the value in the vector sets the value in all references to that vector.
+;;-----------------------------------------------------------------------------------
+;;  Closures must also support extensions that support variable number of arguments.
+;;  to functions.  RSR5 specifices three distinct lamba forms:
+;;
+;;                                              min-args         legal arg count
+;; (flat)     (lambda (v1...vk)                    k              eax = k
+;; (symbol)   (lambda args body)                   0              eax >= 0
+;; (dotted)   (lambda (v1...vk . args) body)       k              eax >= k
+;;
 ;;-----------------------------------------------------------------------------------
 
 (define (closure? expr)
@@ -2511,12 +2568,12 @@
 (define closure-freevars third)
 (define closure-body fourth)
 
-(define (emit-closure si env expr)
+(define (emit-closure si env expr)         ;;  TBD variable number args goes in here
   (emit "# emit-closure")
   (emit "# si = ~s" si)
   (emit "# env = ~s" env)
   (emit "# expr = ~s" expr)  
-  (let* ([formals (closure-formals expr)]
+  (let* ([formals (closure-formals expr)]    ;; TBD  generalized <formals>
 	 [freevars (closure-freevars expr)]
 	 [body (closure-body expr)]
 	 [closed-env (extend-closure-env env freevars)]
@@ -2525,9 +2582,9 @@
 	 [k (length freevars)]
 	 [size (* 4 (+ k 1))])   ;; 4*(k + 1)
 
-    ;;-----------------------------------------------------------
-    ;; Build a closure object in the heap
-    ;;-----------------------------------------------------------
+    ;;-----------------------------------------------------------------
+    ;; Build a closure object in the heap.
+    ;;-----------------------------------------------------------------
     
     ;; Set the label field to L_yy
     (emit "    movl $~a, 0(%ebp)  # closure label" entry-point)  ;; fills %ebp + 0 <-- label
@@ -2542,33 +2599,140 @@
     (emit "    add $~s, %ebp     # bump ebp" (align-to-8-bytes size))
     (emit "    jmp ~a            # jump around closure body"  exit-point) 
 
-    ;;------------------------------------------------------------------
-    ;; Build the code to execute the closure body using the closed
-    ;; environment so any free variable references all resolve to cells
-    ;; in the closure object
-    ;;------------------------------------------------------------------
+    ;;------------------------------------------------------------------------------
+    ;; Build the code to execute the closure body using the closed environment so any
+    ;; free variable references all resolve to cells in the closure object
+    ;;------------------------------------------------------------------------------
     
-    (emit "~a:" entry-point)         ;; this is the label that we put in the closure
-    (emit-check-arg-count (length formals))
-    (let f ([fmls formals]
-	    [si (- (* 2 wordsize))]  ;; Q: why this value for si ???  -8 ???
-	    [env closed-env])      
+    (emit "~a:" entry-point)     ;; this is the label that we put in the closure
+    ;; (lambda (v1 v2 ...) body
+    ;; (lambda args body)
+    ;; (lambda (v1..vk . args) body)
+
+    
+    (when (flatlist? formals)
+	  ;; eax == 4*k
+	  (emit-check-arg-count (length formals)))  
+
+    (when (varargs? formals)
+	  ;; eax >= 4*k
+	  (emit-check-arg-count-min (varargs-min formals)))
+
+    (let f ([fmls formals]                  ;; <<<<---------- formals -------<<<<
+	    [si (- (* 2 wordsize))]         ;; Formals start at esp-8 (see fig 3)
+	    [env closed-env])
       (cond
-       [(empty? fmls)
+       [(empty? fmls)                       ;; <<<<---------- formals -------<<<<
 	(emit-tail-expr si env body)]
+       [(symbol? fmls)                      ;; works for both args and (a b . args)
+	(let ([env (extend-env si env fmls)])
+	  (emit-build-varargs-list si env)
+	  (emit-tail-expr (- si wordsize) env body))]
        [else
 	(f (rest fmls)
 	   (- si wordsize)
 	   (extend-env si env (first fmls)))]))
     (emit "    .align 4,0x90")
-    (emit "~a:" exit-point)    
-    ))
+    (emit "~a:" exit-point)))
+
+;;----------------------------------------------------------------------------------------
+;; At runtime build a list of the extended arguments.  Given arglist of form
+;; (v1...vk . args) observe that eax is the total number of args.  We already checked that
+;; eax >= k. Recall eax is already scaled to 4 bytes because we represent it as a fixnum.
+;; si is the offset from %esp we used to bind the variable that will get assigned the args
+;; list.  Recall si<0 is a negative number.  So adding it to esp grows stack towards low
+;; addresses.
+;;                low addr                                    low addr
+;;              +-------------+                             +-----------+
+;;              |   arg K+N   |<-- esp-4-eax <-- edi        |  arg K+N  |<-+
+;;              +-------------+                             +-----------+  |
+;;              |   arg K+2   |                             |     ()    |  |
+;;              +-------------+                             +-----------+  |
+;;    esp+si   |   arg K+1   |  args                   +-->|  arg K+2  |  |
+;;              +-------------+                         |   +-----------+  |
+;;  esp+(si+4)  |    arg K    |                         |   |     *-----|--+
+;;              +-------------+                         |   +-----------+
+;;              |     ...     |                         |   |  arg K+1  |  <--- esi - pair-tag
+;;              +-------------+                         |   +-----------+
+;;   esp - 8    |    arg 1    |                         +---|-----*     |
+;;              +-------------+                             +-----------+
+;;   esp - 4    |   closure   |                             |           |  <---- ebp
+;;              +-------------+                             +-----------+
+;;      esp  -->|   return    |                               high addr
+;;              +-------------+
+;;                high addr
+;;
+;;  Initially  eax = 4*(K+N) ~~ caller's arg count as a fixnum
+;;  Initially  esi = nil-value  ~~ the datum representing empty list
+;;  Use esi to build up args list from pairs. (arg[K+1] ... arg[K+N])
+;;  Use edi to step down the args on the stack starting with arg[K+N]
+;;  Use ebx as a scratch register.  Recall si<0 by convention.
+;;  Note the terminiating condition on our loop is edi<>esp+(si+4).
+;;  Consider boundary conditions.
+;;  If there are no extended arguments (ie. N=0), the terminating condition
+;;  is met immediately and we skip the body of the loop.  Since esi was
+;;  initialized to () it holds right value for args, where args is our
+;;  varying list of extended arguments.
+;;----------------------------------------------------------------------------------------
+
+(define (emit-build-varargs-list si env)
+  (let ([cont (unique-label)]
+        [loop (unique-label)])
+    (emit "# emit-build-varargs-list")
+    (emit "    movl $~a, %esi       # args <- () " nil-value) ;; collect args in %esi
+    (emit "    lea -4(%esp),%edi    # edi <- esp-4")
+    (emit "    subl %eax, %edi      # edi <- esp-4-eax    addr of arg[K+N] on stack")
+    (emit "~a:" loop)
+    (emit "    lea ~s(%esp),%ebx    # addr of arg[K] on stack" (+ si 4))
+    (emit "    cmp %edi, %ebx       # while edi <> esp+(si+4)")
+    (emit "    je ~a" cont)
+    (emit "    movl (%edi),%ebx     # arg i -> car")  ;;  <<---- BLOWS HERE
+    (emit "    movl %ebx, ~s(%ebp)" car-offset)
+    (emit "    movl %esi, ~s(%ebp)  # esi -> cdr" cdr-offset)
+    (emit "    movl %ebp, %esi")
+    (emit "    addl $~s, %esi       # tag as pair" pair-tag)
+    (emit "    addl $8,%ebp         # bump heap ptr")
+    (emit "    addl $4,%edi         # move to next previous arg from the end")
+    (emit "    jmp ~a" loop)
+    (emit "~a:" cont)
+    (emit "    movl %esi, ~s(%esp)  # set args" si)))
+
+;; (define-primitive (cons si env arg1 arg2)
+;;   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
+;;   (emit-expr si env arg1)                     ;; evaluate arg1
+;;   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
+;;   (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2
+;;   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
+;;   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
+;;   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
+;;   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
+;;   (emit "    or   $~s, %al" pair-tag)         ;; or in the pair tag
+;;   (emit "    add  $~s, %ebp" size-pair)       ;; bump heap ptr
+;;   (emit "# cons end")) 
+
+(define (flatlist? u)  ;; a flat list of symbols or ()
+  (cond
+   [(null? u) #t]
+   [(and (pair? u) (symbol? (car u))) (flatlist? (cdr u))]
+   [else #f]))
+
+(define (varargs? u)   ;; like a list but ends in a symbol not a ()
+  (cond
+   [(null? u) #f]
+   [(symbol? u) #t]
+   [(and (pair? u) (symbol? (car u))) (varargs? (cdr u))]))
+
+(define (varargs-min u) ;; assumes (varargs? u) is #t
+  (cond
+   [(symbol? u) 0]
+   [(pair? u) (1+ (varargs-min (cdr u)))]))
+  
 
 (define (emit-tail-closure si env expr)
   (emit-closure si env expr)
   (emit "   ret"))
 
- (define (extend-formals-env env fmsl)
+ (define (extend-formals-env env fmsl)   ;; <<<<---------- formals -------<<<<
    (let f ([fmls fmsl] [ci (* -2 wordsize)] [env env])  ;; Why -2 * wordsize??  = -8
     (cond
      [(empty? fmls) env]
@@ -2636,7 +2800,7 @@
 ;;                                      fig 4
 ;;
 ;; If only it were that simple.  OSX throws a wrench in the works by insisting that esp
-;; be aligned on a 16 byte boundary at the time that the call is made.  Since our
+;; be aligned on a 16 byte boundary at the time the caller makes the call.  Since our
 ;; call migth be made from anywhere, we need to adjust for the proper alignment at run
 ;; time.  But since all the arguments need to evaluated in the original Scheme stack
 ;; frame we adopt a simple expedient.  We calcuale all the arguments first, then we shift
@@ -2646,8 +2810,6 @@
 ;;
 ;;
 ;;  (diagrams go here - pull from notes on yellow pad)
-;;
-;;
 ;;-------------------------------------------------------------------------------------
 
 (define foreign-call-proc second)
@@ -2705,7 +2867,6 @@
     ;; restore ecx
    (emit "    movl ~s(%esp),%ecx" si) 
    ))
-
 
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)
@@ -2953,6 +3114,20 @@
 	  (emit "    jmp *~s(%edi)  # jump to handler" (- closure-tag))
 	  (emit "~a:" cont))))
 
+(define (emit-check-arg-count-min argc)
+  (when *safe-arg-counts*
+	(let ([cont (unique-label)]
+	      [eh (asmify 'eh_argcount_min)])
+	  (emit "# check argument count")
+	  (emit "    cmp $~s,%eax" (* 4 argc))
+	  (emit "    jge ~a" cont)
+	  (emit "# invoke error handler eh_argcount_min")
+	  (emit "    .extern ~a" eh)
+	  (emit "    movl ~a, %edi  # load handler" eh)
+	  (emit "    movl $0, %eax  # set arg count")
+	  (emit "    jmp *~s(%edi)  # jump to handler" (- closure-tag))
+	  (emit "~a:" cont))))
+
 ;; Generate code for function that evaluates to the list of primitives
 ;; used by the error handlers
 
@@ -2961,3 +3136,112 @@
 		 ,@(map (lambda (f) `(set! p (cons (quote ,f) p)))
 			*primitive-names*)
 		 (lambda () p))))
+
+;;----------------------------------------------------------------------------------------
+;;                              Variable-arity Procedures
+;;----------------------------------------------------------------------------------------
+;;
+;;  (lambda <formals> <body>)
+;;
+;;  Syntax: <Formals> should be a formal arguments list as described below, and ⟨body⟩
+;;  should be a sequence of one or more expressions.
+;;
+;;  <Formals> should have one of the following forms:
+;;
+;;  o (<variable1> ...): The procedure takes a fixed number of arguments; when the
+;;    procedure is called, the arguments will be stored in the bindings of the
+;;    corresponding variables.
+;;
+;; o  <variable>: The procedure takes any number of arguments; when the procedure is
+;;    called, the sequence of actual arguments is converted into a newly allocated list
+;;    and the list is stored in the binding of the ⟨variable⟩.
+;;
+;; o  (<variable 1> ... <variable n> ⟩ . <variable n+1>): If a space-delimited period
+;;    precedes the last variable, then the procedure takes n or more arguments, where
+;;    n is the number of formal arguments before the period (there must be at least one).
+;;    The value stored in the binding of the last variable will be a newly allocated
+;;    list of the actual arguments left over after all the other actual arguments have
+;;    been matched up against the other formal arguments.
+;;                                                                 (R5RS, p.9)
+;;----------------------------------------------------------------------------------------
+;; Scheme procedures that accept a variable number of arguments are easy to implement in
+;; the architecture we defined so far. Suppose a procedure is defined to accept two or
+;; more arguments as in the following example:
+;;
+;;     (let ((f (lambda (a b . c) (vector a b c))))
+;;         (f 1 2 3 4))
+;;
+;; The call to f passes four arguments in the stack locations %esp-4, %esp-8, %esp-12,
+;; and %esp-16 in addition to the number of arguments in %eax. Upon entry of f, and after
+;; performing the argument check, f enters a loop that constructs a list of the arguments
+;; last to front.
+;;
+;; Implementing variable-arity procedures allows us to define many library procedures that
+;; accept any number of arguments including +, -, *, =, <, ..., char=?, char<?, ...,
+;; string=?, string<?, . . . , list, vector, string, and append.
+;;
+;; Other variations of lambda such as case-lambda, which allows us to dispatch different
+;; parts of the code depending on the number of actual arguments, can be implemented easily
+;; and efficiently by a series of comparisons and conditional jumps.
+;;                                                                        (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------
+;;  Two aspects -- (a) code generation and (b) pre-processing steps
+;;
+;;  code generation seems to be confined to emit-closure, best I can tell.
+;;  pre-processing assumptions ??  look for closure formals in transforms.   (MRC)
+;;  Need to patch any transforms that assumed formals was a flat list
+;;  fix up the grammers in comments as needed
+;;----------------------------------------------------------------------------------------
+
+
+
+;;----------------------------------------------------------------------------------------
+;;                                           Apply
+;;----------------------------------------------------------------------------------------
+;; The implementation of the apply primitive is analogous to the implementation of
+;; variable-arity procedures. Procedures accepting variable number of arguments convert
+;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
+;; splices a list of arguments onto the stack.
+;;
+;; When the code generator encounters an apply call, it generates the code in the same
+;; manner as if it were a regular procedure call. The operands are evaluated and saved in
+;; their appropriate stack locations as usual. The operator is evaluated and checked. In
+;; case of nontail calls, the current closure pointer is saved and the stack pointer is
+;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
+;; The number of arguments is placed in %eax as usual. The only difference is that instead
+;; of calling the procedure directly, we call/jmp to the L apply label which splices the
+;; last argument on the stack before transferring control to the destination procedure.
+;;
+;; Implementing apply makes it possible to define the library procedures that take a
+;; function as well as an arbitrary number of arguments such as map and for-each.
+;; (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+;;----------------------------------------------------------------------------------------
+;;                                      Output Ports
+;;----------------------------------------------------------------------------------------
+;; The functionality provided by our compiler so far allows us to implement output ports
+;; easily in Scheme. We represent output ports by vector containing the following fields:
+;;
+;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
+;; 1. A string denoting the file name associated with the port.
+;; 2. A file-descriptor associated with the opened file.
+;; 3. A string that serves as an output buffer.
+;; 4. An index pointing to the next position in the buffer.
+;; 5. The size of the buffer.
+;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
+;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
+;; reduce the num- ber of trips to the operating system. The procedure write-char writes
+;; to the buffer, increments the index, and if the index of the port reaches its size, the
+;; contents of the buffer are flushed us- ing s write (from 3.15) and the index is reset.
+;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
+;; are also implemented. (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------
