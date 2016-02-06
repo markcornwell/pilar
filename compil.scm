@@ -167,11 +167,12 @@
 ;; (load "tests/tests-3.4-req.scm")  ;; apply
 ;; (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 ;; (load "tests/tests-3.2-req.scm")  ;; error, argcheck
-;; (load "tests/tests-3.1-req.scm")  ;; vector
+(load "tests/tests-3.1-req.scm")  ;; vector
 
 (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
-(if *safe* (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
-(load "tests/tests-2.8-req.scm")  ;; symbols
+(if *safe*
+    (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
+(load "tests/tests-2.8-req.scm")   ;; symbols
 (load "tests/tests-2.4-req.scm")   ;; letrec letrec* and/or when/unless cond
 (load "tests/tests-2.3-req.scm")   ;; complex constants
 (load "tests/tests-2.2-req.scm")   ;; set!
@@ -216,7 +217,6 @@
 (define *transform-list*         ;; all transforms get applied in the order below
   (list 'explicit-begins         ;; add implicit begin to make bodies a single expression
 	'eliminate-let*          ;; transform all let* to nested lets	
-;	'eliminate-shadowing     ;; rename variables to make names unique
 	'uniquify-variables           ;; uniquely rename all lambda variables
 	'vectorize-letrec        ;; rewrite letrec as let with vars transformed to vectors
 	'eliminate-set!          ;; rewrite settable variables as vectors
@@ -689,8 +689,6 @@
 	  (vectorize-T ui (cdr exp)))]
    [else exp]))
 
-
-
 ;;-----------------------------------------------------------------------------------
 ;;                                    Assignment
 ;;-----------------------------------------------------------------------------------
@@ -1074,7 +1072,7 @@
 	     primitives
 	     list-ref
 	     list-length
-	    ;; vector
+	     vector     ;; experimental
 	     )
 
 (define-transform (external-symbols expr)
@@ -1783,14 +1781,14 @@
 ;; TBD: integrate it back in as a special case
 ;;
 
-(define-primitive (vector si env x)
-  (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
-  (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector+5
-  (emit-expr (- si wordsize) env x)      ;; eax <- evaluated x
-  (emit "    movl  %eax, %ebx")          ;; ebx <- evaluated x
-  (emit "    movl ~s(%esp), %eax" si)    ;; eax <- the vector+5
-  (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object;
-                                         ;; offset -1 = tag(-5) + lenfield_size(4)
+;; (define-primitive (vector si env x)
+;;   (emit-expr si env '(make-vector 1))    ;; new unitary vector eax
+;;   (emit "    movl %eax, ~s(%esp)" si)    ;; save the vector+5
+;;   (emit-expr (- si wordsize) env x)      ;; eax <- evaluated x
+;;   (emit "    movl  %eax, %ebx")          ;; ebx <- evaluated x
+;;   (emit "    movl ~s(%esp), %eax" si)    ;; eax <- the vector+5
+;;   (emit "    movl %ebx, -1(%eax)"))      ;; v[0] <- object;
+;;                                          ;; offset -1 = tag(-5) + lenfield_size(4)
 
 ;;-------------------------------------------------------------------------------
 ;;                                      Strings
