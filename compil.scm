@@ -164,7 +164,7 @@
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
 ;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
-;; (load "tests/tests-3.4-req.scm")  ;; apply
+(load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 (load "tests/tests-3.1-req.scm")  ;; vector
@@ -2475,6 +2475,44 @@
   )  ;; jump to closure entry point
 
 
+;;----------------------------------------------------------------------------------------
+;;                                           Apply
+;;----------------------------------------------------------------------------------------
+;; The implementation of the apply primitive is analogous to the implementation of
+;; variable-arity procedures. Procedures accepting variable number of arguments convert
+;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
+;; splices a list of arguments onto the stack.
+;;
+;; When the code generator encounters an apply call, it generates the code in the same
+;; manner as if it were a regular procedure call. The operands are evaluated and saved in
+;; their appropriate stack locations as usual. The operator is evaluated and checked. In
+;; case of nontail calls, the current closure pointer is saved and the stack pointer is
+;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
+;; The number of arguments is placed in %eax as usual. The only difference is that instead
+;; of calling the procedure directly, we call/jmp to the L apply label which splices the
+;; last argument on the stack before transferring control to the destination procedure.
+;;
+;; Implementing apply makes it possible to define the library procedures that take a
+;; function as well as an arbitrary number of arguments such as map and for-each.
+;; (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------
+;;
+;;  REALLY NEED TO THINK THIS THROUGH --- It is like a procedure call... (see above)
+;;
+;;----------------------------------------------------------------------------------------
+
+
+(define (emit-apply si env expr)
+  (let ([op (car expr)]
+	[arglist (cdr expr)])
+    ;;
+    (emit-expr (+ si (* 2 wordsize)) env op)
+
+
+    
+    ))
+
+
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
 ;;-----------------------------------------------------------------------------------
@@ -3190,30 +3228,6 @@
 ;;  pre-processing assumptions ??  look for closure formals in transforms.   (MRC)
 ;;  Need to patch any transforms that assumed formals was a flat list
 ;;  fix up the grammers in comments as needed
-;;----------------------------------------------------------------------------------------
-
-
-
-;;----------------------------------------------------------------------------------------
-;;                                           Apply
-;;----------------------------------------------------------------------------------------
-;; The implementation of the apply primitive is analogous to the implementation of
-;; variable-arity procedures. Procedures accepting variable number of arguments convert
-;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
-;; splices a list of arguments onto the stack.
-;;
-;; When the code generator encounters an apply call, it generates the code in the same
-;; manner as if it were a regular procedure call. The operands are evaluated and saved in
-;; their appropriate stack locations as usual. The operator is evaluated and checked. In
-;; case of nontail calls, the current closure pointer is saved and the stack pointer is
-;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
-;; The number of arguments is placed in %eax as usual. The only difference is that instead
-;; of calling the procedure directly, we call/jmp to the L apply label which splices the
-;; last argument on the stack before transferring control to the destination procedure.
-;;
-;; Implementing apply makes it possible to define the library procedures that take a
-;; function as well as an arbitrary number of arguments such as map and for-each.
-;; (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
 
 
