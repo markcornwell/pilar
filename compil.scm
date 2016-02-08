@@ -1658,8 +1658,6 @@
     (emit "    idiv %ebx            # edx <- edx:eax/ebx  remainder")
     (emit "    movl %edx,%eax")))
 
-;; ---------------- Error checks inserted up to here -----------
-
 ;;-----------------------------------------------------------------------------------
 ;;                              Pairs
 ;;-----------------------------------------------------------------------------------
@@ -3363,9 +3361,9 @@
 ;; 5. The size of the buffer.
 ;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
 ;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
-;; reduce the num- ber of trips to the operating system. The procedure write-char writes
+;; reduce the number of trips to the operating system. The procedure write-char writes
 ;; to the buffer, increments the index, and if the index of the port reaches its size, the
-;; contents of the buffer are flushed us- ing s write (from 3.15) and the index is reset.
+;; contents of the buffer are flushed using s write (from 3.15) and the index is reset.
 ;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
 ;; are also implemented. (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
