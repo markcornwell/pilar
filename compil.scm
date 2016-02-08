@@ -1196,7 +1196,7 @@
    [(begin? expr)         (emit-tail-begin si env expr)]   
    [(closure? expr)       (emit-tail-closure si env expr)]
    [(funcall? expr)       (emit-tail-funcall si env expr)]
-   
+   [(apply? expr)         (emit-tail-apply si env expr)]
    [(let? expr)           (emit-tail-let si env (let-bindings expr) (let-body expr))]
    [(if? expr)            (emit-tail-if si env expr)]
    [(and? expr)           (emit-tail-and si env expr)]
@@ -2485,7 +2485,6 @@
   (emit "    jmp *-2(%edi)  # tail-funcall")
   )  ;; jump to closure entry point
 
-
 ;;----------------------------------------------------------------------------------------
 ;;                                           Apply
 ;;----------------------------------------------------------------------------------------
@@ -2513,10 +2512,6 @@
 ;; Implementing apply makes it possible to define the library procedures that take a
 ;; function as well as an arbitrary number of arguments such as map and for-each.
 ;; (Ghuloum 2006)
-;;----------------------------------------------------------------------------------------
-;;
-;;  REALLY NEED TO THINK THIS THROUGH --- It is like a procedure call... (see above)
-;;
 ;;----------------------------------------------------------------------------------------
 
 (define (apply? expr)
@@ -2580,19 +2575,18 @@
     (emit "~a: # while eax<>null? " loop)
     (emit "    cmp  $~a,%eax" nil-value)
     (emit "    je ~a" cont)
-    (emit "    movl ~s(%eax),%ebx" (- pair-tag))   ;; ebx <- car
-    (emit "    movl %ebx,(%esi)")                  ;; push car on stack
-    (emit "    subl $4,%esi")                      ;; bump stk arg ptr
-    (emit "    movl ~s(%eax),%eax" (- pair-tag))   ;; eax <- cdr
-    (emit "    movl ~s(%eax), %eax" cdr-offset)
-    (emit "    jmp ~a" loop)                       ;; end while
+    (emit "    movl ~s(%eax),%ebx    # ebx<- car" (- car-offset pair-tag))
+    (emit "    movl %ebx,(%esi)      # push car on stack")  
+    (emit "    subl $4,%esi          # bump stack arg ptr")
+    (emit "    movl ~s(%eax),%eax    # eax <- cdr" (- cdr-offset pair-tag))
+    (emit "    jmp ~a                # end while" loop)
     (emit "~a:" cont)
     )
   
   ;; Load new frame closure into edi
   (emit "    movl ~s(%esp), %edi   # load new closure to %edi" (- si 8))
 
-  (emit-adjust-base si)  ;; the value of %esp is adjusted by si
+  (emit-adjust-base si)        ;; the value of %esp is adjusted by si
 
   ;; save argument count in eax
   (emit "# save argument count in eax <- esp-esi-8  bottom of frame")
@@ -2977,9 +2971,7 @@
     
     ;; now make the call
     (emit "    .extern _~a" proc)
-
     (emit "    call _~a" proc)
-    ;;(emit "    xorl %eax,%eax")  ;; from the model; necessary???
     
     ;; restore the esp from esi+4*k
     (emit "    movl ~s(%esi),%esp" (* 4 k))
@@ -2991,6 +2983,7 @@
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)
   (emit "     ret"))
+
 
 ;;---------------------------------------------------------------------------
 ;;                      Error Checking and Safe Primitives
