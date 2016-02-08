@@ -2,4 +2,6 @@ Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
 > Performing nontail apply tests ...
-test 0:(let ((f (lambda () 12))) (fx+ (apply f (quote ())) 1)) ...> 
+test 0:(let ((f (lambda () 12))) (fx+ (apply f (quote ())) 1)) ... ok
+test 1:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f 13 (quote ())) 1)) ... ok
+test 2:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f (cons 13 (quote ()))) 1)) ...> 
