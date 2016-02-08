@@ -1,24 +1,24 @@
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == explicit-begins  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == eliminate-let*  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == uniquify-variables  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == vectorize-letrec  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == eliminate-set!  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == close-free-variables  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == eliminate-quote  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == eliminate-when/unless  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == eliminate-cond  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # == external-symbols  ==>
-# -536870912
+# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,25 +31,13 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr -536870912
-    movl $-2147483648, %eax     # immed -536870912
-    ret
-    .text
-    .align 16, 0x90
-    .globl _scheme_entry
-_scheme_entry:
-    movl 4(%esp), %ecx
-    movl %ebx, 4(%ecx)
-    movl %esi, 16(%ecx)
-    movl %edi, 20(%ecx)
-    movl %ebp, 24(%ecx)
-    movl %esp, 28(%ecx)
-    movl 12(%esp), %ebp
-    movl 8(%esp), %esp
-    call _L_scheme_entry
-    movl 4(%ecx), %ebx
-    movl 16(%ecx), %esi
-    movl 20(%ecx), %edi
-    movl 24(%ecx), %ebp
-    movl 28(%ecx), %esp
-    ret
+# emit-expr (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# emit-begin
+#   expr=(begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+#   env=()
+# emit-expr (write-char #\a)
+# funcall
+#    si   =-8
+#    env  = ()
+#    expr = (funcall write-char #\a)
+# emit-expr write-char

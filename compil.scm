@@ -163,7 +163,7 @@
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
-;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
@@ -1622,6 +1622,41 @@
   (emit-expr (- si wordsize) env arg1)
   (emit-check-fixnum 'fx*)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
+
+
+;;------------- experimental -----
+
+(define-primitive (fxquotient si env arg1 arg2)
+  (let ((cont (unique-label)))
+    (emit-expr si env arg2)
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl %eax, ~s(%esp)  # denominator" si)   
+    (emit-expr (- si wordsize) env arg1)  ;; eax <- numerator
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl ~s(%esp),%ebx   # ebx <- denominator" si)
+    (emit "    xor %edx,%edx        # edx <- 0")   
+    (emit "    cmp $0,%eax")
+    (emit "    jge ~a" cont)
+    (emit "    not %edx") 
+    (emit "~a:" cont)
+    (emit "    idiv %ebx            # eax <- edx:eax/ebx")
+    (emit "    sal $2,%eax          # eax <- eax*4 (since it was divided away)")))
+
+(define-primitive (fxremainder si env arg1 arg2)
+  (let ((cont (unique-label)))
+    (emit-expr si env arg2)
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl %eax, ~s(%esp)  # denominator" si)   
+    (emit-expr (- si wordsize) env arg1)  ;; eax <- numerator
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl ~s(%esp),%ebx   # ebx <- denominator" si)
+    (emit "    xor %edx,%edx        # edx <- 0")   
+    (emit "    cmp $0,%eax")
+    (emit "    jge ~a" cont)
+    (emit "    not %edx") 
+    (emit "~a:" cont)
+    (emit "    idiv %ebx            # edx <- edx:eax/ebx  remainder")
+    (emit "    movl %edx,%eax")))
 
 ;; ---------------- Error checks inserted up to here -----------
 

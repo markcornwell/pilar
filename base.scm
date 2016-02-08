@@ -192,6 +192,8 @@
      (set! p (cons 'fx* p))
      (set! p (cons 'fx- p))
      (set! p (cons 'fx+ p))
+     (set! p (cons 'fxquotient p)) ;; new
+     (set! p (cons 'fxremainder p)) ; new
      (set! p (cons 'fx>= p))
      (set! p (cons 'fx> p))
      (set! p (cons 'fx<= p))
