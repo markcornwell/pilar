@@ -164,7 +164,7 @@
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
 ;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
-;; (load "tests/tests-3.4-req.scm")  ;; apply
+(load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 (load "tests/tests-3.1-req.scm")  ;; vector
@@ -265,8 +265,18 @@
 ;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
-  (memq x
-        '(begin closure foreign-call if lambda let let* letrec primitive-ref quote)))
+  (memq x '( apply
+	     begin
+	     closure
+	     foreign-call
+	     if
+	     lambda
+	     let
+	     let*
+	     letrec
+	     primitive-ref
+	     quote
+	     )))
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Explicit Begins
@@ -1157,6 +1167,7 @@
    [(begin? expr)           (emit-begin si env expr)]  
    [(closure? expr)         (emit-closure si env expr)]
    [(funcall? expr)         (emit-funcall si env expr)]
+   [(apply? expr)           (emit-apply si env expr)]
    [(let? expr)             (emit-let si env (let-bindings expr) (let-body expr))] ;; should let let do this
    [(if? expr)              (emit-if si env expr)]
    [(and? expr)             (emit-and si env expr)]
@@ -1185,6 +1196,7 @@
    [(begin? expr)         (emit-tail-begin si env expr)]   
    [(closure? expr)       (emit-tail-closure si env expr)]
    [(funcall? expr)       (emit-tail-funcall si env expr)]
+   [(apply? expr)         (emit-tail-apply si env expr)]
    [(let? expr)           (emit-tail-let si env (let-bindings expr) (let-body expr))]
    [(if? expr)            (emit-tail-if si env expr)]
    [(and? expr)           (emit-tail-and si env expr)]
@@ -2401,7 +2413,6 @@
   ;; uses ebx as a scratch register.
   (emit-check-procedure)
 
-
   (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
 
   ;; evaluate the arguments ar1 ... argN and push on stack
@@ -2474,6 +2485,124 @@
   (emit "    jmp *-2(%edi)  # tail-funcall")
   )  ;; jump to closure entry point
 
+;;----------------------------------------------------------------------------------------
+;;                                           Apply
+;;----------------------------------------------------------------------------------------
+;;
+;;   (apply proc arg1 ... args)                 procedure
+;;
+;;   Proc must be a procedure and args must be a list. Calls proc with the elements of
+;;   the list (append (list arg1 ...) args) as the actual arguments.
+;;   (R5RS)
+;;----------------------------------------------------------------------------------------
+;; The implementation of the apply primitive is analogous to the implementation of
+;; variable-arity procedures. Procedures accepting variable number of arguments convert
+;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
+;; splices a list of arguments onto the stack.
+;;
+;; When the code generator encounters an apply call, it generates the code in the same
+;; manner as if it were a regular procedure call. The operands are evaluated and saved in
+;; their appropriate stack locations as usual. The operator is evaluated and checked. In
+;; case of nontail calls, the current closure pointer is saved and the stack pointer is
+;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
+;; The number of arguments is placed in %eax as usual. The only difference is that instead
+;; of calling the procedure directly, we call/jmp to the L apply label which splices the
+;; last argument on the stack before transferring control to the destination procedure.
+;;
+;; Implementing apply makes it possible to define the library procedures that take a
+;; function as well as an arbitrary number of arguments such as map and for-each.
+;; (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------
+
+(define (apply? expr)
+  (and (pair? expr) (eq? (car expr) 'apply)))
+
+(define apply-proc cadr)
+
+(define apply-arg1...args cddr)
+
+(define (apply-arg1... expr)
+  (drop-last (apply-arg1...args expr)))
+
+(define (drop-last lst)
+  (reverse (cdr (reverse lst))))
+
+(define (apply-args expr)
+  (list-ref expr (fx- (length expr) 1)))
+
+(define (emit-apply si env expr)
+  
+  (define (emit-arg1... si env args)
+    (unless (empty? args)
+        (emit-expr si env (first args))                            ;; evaluated arg in %eax
+        (emit "    mov %eax, ~s(%esp)  # arg ~a" si (first args))  ;; save %eax as evaluated arg
+        (emit-arg1... (- si wordsize) env (rest args))))       ;; recursively emit the rest
+  
+  (define (emit-adjust-base delta-si)
+    (unless (eq? delta-si 0)
+	    (emit "    add $~s, %esp   # adjust base" delta-si)))
+  
+  (emit "# apply")
+  (emit "#    si   =~s" si)
+  (emit "#    env  = ~s" env)
+  (emit "#    expr = ~s" expr)
+
+  ;; Evaluate the apply-proc and stash it esp+si+8
+  ;; This becomes the next frame's closure slot.  See figure 3. (B)(C)
+  (emit-expr (- si 8) env (apply-proc expr))
+  ;; check that funcall-oper is a procedure and if not call error handler
+  ;; uses ebx as a scratch register.
+  (emit-check-procedure)
+  (emit "   movl %eax,  ~s(%esp)  # stash funcall-oper in closure slot" (- si 8))
+
+  ;; Evaluate the optional arg1... and push on stack
+  (emit-arg1... (- si 12) env (apply-arg1... expr))
+
+  ;; Evaluate the args list
+  (emit-expr (- si 12 (* 4 (length (apply-arg1... expr))))
+	     env
+	     (apply-args expr))   ;;  eax <- head of args list
+
+  ;; Push the elements of the list onto the stack as arguments
+  ;; esi ~ next arg location on stack
+  ;; ebx ~ scratch register
+  ;;
+  (let ([loop (unique-label)]
+	[cont (unique-label)]
+	[si-args (- si 12 (* 4 (length (apply-arg1... expr))))])  ;;;  VERIFY THIS!!!
+    (emit "# push apply args list onto the stack")
+    (emit "    lea  ~s(%esp),%esi" si-args)        ;; ptr to top of stack
+    (emit "~a: # while eax<>null? " loop)
+    (emit "    cmp  $~a,%eax" nil-value)
+    (emit "    je ~a" cont)
+    (emit "    movl ~s(%eax),%ebx    # ebx<- car" (- car-offset pair-tag))
+    (emit "    movl %ebx,(%esi)      # push car on stack")  
+    (emit "    subl $4,%esi          # bump stack arg ptr")
+    (emit "    movl ~s(%eax),%eax    # eax <- cdr" (- cdr-offset pair-tag))
+    (emit "    jmp ~a                # end while" loop)
+    (emit "~a:" cont)
+    )
+  
+  ;; Load new frame closure into edi
+  (emit "    movl ~s(%esp), %edi   # load new closure to %edi" (- si 8))
+
+  (emit-adjust-base si)        ;; the value of %esp is adjusted by si
+
+  ;; save argument count in eax
+  (emit "# save argument count in eax <- esp-esi-8  bottom of frame")
+  (emit "    movl %esp,%eax")  ;;   eax <- esp-esi-8  ~ bottom of frame   
+  (emit "    subl %esi,%eax")  ;;   
+  (emit "    subl $12,%eax")    ;; was 8   VERFIY WHY 12
+  
+  ;; call first bumps %esp by 4 and then saves %eip at 0(%esp).  
+  (emit "    call *-2(%edi)        # call thru closure ptr")
+  
+  (emit-adjust-base (- si))        ;; After return the value of %esp is adjusted back
+                                   ;; for tail recursive version below, we do not adjust
+                                   ;; adjust the base, we shift args instead
+  
+  (emit "    movl -4(%esp), %edi   # restore closure frame ptr")
+  )
 
 ;;-----------------------------------------------------------------------------------
 ;;      (begin E* ... )
@@ -2608,7 +2737,6 @@
     ;; (lambda args body)
     ;; (lambda (v1..vk . args) body)
 
-    
     (when (flatlist? formals)
 	  ;; eax == 4*k
 	  (emit-check-arg-count (length formals)))  
@@ -2685,7 +2813,7 @@
     (emit "    lea ~s(%esp),%ebx    # addr of arg[K] on stack" (+ si 4))
     (emit "    cmp %edi, %ebx       # while edi <> esp+(si+4)")
     (emit "    je ~a" cont)
-    (emit "    movl (%edi),%ebx     # arg i -> car")  ;;  <<---- BLOWS HERE
+    (emit "    movl (%edi),%ebx     # arg i -> car")
     (emit "    movl %ebx, ~s(%ebp)" car-offset)
     (emit "    movl %esi, ~s(%ebp)  # esi -> cdr" cdr-offset)
     (emit "    movl %ebp, %esi")
@@ -2695,19 +2823,6 @@
     (emit "    jmp ~a" loop)
     (emit "~a:" cont)
     (emit "    movl %esi, ~s(%esp)  # set args" si)))
-
-;; (define-primitive (cons si env arg1 arg2)
-;;   (emit "# cons arg1=~s arg2=~s" arg1 arg2);
-;;   (emit-expr si env arg1)                     ;; evaluate arg1
-;;   (emit "    movl %eax, ~s(%esp)" si)         ;; save value of arg1
-;;   (emit-expr (- si wordsize) env arg2)        ;; evaluate arg2
-;;   (emit "    movl %eax, ~s(%ebp)" cdr-offset) ;; arg2 -> cdr
-;;   (emit "    movl ~s(%esp), %eax" si)         ;; get value of arg1
-;;   (emit "    movl %eax, ~s(%ebp)" car-offset) ;; arg1 -> car
-;;   (emit "    movl %ebp, %eax")                ;; get ptr to cons'd pair
-;;   (emit "    or   $~s, %al" pair-tag)         ;; or in the pair tag
-;;   (emit "    add  $~s, %ebp" size-pair)       ;; bump heap ptr
-;;   (emit "# cons end")) 
 
 (define (flatlist? u)  ;; a flat list of symbols or ()
   (cond
@@ -2856,9 +2971,7 @@
     
     ;; now make the call
     (emit "    .extern _~a" proc)
-
     (emit "    call _~a" proc)
-    ;;(emit "    xorl %eax,%eax")  ;; from the model; necessary???
     
     ;; restore the esp from esi+4*k
     (emit "    movl ~s(%esi),%esp" (* 4 k))
@@ -2870,6 +2983,7 @@
 (define (emit-tail-foreign-call si env expr)
   (emit-foreign-call si env expr)
   (emit "     ret"))
+
 
 ;;---------------------------------------------------------------------------
 ;;                      Error Checking and Safe Primitives
@@ -3190,30 +3304,6 @@
 ;;  pre-processing assumptions ??  look for closure formals in transforms.   (MRC)
 ;;  Need to patch any transforms that assumed formals was a flat list
 ;;  fix up the grammers in comments as needed
-;;----------------------------------------------------------------------------------------
-
-
-
-;;----------------------------------------------------------------------------------------
-;;                                           Apply
-;;----------------------------------------------------------------------------------------
-;; The implementation of the apply primitive is analogous to the implementation of
-;; variable-arity procedures. Procedures accepting variable number of arguments convert
-;; the extra arguments passed on the stack to a list. Calling apply, on the other hand,
-;; splices a list of arguments onto the stack.
-;;
-;; When the code generator encounters an apply call, it generates the code in the same
-;; manner as if it were a regular procedure call. The operands are evaluated and saved in
-;; their appropriate stack locations as usual. The operator is evaluated and checked. In
-;; case of nontail calls, the current closure pointer is saved and the stack pointer is
-;; adjusted. In case of tail calls, the operands are moved to overwrite the current frame.
-;; The number of arguments is placed in %eax as usual. The only difference is that instead
-;; of calling the procedure directly, we call/jmp to the L apply label which splices the
-;; last argument on the stack before transferring control to the destination procedure.
-;;
-;; Implementing apply makes it possible to define the library procedures that take a
-;; function as well as an arbitrary number of arguments such as map and for-each.
-;; (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------
 
 
