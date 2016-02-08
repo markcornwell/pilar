@@ -1,24 +1,24 @@
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == explicit-begins  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == eliminate-let*  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == uniquify-variables  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == vectorize-letrec  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == eliminate-set!  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == close-free-variables  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == eliminate-quote  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == eliminate-when/unless  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == eliminate-cond  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # == external-symbols  ==>
-# (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
+# -536870912
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,13 +31,25 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
-# emit-begin
-#   expr=(begin (write-char #\a) (flush-output-port (current-output-port)) (exit))
-#   env=()
-# emit-expr (write-char #\a)
-# funcall
-#    si   =-8
-#    env  = ()
-#    expr = (funcall write-char #\a)
-# emit-expr write-char
+# emit-expr -536870912
+    movl $-2147483648, %eax     # immed -536870912
+    ret
+    .text
+    .align 16, 0x90
+    .globl _scheme_entry
+_scheme_entry:
+    movl 4(%esp), %ecx
+    movl %ebx, 4(%ecx)
+    movl %esi, 16(%ecx)
+    movl %edi, 20(%ecx)
+    movl %ebp, 24(%ecx)
+    movl %esp, 28(%ecx)
+    movl 12(%esp), %ebp
+    movl 8(%esp), %esp
+    call _L_scheme_entry
+    movl 4(%ecx), %ebx
+    movl 16(%ecx), %esi
+    movl 20(%ecx), %edi
+    movl 24(%ecx), %ebp
+    movl 28(%ecx), %esp
+    ret

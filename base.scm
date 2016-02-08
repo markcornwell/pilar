@@ -159,9 +159,14 @@
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
 
-;;--------------------------------------------------------------------------------------
-;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
-;;--------------------------------------------------------------------------------------
+  ;;--------------------------------------------------------------------------------------
+  ;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
+  ;;--------------------------------------------------------------------------------------
+  ;; The error handlers identify the primitives reporting the error by passing the ordinal
+  ;; position in this list of primitives.  That way we can report the function name in the
+  ;; error message making the message much more informative.
+  ;; (See "Error Checking for Safe Primitives" in compil.scm)
+  ;;--------------------------------------------------------------------------------------
   
   [primitives
    (let ([p '()])
@@ -177,7 +182,7 @@
      (set! p (cons 'string-length p))
      (set! p (cons 'string? p))
      (set! p (cons 'make-string p))
- ;;  (set! p (cons 'vector p))
+ ;;  (set! p (cons 'vector p))    ;; replace by library proc
      (set! p (cons 'vector-ref p))
      (set! p (cons 'vector-set! p))
      (set! p (cons 'vector-length p))
@@ -189,11 +194,11 @@
      (set! p (cons 'car p))
      (set! p (cons 'cons p))
      (set! p (cons 'pair? p))
+     (set! p (cons 'fxremainder p)) ; new
+     (set! p (cons 'fxquotient p)) ;; new     
      (set! p (cons 'fx* p))
      (set! p (cons 'fx- p))
      (set! p (cons 'fx+ p))
-     (set! p (cons 'fxquotient p)) ;; new
-     (set! p (cons 'fxremainder p)) ; new
      (set! p (cons 'fx>= p))
      (set! p (cons 'fx> p))
      (set! p (cons 'fx<= p))
@@ -228,6 +233,32 @@
   [eh_length       (lambda (i)   (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
   [eh_vector_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
   [eh_string_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
+
+
+;;----------------------------------------------------------------------------------------
+;;                                      Output Ports
+;;----------------------------------------------------------------------------------------
+;; The functionality provided by our compiler so far allows us to implement output ports
+;; easily in Scheme. We represent output ports by vector containing the following fields:
+;;
+;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
+;; 1. A string denoting the file name associated with the port.
+;; 2. A file-descriptor associated with the opened file.
+;; 3. A string that serves as an output buffer.
+;; 4. An index pointing to the next position in the buffer.
+;; 5. The size of the buffer.
+;;
+;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
+;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
+;; reduce the number of trips to the operating system. The procedure write-char writes
+;; to the buffer, increments the index, and if the index of the port reaches its size, the
+;; contents of the buffer are flushed using s write (from 3.15) and the index is reset.
+;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
+;; are also implemented. (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------  
+
+  
+  
  ) ; end labels
  
  (begin #t)) 

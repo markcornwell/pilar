@@ -163,7 +163,7 @@
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
-(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+;(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
@@ -3347,23 +3347,3 @@
 
 
 
-;;----------------------------------------------------------------------------------------
-;;                                      Output Ports
-;;----------------------------------------------------------------------------------------
-;; The functionality provided by our compiler so far allows us to implement output ports
-;; easily in Scheme. We represent output ports by vector containing the following fields:
-;;
-;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
-;; 1. A string denoting the file name associated with the port.
-;; 2. A file-descriptor associated with the opened file.
-;; 3. A string that serves as an output buffer.
-;; 4. An index pointing to the next position in the buffer.
-;; 5. The size of the buffer.
-;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
-;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
-;; reduce the number of trips to the operating system. The procedure write-char writes
-;; to the buffer, increments the index, and if the index of the port reaches its size, the
-;; contents of the buffer are flushed using s write (from 3.15) and the index is reset.
-;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
-;; are also implemented. (Ghuloum 2006)
-;;----------------------------------------------------------------------------------------
