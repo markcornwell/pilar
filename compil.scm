@@ -162,8 +162,11 @@
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
-;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
-;(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
+
+(load "tests/tests-3.3-req.scm")  ;; string-set! errors
+
+(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
@@ -1084,6 +1087,17 @@
 	     list-length
 	     vector
 	     string
+	     standard-out
+	     current-output-port
+	     port-fd
+	     port-buf
+	     port-size
+	     port-ndx
+	     port-ndx-add1
+	     port-ndx-reset
+	     flush-output-port
+	     write-char
+	     exit
 	     )
 
 (define-transform (external-symbols expr)

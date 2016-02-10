@@ -257,8 +257,48 @@
 ;; are also implemented. (Ghuloum 2006)
 ;;----------------------------------------------------------------------------------------  
 
+  [standard-out
+   (let ([p (make-vector 6)]
+	 [sz 10])           ;; We represent output ports by vector containing the following fields:
+        (vector-set! p 0 'output-port)  ;; 0. A unique identifier to distinguish output ports from ordinary vectors
+        (vector-set! p 1 "/dev/stdout") ;; 1. A string denoting the file name associated with the port.
+        (vector-set! p 2 1)             ;; 2. A file-descriptor associated with the opened file.
+        (vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
+        (vector-set! p 4 0)             ;; 4. An index pointing to the next position in the buffer.
+        (vector-set! p 5 sz)            ;; 5. The size of the buffer.      
+        (lambda () p))]
+
+  [current-output-port
+   (let ([current-out (standard-out)])
+     (lambda () current-out))]
+
+  [port-fd        (lambda (p) (vector-ref p 2))]
+  [port-buf       (lambda (p) (vector-ref p 3))]
+  [port-ndx       (lambda (p) (vector-ref p 4))]
+  [port-ndx-add1  (lambda (p) (vector-set! p 4 (fxadd1 (vector-ref p 4))))]
+  [port-ndx-reset (lambda (p) (vector-set! p 4 0))]
+  [port-size      (lambda (p) (vector-ref p 5))]
   
-  
- ) ; end labels
+  [write-char 
+   (lambda (ch)
+     (let ([p (current-output-port)])
+       (when (fx= (port-ndx p) (port-size p))
+             (flush-output-port p))
+       (string-set! (port-buf p) (port-ndx p) ch)
+       (port-ndx-add1 p)))]
+   
+   [flush-output-port
+    (lambda (p)
+      (foreign-call "s_write" (port-fd p) (port-buf p) (port-ndx p))
+      (port-ndx-reset p))]
+
+   [exit (lambda () (foreign-call "s_exit"))]
  
- (begin #t)) 
+   [output-port?  (lambda (x) (error 'output-port? "not yet implemented"))]
+   [open-output-file (lambda (x) (error 'open-output "not yet implemented"))]
+   [close-output-port (lambda (x) (error 'close-output-port "not yet implemented"))])
+
+   
+ (begin #t)) ; end labels
+ 
+

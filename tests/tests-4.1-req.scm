@@ -20,10 +20,25 @@
 )   
 
 (add-tests-with-string-output "write-char"
+  [(begin (exit)) => ""]
+  [(begin (vector-ref (current-output-port) 0)) => "output-port\n"]
+  [(begin (port-size (current-output-port))) => "10\n"]
+  [(begin (port-ndx (current-output-port))) => "0\n"]
+  [(begin (port-fd (current-output-port))) => "1\n"]
+  [(begin (port-buf (current-output-port))) => "\"\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]
+  [(begin (flush-output-port (current-output-port)) (exit)) => ""]
+  [(begin (write-char #\b) (exit)) => ""]
+  [(let ([p (current-output-port)]) (write-char #\w) (port-ndx p)) => "1\n"]    ;;; <<---- error got "0\n"
+  [(begin (current-output-port) (write-char #\w) (port-ndx (current-output-port))) => "1\n"]  
+  [(begin (write-char #\w) (port-ndx (current-output-port))) => "1\n"]
+  [(begin (write-char #\c) (port-buf (current-output-port))) => "\"c\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]  
   [(begin 
-    (write-char #\a)
+     (write-char #\a)
+     (write-char #\b)
+     (write-char #\c)
+     (write-char #\newline)
     (flush-output-port (current-output-port))
-    (exit)) => "a"]
+    (exit)) => "abc"]
   [(begin 
     (write-char #\a)
     (close-output-port (current-output-port))
