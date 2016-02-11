@@ -162,8 +162,9 @@
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
-;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char 
-;; (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
+;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
+
+(load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
@@ -268,6 +269,7 @@
   (memq x '( apply
 	     begin
 	     closure
+	     cond
 	     foreign-call
 	     if
 	     lambda
@@ -1015,8 +1017,12 @@
 ;;
 ;;----------------------------------------------------------------------------------
 
+;; (define (asmify s)
+;;   (list->string (asmify1 (string->list (symbol->string s)))))
+
 (define (asmify s)
-  (list->string (asmify1 (string->list (symbol->string s)))))
+  (string-append "mrc_" (list->string (asmify1 (string->list (symbol->string s))))))
+
 
 (define (asmify1 l)  ;;  TBD expand this list to all scheme specials chars 
     (cond
@@ -1082,8 +1088,31 @@
 	     primitives
 	     list-ref
 	     list-length
+	     reverse
 	     vector
 	     string
+	     standard-out
+	     current-output-port
+	     port-fd
+	     port-buf
+	     port-size
+	     port-ndx
+	     port-ndx-add1
+	     port-ndx-reset
+	     flush-output-port
+	     close-output-port
+	     open-output-file
+	     write-char
+	     exit
+	     write
+	     integer->char
+	     string->list
+	     integer->list  ;; non standard
+	     negative?
+	     positive?
+	     zero?
+	     map
+	     for-each
 	     )
 
 (define-transform (external-symbols expr)
@@ -1623,7 +1652,40 @@
   (emit-check-fixnum 'fx*)
   (emit "    imul ~s(%esp), %eax" si)) ;; 4xy = (4x/4)*4y
 
-;; ---------------- Error checks inserted up to here -----------
+
+;;------------- experimental -----
+
+(define-primitive (fxquotient si env arg1 arg2)
+  (let ((cont (unique-label)))
+    (emit-expr si env arg2)
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl %eax, ~s(%esp)  # denominator" si)   
+    (emit-expr (- si wordsize) env arg1)  ;; eax <- numerator
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl ~s(%esp),%ebx   # ebx <- denominator" si)
+    (emit "    xor %edx,%edx        # edx <- 0")   
+    (emit "    cmp $0,%eax")
+    (emit "    jge ~a" cont)
+    (emit "    not %edx") 
+    (emit "~a:" cont)
+    (emit "    idiv %ebx            # eax <- edx:eax/ebx")
+    (emit "    sal $2,%eax          # eax <- eax*4 (since it was divided away)")))
+
+(define-primitive (fxremainder si env arg1 arg2)
+  (let ((cont (unique-label)))
+    (emit-expr si env arg2)
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl %eax, ~s(%esp)  # denominator" si)   
+    (emit-expr (- si wordsize) env arg1)  ;; eax <- numerator
+    (emit-check-fixnum 'fxquotient)
+    (emit "    movl ~s(%esp),%ebx   # ebx <- denominator" si)
+    (emit "    xor %edx,%edx        # edx <- 0")   
+    (emit "    cmp $0,%eax")
+    (emit "    jge ~a" cont)
+    (emit "    not %edx") 
+    (emit "~a:" cont)
+    (emit "    idiv %ebx            # edx <- edx:eax/ebx  remainder")
+    (emit "    movl %edx,%eax")))
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Pairs
@@ -3314,23 +3376,3 @@
 
 
 
-;;----------------------------------------------------------------------------------------
-;;                                      Output Ports
-;;----------------------------------------------------------------------------------------
-;; The functionality provided by our compiler so far allows us to implement output ports
-;; easily in Scheme. We represent output ports by vector containing the following fields:
-;;
-;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
-;; 1. A string denoting the file name associated with the port.
-;; 2. A file-descriptor associated with the opened file.
-;; 3. A string that serves as an output buffer.
-;; 4. An index pointing to the next position in the buffer.
-;; 5. The size of the buffer.
-;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
-;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
-;; reduce the num- ber of trips to the operating system. The procedure write-char writes
-;; to the buffer, increments the index, and if the index of the port reaches its size, the
-;; contents of the buffer are flushed us- ing s write (from 3.15) and the index is reset.
-;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
-;; are also implemented. (Ghuloum 2006)
-;;----------------------------------------------------------------------------------------

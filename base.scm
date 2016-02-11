@@ -93,7 +93,7 @@
   [append1
    (lambda (lst elt)
      (if (null? lst)
-	 (cons e nil)
+	 (cons elt nil)
 	 (cons (car lst) (append1 (cdr lst) elt))))]
 
   [list-ref
@@ -107,6 +107,14 @@
      (if (null? l)
 	 0
 	 (fxadd1 (list-length (cdr l)))))]
+
+  [reverse
+   (letrec ([f (lambda (l lrev)
+		 (if (null? l)
+		     lrev
+		     (f (cdr l) (cons (car l) lrev))))])
+     (lambda (l) (f l '())))]
+	 
 
 ;;----------------------------------------------------------------------------------
 ;;                                     Vectors
@@ -140,8 +148,28 @@
   		 (fill-string s (fxadd1 k) (cdr args)))))])	
      (lambda args
        (let ([s (make-string (list-length args))])
-  	   (fill-string s 0 args))))]
-  
+	 (fill-string s 0 args))))]
+
+  [string->list
+   (letrec
+       ([f (lambda (s i)
+	     (if (fx= i (string-length s))
+		 '()
+		 (cons (string-ref s i)
+		       (f s (fxadd1 i)))))])
+     (lambda (s) (f s 0)))]
+
+  [integer->list  ;; assume i>0
+   (letrec
+       ([f (lambda (i l)
+	     (cond
+	      [(fx< i 10) (cons i l)]
+	      [else
+	       (f (fxquotient i 10)
+		  (cons (fxremainder i 10) l))]))])
+     (lambda (i) (f i '())))]
+
+
 ;;----------------------------------------------------------------------------------
 ;;                         Handlers for Runtime Errors
 ;;----------------------------------------------------------------------------------
@@ -159,9 +187,16 @@
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
 
-;;--------------------------------------------------------------------------------------
-;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
-;;--------------------------------------------------------------------------------------
+
+
+  ;;--------------------------------------------------------------------------------------
+  ;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
+  ;;--------------------------------------------------------------------------------------
+  ;; The error handlers identify the primitives reporting the error by passing the ordinal
+  ;; position in this list of primitives.  That way we can report the function name in the
+  ;; error message making the message much more informative.
+  ;; (See "Error Checking for Safe Primitives" in compil.scm)
+  ;;--------------------------------------------------------------------------------------
   
   [primitives
    (let ([p '()])
@@ -177,7 +212,7 @@
      (set! p (cons 'string-length p))
      (set! p (cons 'string? p))
      (set! p (cons 'make-string p))
- ;;  (set! p (cons 'vector p))
+ ;;  (set! p (cons 'vector p))    ;; replace by library proc
      (set! p (cons 'vector-ref p))
      (set! p (cons 'vector-set! p))
      (set! p (cons 'vector-length p))
@@ -189,6 +224,8 @@
      (set! p (cons 'car p))
      (set! p (cons 'cons p))
      (set! p (cons 'pair? p))
+     (set! p (cons 'fxremainder p)) ; new
+     (set! p (cons 'fxquotient p)) ;; new     
      (set! p (cons 'fx* p))
      (set! p (cons 'fx- p))
      (set! p (cons 'fx+ p))
@@ -226,6 +263,181 @@
   [eh_length       (lambda (i)   (error (list-ref (primitives) i)  "length must be a fixnum >= 0"))]
   [eh_vector_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
   [eh_string_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
- ) ; end labels
+
+;;----------------------------------------------------------------------------------------
+;;                                    Numerical Operations
+;;----------------------------------------------------------------------------------------
+
+  [zero? (lambda (z) (fxzero? z))]
+  [positive? (lambda (x) (fx> x 0))]
+  [negative? (lambda (x) (fx< x 0))]
+
+  ;;(odd? n)
+  ;;(even? n)
+
+;;----------------------------------------------------------------------------------------
+;;                                     Map and for-each
+;;----------------------------------------------------------------------------------------
+;;  (map proc list1 list2 ...)
+;;  (for-each proc list1 list2 ...)
+;;
+  
+  [map (lambda (f l)    ;; special case of map   TBD generalize to more arglists
+	  (if (null? l)
+	      (quote ())
+	      (cons (f (car l)) (map f (cdr l)))))]
+
+  [for-each (lambda (f l)   ;; generalize later
+	       (unless (null? l)
+		  (begin
+		    (f (car l))
+		    (for-each f (cdr l)))))]
+  
+;;----------------------------------------------------------------------------------------
+;;                                      Output Ports
+;;----------------------------------------------------------------------------------------
+;; The functionality provided by our compiler so far allows us to implement output ports
+;; easily in Scheme. We represent output ports by vector containing the following fields:
+;;
+;; 0. A unique identifier that allows us to distinguish output ports from ordinary vectors.
+;; 1. A string denoting the file name associated with the port.
+;; 2. A file-descriptor associated with the opened file.
+;; 3. A string that serves as an output buffer.
+;; 4. An index pointing to the next position in the buffer.
+;; 5. The size of the buffer.
+;;
+;; The current-output-port is initialized at startup and its file descriptor is 1 on Unix
+;; systems. The buffers are chosen to be sufficiently large (4096 characters) in order to
+;; reduce the number of trips to the operating system. The procedure write-char writes
+;; to the buffer, increments the index, and if the index of the port reaches its size, the
+;; contents of the buffer are flushed using s write (from 3.15) and the index is reset.
+;; The procedures output-port?, open-output-file, close-output-port, and flush-output-port
+;; are also implemented. (Ghuloum 2006)
+;;----------------------------------------------------------------------------------------  
+
+  [standard-out
+   (let ([p (make-vector 6)]
+	 [sz 1024])                     ;; We represent output ports by vector containing the following fields:
+        (vector-set! p 0 'output-port)  ;; 0. A unique identifier to distinguish output ports from ordinary vectors
+        (vector-set! p 1 "/dev/stdout") ;; 1. A string denoting the file name associated with the port.
+        (vector-set! p 2 1)             ;; 2. A file-descriptor associated with the opened file.
+        (vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
+        (vector-set! p 4 0)             ;; 4. An index pointing to the next position in the buffer.
+        (vector-set! p 5 sz)            ;; 5. The size of the buffer.      
+        p)]
+
+  [current-output-port
+   (let ([current-out standard-out])
+     (lambda () current-out))]
+
+  [port-fd        (lambda (p) (vector-ref p 2))]
+  [port-buf       (lambda (p) (vector-ref p 3))]
+  [port-ndx       (lambda (p) (vector-ref p 4))]
+  [port-ndx-add1  (lambda (p) (vector-set! p 4 (fxadd1 (vector-ref p 4))))]
+  [port-ndx-reset (lambda (p) (vector-set! p 4 0))]
+  [port-size      (lambda (p) (vector-ref p 5))]
+  
+  [write-char 
+   (lambda (ch)
+     (let ([p (current-output-port)])
+       (begin
+	 (when  (fx= (port-ndx p) (port-size p)) (flush-output-port p))
+	 (string-set! (port-buf p) (port-ndx p) ch)
+	 (port-ndx-add1 p))))]
+   
+   [flush-output-port  ;; TBD  add error checking
+    (lambda args
+      (let ([p (if (null? args)
+		   (current-output-port)
+		   (car args))])
+	(begin   ;; TBD investigate why this begin is needed.  early pass should have inserted it for us.
+	  (foreign-call "s_write" (port-fd p) (port-buf p) (port-ndx p))
+	  (port-ndx-reset p))))]
+
+   [exit
+    (lambda ()
+      (begin
+        (flush-output-port) ;; should be flush all output ports  TBD
+	(foreign-call "s_exit")))]
  
- (begin #t)) 
+   [output-port?
+    (lambda (x)
+      (if (vector? x)
+	  (if (fx= 6 (vector-length? x))
+	      (symbol=? (vector-ref x 0) 'output-port)
+	      #f)
+	  #f))]
+   
+   [open-output-file
+    (lambda (x)
+      (error 'open-output "not yet implemented"))]
+   
+   [close-output-port
+    (lambda (p)
+      (flush-output-port p)
+;; TBD
+      )]
+
+   [write  ;; <<-- Need to uniquity
+    (letrec
+   	([print-boolean
+   	  (lambda (expr)
+	    (begin
+	      (write-char #\#)
+	      (if expr (write-char #\t) (write-char #\f))))]
+   	 [print-null
+   	  (lambda ()
+   	    (begin (write-char #\() (write-char #\))))]
+   	 [print-char
+   	  (lambda (expr)
+   	    (begin (write-char #\#) (write-char #\\) (write-char expr)))]
+   	 [print-fixnum
+   	  (lambda (i)
+   	    (if (negative? i)
+   		(begin (write-char #\-) (print-fixnum (fx* -1 i)))
+   		(map (lambda (x)
+   			(write-char (fixnum->char (fx+ (char->fixnum #\0) x))))
+   		      (integer->list i))))]
+	 [print-string
+	  (lambda (s)
+	    (write-char #\")
+	    (for-each write-char (string->list s))
+	    (write-char #\"))]
+   	 [print-pair
+   	  (lambda (pr)
+   	    (begin
+   	      (write-char #\()
+   	      (print-pairs pr)
+   	      (write-char #\))))]
+   	 [print-pairs
+   	  (lambda (pr)
+   	    (write (car pr))
+   	    (cond
+   	     [(null? (cdr pr)) #t]
+   	     [(pair? (cdr pr))
+	      (begin
+		(write-char #\space)
+		(print-pairs (cdr pr)))]
+   	     [else
+   	      (begin
+   	 	(write-char #\space)
+   	 	(write-char #\.)
+   	 	(write-char #\space)
+		(write (cdr pr)))]))])
+	 
+	 (lambda (expr)
+	   (cond     ;;  <<-- blow here.  Time to debug eliminate-cond.
+	    [(boolean? expr) (print-boolean expr)]
+	    [(null? expr) (print-null)]
+	    [(char? expr) (print-char expr)]
+	    [(fixnum? expr) (print-fixnum expr)]
+	    [(string? expr) (print-string expr)]
+	    [(pair? expr) (print-pair expr)]
+	    [else (error 'write "unrecognized expression")] )))]
+
+   [integer->char
+    (lambda (i) (fixnum->char i))])
+       
+ (begin #t)) ; end labels
+ 
+
