@@ -215,13 +215,13 @@ base_init:
 # make-symbol arg1="nil" arg2=()
 # emit-expr "nil"
 # string literal
-    jmp _L_1423634
+    jmp _L_1431453
     .align 8,0x90
-_L_1423633 :
+_L_1431452 :
     .int 12
     .ascii "nil"
-_L_1423634:
-    movl $_L_1423633, %eax
+_L_1431453:
+    movl $_L_1431452, %eax
     orl $6, %eax
     movl %eax, 0(%esp)
 # emit-expr ()
@@ -249,7 +249,7 @@ _L_1423634:
 # si = -4
 # env = ((f195865 . 0))
 # expr = (closure () (f195865) (let () f195865))
-    movl $_L_1423635, 0(%ebp)  # closure label
+    movl $_L_1431454, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195865 . 0))
 # var=f195865
@@ -259,17 +259,17 @@ _L_1423634:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423636            # jump around closure body
-_L_1423635:
+    jmp _L_1431455            # jump around closure body
+_L_1431454:
 # check argument count
     cmp $0,%eax
-    je _L_1423637
+    je _L_1431456
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423637:
+_L_1431456:
 # emit-tail-expr
 # si=-8
 # env=((f195865 . 4) (f195865 . 0))
@@ -292,7 +292,7 @@ _L_1423637:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_1423636:
+_L_1431455:
      movl %eax, mrc_symbols
 # == explicit-begins  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
@@ -328,24 +328,24 @@ _L_1423636:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423638"
+    je "_L_1431457"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423638:
+_L_1431457:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423639
+    jge _L_1431458
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423639:
+_L_1431458:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -363,24 +363,24 @@ _L_1423639:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423640"
+    je "_L_1431459"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423640:
+_L_1431459:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423641
+    jge _L_1431460
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423641:
+_L_1431460:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -398,24 +398,24 @@ _L_1423641:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423642"
+    je "_L_1431461"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423642:
+_L_1431461:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423643
+    jge _L_1431462
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423643:
+_L_1431462:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -433,24 +433,24 @@ _L_1423643:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423644"
+    je "_L_1431463"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423644:
+_L_1431463:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423645
+    jge _L_1431464
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423645:
+_L_1431464:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -479,14 +479,14 @@ _L_1423645:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423646
+    je _L_1431465
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423646:
+_L_1431465:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -494,49 +494,49 @@ _L_1423646:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423647"
+    je "_L_1431466"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423647:
+_L_1431466:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423649
+    jle _L_1431468
     cmp  $0,%eax
-    jge _L_1423648
-_L_1423649:
+    jge _L_1431467
+_L_1431468:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423648:
+_L_1431467:
     movl %eax, -20(%esp)
 # emit-expr (closure (f195890 f195891) () (let ((f195890 f195890) (f195891 f195891)) (fx= (string-length f195890) (string-length f195891))))
 # emit-closure
 # si = -24
 # env = ((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr = (closure (f195890 f195891) () (let ((f195890 f195890) (f195891 f195891)) (fx= (string-length f195890) (string-length f195891))))
-    movl $_L_1423650, 0(%ebp)  # closure label
+    movl $_L_1431469, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423651            # jump around closure body
-_L_1423650:
+    jmp _L_1431470            # jump around closure body
+_L_1431469:
 # check argument count
     cmp $8,%eax
-    je _L_1423652
+    je _L_1431471
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423652:
+_L_1431471:
 # emit-tail-expr
 # si=-16
 # env=((f195891 . -12) (f195890 . -8) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -576,27 +576,27 @@ _L_1423652:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423653
+    je _L_1431472
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $152,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423653:
+_L_1431472:
     movl -6(%eax), %eax
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423654"
+    je "_L_1431473"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423654:
+_L_1431473:
     movl %eax, -24(%esp)
 # emit-expr (string-length f195890)
 # emit-expr f195890
@@ -609,27 +609,27 @@ _L_1423654:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423655
+    je _L_1431474
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $152,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423655:
+_L_1431474:
     movl -6(%eax), %eax
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423656"
+    je "_L_1431475"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423656:
+_L_1431475:
     cmp -24(%esp), %eax
     sete %al
     movzbl %al, %eax
@@ -638,7 +638,7 @@ _L_1423656:
 #return from tail (fx= (string-length f195890) (string-length f195891))
     ret
     .align 4,0x90
-_L_1423651:
+_L_1431470:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -657,14 +657,14 @@ _L_1423651:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423657
+    je _L_1431476
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423657:
+_L_1431476:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -672,49 +672,49 @@ _L_1423657:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423658"
+    je "_L_1431477"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423658:
+_L_1431477:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423660
+    jle _L_1431479
     cmp  $0,%eax
-    jge _L_1423659
-_L_1423660:
+    jge _L_1431478
+_L_1431479:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423659:
+_L_1431478:
     movl %eax, -20(%esp)
 # emit-expr (closure (f195887 f195888 f195889) () (let ((f195887 f195887) (f195888 f195888) (f195889 f195889)) (char=? (string-ref f195887 f195889) (string-ref f195888 f195889))))
 # emit-closure
 # si = -24
 # env = ((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr = (closure (f195887 f195888 f195889) () (let ((f195887 f195887) (f195888 f195888) (f195889 f195889)) (char=? (string-ref f195887 f195889) (string-ref f195888 f195889))))
-    movl $_L_1423661, 0(%ebp)  # closure label
+    movl $_L_1431480, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423662            # jump around closure body
-_L_1423661:
+    jmp _L_1431481            # jump around closure body
+_L_1431480:
 # check argument count
     cmp $12,%eax
-    je _L_1423663
+    je _L_1431482
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423663:
+_L_1431482:
 # emit-tail-expr
 # si=-20
 # env=((f195889 . -16) (f195888 . -12) (f195887 . -8) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -762,14 +762,14 @@ _L_1423663:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423664
+    je _L_1431483
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423664:
+_L_1431483:
     movl %eax, -32(%esp)
 # emit-expr f195889
 # emit-variable-ref
@@ -781,28 +781,28 @@ _L_1423664:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423665"
+    je "_L_1431484"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423665:
+_L_1431484:
 # check bounds on string index
     movl -32(%esp), %ebx
     cmp  %eax,-6(%ebx) 
-    jle _L_1423667
+    jle _L_1431486
     cmp  $0,%eax
-    jge _L_1423666
-_L_1423667:
+    jge _L_1431485
+_L_1431486:
 # invoke error handler eh_string_index
     .extern mrc_eh$ustring$uindex
     movl mrc_eh$ustring$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423666:
+_L_1431485:
     sar $2, %eax
     movl -32(%esp), %esi
     movl -2(%eax,%esi), %eax
@@ -812,14 +812,14 @@ _L_1423666:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_1423668"
+    je "_L_1431487"
 # invoke error handler eh_character
     .extern mrc_eh$ucharacter
     movl mrc_eh$ucharacter, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $32,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423668:
+_L_1431487:
     movb %ah, -32(%esp)
 # emit-expr (string-ref f195888 f195889)
 # emit-expr f195888
@@ -832,14 +832,14 @@ _L_1423668:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423669
+    je _L_1431488
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423669:
+_L_1431488:
     movl %eax, -36(%esp)
 # emit-expr f195889
 # emit-variable-ref
@@ -851,28 +851,28 @@ _L_1423669:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423670"
+    je "_L_1431489"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423670:
+_L_1431489:
 # check bounds on string index
     movl -36(%esp), %ebx
     cmp  %eax,-6(%ebx) 
-    jle _L_1423672
+    jle _L_1431491
     cmp  $0,%eax
-    jge _L_1423671
-_L_1423672:
+    jge _L_1431490
+_L_1431491:
 # invoke error handler eh_string_index
     .extern mrc_eh$ustring$uindex
     movl mrc_eh$ustring$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423671:
+_L_1431490:
     sar $2, %eax
     movl -36(%esp), %esi
     movl -2(%eax,%esi), %eax
@@ -882,14 +882,14 @@ _L_1423671:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_1423673"
+    je "_L_1431492"
 # invoke error handler eh_character
     .extern mrc_eh$ucharacter
     movl mrc_eh$ucharacter, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $32,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423673:
+_L_1431492:
     cmp %ah, -32(%esp)
     sete %al
     movzbl %al, %eax
@@ -898,7 +898,7 @@ _L_1423673:
 #return from tail (char=? (string-ref f195887 f195889) (string-ref f195888 f195889))
     ret
     .align 4,0x90
-_L_1423662:
+_L_1431481:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -917,14 +917,14 @@ _L_1423662:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423674
+    je _L_1431493
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423674:
+_L_1431493:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -932,35 +932,35 @@ _L_1423674:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423675"
+    je "_L_1431494"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423675:
+_L_1431494:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423677
+    jle _L_1431496
     cmp  $0,%eax
-    jge _L_1423676
-_L_1423677:
+    jge _L_1431495
+_L_1431496:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423676:
+_L_1431495:
     movl %eax, -20(%esp)
 # emit-expr (closure (f195883 f195884 f195885 f195886) (f195868 f195867) (let ((f195883 f195883) (f195884 f195884) (f195885 f195885) (f195886 f195886)) (if (fx= f195885 f195886) #t (if ((vector-ref f195868 0) f195883 f195884 f195885) ((vector-ref f195867 0) f195883 f195884 (fx+ f195885 1) f195886) #f))))
 # emit-closure
 # si = -24
 # env = ((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr = (closure (f195883 f195884 f195885 f195886) (f195868 f195867) (let ((f195883 f195883) (f195884 f195884) (f195885 f195885) (f195886 f195886)) (if (fx= f195885 f195886) #t (if ((vector-ref f195868 0) f195883 f195884 f195885) ((vector-ref f195867 0) f195883 f195884 (fx+ f195885 1) f195886) #f))))
-    movl $_L_1423678, 0(%ebp)  # closure label
+    movl $_L_1431497, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # var=f195868
@@ -976,17 +976,17 @@ _L_1423676:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423679            # jump around closure body
-_L_1423678:
+    jmp _L_1431498            # jump around closure body
+_L_1431497:
 # check argument count
     cmp $16,%eax
-    je _L_1423680
+    je _L_1431499
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423680:
+_L_1431499:
 # emit-tail-expr
 # si=-24
 # env=((f195886 . -20) (f195885 . -16) (f195884 . -12) (f195883 . -8) (f195867 . 8) (f195868 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -1039,14 +1039,14 @@ _L_1423680:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423683"
+    je "_L_1431502"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423683:
+_L_1431502:
     movl %eax, -40(%esp)
 # emit-expr f195885
 # emit-variable-ref
@@ -1058,29 +1058,29 @@ _L_1423683:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423684"
+    je "_L_1431503"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423684:
+_L_1431503:
     cmp -40(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423681
+    je _L_1431500
 # emit-tail-expr
 # si=-40
 # env=((f195886 . -36) (f195885 . -32) (f195884 . -28) (f195883 . -24) (f195886 . -20) (f195885 . -16) (f195884 . -12) (f195883 . -8) (f195867 . 8) (f195868 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_1423682
-_L_1423681:
+    jmp _L_1431501
+_L_1431500:
 # emit-tail-expr
 # si=-40
 # env=((f195886 . -36) (f195885 . -32) (f195884 . -28) (f195883 . -24) (f195886 . -20) (f195885 . -16) (f195884 . -12) (f195883 . -8) (f195867 . 8) (f195868 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -1101,14 +1101,14 @@ _L_1423681:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423687
+    je _L_1431506
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423687:
+_L_1431506:
     movl %eax, -48(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1116,41 +1116,41 @@ _L_1423687:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423688"
+    je "_L_1431507"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423688:
+_L_1431507:
 # check bounds on vector index
     movl -48(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423690
+    jle _L_1431509
     cmp  $0,%eax
-    jge _L_1423689
-_L_1423690:
+    jge _L_1431508
+_L_1431509:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423689:
+_L_1431508:
     movl -48(%esp), %esi
     movl -1(%eax,%esi), %eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423691"
+    je "_L_1431510"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423691":
+"_L_1431510":
    movl %eax,  -48(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195883
 # emit-variable-ref
@@ -1180,7 +1180,7 @@ _L_1423689:
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_1423685
+    je _L_1431504
 # emit-tail-expr
 # si=-40
 # env=((f195886 . -36) (f195885 . -32) (f195884 . -28) (f195883 . -24) (f195886 . -20) (f195885 . -16) (f195884 . -12) (f195883 . -8) (f195867 . 8) (f195868 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -1200,14 +1200,14 @@ _L_1423689:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423692
+    je _L_1431511
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423692:
+_L_1431511:
     movl %eax, -40(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1215,28 +1215,28 @@ _L_1423692:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423693"
+    je "_L_1431512"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423693:
+_L_1431512:
 # check bounds on vector index
     movl -40(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423695
+    jle _L_1431514
     cmp  $0,%eax
-    jge _L_1423694
-_L_1423695:
+    jge _L_1431513
+_L_1431514:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423694:
+_L_1431513:
     movl -40(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -40(%esp)  # stash funcall-oper in next closure slot
@@ -1261,14 +1261,14 @@ _L_1423694:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423696"
+    je "_L_1431515"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423696:
+_L_1431515:
     movl %eax, -52(%esp)  # fx+ push arg1
 # emit-expr f195885
 # emit-variable-ref
@@ -1280,14 +1280,14 @@ _L_1423696:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423697"
+    je "_L_1431516"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423697:
+_L_1431516:
     addl -52(%esp), %eax  # fx+ arg1 arg2
     mov %eax, -52(%esp)    # arg (fx+ f195885 1)
 # emit-expr f195886
@@ -1316,18 +1316,18 @@ _L_1423697:
 # emit-shift-args:  size=0   si=-60  delta=36
     movl $16,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1423686
-_L_1423685:
+    jmp _L_1431505
+_L_1431504:
 # emit-tail-expr
 # si=-40
 # env=((f195886 . -36) (f195885 . -32) (f195884 . -28) (f195883 . -24) (f195886 . -20) (f195885 . -16) (f195884 . -12) (f195883 . -8) (f195867 . 8) (f195868 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_1423686:
-_L_1423682:
+_L_1431505:
+_L_1431501:
     .align 4,0x90
-_L_1423679:
+_L_1431498:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1346,14 +1346,14 @@ _L_1423679:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423698
+    je _L_1431517
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423698:
+_L_1431517:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1361,35 +1361,35 @@ _L_1423698:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423699"
+    je "_L_1431518"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423699:
+_L_1431518:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423701
+    jle _L_1431520
     cmp  $0,%eax
-    jge _L_1423700
-_L_1423701:
+    jge _L_1431519
+_L_1431520:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423700:
+_L_1431519:
     movl %eax, -20(%esp)
 # emit-expr (closure (f195881 f195882) (f195869 f195867) (let ((f195881 f195881) (f195882 f195882)) (if ((vector-ref f195869 0) f195881 f195882) ((vector-ref f195867 0) f195881 f195882 0 (string-length f195881)) #f)))
 # emit-closure
 # si = -24
 # env = ((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr = (closure (f195881 f195882) (f195869 f195867) (let ((f195881 f195881) (f195882 f195882)) (if ((vector-ref f195869 0) f195881 f195882) ((vector-ref f195867 0) f195881 f195882 0 (string-length f195881)) #f)))
-    movl $_L_1423702, 0(%ebp)  # closure label
+    movl $_L_1431521, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # var=f195869
@@ -1405,17 +1405,17 @@ _L_1423700:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423703            # jump around closure body
-_L_1423702:
+    jmp _L_1431522            # jump around closure body
+_L_1431521:
 # check argument count
     cmp $8,%eax
-    je _L_1423704
+    je _L_1431523
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423704:
+_L_1431523:
 # emit-tail-expr
 # si=-16
 # env=((f195882 . -12) (f195881 . -8) (f195867 . 8) (f195869 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -1459,14 +1459,14 @@ _L_1423704:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423707
+    je _L_1431526
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423707:
+_L_1431526:
     movl %eax, -32(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1474,41 +1474,41 @@ _L_1423707:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423708"
+    je "_L_1431527"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423708:
+_L_1431527:
 # check bounds on vector index
     movl -32(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423710
+    jle _L_1431529
     cmp  $0,%eax
-    jge _L_1423709
-_L_1423710:
+    jge _L_1431528
+_L_1431529:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423709:
+_L_1431528:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423711"
+    je "_L_1431530"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423711":
+"_L_1431530":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195881
 # emit-variable-ref
@@ -1531,7 +1531,7 @@ _L_1423709:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_1423705
+    je _L_1431524
 # emit-tail-expr
 # si=-24
 # env=((f195882 . -20) (f195881 . -16) (f195882 . -12) (f195881 . -8) (f195867 . 8) (f195869 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
@@ -1551,14 +1551,14 @@ _L_1423709:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423712
+    je _L_1431531
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423712:
+_L_1431531:
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1566,28 +1566,28 @@ _L_1423712:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423713"
+    je "_L_1431532"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423713:
+_L_1431532:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423715
+    jle _L_1431534
     cmp  $0,%eax
-    jge _L_1423714
-_L_1423715:
+    jge _L_1431533
+_L_1431534:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423714:
+_L_1431533:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
@@ -1619,14 +1619,14 @@ _L_1423714:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423716
+    je _L_1431535
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $152,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423716:
+_L_1431535:
     movl -6(%eax), %eax
     mov %eax, -40(%esp)    # arg (string-length f195881)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -1648,17 +1648,17 @@ _L_1423716:
 # emit-shift-args:  size=0   si=-44  delta=20
     movl $16,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1423706
-_L_1423705:
+    jmp _L_1431525
+_L_1431524:
 # emit-tail-expr
 # si=-24
 # env=((f195882 . -20) (f195881 . -16) (f195882 . -12) (f195881 . -8) (f195867 . 8) (f195869 . 4) (f195866 . -12) (f195867 . -8) (f195868 . -4) (f195869 . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_1423706:
+_L_1431525:
     .align 4,0x90
-_L_1423703:
+_L_1431522:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -1681,14 +1681,14 @@ _L_1423703:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423717
+    je _L_1431536
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423717:
+_L_1431536:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1696,28 +1696,28 @@ _L_1423717:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423718"
+    je "_L_1431537"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423718:
+_L_1431537:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423720
+    jle _L_1431539
     cmp  $0,%eax
-    jge _L_1423719
-_L_1423720:
+    jge _L_1431538
+_L_1431539:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423719:
+_L_1431538:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
 # emit-expr (begin)
@@ -1759,24 +1759,24 @@ _L_1423719:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423721"
+    je "_L_1431540"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423721:
+_L_1431540:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423722
+    jge _L_1431541
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423722:
+_L_1431541:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -1805,14 +1805,14 @@ _L_1423722:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423723
+    je _L_1431542
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423723:
+_L_1431542:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -1820,35 +1820,35 @@ _L_1423723:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423724"
+    je "_L_1431543"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423724:
+_L_1431543:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423726
+    jle _L_1431545
     cmp  $0,%eax
-    jge _L_1423725
-_L_1423726:
+    jge _L_1431544
+_L_1431545:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423725:
+_L_1431544:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195901 f195902) ((primitive-ref string=?) f195892) (let ((f195901 f195901) (f195902 f195902)) (if ((primitive-ref string=?) f195901 (symbol->string (car f195902))) (car f195902) (if (null? (cdr f195902)) (let ((f195906 (make-symbol f195901 #f))) (let ((f195908 (cons f195906 ()))) (begin (set-cdr! f195902 f195908) f195906))) ((vector-ref f195892 0) f195901 (cdr f195902))))))
 # emit-closure
 # si = -12
 # env = ((f195892 . 0))
 # expr = (closure (f195901 f195902) ((primitive-ref string=?) f195892) (let ((f195901 f195901) (f195902 f195902)) (if ((primitive-ref string=?) f195901 (symbol->string (car f195902))) (car f195902) (if (null? (cdr f195902)) (let ((f195906 (make-symbol f195901 #f))) (let ((f195908 (cons f195906 ()))) (begin (set-cdr! f195902 f195908) f195906))) ((vector-ref f195892 0) f195901 (cdr f195902))))))
-    movl $_L_1423727, 0(%ebp)  # closure label
+    movl $_L_1431546, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref string=?) not defined in the environmnet
 # emit-variable-ref
 # env=((f195892 . 0))
@@ -1859,17 +1859,17 @@ _L_1423725:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423728            # jump around closure body
-_L_1423727:
+    jmp _L_1431547            # jump around closure body
+_L_1431546:
 # check argument count
     cmp $8,%eax
-    je _L_1423729
+    je _L_1431548
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423729:
+_L_1431548:
 # emit-tail-expr
 # si=-16
 # env=((f195902 . -12) (f195901 . -8) (f195892 . 8) ((primitive-ref string=?) . 4) (f195892 . 0))
@@ -1909,13 +1909,13 @@ _L_1423729:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423732"
+    je "_L_1431551"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423732":
+"_L_1431551":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195901
 # emit-variable-ref
@@ -1937,14 +1937,14 @@ _L_1423729:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423733
+    je _L_1431552
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423733:
+_L_1431552:
     movl -1(%eax), %eax
     movl -3(%eax), %eax
     mov %eax, -40(%esp)  # arg (symbol->string (car f195902))
@@ -1955,7 +1955,7 @@ _L_1423733:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_1423730
+    je _L_1431549
 # emit-tail-expr
 # si=-24
 # env=((f195902 . -20) (f195901 . -16) (f195902 . -12) (f195901 . -8) (f195892 . 8) ((primitive-ref string=?) . 4) (f195892 . 0))
@@ -1971,19 +1971,19 @@ _L_1423733:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423734
+    je _L_1431553
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423734:
+_L_1431553:
     movl -1(%eax), %eax
 #return from tail (car f195902)
     ret
-    jmp _L_1423731
-_L_1423730:
+    jmp _L_1431550
+_L_1431549:
 # emit-tail-expr
 # si=-24
 # env=((f195902 . -20) (f195901 . -16) (f195902 . -12) (f195901 . -8) (f195892 . 8) ((primitive-ref string=?) . 4) (f195892 . 0))
@@ -2000,14 +2000,14 @@ _L_1423730:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423737
+    je _L_1431556
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423737:
+_L_1431556:
     movl 3(%eax), %eax
     cmp $63, %eax
     mov $0, %eax
@@ -2016,7 +2016,7 @@ _L_1423737:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423735
+    je _L_1431554
 # emit-tail-expr
 # si=-24
 # env=((f195902 . -20) (f195901 . -16) (f195902 . -12) (f195901 . -8) (f195892 . 8) ((primitive-ref string=?) . 4) (f195892 . 0))
@@ -2090,14 +2090,14 @@ _L_1423737:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423738
+    je _L_1431557
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $120,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423738:
+_L_1431557:
     movl %eax, -32(%esp)
 # emit-expr f195908
 # emit-variable-ref
@@ -2126,8 +2126,8 @@ _L_1423738:
     ret
 # end emit-tail-variable ref
      ret   # return thru stack
-    jmp _L_1423736
-_L_1423735:
+    jmp _L_1431555
+_L_1431554:
 # emit-tail-expr
 # si=-24
 # env=((f195902 . -20) (f195901 . -16) (f195902 . -12) (f195901 . -8) (f195892 . 8) ((primitive-ref string=?) . 4) (f195892 . 0))
@@ -2147,14 +2147,14 @@ _L_1423735:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423739
+    je _L_1431558
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423739:
+_L_1431558:
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -2162,28 +2162,28 @@ _L_1423739:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423740"
+    je "_L_1431559"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423740:
+_L_1431559:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423742
+    jle _L_1431561
     cmp  $0,%eax
-    jge _L_1423741
-_L_1423742:
+    jge _L_1431560
+_L_1431561:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423741:
+_L_1431560:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
@@ -2205,14 +2205,14 @@ _L_1423741:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423743
+    je _L_1431562
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423743:
+_L_1431562:
     movl 3(%eax), %eax
     mov %eax, -32(%esp)    # arg (cdr f195902)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -2228,10 +2228,10 @@ _L_1423743:
 # emit-shift-args:  size=0   si=-36  delta=20
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1423736:
-_L_1423731:
+_L_1431555:
+_L_1431550:
     .align 4,0x90
-_L_1423728:
+_L_1431547:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -2248,7 +2248,7 @@ _L_1423728:
 # si = -4
 # env = ((f195892 . 0))
 # expr = (closure (f195910) (f195892 (primitive-ref symbols)) (let ((f195910 f195910)) ((vector-ref f195892 0) f195910 ((primitive-ref symbols)))))
-    movl $_L_1423744, 0(%ebp)  # closure label
+    movl $_L_1431563, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195892 . 0))
 # var=f195892
@@ -2259,17 +2259,17 @@ _L_1423728:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423745            # jump around closure body
-_L_1423744:
+    jmp _L_1431564            # jump around closure body
+_L_1431563:
 # check argument count
     cmp $4,%eax
-    je _L_1423746
+    je _L_1431565
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423746:
+_L_1431565:
 # emit-tail-expr
 # si=-12
 # env=((f195910 . -8) ((primitive-ref symbols) . 8) (f195892 . 4) (f195892 . 0))
@@ -2305,14 +2305,14 @@ _L_1423746:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423747
+    je _L_1431566
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423747:
+_L_1431566:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -2320,28 +2320,28 @@ _L_1423747:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423748"
+    je "_L_1431567"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423748:
+_L_1431567:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423750
+    jle _L_1431569
     cmp  $0,%eax
-    jge _L_1423749
-_L_1423750:
+    jge _L_1431568
+_L_1431569:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423749:
+_L_1431568:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -2364,13 +2364,13 @@ _L_1423749:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423751"
+    je "_L_1431570"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423751":
+"_L_1431570":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
@@ -2393,7 +2393,7 @@ _L_1423749:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423745:
+_L_1431564:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -2424,23 +2424,23 @@ _L_1423745:
 # si = 0
 # env = ()
 # expr = (closure (f195911 f195912) (nil (primitive-ref append1)) (let ((f195911 f195911) (f195912 f195912)) (if (null? f195911) (cons f195912 nil) (cons (car f195911) ((primitive-ref append1) (cdr f195911) f195912)))))
-    movl $_L_1423752, 0(%ebp)  # closure label
+    movl $_L_1431571, 0(%ebp)  # closure label
 # WARNING: free var nil not defined in the environmnet
 # WARNING: free var (primitive-ref append1) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423753            # jump around closure body
-_L_1423752:
+    jmp _L_1431572            # jump around closure body
+_L_1431571:
 # check argument count
     cmp $8,%eax
-    je _L_1423754
+    je _L_1431573
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423754:
+_L_1431573:
 # emit-tail-expr
 # si=-16
 # env=((f195912 . -12) (f195911 . -8) ((primitive-ref append1) . 8) (nil . 4))
@@ -2482,7 +2482,7 @@ _L_1423754:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423755
+    je _L_1431574
 # emit-tail-expr
 # si=-24
 # env=((f195912 . -20) (f195911 . -16) (f195912 . -12) (f195911 . -8) ((primitive-ref append1) . 8) (nil . 4))
@@ -2511,8 +2511,8 @@ _L_1423754:
 # cons end
 #return from tail (cons f195912 nil)
     ret
-    jmp _L_1423756
-_L_1423755:
+    jmp _L_1431575
+_L_1431574:
 # emit-tail-expr
 # si=-24
 # env=((f195912 . -20) (f195911 . -16) (f195912 . -12) (f195911 . -8) ((primitive-ref append1) . 8) (nil . 4))
@@ -2530,14 +2530,14 @@ _L_1423755:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423757
+    je _L_1431576
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423757:
+_L_1431576:
     movl -1(%eax), %eax
     movl %eax, -24(%esp)
 # emit-expr ((primitive-ref append1) (cdr f195911) f195912)
@@ -2552,13 +2552,13 @@ _L_1423757:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423758"
+    je "_L_1431577"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423758":
+"_L_1431577":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr (cdr f195911)
 # emit-expr f195911
@@ -2571,14 +2571,14 @@ _L_1423757:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423759
+    je _L_1431578
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423759:
+_L_1431578:
     movl 3(%eax), %eax
     mov %eax, -40(%esp)  # arg (cdr f195911)
 # emit-expr f195912
@@ -2603,9 +2603,9 @@ _L_1423759:
 # cons end
 #return from tail (cons (car f195911) ((primitive-ref append1) (cdr f195911) f195912))
     ret
-_L_1423756:
+_L_1431575:
     .align 4,0x90
-_L_1423753:
+_L_1431572:
      movl %eax, mrc_append1
 # == explicit-begins  ==>
 # (lambda (l k) (if (fx= k 0) (car l) (list-ref (cdr l) (fx- k 1))))
@@ -2632,22 +2632,22 @@ _L_1423753:
 # si = 0
 # env = ()
 # expr = (closure (f195913 f195914) ((primitive-ref list-ref)) (let ((f195913 f195913) (f195914 f195914)) (if (fx= f195914 0) (car f195913) ((primitive-ref list-ref) (cdr f195913) (fx- f195914 1)))))
-    movl $_L_1423760, 0(%ebp)  # closure label
+    movl $_L_1431579, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423761            # jump around closure body
-_L_1423760:
+    jmp _L_1431580            # jump around closure body
+_L_1431579:
 # check argument count
     cmp $8,%eax
-    je _L_1423762
+    je _L_1431581
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423762:
+_L_1431581:
 # emit-tail-expr
 # si=-16
 # env=((f195914 . -12) (f195913 . -8) ((primitive-ref list-ref) . 4))
@@ -2682,14 +2682,14 @@ _L_1423762:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423765"
+    je "_L_1431584"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423765:
+_L_1431584:
     movl %eax, -24(%esp)
 # emit-expr f195914
 # emit-variable-ref
@@ -2701,21 +2701,21 @@ _L_1423765:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423766"
+    je "_L_1431585"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423766:
+_L_1431585:
     cmp -24(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423763
+    je _L_1431582
 # emit-tail-expr
 # si=-24
 # env=((f195914 . -20) (f195913 . -16) (f195914 . -12) (f195913 . -8) ((primitive-ref list-ref) . 4))
@@ -2731,19 +2731,19 @@ _L_1423766:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423767
+    je _L_1431586
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423767:
+_L_1431586:
     movl -1(%eax), %eax
 #return from tail (car f195913)
     ret
-    jmp _L_1423764
-_L_1423763:
+    jmp _L_1431583
+_L_1431582:
 # emit-tail-expr
 # si=-24
 # env=((f195914 . -20) (f195913 . -16) (f195914 . -12) (f195913 . -8) ((primitive-ref list-ref) . 4))
@@ -2767,14 +2767,14 @@ _L_1423763:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423768
+    je _L_1431587
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423768:
+_L_1431587:
     movl 3(%eax), %eax
     mov %eax, -28(%esp)    # arg (cdr f195913)
 # emit-expr (fx- f195914 1)
@@ -2784,14 +2784,14 @@ _L_1423768:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423769"
+    je "_L_1431588"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $84,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423769:
+_L_1431588:
     movl %eax, -32(%esp)
 # emit-expr f195914
 # emit-variable-ref
@@ -2803,14 +2803,14 @@ _L_1423769:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423770"
+    je "_L_1431589"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $84,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423770:
+_L_1431589:
     subl -32(%esp), %eax
     mov %eax, -32(%esp)    # arg (fx- f195914 1)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -2826,9 +2826,9 @@ _L_1423770:
 # emit-shift-args:  size=0   si=-36  delta=20
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1423764:
+_L_1431583:
     .align 4,0x90
-_L_1423761:
+_L_1431580:
      movl %eax, mrc_list$mref
 # == explicit-begins  ==>
 # (lambda (l) (if (null? l) 0 (fxadd1 (list-length (cdr l)))))
@@ -2855,22 +2855,22 @@ _L_1423761:
 # si = 0
 # env = ()
 # expr = (closure (f195915) ((primitive-ref list-length)) (let ((f195915 f195915)) (if (null? f195915) 0 (fxadd1 ((primitive-ref list-length) (cdr f195915))))))
-    movl $_L_1423771, 0(%ebp)  # closure label
+    movl $_L_1431590, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref list-length) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423772            # jump around closure body
-_L_1423771:
+    jmp _L_1431591            # jump around closure body
+_L_1431590:
 # check argument count
     cmp $4,%eax
-    je _L_1423773
+    je _L_1431592
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423773:
+_L_1431592:
 # emit-tail-expr
 # si=-12
 # env=((f195915 . -8) ((primitive-ref list-length) . 4))
@@ -2905,15 +2905,15 @@ _L_1423773:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423774
+    je _L_1431593
 # emit-tail-expr
 # si=-16
 # env=((f195915 . -12) (f195915 . -8) ((primitive-ref list-length) . 4))
 # expr=0
     movl $0, %eax     # immed 0
     ret                  # immediate tail return
-    jmp _L_1423775
-_L_1423774:
+    jmp _L_1431594
+_L_1431593:
 # emit-tail-expr
 # si=-16
 # env=((f195915 . -12) (f195915 . -8) ((primitive-ref list-length) . 4))
@@ -2931,13 +2931,13 @@ _L_1423774:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423776"
+    je "_L_1431595"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423776":
+"_L_1431595":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr (cdr f195915)
 # emit-expr f195915
@@ -2950,14 +2950,14 @@ _L_1423774:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423777
+    je _L_1431596
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423777:
+_L_1431596:
     movl 3(%eax), %eax
     mov %eax, -28(%esp)  # arg (cdr f195915)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -2970,20 +2970,20 @@ _L_1423777:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423778"
+    je "_L_1431597"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $48,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423778:
+_L_1431597:
      addl $4, %eax
 #return from tail (fxadd1 ((primitive-ref list-length) (cdr f195915)))
     ret
-_L_1423775:
+_L_1431594:
     .align 4,0x90
-_L_1423772:
+_L_1431591:
      movl %eax, mrc_list$mlength
 # == explicit-begins  ==>
 # (letrec ((f (lambda (l lrev) (if (null? l) lrev (f (cdr l) (cons (car l) lrev)))))) (lambda (l) (f l (quote ()))))
@@ -3019,24 +3019,24 @@ _L_1423772:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423779"
+    je "_L_1431598"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423779:
+_L_1431598:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423780
+    jge _L_1431599
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423780:
+_L_1431599:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -3065,14 +3065,14 @@ _L_1423780:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423781
+    je _L_1431600
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423781:
+_L_1431600:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -3080,35 +3080,35 @@ _L_1423781:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423782"
+    je "_L_1431601"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423782:
+_L_1431601:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423784
+    jle _L_1431603
     cmp  $0,%eax
-    jge _L_1423783
-_L_1423784:
+    jge _L_1431602
+_L_1431603:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423783:
+_L_1431602:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195919 f195920) (f195916) (let ((f195919 f195919) (f195920 f195920)) (if (null? f195919) f195920 ((vector-ref f195916 0) (cdr f195919) (cons (car f195919) f195920)))))
 # emit-closure
 # si = -12
 # env = ((f195916 . 0))
 # expr = (closure (f195919 f195920) (f195916) (let ((f195919 f195919) (f195920 f195920)) (if (null? f195919) f195920 ((vector-ref f195916 0) (cdr f195919) (cons (car f195919) f195920)))))
-    movl $_L_1423785, 0(%ebp)  # closure label
+    movl $_L_1431604, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195916 . 0))
 # var=f195916
@@ -3118,17 +3118,17 @@ _L_1423783:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423786            # jump around closure body
-_L_1423785:
+    jmp _L_1431605            # jump around closure body
+_L_1431604:
 # check argument count
     cmp $8,%eax
-    je _L_1423787
+    je _L_1431606
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423787:
+_L_1431606:
 # emit-tail-expr
 # si=-16
 # env=((f195920 . -12) (f195919 . -8) (f195916 . 4) (f195916 . 0))
@@ -3170,7 +3170,7 @@ _L_1423787:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423788
+    je _L_1431607
 # emit-tail-expr
 # si=-24
 # env=((f195920 . -20) (f195919 . -16) (f195920 . -12) (f195919 . -8) (f195916 . 4) (f195916 . 0))
@@ -3183,8 +3183,8 @@ _L_1423787:
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
-    jmp _L_1423789
-_L_1423788:
+    jmp _L_1431608
+_L_1431607:
 # emit-tail-expr
 # si=-24
 # env=((f195920 . -20) (f195919 . -16) (f195920 . -12) (f195919 . -8) (f195916 . 4) (f195916 . 0))
@@ -3204,14 +3204,14 @@ _L_1423788:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423790
+    je _L_1431609
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423790:
+_L_1431609:
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -3219,28 +3219,28 @@ _L_1423790:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423791"
+    je "_L_1431610"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423791:
+_L_1431610:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423793
+    jle _L_1431612
     cmp  $0,%eax
-    jge _L_1423792
-_L_1423793:
+    jge _L_1431611
+_L_1431612:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423792:
+_L_1431611:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
@@ -3255,14 +3255,14 @@ _L_1423792:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423794
+    je _L_1431613
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423794:
+_L_1431613:
     movl 3(%eax), %eax
     mov %eax, -28(%esp)    # arg (cdr f195919)
 # emit-expr (cons (car f195919) f195920)
@@ -3278,14 +3278,14 @@ _L_1423794:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423795
+    je _L_1431614
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423795:
+_L_1431614:
     movl -1(%eax), %eax
     movl %eax, -32(%esp)
 # emit-expr f195920
@@ -3315,9 +3315,9 @@ _L_1423795:
 # emit-shift-args:  size=0   si=-36  delta=20
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1423789:
+_L_1431608:
     .align 4,0x90
-_L_1423786:
+_L_1431605:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -3334,7 +3334,7 @@ _L_1423786:
 # si = -4
 # env = ((f195916 . 0))
 # expr = (closure (f195922) (f195916) (let ((f195922 f195922)) ((vector-ref f195916 0) f195922 ())))
-    movl $_L_1423796, 0(%ebp)  # closure label
+    movl $_L_1431615, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195916 . 0))
 # var=f195916
@@ -3344,17 +3344,17 @@ _L_1423786:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423797            # jump around closure body
-_L_1423796:
+    jmp _L_1431616            # jump around closure body
+_L_1431615:
 # check argument count
     cmp $4,%eax
-    je _L_1423798
+    je _L_1431617
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423798:
+_L_1431617:
 # emit-tail-expr
 # si=-12
 # env=((f195922 . -8) (f195916 . 4) (f195916 . 0))
@@ -3390,14 +3390,14 @@ _L_1423798:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423799
+    je _L_1431618
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423799:
+_L_1431618:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -3405,28 +3405,28 @@ _L_1423799:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423800"
+    je "_L_1431619"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423800:
+_L_1431619:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423802
+    jle _L_1431621
     cmp  $0,%eax
-    jge _L_1423801
-_L_1423802:
+    jge _L_1431620
+_L_1431621:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423801:
+_L_1431620:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -3454,7 +3454,7 @@ _L_1423801:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423797:
+_L_1431616:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -3494,24 +3494,24 @@ _L_1423797:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423803"
+    je "_L_1431622"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423803:
+_L_1431622:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423804
+    jge _L_1431623
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423804:
+_L_1431623:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -3540,14 +3540,14 @@ _L_1423804:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423805
+    je _L_1431624
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423805:
+_L_1431624:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -3555,35 +3555,35 @@ _L_1423805:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423806"
+    je "_L_1431625"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423806:
+_L_1431625:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423808
+    jle _L_1431627
     cmp  $0,%eax
-    jge _L_1423807
-_L_1423808:
+    jge _L_1431626
+_L_1431627:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423807:
+_L_1431626:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195927 f195928 f195929) (f195923) (let ((f195927 f195927) (f195928 f195928) (f195929 f195929)) (if (null? f195929) f195927 (begin (vector-set! f195927 f195928 (car f195929)) ((vector-ref f195923 0) f195927 (fxadd1 f195928) (cdr f195929))))))
 # emit-closure
 # si = -12
 # env = ((f195923 . 0))
 # expr = (closure (f195927 f195928 f195929) (f195923) (let ((f195927 f195927) (f195928 f195928) (f195929 f195929)) (if (null? f195929) f195927 (begin (vector-set! f195927 f195928 (car f195929)) ((vector-ref f195923 0) f195927 (fxadd1 f195928) (cdr f195929))))))
-    movl $_L_1423809, 0(%ebp)  # closure label
+    movl $_L_1431628, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195923 . 0))
 # var=f195923
@@ -3593,17 +3593,17 @@ _L_1423807:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423810            # jump around closure body
-_L_1423809:
+    jmp _L_1431629            # jump around closure body
+_L_1431628:
 # check argument count
     cmp $12,%eax
-    je _L_1423811
+    je _L_1431630
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423811:
+_L_1431630:
 # emit-tail-expr
 # si=-20
 # env=((f195929 . -16) (f195928 . -12) (f195927 . -8) (f195923 . 4) (f195923 . 0))
@@ -3652,7 +3652,7 @@ _L_1423811:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423812
+    je _L_1431631
 # emit-tail-expr
 # si=-32
 # env=((f195929 . -28) (f195928 . -24) (f195927 . -20) (f195929 . -16) (f195928 . -12) (f195927 . -8) (f195923 . 4) (f195923 . 0))
@@ -3665,8 +3665,8 @@ _L_1423811:
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
-    jmp _L_1423813
-_L_1423812:
+    jmp _L_1431632
+_L_1431631:
 # emit-tail-expr
 # si=-32
 # env=((f195929 . -28) (f195928 . -24) (f195927 . -20) (f195929 . -16) (f195928 . -12) (f195927 . -8) (f195923 . 4) (f195923 . 0))
@@ -3684,14 +3684,14 @@ _L_1423812:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423814
+    je _L_1431633
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423814:
+_L_1431633:
     movl %eax, -32(%esp)
 # emit-expr f195928
 # emit-variable-ref
@@ -3703,28 +3703,28 @@ _L_1423814:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423815"
+    je "_L_1431634"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423815:
+_L_1431634:
 # check bounds on vector index
     movl -32(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423817
+    jle _L_1431636
     cmp  $0,%eax
-    jge _L_1423816
-_L_1423817:
+    jge _L_1431635
+_L_1431636:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423816:
+_L_1431635:
     movl %eax, -36(%esp)
 # emit-expr (car f195929)
 # emit-expr f195929
@@ -3737,14 +3737,14 @@ _L_1423816:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423818
+    je _L_1431637
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423818:
+_L_1431637:
     movl -1(%eax), %eax
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
@@ -3774,14 +3774,14 @@ _L_1423818:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423819
+    je _L_1431638
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423819:
+_L_1431638:
     movl %eax, -32(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -3789,28 +3789,28 @@ _L_1423819:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423820"
+    je "_L_1431639"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423820:
+_L_1431639:
 # check bounds on vector index
     movl -32(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423822
+    jle _L_1431641
     cmp  $0,%eax
-    jge _L_1423821
-_L_1423822:
+    jge _L_1431640
+_L_1431641:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423821:
+_L_1431640:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
@@ -3832,14 +3832,14 @@ _L_1423821:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423823"
+    je "_L_1431642"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $48,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423823:
+_L_1431642:
      addl $4, %eax
     mov %eax, -40(%esp)    # arg (fxadd1 f195928)
 # emit-expr (cdr f195929)
@@ -3853,14 +3853,14 @@ _L_1423823:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423824
+    je _L_1431643
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423824:
+_L_1431643:
     movl 3(%eax), %eax
     mov %eax, -44(%esp)    # arg (cdr f195929)
     movl -32(%esp), %edi   # load new closure to %edi
@@ -3880,9 +3880,9 @@ _L_1423824:
     movl $12,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
-_L_1423813:
+_L_1431632:
     .align 4,0x90
-_L_1423810:
+_L_1431629:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -3899,7 +3899,7 @@ _L_1423810:
 # si = -4
 # env = ((f195923 . 0))
 # expr = (closure f195933 (f195923) (let () (let ((f195935 (make-vector ((primitive-ref list-length) f195933)))) ((vector-ref f195923 0) f195935 0 f195933))))
-    movl $_L_1423825, 0(%ebp)  # closure label
+    movl $_L_1431644, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195923 . 0))
 # var=f195923
@@ -3909,25 +3909,25 @@ _L_1423810:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423826            # jump around closure body
-_L_1423825:
+    jmp _L_1431645            # jump around closure body
+_L_1431644:
 # check argument count
     cmp $0,%eax
-    jge _L_1423827
+    jge _L_1431646
 # invoke error handler eh_argcount_min
     .extern mrc_eh$uargcount$umin
     movl mrc_eh$uargcount$umin, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423827:
+_L_1431646:
 # emit-build-varargs-list
     movl $63, %esi       # args <- () 
     lea -4(%esp),%edi    # edi <- esp-4
     subl %eax, %edi      # edi <- esp-4-eax    addr of arg[K+N] on stack
-_L_1423829:
+_L_1431648:
     lea -4(%esp),%ebx    # addr of arg[K] on stack
     cmp %edi, %ebx       # while edi <> esp+(si+4)
-    je _L_1423828
+    je _L_1431647
     movl (%edi),%ebx     # arg i -> car
     movl %ebx, 0(%ebp)
     movl %esi, 4(%ebp)  # esi -> cdr
@@ -3935,8 +3935,8 @@ _L_1423829:
     addl $1, %esi       # tag as pair
     addl $8,%ebp         # bump heap ptr
     addl $4,%edi         # move to next previous arg from the end
-    jmp _L_1423829
-_L_1423828:
+    jmp _L_1431648
+_L_1431647:
     movl %esi, -8(%esp)  # set args
 # emit-tail-expr
 # si=-12
@@ -3970,13 +3970,13 @@ _L_1423828:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423830"
+    je "_L_1431649"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423830":
+"_L_1431649":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195933
 # emit-variable-ref
@@ -3995,24 +3995,24 @@ _L_1423828:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423831"
+    je "_L_1431650"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423831:
+_L_1431650:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423832
+    jge _L_1431651
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423832:
+_L_1431651:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -4041,14 +4041,14 @@ _L_1423832:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423833
+    je _L_1431652
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423833:
+_L_1431652:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -4056,28 +4056,28 @@ _L_1423833:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423834"
+    je "_L_1431653"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423834:
+_L_1431653:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423836
+    jle _L_1431655
     cmp  $0,%eax
-    jge _L_1423835
-_L_1423836:
+    jge _L_1431654
+_L_1431655:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423835:
+_L_1431654:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -4115,7 +4115,7 @@ _L_1423835:
     movl $12,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423826:
+_L_1431645:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -4155,24 +4155,24 @@ _L_1423826:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423837"
+    je "_L_1431656"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423837:
+_L_1431656:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423838
+    jge _L_1431657
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423838:
+_L_1431657:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -4201,14 +4201,14 @@ _L_1423838:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423839
+    je _L_1431658
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423839:
+_L_1431658:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -4216,35 +4216,35 @@ _L_1423839:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423840"
+    je "_L_1431659"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423840:
+_L_1431659:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423842
+    jle _L_1431661
     cmp  $0,%eax
-    jge _L_1423841
-_L_1423842:
+    jge _L_1431660
+_L_1431661:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423841:
+_L_1431660:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195940 f195941 f195942) (f195936) (let ((f195940 f195940) (f195941 f195941) (f195942 f195942)) (if (null? f195942) f195940 (begin (string-set! f195940 f195941 (car f195942)) ((vector-ref f195936 0) f195940 (fxadd1 f195941) (cdr f195942))))))
 # emit-closure
 # si = -12
 # env = ((f195936 . 0))
 # expr = (closure (f195940 f195941 f195942) (f195936) (let ((f195940 f195940) (f195941 f195941) (f195942 f195942)) (if (null? f195942) f195940 (begin (string-set! f195940 f195941 (car f195942)) ((vector-ref f195936 0) f195940 (fxadd1 f195941) (cdr f195942))))))
-    movl $_L_1423843, 0(%ebp)  # closure label
+    movl $_L_1431662, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195936 . 0))
 # var=f195936
@@ -4254,17 +4254,17 @@ _L_1423841:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423844            # jump around closure body
-_L_1423843:
+    jmp _L_1431663            # jump around closure body
+_L_1431662:
 # check argument count
     cmp $12,%eax
-    je _L_1423845
+    je _L_1431664
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423845:
+_L_1431664:
 # emit-tail-expr
 # si=-20
 # env=((f195942 . -16) (f195941 . -12) (f195940 . -8) (f195936 . 4) (f195936 . 0))
@@ -4313,7 +4313,7 @@ _L_1423845:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423846
+    je _L_1431665
 # emit-tail-expr
 # si=-32
 # env=((f195942 . -28) (f195941 . -24) (f195940 . -20) (f195942 . -16) (f195941 . -12) (f195940 . -8) (f195936 . 4) (f195936 . 0))
@@ -4326,8 +4326,8 @@ _L_1423845:
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
-    jmp _L_1423847
-_L_1423846:
+    jmp _L_1431666
+_L_1431665:
 # emit-tail-expr
 # si=-32
 # env=((f195942 . -28) (f195941 . -24) (f195940 . -20) (f195942 . -16) (f195941 . -12) (f195940 . -8) (f195936 . 4) (f195936 . 0))
@@ -4345,14 +4345,14 @@ _L_1423846:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423848
+    je _L_1431667
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423848:
+_L_1431667:
     movl %eax, -32(%esp)
 # emit-expr f195941
 # emit-variable-ref
@@ -4364,28 +4364,28 @@ _L_1423848:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423849"
+    je "_L_1431668"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423849:
+_L_1431668:
 # check bounds on string index
     movl -32(%esp), %ebx
     cmp  %eax,-6(%ebx) 
-    jle _L_1423851
+    jle _L_1431670
     cmp  $0,%eax
-    jge _L_1423850
-_L_1423851:
+    jge _L_1431669
+_L_1431670:
 # invoke error handler eh_string_index
     .extern mrc_eh$ustring$uindex
     movl mrc_eh$ustring$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423850:
+_L_1431669:
     movl %eax, -36(%esp)
 # emit-expr (car f195942)
 # emit-expr f195942
@@ -4398,27 +4398,27 @@ _L_1423850:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423852
+    je _L_1431671
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423852:
+_L_1431671:
     movl -1(%eax), %eax
 # check the argument is a char
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_1423853"
+    je "_L_1431672"
 # invoke error handler eh_character
     .extern mrc_eh$ucharacter
     movl mrc_eh$ucharacter, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423853:
+_L_1431672:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     sar $2, %esi
@@ -4448,14 +4448,14 @@ _L_1423853:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423854
+    je _L_1431673
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423854:
+_L_1431673:
     movl %eax, -32(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -4463,28 +4463,28 @@ _L_1423854:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423855"
+    je "_L_1431674"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423855:
+_L_1431674:
 # check bounds on vector index
     movl -32(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423857
+    jle _L_1431676
     cmp  $0,%eax
-    jge _L_1423856
-_L_1423857:
+    jge _L_1431675
+_L_1431676:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423856:
+_L_1431675:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
@@ -4506,14 +4506,14 @@ _L_1423856:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423858"
+    je "_L_1431677"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $48,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423858:
+_L_1431677:
      addl $4, %eax
     mov %eax, -40(%esp)    # arg (fxadd1 f195941)
 # emit-expr (cdr f195942)
@@ -4527,14 +4527,14 @@ _L_1423858:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1423859
+    je _L_1431678
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423859:
+_L_1431678:
     movl 3(%eax), %eax
     mov %eax, -44(%esp)    # arg (cdr f195942)
     movl -32(%esp), %edi   # load new closure to %edi
@@ -4554,9 +4554,9 @@ _L_1423859:
     movl $12,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
-_L_1423847:
+_L_1431666:
     .align 4,0x90
-_L_1423844:
+_L_1431663:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -4573,7 +4573,7 @@ _L_1423844:
 # si = -4
 # env = ((f195936 . 0))
 # expr = (closure f195946 (f195936) (let () (let ((f195948 (make-string ((primitive-ref list-length) f195946)))) ((vector-ref f195936 0) f195948 0 f195946))))
-    movl $_L_1423860, 0(%ebp)  # closure label
+    movl $_L_1431679, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195936 . 0))
 # var=f195936
@@ -4583,25 +4583,25 @@ _L_1423844:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423861            # jump around closure body
-_L_1423860:
+    jmp _L_1431680            # jump around closure body
+_L_1431679:
 # check argument count
     cmp $0,%eax
-    jge _L_1423862
+    jge _L_1431681
 # invoke error handler eh_argcount_min
     .extern mrc_eh$uargcount$umin
     movl mrc_eh$uargcount$umin, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423862:
+_L_1431681:
 # emit-build-varargs-list
     movl $63, %esi       # args <- () 
     lea -4(%esp),%edi    # edi <- esp-4
     subl %eax, %edi      # edi <- esp-4-eax    addr of arg[K+N] on stack
-_L_1423864:
+_L_1431683:
     lea -4(%esp),%ebx    # addr of arg[K] on stack
     cmp %edi, %ebx       # while edi <> esp+(si+4)
-    je _L_1423863
+    je _L_1431682
     movl (%edi),%ebx     # arg i -> car
     movl %ebx, 0(%ebp)
     movl %esi, 4(%ebp)  # esi -> cdr
@@ -4609,8 +4609,8 @@ _L_1423864:
     addl $1, %esi       # tag as pair
     addl $8,%ebp         # bump heap ptr
     addl $4,%edi         # move to next previous arg from the end
-    jmp _L_1423864
-_L_1423863:
+    jmp _L_1431683
+_L_1431682:
     movl %esi, -8(%esp)  # set args
 # emit-tail-expr
 # si=-12
@@ -4644,13 +4644,13 @@ _L_1423863:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423865"
+    je "_L_1431684"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423865":
+"_L_1431684":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195946
 # emit-variable-ref
@@ -4669,24 +4669,24 @@ _L_1423863:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423866"
+    je "_L_1431685"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $144,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423866:
+_L_1431685:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423867
+    jge _L_1431686
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $144,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423867:
+_L_1431686:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -4717,14 +4717,14 @@ _L_1423867:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423868
+    je _L_1431687
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423868:
+_L_1431687:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -4732,28 +4732,28 @@ _L_1423868:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423869"
+    je "_L_1431688"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423869:
+_L_1431688:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423871
+    jle _L_1431690
     cmp  $0,%eax
-    jge _L_1423870
-_L_1423871:
+    jge _L_1431689
+_L_1431690:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423870:
+_L_1431689:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -4791,7 +4791,7 @@ _L_1423870:
     movl $12,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423861:
+_L_1431680:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -4831,24 +4831,24 @@ _L_1423861:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423872"
+    je "_L_1431691"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423872:
+_L_1431691:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423873
+    jge _L_1431692
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423873:
+_L_1431692:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -4877,14 +4877,14 @@ _L_1423873:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423874
+    je _L_1431693
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423874:
+_L_1431693:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -4892,35 +4892,35 @@ _L_1423874:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423875"
+    je "_L_1431694"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423875:
+_L_1431694:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423877
+    jle _L_1431696
     cmp  $0,%eax
-    jge _L_1423876
-_L_1423877:
+    jge _L_1431695
+_L_1431696:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423876:
+_L_1431695:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195952 f195953) (f195949) (let ((f195952 f195952) (f195953 f195953)) (if (fx= f195953 (string-length f195952)) () (cons (string-ref f195952 f195953) ((vector-ref f195949 0) f195952 (fxadd1 f195953))))))
 # emit-closure
 # si = -12
 # env = ((f195949 . 0))
 # expr = (closure (f195952 f195953) (f195949) (let ((f195952 f195952) (f195953 f195953)) (if (fx= f195953 (string-length f195952)) () (cons (string-ref f195952 f195953) ((vector-ref f195949 0) f195952 (fxadd1 f195953))))))
-    movl $_L_1423878, 0(%ebp)  # closure label
+    movl $_L_1431697, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195949 . 0))
 # var=f195949
@@ -4930,17 +4930,17 @@ _L_1423876:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423879            # jump around closure body
-_L_1423878:
+    jmp _L_1431698            # jump around closure body
+_L_1431697:
 # check argument count
     cmp $8,%eax
-    je _L_1423880
+    je _L_1431699
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423880:
+_L_1431699:
 # emit-tail-expr
 # si=-16
 # env=((f195953 . -12) (f195952 . -8) (f195949 . 4) (f195949 . 0))
@@ -4980,27 +4980,27 @@ _L_1423880:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423883
+    je _L_1431702
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $152,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423883:
+_L_1431702:
     movl -6(%eax), %eax
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423884"
+    je "_L_1431703"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423884:
+_L_1431703:
     movl %eax, -24(%esp)
 # emit-expr f195953
 # emit-variable-ref
@@ -5012,29 +5012,29 @@ _L_1423884:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423885"
+    je "_L_1431704"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423885:
+_L_1431704:
     cmp -24(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423881
+    je _L_1431700
 # emit-tail-expr
 # si=-24
 # env=((f195953 . -20) (f195952 . -16) (f195953 . -12) (f195952 . -8) (f195949 . 4) (f195949 . 0))
 # expr=()
     movl $63, %eax     # immed ()
     ret                  # immediate tail return
-    jmp _L_1423882
-_L_1423881:
+    jmp _L_1431701
+_L_1431700:
 # emit-tail-expr
 # si=-24
 # env=((f195953 . -20) (f195952 . -16) (f195953 . -12) (f195952 . -8) (f195949 . 4) (f195949 . 0))
@@ -5052,14 +5052,14 @@ _L_1423881:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423886
+    je _L_1431705
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423886:
+_L_1431705:
     movl %eax, -24(%esp)
 # emit-expr f195953
 # emit-variable-ref
@@ -5071,28 +5071,28 @@ _L_1423886:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423887"
+    je "_L_1431706"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423887:
+_L_1431706:
 # check bounds on string index
     movl -24(%esp), %ebx
     cmp  %eax,-6(%ebx) 
-    jle _L_1423889
+    jle _L_1431708
     cmp  $0,%eax
-    jge _L_1423888
-_L_1423889:
+    jge _L_1431707
+_L_1431708:
 # invoke error handler eh_string_index
     .extern mrc_eh$ustring$uindex
     movl mrc_eh$ustring$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $156,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423888:
+_L_1431707:
     sar $2, %eax
     movl -24(%esp), %esi
     movl -2(%eax,%esi), %eax
@@ -5115,14 +5115,14 @@ _L_1423888:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423890
+    je _L_1431709
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423890:
+_L_1431709:
     movl %eax, -36(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -5130,41 +5130,41 @@ _L_1423890:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423891"
+    je "_L_1431710"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423891:
+_L_1431710:
 # check bounds on vector index
     movl -36(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423893
+    jle _L_1431712
     cmp  $0,%eax
-    jge _L_1423892
-_L_1423893:
+    jge _L_1431711
+_L_1431712:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423892:
+_L_1431711:
     movl -36(%esp), %esi
     movl -1(%eax,%esi), %eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423894"
+    je "_L_1431713"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423894":
+"_L_1431713":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195952
 # emit-variable-ref
@@ -5184,14 +5184,14 @@ _L_1423892:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423895"
+    je "_L_1431714"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $48,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423895:
+_L_1431714:
      addl $4, %eax
     mov %eax, -44(%esp)  # arg (fxadd1 f195953)
     movl -36(%esp), %edi   # load new closure to %edi
@@ -5209,9 +5209,9 @@ _L_1423895:
 # cons end
 #return from tail (cons (string-ref f195952 f195953) ((vector-ref f195949 0) f195952 (fxadd1 f195953)))
     ret
-_L_1423882:
+_L_1431701:
     .align 4,0x90
-_L_1423879:
+_L_1431698:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -5228,7 +5228,7 @@ _L_1423879:
 # si = -4
 # env = ((f195949 . 0))
 # expr = (closure (f195955) (f195949) (let ((f195955 f195955)) ((vector-ref f195949 0) f195955 0)))
-    movl $_L_1423896, 0(%ebp)  # closure label
+    movl $_L_1431715, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195949 . 0))
 # var=f195949
@@ -5238,17 +5238,17 @@ _L_1423879:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423897            # jump around closure body
-_L_1423896:
+    jmp _L_1431716            # jump around closure body
+_L_1431715:
 # check argument count
     cmp $4,%eax
-    je _L_1423898
+    je _L_1431717
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423898:
+_L_1431717:
 # emit-tail-expr
 # si=-12
 # env=((f195955 . -8) (f195949 . 4) (f195949 . 0))
@@ -5284,14 +5284,14 @@ _L_1423898:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423899
+    je _L_1431718
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423899:
+_L_1431718:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -5299,28 +5299,28 @@ _L_1423899:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423900"
+    je "_L_1431719"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423900:
+_L_1431719:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423902
+    jle _L_1431721
     cmp  $0,%eax
-    jge _L_1423901
-_L_1423902:
+    jge _L_1431720
+_L_1431721:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423901:
+_L_1431720:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -5348,7 +5348,7 @@ _L_1423901:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423897:
+_L_1431716:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -5388,24 +5388,24 @@ _L_1423897:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423903"
+    je "_L_1431722"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423903:
+_L_1431722:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1423904
+    jge _L_1431723
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423904:
+_L_1431723:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -5434,14 +5434,14 @@ _L_1423904:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423905
+    je _L_1431724
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423905:
+_L_1431724:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -5449,35 +5449,35 @@ _L_1423905:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423906"
+    je "_L_1431725"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423906:
+_L_1431725:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423908
+    jle _L_1431727
     cmp  $0,%eax
-    jge _L_1423907
-_L_1423908:
+    jge _L_1431726
+_L_1431727:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423907:
+_L_1431726:
     movl %eax, -8(%esp)
 # emit-expr (closure (f195959 f195960) (else f195956) (let ((f195959 f195959) (f195960 f195960)) (if (fx< f195959 10) (cons f195959 f195960) ((vector-ref f195956 0) (fxquotient f195959 10) (cons (fxremainder f195959 10) f195960)))))
 # emit-closure
 # si = -12
 # env = ((f195956 . 0))
 # expr = (closure (f195959 f195960) (else f195956) (let ((f195959 f195959) (f195960 f195960)) (if (fx< f195959 10) (cons f195959 f195960) ((vector-ref f195956 0) (fxquotient f195959 10) (cons (fxremainder f195959 10) f195960)))))
-    movl $_L_1423909, 0(%ebp)  # closure label
+    movl $_L_1431728, 0(%ebp)  # closure label
 # WARNING: free var else not defined in the environmnet
 # emit-variable-ref
 # env=((f195956 . 0))
@@ -5488,17 +5488,17 @@ _L_1423907:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1423910            # jump around closure body
-_L_1423909:
+    jmp _L_1431729            # jump around closure body
+_L_1431728:
 # check argument count
     cmp $8,%eax
-    je _L_1423911
+    je _L_1431730
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423911:
+_L_1431730:
 # emit-tail-expr
 # si=-16
 # env=((f195960 . -12) (f195959 . -8) (f195956 . 8) (else . 4) (f195956 . 0))
@@ -5533,14 +5533,14 @@ _L_1423911:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423914"
+    je "_L_1431733"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $64,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423914:
+_L_1431733:
     movl %eax, -24(%esp)
 # emit-expr f195959
 # emit-variable-ref
@@ -5552,21 +5552,21 @@ _L_1423914:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423915"
+    je "_L_1431734"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $64,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423915:
+_L_1431734:
     cmp -24(%esp), %eax
     setl %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1423912
+    je _L_1431731
 # emit-tail-expr
 # si=-24
 # env=((f195960 . -20) (f195959 . -16) (f195960 . -12) (f195959 . -8) (f195956 . 8) (else . 4) (f195956 . 0))
@@ -5595,8 +5595,8 @@ _L_1423915:
 # cons end
 #return from tail (cons f195959 f195960)
     ret
-    jmp _L_1423913
-_L_1423912:
+    jmp _L_1431732
+_L_1431731:
 # emit-tail-expr
 # si=-24
 # env=((f195960 . -20) (f195959 . -16) (f195960 . -12) (f195959 . -8) (f195956 . 8) (else . 4) (f195956 . 0))
@@ -5616,14 +5616,14 @@ _L_1423912:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423916
+    je _L_1431735
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423916:
+_L_1431735:
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -5631,28 +5631,28 @@ _L_1423916:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423917"
+    je "_L_1431736"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423917:
+_L_1431736:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423919
+    jle _L_1431738
     cmp  $0,%eax
-    jge _L_1423918
-_L_1423919:
+    jge _L_1431737
+_L_1431738:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423918:
+_L_1431737:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
@@ -5663,14 +5663,14 @@ _L_1423918:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423921"
+    je "_L_1431740"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $92,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423921:
+_L_1431740:
     movl %eax, -28(%esp)  # denominator
 # emit-expr f195959
 # emit-variable-ref
@@ -5682,20 +5682,20 @@ _L_1423921:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423922"
+    je "_L_1431741"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $92,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423922:
+_L_1431741:
     movl -28(%esp),%ebx   # ebx <- denominator
     xor %edx,%edx        # edx <- 0
     cmp $0,%eax
-    jge _L_1423920
+    jge _L_1431739
     not %edx
-_L_1423920:
+_L_1431739:
     idiv %ebx            # eax <- edx:eax/ebx
     sal $2,%eax          # eax <- eax*4 (since it was divided away)
     mov %eax, -28(%esp)    # arg (fxquotient f195959 10)
@@ -5708,14 +5708,14 @@ _L_1423920:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423924"
+    je "_L_1431743"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $92,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423924:
+_L_1431743:
     movl %eax, -32(%esp)  # denominator
 # emit-expr f195959
 # emit-variable-ref
@@ -5727,20 +5727,20 @@ _L_1423924:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423925"
+    je "_L_1431744"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $92,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423925:
+_L_1431744:
     movl -32(%esp),%ebx   # ebx <- denominator
     xor %edx,%edx        # edx <- 0
     cmp $0,%eax
-    jge _L_1423923
+    jge _L_1431742
     not %edx
-_L_1423923:
+_L_1431742:
     idiv %ebx            # edx <- edx:eax/ebx  remainder
     movl %edx,%eax
     movl %eax, -32(%esp)
@@ -5771,9 +5771,9 @@ _L_1423923:
 # emit-shift-args:  size=0   si=-36  delta=20
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1423913:
+_L_1431732:
     .align 4,0x90
-_L_1423910:
+_L_1431729:
     movl -4(%esp), %ebx
     movl -8(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -5790,7 +5790,7 @@ _L_1423910:
 # si = -4
 # env = ((f195956 . 0))
 # expr = (closure (f195962) (f195956) (let ((f195962 f195962)) ((vector-ref f195956 0) f195962 ())))
-    movl $_L_1423926, 0(%ebp)  # closure label
+    movl $_L_1431745, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195956 . 0))
 # var=f195956
@@ -5800,17 +5800,17 @@ _L_1423910:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423927            # jump around closure body
-_L_1423926:
+    jmp _L_1431746            # jump around closure body
+_L_1431745:
 # check argument count
     cmp $4,%eax
-    je _L_1423928
+    je _L_1431747
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423928:
+_L_1431747:
 # emit-tail-expr
 # si=-12
 # env=((f195962 . -8) (f195956 . 4) (f195956 . 0))
@@ -5846,14 +5846,14 @@ _L_1423928:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423929
+    je _L_1431748
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423929:
+_L_1431748:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -5861,28 +5861,28 @@ _L_1423929:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423930"
+    je "_L_1431749"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423930:
+_L_1431749:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423932
+    jle _L_1431751
     cmp  $0,%eax
-    jge _L_1423931
-_L_1423932:
+    jge _L_1431750
+_L_1431751:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423931:
+_L_1431750:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -5910,7 +5910,7 @@ _L_1423931:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1423927:
+_L_1431746:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -5947,21 +5947,21 @@ _L_1423927:
 # si = 0
 # env = ()
 # expr = (closure (f195964) () (let ((f195964 f195964)) (foreign-call "s_write" 2 f195964 (string-length f195964))))
-    movl $_L_1423933, 0(%ebp)  # closure label
+    movl $_L_1431752, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423934            # jump around closure body
-_L_1423933:
+    jmp _L_1431753            # jump around closure body
+_L_1431752:
 # check argument count
     cmp $4,%eax
-    je _L_1423935
+    je _L_1431754
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423935:
+_L_1431754:
 # emit-tail-expr
 # si=-12
 # env=((f195964 . -8))
@@ -5995,14 +5995,14 @@ _L_1423935:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1423936
+    je _L_1431755
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $152,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423936:
+_L_1431755:
     movl -6(%eax), %eax
     movl %eax, -24(%esp)
 # emit-expr f195964
@@ -6033,7 +6033,7 @@ _L_1423936:
     movl -16(%esp),%ecx
      ret
     .align 4,0x90
-_L_1423934:
+_L_1431753:
     movl %eax, 0(%esp)  # stack save
 # emit-expr (let ((f195972 (closure (f195973 f195974) (f195963 f195963 f195963 f195963 f195963) (let ((f195973 f195973) (f195974 f195974)) (begin (f195963 "error:") (f195963 (symbol->string f195973)) (f195963 ": ") (f195963 f195974) (f195963 "\n")))))) (closure (f195977 f195978) (f195972) (let ((f195977 f195977) (f195978 f195978)) (begin (f195972 f195977 f195978) (foreign-call "s_exit" 1)))))
 # emit-let
@@ -6046,7 +6046,7 @@ _L_1423934:
 # si = -4
 # env = ((f195963 . 0))
 # expr = (closure (f195973 f195974) (f195963 f195963 f195963 f195963 f195963) (let ((f195973 f195973) (f195974 f195974)) (begin (f195963 "error:") (f195963 (symbol->string f195973)) (f195963 ": ") (f195963 f195974) (f195963 "\n"))))
-    movl $_L_1423937, 0(%ebp)  # closure label
+    movl $_L_1431756, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195963 . 0))
 # var=f195963
@@ -6080,17 +6080,17 @@ _L_1423934:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_1423938            # jump around closure body
-_L_1423937:
+    jmp _L_1431757            # jump around closure body
+_L_1431756:
 # check argument count
     cmp $8,%eax
-    je _L_1423939
+    je _L_1431758
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423939:
+_L_1431758:
 # emit-tail-expr
 # si=-16
 # env=((f195974 . -12) (f195973 . -8) (f195963 . 20) (f195963 . 16) (f195963 . 12) (f195963 . 8) (f195963 . 4) (f195963 . 0))
@@ -6135,23 +6135,23 @@ _L_1423939:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423940"
+    je "_L_1431759"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423940":
+"_L_1431759":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr "error:"
 # string literal
-    jmp _L_1423942
+    jmp _L_1431761
     .align 8,0x90
-_L_1423941 :
+_L_1431760 :
     .int 24
     .ascii "error:"
-_L_1423942:
-    movl $_L_1423941, %eax
+_L_1431761:
+    movl $_L_1431760, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg error:
     movl -32(%esp), %edi   # load new closure to %edi
@@ -6181,13 +6181,13 @@ _L_1423942:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423943"
+    je "_L_1431762"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423943":
+"_L_1431762":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr (symbol->string f195973)
 # symbol->string f195973
@@ -6226,23 +6226,23 @@ _L_1423942:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423944"
+    je "_L_1431763"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423944":
+"_L_1431763":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr ": "
 # string literal
-    jmp _L_1423946
+    jmp _L_1431765
     .align 8,0x90
-_L_1423945 :
+_L_1431764 :
     .int 8
     .ascii ": "
-_L_1423946:
-    movl $_L_1423945, %eax
+_L_1431765:
+    movl $_L_1431764, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg : 
     movl -32(%esp), %edi   # load new closure to %edi
@@ -6272,13 +6272,13 @@ _L_1423946:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423947"
+    je "_L_1431766"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423947":
+"_L_1431766":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195974
 # emit-variable-ref
@@ -6316,13 +6316,13 @@ _L_1423946:
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
 # emit-expr "\n"
 # string literal
-    jmp _L_1423949
+    jmp _L_1431768
     .align 8,0x90
-_L_1423948 :
+_L_1431767 :
     .int 4
     .ascii "\n"
-_L_1423949:
-    movl $_L_1423948, %eax
+_L_1431768:
+    movl $_L_1431767, %eax
     orl $6, %eax
     mov %eax, -28(%esp)    # arg 
 
@@ -6338,14 +6338,14 @@ _L_1423949:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1423938:
+_L_1431757:
     movl %eax, -4(%esp)  # stack save
 # emit-expr (closure (f195977 f195978) (f195972) (let ((f195977 f195977) (f195978 f195978)) (begin (f195972 f195977 f195978) (foreign-call "s_exit" 1))))
 # emit-closure
 # si = -8
 # env = ((f195972 . -4) (f195963 . 0))
 # expr = (closure (f195977 f195978) (f195972) (let ((f195977 f195977) (f195978 f195978)) (begin (f195972 f195977 f195978) (foreign-call "s_exit" 1))))
-    movl $_L_1423950, 0(%ebp)  # closure label
+    movl $_L_1431769, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195972 . -4) (f195963 . 0))
 # var=f195972
@@ -6355,17 +6355,17 @@ _L_1423938:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1423951            # jump around closure body
-_L_1423950:
+    jmp _L_1431770            # jump around closure body
+_L_1431769:
 # check argument count
     cmp $8,%eax
-    je _L_1423952
+    je _L_1431771
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1423952:
+_L_1431771:
 # emit-tail-expr
 # si=-16
 # env=((f195978 . -12) (f195977 . -8) (f195972 . 4) (f195972 . -4) (f195963 . 0))
@@ -6410,13 +6410,13 @@ _L_1423952:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423953"
+    je "_L_1431772"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423953":
+"_L_1431772":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195977
 # emit-variable-ref
@@ -6468,7 +6468,7 @@ _L_1423952:
      ret
      ret   # return thru stack
     .align 4,0x90
-_L_1423951:
+_L_1431770:
      movl %eax, mrc_error
 # == explicit-begins  ==>
 # (let ((p (quote ()))) (begin (set! p (cons (quote procedure?) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote symbol-value) p)) (set! p (cons (quote symbol->string) p)) (set! p (cons (quote make-symbol) p)) (set! p (cons (quote symbol?) p)) (set! p (cons (quote string-set!) p)) (set! p (cons (quote string-ref) p)) (set! p (cons (quote string-length) p)) (set! p (cons (quote string?) p)) (set! p (cons (quote make-string) p)) (set! p (cons (quote vector-ref) p)) (set! p (cons (quote vector-set!) p)) (set! p (cons (quote vector-length) p)) (set! p (cons (quote make-vector) p)) (set! p (cons (quote vector?) p)) (set! p (cons (quote set-cdr!) p)) (set! p (cons (quote set-car!) p)) (set! p (cons (quote cdr) p)) (set! p (cons (quote car) p)) (set! p (cons (quote cons) p)) (set! p (cons (quote pair?) p)) (set! p (cons (quote fxremainder) p)) (set! p (cons (quote fxquotient) p)) (set! p (cons (quote fx*) p)) (set! p (cons (quote fx-) p)) (set! p (cons (quote fx+) p)) (set! p (cons (quote fx>=) p)) (set! p (cons (quote fx>) p)) (set! p (cons (quote fx<=) p)) (set! p (cons (quote fx<) p)) (set! p (cons (quote fx=) p)) (set! p (cons (quote fxzero?) p)) (set! p (cons (quote fxsub1) p)) (set! p (cons (quote fxadd1) p)) (set! p (cons (quote fxlogor) p)) (set! p (cons (quote fxlogand) p)) (set! p (cons (quote fxlognot) p)) (set! p (cons (quote char=?) p)) (set! p (cons (quote eq?) p)) (set! p (cons (quote not) p)) (set! p (cons (quote boolean?) p)) (set! p (cons (quote fixnum?) p)) (set! p (cons (quote char?) p)) (set! p (cons (quote null?) p)) (set! p (cons (quote char->fixnum) p)) (set! p (cons (quote fixnum->char) p)) (lambda () p)))
@@ -6508,13 +6508,13 @@ _L_1423951:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423954"
+    je "_L_1431773"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423954":
+"_L_1431773":
    movl %eax,  -8(%esp)  # stash funcall-oper in closure slot
 # emit-expr ()
     movl $63, %eax     # immed ()
@@ -6539,14 +6539,14 @@ _L_1423951:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423955
+    je _L_1431774
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423955:
+_L_1431774:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6554,28 +6554,28 @@ _L_1423955:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423956"
+    je "_L_1431775"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423956:
+_L_1431775:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423958
+    jle _L_1431777
     cmp  $0,%eax
-    jge _L_1423957
-_L_1423958:
+    jge _L_1431776
+_L_1431777:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423957:
+_L_1431776:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "procedure?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "procedure?") arg2=(vector-ref f195979 0)
@@ -6591,23 +6591,23 @@ _L_1423957:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423959"
+    je "_L_1431778"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423959":
+"_L_1431778":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "procedure?"
 # string literal
-    jmp _L_1423961
+    jmp _L_1431780
     .align 8,0x90
-_L_1423960 :
+_L_1431779 :
     .int 40
     .ascii "procedure?"
-_L_1423961:
-    movl $_L_1423960, %eax
+_L_1431780:
+    movl $_L_1431779, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg procedure?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -6628,14 +6628,14 @@ _L_1423961:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423962
+    je _L_1431781
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423962:
+_L_1431781:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6643,28 +6643,28 @@ _L_1423962:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423963"
+    je "_L_1431782"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423963:
+_L_1431782:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423965
+    jle _L_1431784
     cmp  $0,%eax
-    jge _L_1423964
-_L_1423965:
+    jge _L_1431783
+_L_1431784:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423964:
+_L_1431783:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -6692,14 +6692,14 @@ _L_1423964:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423966
+    je _L_1431785
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423966:
+_L_1431785:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6707,28 +6707,28 @@ _L_1423966:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423967"
+    je "_L_1431786"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423967:
+_L_1431786:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423969
+    jle _L_1431788
     cmp  $0,%eax
-    jge _L_1423968
-_L_1423969:
+    jge _L_1431787
+_L_1431788:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423968:
+_L_1431787:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "cdr") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "cdr") arg2=(vector-ref f195979 0)
@@ -6744,23 +6744,23 @@ _L_1423968:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423970"
+    je "_L_1431789"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423970":
+"_L_1431789":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "cdr"
 # string literal
-    jmp _L_1423972
+    jmp _L_1431791
     .align 8,0x90
-_L_1423971 :
+_L_1431790 :
     .int 12
     .ascii "cdr"
-_L_1423972:
-    movl $_L_1423971, %eax
+_L_1431791:
+    movl $_L_1431790, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg cdr
     movl -20(%esp), %edi   # load new closure to %edi
@@ -6781,14 +6781,14 @@ _L_1423972:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423973
+    je _L_1431792
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423973:
+_L_1431792:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6796,28 +6796,28 @@ _L_1423973:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423974"
+    je "_L_1431793"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423974:
+_L_1431793:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423976
+    jle _L_1431795
     cmp  $0,%eax
-    jge _L_1423975
-_L_1423976:
+    jge _L_1431794
+_L_1431795:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423975:
+_L_1431794:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -6845,14 +6845,14 @@ _L_1423975:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423977
+    je _L_1431796
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423977:
+_L_1431796:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6860,28 +6860,28 @@ _L_1423977:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423978"
+    je "_L_1431797"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423978:
+_L_1431797:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423980
+    jle _L_1431799
     cmp  $0,%eax
-    jge _L_1423979
-_L_1423980:
+    jge _L_1431798
+_L_1431799:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423979:
+_L_1431798:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "car") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "car") arg2=(vector-ref f195979 0)
@@ -6897,23 +6897,23 @@ _L_1423979:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423981"
+    je "_L_1431800"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423981":
+"_L_1431800":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "car"
 # string literal
-    jmp _L_1423983
+    jmp _L_1431802
     .align 8,0x90
-_L_1423982 :
+_L_1431801 :
     .int 12
     .ascii "car"
-_L_1423983:
-    movl $_L_1423982, %eax
+_L_1431802:
+    movl $_L_1431801, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg car
     movl -20(%esp), %edi   # load new closure to %edi
@@ -6934,14 +6934,14 @@ _L_1423983:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423984
+    je _L_1431803
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423984:
+_L_1431803:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -6949,28 +6949,28 @@ _L_1423984:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423985"
+    je "_L_1431804"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423985:
+_L_1431804:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423987
+    jle _L_1431806
     cmp  $0,%eax
-    jge _L_1423986
-_L_1423987:
+    jge _L_1431805
+_L_1431806:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423986:
+_L_1431805:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -6998,14 +6998,14 @@ _L_1423986:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423988
+    je _L_1431807
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423988:
+_L_1431807:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7013,28 +7013,28 @@ _L_1423988:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423989"
+    je "_L_1431808"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423989:
+_L_1431808:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423991
+    jle _L_1431810
     cmp  $0,%eax
-    jge _L_1423990
-_L_1423991:
+    jge _L_1431809
+_L_1431810:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423990:
+_L_1431809:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "symbol-value") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "symbol-value") arg2=(vector-ref f195979 0)
@@ -7050,23 +7050,23 @@ _L_1423990:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1423992"
+    je "_L_1431811"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1423992":
+"_L_1431811":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "symbol-value"
 # string literal
-    jmp _L_1423994
+    jmp _L_1431813
     .align 8,0x90
-_L_1423993 :
+_L_1431812 :
     .int 48
     .ascii "symbol-value"
-_L_1423994:
-    movl $_L_1423993, %eax
+_L_1431813:
+    movl $_L_1431812, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg symbol-value
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7087,14 +7087,14 @@ _L_1423994:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423995
+    je _L_1431814
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423995:
+_L_1431814:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7102,28 +7102,28 @@ _L_1423995:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1423996"
+    je "_L_1431815"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423996:
+_L_1431815:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1423998
+    jle _L_1431817
     cmp  $0,%eax
-    jge _L_1423997
-_L_1423998:
+    jge _L_1431816
+_L_1431817:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1423997:
+_L_1431816:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7151,14 +7151,14 @@ _L_1423997:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1423999
+    je _L_1431818
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1423999:
+_L_1431818:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7166,28 +7166,28 @@ _L_1423999:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424000"
+    je "_L_1431819"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424000:
+_L_1431819:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424002
+    jle _L_1431821
     cmp  $0,%eax
-    jge _L_1424001
-_L_1424002:
+    jge _L_1431820
+_L_1431821:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424001:
+_L_1431820:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "symbol->string") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "symbol->string") arg2=(vector-ref f195979 0)
@@ -7203,23 +7203,23 @@ _L_1424001:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424003"
+    je "_L_1431822"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424003":
+"_L_1431822":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "symbol->string"
 # string literal
-    jmp _L_1424005
+    jmp _L_1431824
     .align 8,0x90
-_L_1424004 :
+_L_1431823 :
     .int 56
     .ascii "symbol->string"
-_L_1424005:
-    movl $_L_1424004, %eax
+_L_1431824:
+    movl $_L_1431823, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg symbol->string
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7240,14 +7240,14 @@ _L_1424005:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424006
+    je _L_1431825
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424006:
+_L_1431825:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7255,28 +7255,28 @@ _L_1424006:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424007"
+    je "_L_1431826"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424007:
+_L_1431826:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424009
+    jle _L_1431828
     cmp  $0,%eax
-    jge _L_1424008
-_L_1424009:
+    jge _L_1431827
+_L_1431828:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424008:
+_L_1431827:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7304,14 +7304,14 @@ _L_1424008:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424010
+    je _L_1431829
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424010:
+_L_1431829:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7319,28 +7319,28 @@ _L_1424010:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424011"
+    je "_L_1431830"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424011:
+_L_1431830:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424013
+    jle _L_1431832
     cmp  $0,%eax
-    jge _L_1424012
-_L_1424013:
+    jge _L_1431831
+_L_1431832:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424012:
+_L_1431831:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "make-symbol") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "make-symbol") arg2=(vector-ref f195979 0)
@@ -7356,23 +7356,23 @@ _L_1424012:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424014"
+    je "_L_1431833"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424014":
+"_L_1431833":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "make-symbol"
 # string literal
-    jmp _L_1424016
+    jmp _L_1431835
     .align 8,0x90
-_L_1424015 :
+_L_1431834 :
     .int 44
     .ascii "make-symbol"
-_L_1424016:
-    movl $_L_1424015, %eax
+_L_1431835:
+    movl $_L_1431834, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg make-symbol
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7393,14 +7393,14 @@ _L_1424016:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424017
+    je _L_1431836
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424017:
+_L_1431836:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7408,28 +7408,28 @@ _L_1424017:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424018"
+    je "_L_1431837"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424018:
+_L_1431837:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424020
+    jle _L_1431839
     cmp  $0,%eax
-    jge _L_1424019
-_L_1424020:
+    jge _L_1431838
+_L_1431839:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424019:
+_L_1431838:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7457,14 +7457,14 @@ _L_1424019:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424021
+    je _L_1431840
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424021:
+_L_1431840:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7472,28 +7472,28 @@ _L_1424021:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424022"
+    je "_L_1431841"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424022:
+_L_1431841:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424024
+    jle _L_1431843
     cmp  $0,%eax
-    jge _L_1424023
-_L_1424024:
+    jge _L_1431842
+_L_1431843:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424023:
+_L_1431842:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "symbol?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "symbol?") arg2=(vector-ref f195979 0)
@@ -7509,23 +7509,23 @@ _L_1424023:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424025"
+    je "_L_1431844"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424025":
+"_L_1431844":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "symbol?"
 # string literal
-    jmp _L_1424027
+    jmp _L_1431846
     .align 8,0x90
-_L_1424026 :
+_L_1431845 :
     .int 28
     .ascii "symbol?"
-_L_1424027:
-    movl $_L_1424026, %eax
+_L_1431846:
+    movl $_L_1431845, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg symbol?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7546,14 +7546,14 @@ _L_1424027:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424028
+    je _L_1431847
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424028:
+_L_1431847:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7561,28 +7561,28 @@ _L_1424028:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424029"
+    je "_L_1431848"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424029:
+_L_1431848:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424031
+    jle _L_1431850
     cmp  $0,%eax
-    jge _L_1424030
-_L_1424031:
+    jge _L_1431849
+_L_1431850:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424030:
+_L_1431849:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7610,14 +7610,14 @@ _L_1424030:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424032
+    je _L_1431851
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424032:
+_L_1431851:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7625,28 +7625,28 @@ _L_1424032:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424033"
+    je "_L_1431852"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424033:
+_L_1431852:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424035
+    jle _L_1431854
     cmp  $0,%eax
-    jge _L_1424034
-_L_1424035:
+    jge _L_1431853
+_L_1431854:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424034:
+_L_1431853:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "string-set!") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "string-set!") arg2=(vector-ref f195979 0)
@@ -7662,23 +7662,23 @@ _L_1424034:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424036"
+    je "_L_1431855"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424036":
+"_L_1431855":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "string-set!"
 # string literal
-    jmp _L_1424038
+    jmp _L_1431857
     .align 8,0x90
-_L_1424037 :
+_L_1431856 :
     .int 44
     .ascii "string-set!"
-_L_1424038:
-    movl $_L_1424037, %eax
+_L_1431857:
+    movl $_L_1431856, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg string-set!
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7699,14 +7699,14 @@ _L_1424038:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424039
+    je _L_1431858
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424039:
+_L_1431858:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7714,28 +7714,28 @@ _L_1424039:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424040"
+    je "_L_1431859"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424040:
+_L_1431859:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424042
+    jle _L_1431861
     cmp  $0,%eax
-    jge _L_1424041
-_L_1424042:
+    jge _L_1431860
+_L_1431861:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424041:
+_L_1431860:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7763,14 +7763,14 @@ _L_1424041:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424043
+    je _L_1431862
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424043:
+_L_1431862:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7778,28 +7778,28 @@ _L_1424043:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424044"
+    je "_L_1431863"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424044:
+_L_1431863:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424046
+    jle _L_1431865
     cmp  $0,%eax
-    jge _L_1424045
-_L_1424046:
+    jge _L_1431864
+_L_1431865:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424045:
+_L_1431864:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "string-ref") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "string-ref") arg2=(vector-ref f195979 0)
@@ -7815,23 +7815,23 @@ _L_1424045:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424047"
+    je "_L_1431866"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424047":
+"_L_1431866":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "string-ref"
 # string literal
-    jmp _L_1424049
+    jmp _L_1431868
     .align 8,0x90
-_L_1424048 :
+_L_1431867 :
     .int 40
     .ascii "string-ref"
-_L_1424049:
-    movl $_L_1424048, %eax
+_L_1431868:
+    movl $_L_1431867, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg string-ref
     movl -20(%esp), %edi   # load new closure to %edi
@@ -7852,14 +7852,14 @@ _L_1424049:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424050
+    je _L_1431869
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424050:
+_L_1431869:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7867,28 +7867,28 @@ _L_1424050:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424051"
+    je "_L_1431870"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424051:
+_L_1431870:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424053
+    jle _L_1431872
     cmp  $0,%eax
-    jge _L_1424052
-_L_1424053:
+    jge _L_1431871
+_L_1431872:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424052:
+_L_1431871:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -7916,14 +7916,14 @@ _L_1424052:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424054
+    je _L_1431873
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424054:
+_L_1431873:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -7931,28 +7931,28 @@ _L_1424054:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424055"
+    je "_L_1431874"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424055:
+_L_1431874:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424057
+    jle _L_1431876
     cmp  $0,%eax
-    jge _L_1424056
-_L_1424057:
+    jge _L_1431875
+_L_1431876:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424056:
+_L_1431875:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "string-length") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "string-length") arg2=(vector-ref f195979 0)
@@ -7968,23 +7968,23 @@ _L_1424056:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424058"
+    je "_L_1431877"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424058":
+"_L_1431877":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "string-length"
 # string literal
-    jmp _L_1424060
+    jmp _L_1431879
     .align 8,0x90
-_L_1424059 :
+_L_1431878 :
     .int 52
     .ascii "string-length"
-_L_1424060:
-    movl $_L_1424059, %eax
+_L_1431879:
+    movl $_L_1431878, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg string-length
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8005,14 +8005,14 @@ _L_1424060:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424061
+    je _L_1431880
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424061:
+_L_1431880:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8020,28 +8020,28 @@ _L_1424061:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424062"
+    je "_L_1431881"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424062:
+_L_1431881:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424064
+    jle _L_1431883
     cmp  $0,%eax
-    jge _L_1424063
-_L_1424064:
+    jge _L_1431882
+_L_1431883:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424063:
+_L_1431882:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8069,14 +8069,14 @@ _L_1424063:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424065
+    je _L_1431884
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424065:
+_L_1431884:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8084,28 +8084,28 @@ _L_1424065:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424066"
+    je "_L_1431885"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424066:
+_L_1431885:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424068
+    jle _L_1431887
     cmp  $0,%eax
-    jge _L_1424067
-_L_1424068:
+    jge _L_1431886
+_L_1431887:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424067:
+_L_1431886:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "string?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "string?") arg2=(vector-ref f195979 0)
@@ -8121,23 +8121,23 @@ _L_1424067:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424069"
+    je "_L_1431888"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424069":
+"_L_1431888":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "string?"
 # string literal
-    jmp _L_1424071
+    jmp _L_1431890
     .align 8,0x90
-_L_1424070 :
+_L_1431889 :
     .int 28
     .ascii "string?"
-_L_1424071:
-    movl $_L_1424070, %eax
+_L_1431890:
+    movl $_L_1431889, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg string?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8158,14 +8158,14 @@ _L_1424071:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424072
+    je _L_1431891
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424072:
+_L_1431891:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8173,28 +8173,28 @@ _L_1424072:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424073"
+    je "_L_1431892"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424073:
+_L_1431892:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424075
+    jle _L_1431894
     cmp  $0,%eax
-    jge _L_1424074
-_L_1424075:
+    jge _L_1431893
+_L_1431894:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424074:
+_L_1431893:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8222,14 +8222,14 @@ _L_1424074:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424076
+    je _L_1431895
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424076:
+_L_1431895:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8237,28 +8237,28 @@ _L_1424076:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424077"
+    je "_L_1431896"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424077:
+_L_1431896:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424079
+    jle _L_1431898
     cmp  $0,%eax
-    jge _L_1424078
-_L_1424079:
+    jge _L_1431897
+_L_1431898:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424078:
+_L_1431897:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "make-string") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "make-string") arg2=(vector-ref f195979 0)
@@ -8274,23 +8274,23 @@ _L_1424078:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424080"
+    je "_L_1431899"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424080":
+"_L_1431899":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "make-string"
 # string literal
-    jmp _L_1424082
+    jmp _L_1431901
     .align 8,0x90
-_L_1424081 :
+_L_1431900 :
     .int 44
     .ascii "make-string"
-_L_1424082:
-    movl $_L_1424081, %eax
+_L_1431901:
+    movl $_L_1431900, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg make-string
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8311,14 +8311,14 @@ _L_1424082:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424083
+    je _L_1431902
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424083:
+_L_1431902:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8326,28 +8326,28 @@ _L_1424083:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424084"
+    je "_L_1431903"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424084:
+_L_1431903:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424086
+    jle _L_1431905
     cmp  $0,%eax
-    jge _L_1424085
-_L_1424086:
+    jge _L_1431904
+_L_1431905:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424085:
+_L_1431904:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8375,14 +8375,14 @@ _L_1424085:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424087
+    je _L_1431906
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424087:
+_L_1431906:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8390,28 +8390,28 @@ _L_1424087:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424088"
+    je "_L_1431907"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424088:
+_L_1431907:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424090
+    jle _L_1431909
     cmp  $0,%eax
-    jge _L_1424089
-_L_1424090:
+    jge _L_1431908
+_L_1431909:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424089:
+_L_1431908:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "vector-ref") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "vector-ref") arg2=(vector-ref f195979 0)
@@ -8427,23 +8427,23 @@ _L_1424089:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424091"
+    je "_L_1431910"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424091":
+"_L_1431910":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "vector-ref"
 # string literal
-    jmp _L_1424093
+    jmp _L_1431912
     .align 8,0x90
-_L_1424092 :
+_L_1431911 :
     .int 40
     .ascii "vector-ref"
-_L_1424093:
-    movl $_L_1424092, %eax
+_L_1431912:
+    movl $_L_1431911, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg vector-ref
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8464,14 +8464,14 @@ _L_1424093:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424094
+    je _L_1431913
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424094:
+_L_1431913:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8479,28 +8479,28 @@ _L_1424094:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424095"
+    je "_L_1431914"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424095:
+_L_1431914:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424097
+    jle _L_1431916
     cmp  $0,%eax
-    jge _L_1424096
-_L_1424097:
+    jge _L_1431915
+_L_1431916:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424096:
+_L_1431915:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8528,14 +8528,14 @@ _L_1424096:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424098
+    je _L_1431917
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424098:
+_L_1431917:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8543,28 +8543,28 @@ _L_1424098:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424099"
+    je "_L_1431918"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424099:
+_L_1431918:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424101
+    jle _L_1431920
     cmp  $0,%eax
-    jge _L_1424100
-_L_1424101:
+    jge _L_1431919
+_L_1431920:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424100:
+_L_1431919:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "vector-set!") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "vector-set!") arg2=(vector-ref f195979 0)
@@ -8580,23 +8580,23 @@ _L_1424100:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424102"
+    je "_L_1431921"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424102":
+"_L_1431921":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "vector-set!"
 # string literal
-    jmp _L_1424104
+    jmp _L_1431923
     .align 8,0x90
-_L_1424103 :
+_L_1431922 :
     .int 44
     .ascii "vector-set!"
-_L_1424104:
-    movl $_L_1424103, %eax
+_L_1431923:
+    movl $_L_1431922, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg vector-set!
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8617,14 +8617,14 @@ _L_1424104:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424105
+    je _L_1431924
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424105:
+_L_1431924:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8632,28 +8632,28 @@ _L_1424105:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424106"
+    je "_L_1431925"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424106:
+_L_1431925:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424108
+    jle _L_1431927
     cmp  $0,%eax
-    jge _L_1424107
-_L_1424108:
+    jge _L_1431926
+_L_1431927:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424107:
+_L_1431926:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8681,14 +8681,14 @@ _L_1424107:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424109
+    je _L_1431928
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424109:
+_L_1431928:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8696,28 +8696,28 @@ _L_1424109:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424110"
+    je "_L_1431929"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424110:
+_L_1431929:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424112
+    jle _L_1431931
     cmp  $0,%eax
-    jge _L_1424111
-_L_1424112:
+    jge _L_1431930
+_L_1431931:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424111:
+_L_1431930:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "vector-length") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "vector-length") arg2=(vector-ref f195979 0)
@@ -8733,23 +8733,23 @@ _L_1424111:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424113"
+    je "_L_1431932"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424113":
+"_L_1431932":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "vector-length"
 # string literal
-    jmp _L_1424115
+    jmp _L_1431934
     .align 8,0x90
-_L_1424114 :
+_L_1431933 :
     .int 52
     .ascii "vector-length"
-_L_1424115:
-    movl $_L_1424114, %eax
+_L_1431934:
+    movl $_L_1431933, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg vector-length
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8770,14 +8770,14 @@ _L_1424115:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424116
+    je _L_1431935
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424116:
+_L_1431935:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8785,28 +8785,28 @@ _L_1424116:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424117"
+    je "_L_1431936"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424117:
+_L_1431936:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424119
+    jle _L_1431938
     cmp  $0,%eax
-    jge _L_1424118
-_L_1424119:
+    jge _L_1431937
+_L_1431938:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424118:
+_L_1431937:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8834,14 +8834,14 @@ _L_1424118:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424120
+    je _L_1431939
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424120:
+_L_1431939:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8849,28 +8849,28 @@ _L_1424120:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424121"
+    je "_L_1431940"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424121:
+_L_1431940:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424123
+    jle _L_1431942
     cmp  $0,%eax
-    jge _L_1424122
-_L_1424123:
+    jge _L_1431941
+_L_1431942:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424122:
+_L_1431941:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "make-vector") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "make-vector") arg2=(vector-ref f195979 0)
@@ -8886,23 +8886,23 @@ _L_1424122:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424124"
+    je "_L_1431943"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424124":
+"_L_1431943":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "make-vector"
 # string literal
-    jmp _L_1424126
+    jmp _L_1431945
     .align 8,0x90
-_L_1424125 :
+_L_1431944 :
     .int 44
     .ascii "make-vector"
-_L_1424126:
-    movl $_L_1424125, %eax
+_L_1431945:
+    movl $_L_1431944, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg make-vector
     movl -20(%esp), %edi   # load new closure to %edi
@@ -8923,14 +8923,14 @@ _L_1424126:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424127
+    je _L_1431946
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424127:
+_L_1431946:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -8938,28 +8938,28 @@ _L_1424127:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424128"
+    je "_L_1431947"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424128:
+_L_1431947:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424130
+    jle _L_1431949
     cmp  $0,%eax
-    jge _L_1424129
-_L_1424130:
+    jge _L_1431948
+_L_1431949:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424129:
+_L_1431948:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -8987,14 +8987,14 @@ _L_1424129:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424131
+    je _L_1431950
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424131:
+_L_1431950:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9002,28 +9002,28 @@ _L_1424131:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424132"
+    je "_L_1431951"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424132:
+_L_1431951:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424134
+    jle _L_1431953
     cmp  $0,%eax
-    jge _L_1424133
-_L_1424134:
+    jge _L_1431952
+_L_1431953:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424133:
+_L_1431952:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "vector?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "vector?") arg2=(vector-ref f195979 0)
@@ -9039,23 +9039,23 @@ _L_1424133:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424135"
+    je "_L_1431954"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424135":
+"_L_1431954":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "vector?"
 # string literal
-    jmp _L_1424137
+    jmp _L_1431956
     .align 8,0x90
-_L_1424136 :
+_L_1431955 :
     .int 28
     .ascii "vector?"
-_L_1424137:
-    movl $_L_1424136, %eax
+_L_1431956:
+    movl $_L_1431955, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg vector?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9076,14 +9076,14 @@ _L_1424137:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424138
+    je _L_1431957
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424138:
+_L_1431957:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9091,28 +9091,28 @@ _L_1424138:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424139"
+    je "_L_1431958"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424139:
+_L_1431958:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424141
+    jle _L_1431960
     cmp  $0,%eax
-    jge _L_1424140
-_L_1424141:
+    jge _L_1431959
+_L_1431960:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424140:
+_L_1431959:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9140,14 +9140,14 @@ _L_1424140:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424142
+    je _L_1431961
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424142:
+_L_1431961:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9155,28 +9155,28 @@ _L_1424142:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424143"
+    je "_L_1431962"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424143:
+_L_1431962:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424145
+    jle _L_1431964
     cmp  $0,%eax
-    jge _L_1424144
-_L_1424145:
+    jge _L_1431963
+_L_1431964:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424144:
+_L_1431963:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "set-cdr!") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "set-cdr!") arg2=(vector-ref f195979 0)
@@ -9192,23 +9192,23 @@ _L_1424144:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424146"
+    je "_L_1431965"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424146":
+"_L_1431965":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "set-cdr!"
 # string literal
-    jmp _L_1424148
+    jmp _L_1431967
     .align 8,0x90
-_L_1424147 :
+_L_1431966 :
     .int 32
     .ascii "set-cdr!"
-_L_1424148:
-    movl $_L_1424147, %eax
+_L_1431967:
+    movl $_L_1431966, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg set-cdr!
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9229,14 +9229,14 @@ _L_1424148:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424149
+    je _L_1431968
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424149:
+_L_1431968:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9244,28 +9244,28 @@ _L_1424149:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424150"
+    je "_L_1431969"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424150:
+_L_1431969:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424152
+    jle _L_1431971
     cmp  $0,%eax
-    jge _L_1424151
-_L_1424152:
+    jge _L_1431970
+_L_1431971:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424151:
+_L_1431970:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9293,14 +9293,14 @@ _L_1424151:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424153
+    je _L_1431972
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424153:
+_L_1431972:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9308,28 +9308,28 @@ _L_1424153:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424154"
+    je "_L_1431973"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424154:
+_L_1431973:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424156
+    jle _L_1431975
     cmp  $0,%eax
-    jge _L_1424155
-_L_1424156:
+    jge _L_1431974
+_L_1431975:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424155:
+_L_1431974:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "set-car!") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "set-car!") arg2=(vector-ref f195979 0)
@@ -9345,23 +9345,23 @@ _L_1424155:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424157"
+    je "_L_1431976"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424157":
+"_L_1431976":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "set-car!"
 # string literal
-    jmp _L_1424159
+    jmp _L_1431978
     .align 8,0x90
-_L_1424158 :
+_L_1431977 :
     .int 32
     .ascii "set-car!"
-_L_1424159:
-    movl $_L_1424158, %eax
+_L_1431978:
+    movl $_L_1431977, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg set-car!
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9382,14 +9382,14 @@ _L_1424159:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424160
+    je _L_1431979
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424160:
+_L_1431979:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9397,28 +9397,28 @@ _L_1424160:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424161"
+    je "_L_1431980"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424161:
+_L_1431980:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424163
+    jle _L_1431982
     cmp  $0,%eax
-    jge _L_1424162
-_L_1424163:
+    jge _L_1431981
+_L_1431982:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424162:
+_L_1431981:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9446,14 +9446,14 @@ _L_1424162:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424164
+    je _L_1431983
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424164:
+_L_1431983:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9461,28 +9461,28 @@ _L_1424164:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424165"
+    je "_L_1431984"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424165:
+_L_1431984:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424167
+    jle _L_1431986
     cmp  $0,%eax
-    jge _L_1424166
-_L_1424167:
+    jge _L_1431985
+_L_1431986:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424166:
+_L_1431985:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "cdr") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "cdr") arg2=(vector-ref f195979 0)
@@ -9498,23 +9498,23 @@ _L_1424166:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424168"
+    je "_L_1431987"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424168":
+"_L_1431987":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "cdr"
 # string literal
-    jmp _L_1424170
+    jmp _L_1431989
     .align 8,0x90
-_L_1424169 :
+_L_1431988 :
     .int 12
     .ascii "cdr"
-_L_1424170:
-    movl $_L_1424169, %eax
+_L_1431989:
+    movl $_L_1431988, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg cdr
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9535,14 +9535,14 @@ _L_1424170:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424171
+    je _L_1431990
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424171:
+_L_1431990:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9550,28 +9550,28 @@ _L_1424171:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424172"
+    je "_L_1431991"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424172:
+_L_1431991:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424174
+    jle _L_1431993
     cmp  $0,%eax
-    jge _L_1424173
-_L_1424174:
+    jge _L_1431992
+_L_1431993:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424173:
+_L_1431992:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9599,14 +9599,14 @@ _L_1424173:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424175
+    je _L_1431994
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424175:
+_L_1431994:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9614,28 +9614,28 @@ _L_1424175:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424176"
+    je "_L_1431995"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424176:
+_L_1431995:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424178
+    jle _L_1431997
     cmp  $0,%eax
-    jge _L_1424177
-_L_1424178:
+    jge _L_1431996
+_L_1431997:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424177:
+_L_1431996:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "car") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "car") arg2=(vector-ref f195979 0)
@@ -9651,23 +9651,23 @@ _L_1424177:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424179"
+    je "_L_1431998"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424179":
+"_L_1431998":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "car"
 # string literal
-    jmp _L_1424181
+    jmp _L_1432000
     .align 8,0x90
-_L_1424180 :
+_L_1431999 :
     .int 12
     .ascii "car"
-_L_1424181:
-    movl $_L_1424180, %eax
+_L_1432000:
+    movl $_L_1431999, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg car
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9688,14 +9688,14 @@ _L_1424181:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424182
+    je _L_1432001
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424182:
+_L_1432001:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9703,28 +9703,28 @@ _L_1424182:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424183"
+    je "_L_1432002"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424183:
+_L_1432002:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424185
+    jle _L_1432004
     cmp  $0,%eax
-    jge _L_1424184
-_L_1424185:
+    jge _L_1432003
+_L_1432004:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424184:
+_L_1432003:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9752,14 +9752,14 @@ _L_1424184:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424186
+    je _L_1432005
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424186:
+_L_1432005:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9767,28 +9767,28 @@ _L_1424186:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424187"
+    je "_L_1432006"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424187:
+_L_1432006:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424189
+    jle _L_1432008
     cmp  $0,%eax
-    jge _L_1424188
-_L_1424189:
+    jge _L_1432007
+_L_1432008:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424188:
+_L_1432007:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "cons") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "cons") arg2=(vector-ref f195979 0)
@@ -9804,23 +9804,23 @@ _L_1424188:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424190"
+    je "_L_1432009"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424190":
+"_L_1432009":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "cons"
 # string literal
-    jmp _L_1424192
+    jmp _L_1432011
     .align 8,0x90
-_L_1424191 :
+_L_1432010 :
     .int 16
     .ascii "cons"
-_L_1424192:
-    movl $_L_1424191, %eax
+_L_1432011:
+    movl $_L_1432010, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg cons
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9841,14 +9841,14 @@ _L_1424192:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424193
+    je _L_1432012
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424193:
+_L_1432012:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9856,28 +9856,28 @@ _L_1424193:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424194"
+    je "_L_1432013"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424194:
+_L_1432013:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424196
+    jle _L_1432015
     cmp  $0,%eax
-    jge _L_1424195
-_L_1424196:
+    jge _L_1432014
+_L_1432015:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424195:
+_L_1432014:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -9905,14 +9905,14 @@ _L_1424195:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424197
+    je _L_1432016
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424197:
+_L_1432016:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -9920,28 +9920,28 @@ _L_1424197:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424198"
+    je "_L_1432017"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424198:
+_L_1432017:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424200
+    jle _L_1432019
     cmp  $0,%eax
-    jge _L_1424199
-_L_1424200:
+    jge _L_1432018
+_L_1432019:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424199:
+_L_1432018:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "pair?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "pair?") arg2=(vector-ref f195979 0)
@@ -9957,23 +9957,23 @@ _L_1424199:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424201"
+    je "_L_1432020"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424201":
+"_L_1432020":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "pair?"
 # string literal
-    jmp _L_1424203
+    jmp _L_1432022
     .align 8,0x90
-_L_1424202 :
+_L_1432021 :
     .int 20
     .ascii "pair?"
-_L_1424203:
-    movl $_L_1424202, %eax
+_L_1432022:
+    movl $_L_1432021, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg pair?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -9994,14 +9994,14 @@ _L_1424203:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424204
+    je _L_1432023
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424204:
+_L_1432023:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10009,28 +10009,28 @@ _L_1424204:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424205"
+    je "_L_1432024"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424205:
+_L_1432024:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424207
+    jle _L_1432026
     cmp  $0,%eax
-    jge _L_1424206
-_L_1424207:
+    jge _L_1432025
+_L_1432026:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424206:
+_L_1432025:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10058,14 +10058,14 @@ _L_1424206:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424208
+    je _L_1432027
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424208:
+_L_1432027:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10073,28 +10073,28 @@ _L_1424208:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424209"
+    je "_L_1432028"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424209:
+_L_1432028:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424211
+    jle _L_1432030
     cmp  $0,%eax
-    jge _L_1424210
-_L_1424211:
+    jge _L_1432029
+_L_1432030:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424210:
+_L_1432029:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxremainder") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxremainder") arg2=(vector-ref f195979 0)
@@ -10110,23 +10110,23 @@ _L_1424210:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424212"
+    je "_L_1432031"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424212":
+"_L_1432031":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxremainder"
 # string literal
-    jmp _L_1424214
+    jmp _L_1432033
     .align 8,0x90
-_L_1424213 :
+_L_1432032 :
     .int 44
     .ascii "fxremainder"
-_L_1424214:
-    movl $_L_1424213, %eax
+_L_1432033:
+    movl $_L_1432032, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxremainder
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10147,14 +10147,14 @@ _L_1424214:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424215
+    je _L_1432034
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424215:
+_L_1432034:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10162,28 +10162,28 @@ _L_1424215:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424216"
+    je "_L_1432035"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424216:
+_L_1432035:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424218
+    jle _L_1432037
     cmp  $0,%eax
-    jge _L_1424217
-_L_1424218:
+    jge _L_1432036
+_L_1432037:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424217:
+_L_1432036:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10211,14 +10211,14 @@ _L_1424217:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424219
+    je _L_1432038
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424219:
+_L_1432038:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10226,28 +10226,28 @@ _L_1424219:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424220"
+    je "_L_1432039"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424220:
+_L_1432039:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424222
+    jle _L_1432041
     cmp  $0,%eax
-    jge _L_1424221
-_L_1424222:
+    jge _L_1432040
+_L_1432041:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424221:
+_L_1432040:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxquotient") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxquotient") arg2=(vector-ref f195979 0)
@@ -10263,23 +10263,23 @@ _L_1424221:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424223"
+    je "_L_1432042"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424223":
+"_L_1432042":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxquotient"
 # string literal
-    jmp _L_1424225
+    jmp _L_1432044
     .align 8,0x90
-_L_1424224 :
+_L_1432043 :
     .int 40
     .ascii "fxquotient"
-_L_1424225:
-    movl $_L_1424224, %eax
+_L_1432044:
+    movl $_L_1432043, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxquotient
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10300,14 +10300,14 @@ _L_1424225:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424226
+    je _L_1432045
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424226:
+_L_1432045:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10315,28 +10315,28 @@ _L_1424226:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424227"
+    je "_L_1432046"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424227:
+_L_1432046:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424229
+    jle _L_1432048
     cmp  $0,%eax
-    jge _L_1424228
-_L_1424229:
+    jge _L_1432047
+_L_1432048:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424228:
+_L_1432047:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10364,14 +10364,14 @@ _L_1424228:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424230
+    je _L_1432049
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424230:
+_L_1432049:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10379,28 +10379,28 @@ _L_1424230:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424231"
+    je "_L_1432050"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424231:
+_L_1432050:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424233
+    jle _L_1432052
     cmp  $0,%eax
-    jge _L_1424232
-_L_1424233:
+    jge _L_1432051
+_L_1432052:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424232:
+_L_1432051:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx*") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx*") arg2=(vector-ref f195979 0)
@@ -10416,23 +10416,23 @@ _L_1424232:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424234"
+    je "_L_1432053"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424234":
+"_L_1432053":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx*"
 # string literal
-    jmp _L_1424236
+    jmp _L_1432055
     .align 8,0x90
-_L_1424235 :
+_L_1432054 :
     .int 12
     .ascii "fx*"
-_L_1424236:
-    movl $_L_1424235, %eax
+_L_1432055:
+    movl $_L_1432054, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx*
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10453,14 +10453,14 @@ _L_1424236:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424237
+    je _L_1432056
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424237:
+_L_1432056:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10468,28 +10468,28 @@ _L_1424237:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424238"
+    je "_L_1432057"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424238:
+_L_1432057:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424240
+    jle _L_1432059
     cmp  $0,%eax
-    jge _L_1424239
-_L_1424240:
+    jge _L_1432058
+_L_1432059:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424239:
+_L_1432058:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10517,14 +10517,14 @@ _L_1424239:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424241
+    je _L_1432060
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424241:
+_L_1432060:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10532,28 +10532,28 @@ _L_1424241:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424242"
+    je "_L_1432061"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424242:
+_L_1432061:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424244
+    jle _L_1432063
     cmp  $0,%eax
-    jge _L_1424243
-_L_1424244:
+    jge _L_1432062
+_L_1432063:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424243:
+_L_1432062:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx-") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx-") arg2=(vector-ref f195979 0)
@@ -10569,23 +10569,23 @@ _L_1424243:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424245"
+    je "_L_1432064"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424245":
+"_L_1432064":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx-"
 # string literal
-    jmp _L_1424247
+    jmp _L_1432066
     .align 8,0x90
-_L_1424246 :
+_L_1432065 :
     .int 12
     .ascii "fx-"
-_L_1424247:
-    movl $_L_1424246, %eax
+_L_1432066:
+    movl $_L_1432065, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx-
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10606,14 +10606,14 @@ _L_1424247:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424248
+    je _L_1432067
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424248:
+_L_1432067:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10621,28 +10621,28 @@ _L_1424248:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424249"
+    je "_L_1432068"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424249:
+_L_1432068:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424251
+    jle _L_1432070
     cmp  $0,%eax
-    jge _L_1424250
-_L_1424251:
+    jge _L_1432069
+_L_1432070:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424250:
+_L_1432069:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10670,14 +10670,14 @@ _L_1424250:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424252
+    je _L_1432071
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424252:
+_L_1432071:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10685,28 +10685,28 @@ _L_1424252:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424253"
+    je "_L_1432072"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424253:
+_L_1432072:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424255
+    jle _L_1432074
     cmp  $0,%eax
-    jge _L_1424254
-_L_1424255:
+    jge _L_1432073
+_L_1432074:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424254:
+_L_1432073:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx+") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx+") arg2=(vector-ref f195979 0)
@@ -10722,23 +10722,23 @@ _L_1424254:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424256"
+    je "_L_1432075"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424256":
+"_L_1432075":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx+"
 # string literal
-    jmp _L_1424258
+    jmp _L_1432077
     .align 8,0x90
-_L_1424257 :
+_L_1432076 :
     .int 12
     .ascii "fx+"
-_L_1424258:
-    movl $_L_1424257, %eax
+_L_1432077:
+    movl $_L_1432076, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx+
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10759,14 +10759,14 @@ _L_1424258:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424259
+    je _L_1432078
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424259:
+_L_1432078:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10774,28 +10774,28 @@ _L_1424259:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424260"
+    je "_L_1432079"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424260:
+_L_1432079:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424262
+    jle _L_1432081
     cmp  $0,%eax
-    jge _L_1424261
-_L_1424262:
+    jge _L_1432080
+_L_1432081:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424261:
+_L_1432080:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10823,14 +10823,14 @@ _L_1424261:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424263
+    je _L_1432082
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424263:
+_L_1432082:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10838,28 +10838,28 @@ _L_1424263:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424264"
+    je "_L_1432083"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424264:
+_L_1432083:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424266
+    jle _L_1432085
     cmp  $0,%eax
-    jge _L_1424265
-_L_1424266:
+    jge _L_1432084
+_L_1432085:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424265:
+_L_1432084:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx>=") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx>=") arg2=(vector-ref f195979 0)
@@ -10875,23 +10875,23 @@ _L_1424265:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424267"
+    je "_L_1432086"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424267":
+"_L_1432086":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx>="
 # string literal
-    jmp _L_1424269
+    jmp _L_1432088
     .align 8,0x90
-_L_1424268 :
+_L_1432087 :
     .int 16
     .ascii "fx>="
-_L_1424269:
-    movl $_L_1424268, %eax
+_L_1432088:
+    movl $_L_1432087, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx>=
     movl -20(%esp), %edi   # load new closure to %edi
@@ -10912,14 +10912,14 @@ _L_1424269:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424270
+    je _L_1432089
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424270:
+_L_1432089:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10927,28 +10927,28 @@ _L_1424270:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424271"
+    je "_L_1432090"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424271:
+_L_1432090:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424273
+    jle _L_1432092
     cmp  $0,%eax
-    jge _L_1424272
-_L_1424273:
+    jge _L_1432091
+_L_1432092:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424272:
+_L_1432091:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -10976,14 +10976,14 @@ _L_1424272:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424274
+    je _L_1432093
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424274:
+_L_1432093:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -10991,28 +10991,28 @@ _L_1424274:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424275"
+    je "_L_1432094"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424275:
+_L_1432094:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424277
+    jle _L_1432096
     cmp  $0,%eax
-    jge _L_1424276
-_L_1424277:
+    jge _L_1432095
+_L_1432096:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424276:
+_L_1432095:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx>") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx>") arg2=(vector-ref f195979 0)
@@ -11028,23 +11028,23 @@ _L_1424276:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424278"
+    je "_L_1432097"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424278":
+"_L_1432097":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx>"
 # string literal
-    jmp _L_1424280
+    jmp _L_1432099
     .align 8,0x90
-_L_1424279 :
+_L_1432098 :
     .int 12
     .ascii "fx>"
-_L_1424280:
-    movl $_L_1424279, %eax
+_L_1432099:
+    movl $_L_1432098, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx>
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11065,14 +11065,14 @@ _L_1424280:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424281
+    je _L_1432100
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424281:
+_L_1432100:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11080,28 +11080,28 @@ _L_1424281:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424282"
+    je "_L_1432101"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424282:
+_L_1432101:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424284
+    jle _L_1432103
     cmp  $0,%eax
-    jge _L_1424283
-_L_1424284:
+    jge _L_1432102
+_L_1432103:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424283:
+_L_1432102:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11129,14 +11129,14 @@ _L_1424283:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424285
+    je _L_1432104
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424285:
+_L_1432104:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11144,28 +11144,28 @@ _L_1424285:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424286"
+    je "_L_1432105"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424286:
+_L_1432105:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424288
+    jle _L_1432107
     cmp  $0,%eax
-    jge _L_1424287
-_L_1424288:
+    jge _L_1432106
+_L_1432107:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424287:
+_L_1432106:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx<=") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx<=") arg2=(vector-ref f195979 0)
@@ -11181,23 +11181,23 @@ _L_1424287:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424289"
+    je "_L_1432108"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424289":
+"_L_1432108":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx<="
 # string literal
-    jmp _L_1424291
+    jmp _L_1432110
     .align 8,0x90
-_L_1424290 :
+_L_1432109 :
     .int 16
     .ascii "fx<="
-_L_1424291:
-    movl $_L_1424290, %eax
+_L_1432110:
+    movl $_L_1432109, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx<=
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11218,14 +11218,14 @@ _L_1424291:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424292
+    je _L_1432111
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424292:
+_L_1432111:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11233,28 +11233,28 @@ _L_1424292:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424293"
+    je "_L_1432112"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424293:
+_L_1432112:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424295
+    jle _L_1432114
     cmp  $0,%eax
-    jge _L_1424294
-_L_1424295:
+    jge _L_1432113
+_L_1432114:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424294:
+_L_1432113:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11282,14 +11282,14 @@ _L_1424294:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424296
+    je _L_1432115
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424296:
+_L_1432115:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11297,28 +11297,28 @@ _L_1424296:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424297"
+    je "_L_1432116"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424297:
+_L_1432116:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424299
+    jle _L_1432118
     cmp  $0,%eax
-    jge _L_1424298
-_L_1424299:
+    jge _L_1432117
+_L_1432118:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424298:
+_L_1432117:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx<") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx<") arg2=(vector-ref f195979 0)
@@ -11334,23 +11334,23 @@ _L_1424298:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424300"
+    je "_L_1432119"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424300":
+"_L_1432119":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx<"
 # string literal
-    jmp _L_1424302
+    jmp _L_1432121
     .align 8,0x90
-_L_1424301 :
+_L_1432120 :
     .int 12
     .ascii "fx<"
-_L_1424302:
-    movl $_L_1424301, %eax
+_L_1432121:
+    movl $_L_1432120, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx<
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11371,14 +11371,14 @@ _L_1424302:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424303
+    je _L_1432122
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424303:
+_L_1432122:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11386,28 +11386,28 @@ _L_1424303:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424304"
+    je "_L_1432123"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424304:
+_L_1432123:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424306
+    jle _L_1432125
     cmp  $0,%eax
-    jge _L_1424305
-_L_1424306:
+    jge _L_1432124
+_L_1432125:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424305:
+_L_1432124:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11435,14 +11435,14 @@ _L_1424305:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424307
+    je _L_1432126
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424307:
+_L_1432126:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11450,28 +11450,28 @@ _L_1424307:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424308"
+    je "_L_1432127"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424308:
+_L_1432127:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424310
+    jle _L_1432129
     cmp  $0,%eax
-    jge _L_1424309
-_L_1424310:
+    jge _L_1432128
+_L_1432129:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424309:
+_L_1432128:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fx=") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fx=") arg2=(vector-ref f195979 0)
@@ -11487,23 +11487,23 @@ _L_1424309:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424311"
+    je "_L_1432130"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424311":
+"_L_1432130":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fx="
 # string literal
-    jmp _L_1424313
+    jmp _L_1432132
     .align 8,0x90
-_L_1424312 :
+_L_1432131 :
     .int 12
     .ascii "fx="
-_L_1424313:
-    movl $_L_1424312, %eax
+_L_1432132:
+    movl $_L_1432131, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fx=
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11524,14 +11524,14 @@ _L_1424313:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424314
+    je _L_1432133
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424314:
+_L_1432133:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11539,28 +11539,28 @@ _L_1424314:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424315"
+    je "_L_1432134"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424315:
+_L_1432134:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424317
+    jle _L_1432136
     cmp  $0,%eax
-    jge _L_1424316
-_L_1424317:
+    jge _L_1432135
+_L_1432136:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424316:
+_L_1432135:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11588,14 +11588,14 @@ _L_1424316:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424318
+    je _L_1432137
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424318:
+_L_1432137:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11603,28 +11603,28 @@ _L_1424318:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424319"
+    je "_L_1432138"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424319:
+_L_1432138:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424321
+    jle _L_1432140
     cmp  $0,%eax
-    jge _L_1424320
-_L_1424321:
+    jge _L_1432139
+_L_1432140:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424320:
+_L_1432139:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxzero?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxzero?") arg2=(vector-ref f195979 0)
@@ -11640,23 +11640,23 @@ _L_1424320:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424322"
+    je "_L_1432141"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424322":
+"_L_1432141":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxzero?"
 # string literal
-    jmp _L_1424324
+    jmp _L_1432143
     .align 8,0x90
-_L_1424323 :
+_L_1432142 :
     .int 28
     .ascii "fxzero?"
-_L_1424324:
-    movl $_L_1424323, %eax
+_L_1432143:
+    movl $_L_1432142, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxzero?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11677,14 +11677,14 @@ _L_1424324:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424325
+    je _L_1432144
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424325:
+_L_1432144:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11692,28 +11692,28 @@ _L_1424325:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424326"
+    je "_L_1432145"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424326:
+_L_1432145:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424328
+    jle _L_1432147
     cmp  $0,%eax
-    jge _L_1424327
-_L_1424328:
+    jge _L_1432146
+_L_1432147:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424327:
+_L_1432146:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11741,14 +11741,14 @@ _L_1424327:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424329
+    je _L_1432148
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424329:
+_L_1432148:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11756,28 +11756,28 @@ _L_1424329:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424330"
+    je "_L_1432149"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424330:
+_L_1432149:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424332
+    jle _L_1432151
     cmp  $0,%eax
-    jge _L_1424331
-_L_1424332:
+    jge _L_1432150
+_L_1432151:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424331:
+_L_1432150:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxsub1") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxsub1") arg2=(vector-ref f195979 0)
@@ -11793,23 +11793,23 @@ _L_1424331:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424333"
+    je "_L_1432152"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424333":
+"_L_1432152":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxsub1"
 # string literal
-    jmp _L_1424335
+    jmp _L_1432154
     .align 8,0x90
-_L_1424334 :
+_L_1432153 :
     .int 24
     .ascii "fxsub1"
-_L_1424335:
-    movl $_L_1424334, %eax
+_L_1432154:
+    movl $_L_1432153, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxsub1
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11830,14 +11830,14 @@ _L_1424335:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424336
+    je _L_1432155
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424336:
+_L_1432155:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11845,28 +11845,28 @@ _L_1424336:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424337"
+    je "_L_1432156"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424337:
+_L_1432156:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424339
+    jle _L_1432158
     cmp  $0,%eax
-    jge _L_1424338
-_L_1424339:
+    jge _L_1432157
+_L_1432158:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424338:
+_L_1432157:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -11894,14 +11894,14 @@ _L_1424338:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424340
+    je _L_1432159
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424340:
+_L_1432159:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11909,28 +11909,28 @@ _L_1424340:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424341"
+    je "_L_1432160"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424341:
+_L_1432160:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424343
+    jle _L_1432162
     cmp  $0,%eax
-    jge _L_1424342
-_L_1424343:
+    jge _L_1432161
+_L_1432162:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424342:
+_L_1432161:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxadd1") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxadd1") arg2=(vector-ref f195979 0)
@@ -11946,23 +11946,23 @@ _L_1424342:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424344"
+    je "_L_1432163"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424344":
+"_L_1432163":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxadd1"
 # string literal
-    jmp _L_1424346
+    jmp _L_1432165
     .align 8,0x90
-_L_1424345 :
+_L_1432164 :
     .int 24
     .ascii "fxadd1"
-_L_1424346:
-    movl $_L_1424345, %eax
+_L_1432165:
+    movl $_L_1432164, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxadd1
     movl -20(%esp), %edi   # load new closure to %edi
@@ -11983,14 +11983,14 @@ _L_1424346:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424347
+    je _L_1432166
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424347:
+_L_1432166:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -11998,28 +11998,28 @@ _L_1424347:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424348"
+    je "_L_1432167"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424348:
+_L_1432167:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424350
+    jle _L_1432169
     cmp  $0,%eax
-    jge _L_1424349
-_L_1424350:
+    jge _L_1432168
+_L_1432169:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424349:
+_L_1432168:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12047,14 +12047,14 @@ _L_1424349:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424351
+    je _L_1432170
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424351:
+_L_1432170:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12062,28 +12062,28 @@ _L_1424351:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424352"
+    je "_L_1432171"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424352:
+_L_1432171:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424354
+    jle _L_1432173
     cmp  $0,%eax
-    jge _L_1424353
-_L_1424354:
+    jge _L_1432172
+_L_1432173:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424353:
+_L_1432172:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxlogor") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxlogor") arg2=(vector-ref f195979 0)
@@ -12099,23 +12099,23 @@ _L_1424353:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424355"
+    je "_L_1432174"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424355":
+"_L_1432174":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxlogor"
 # string literal
-    jmp _L_1424357
+    jmp _L_1432176
     .align 8,0x90
-_L_1424356 :
+_L_1432175 :
     .int 28
     .ascii "fxlogor"
-_L_1424357:
-    movl $_L_1424356, %eax
+_L_1432176:
+    movl $_L_1432175, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxlogor
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12136,14 +12136,14 @@ _L_1424357:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424358
+    je _L_1432177
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424358:
+_L_1432177:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12151,28 +12151,28 @@ _L_1424358:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424359"
+    je "_L_1432178"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424359:
+_L_1432178:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424361
+    jle _L_1432180
     cmp  $0,%eax
-    jge _L_1424360
-_L_1424361:
+    jge _L_1432179
+_L_1432180:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424360:
+_L_1432179:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12200,14 +12200,14 @@ _L_1424360:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424362
+    je _L_1432181
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424362:
+_L_1432181:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12215,28 +12215,28 @@ _L_1424362:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424363"
+    je "_L_1432182"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424363:
+_L_1432182:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424365
+    jle _L_1432184
     cmp  $0,%eax
-    jge _L_1424364
-_L_1424365:
+    jge _L_1432183
+_L_1432184:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424364:
+_L_1432183:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxlogand") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxlogand") arg2=(vector-ref f195979 0)
@@ -12252,23 +12252,23 @@ _L_1424364:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424366"
+    je "_L_1432185"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424366":
+"_L_1432185":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxlogand"
 # string literal
-    jmp _L_1424368
+    jmp _L_1432187
     .align 8,0x90
-_L_1424367 :
+_L_1432186 :
     .int 32
     .ascii "fxlogand"
-_L_1424368:
-    movl $_L_1424367, %eax
+_L_1432187:
+    movl $_L_1432186, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxlogand
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12289,14 +12289,14 @@ _L_1424368:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424369
+    je _L_1432188
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424369:
+_L_1432188:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12304,28 +12304,28 @@ _L_1424369:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424370"
+    je "_L_1432189"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424370:
+_L_1432189:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424372
+    jle _L_1432191
     cmp  $0,%eax
-    jge _L_1424371
-_L_1424372:
+    jge _L_1432190
+_L_1432191:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424371:
+_L_1432190:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12353,14 +12353,14 @@ _L_1424371:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424373
+    je _L_1432192
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424373:
+_L_1432192:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12368,28 +12368,28 @@ _L_1424373:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424374"
+    je "_L_1432193"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424374:
+_L_1432193:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424376
+    jle _L_1432195
     cmp  $0,%eax
-    jge _L_1424375
-_L_1424376:
+    jge _L_1432194
+_L_1432195:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424375:
+_L_1432194:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fxlognot") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fxlognot") arg2=(vector-ref f195979 0)
@@ -12405,23 +12405,23 @@ _L_1424375:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424377"
+    je "_L_1432196"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424377":
+"_L_1432196":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fxlognot"
 # string literal
-    jmp _L_1424379
+    jmp _L_1432198
     .align 8,0x90
-_L_1424378 :
+_L_1432197 :
     .int 32
     .ascii "fxlognot"
-_L_1424379:
-    movl $_L_1424378, %eax
+_L_1432198:
+    movl $_L_1432197, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fxlognot
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12442,14 +12442,14 @@ _L_1424379:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424380
+    je _L_1432199
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424380:
+_L_1432199:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12457,28 +12457,28 @@ _L_1424380:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424381"
+    je "_L_1432200"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424381:
+_L_1432200:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424383
+    jle _L_1432202
     cmp  $0,%eax
-    jge _L_1424382
-_L_1424383:
+    jge _L_1432201
+_L_1432202:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424382:
+_L_1432201:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12506,14 +12506,14 @@ _L_1424382:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424384
+    je _L_1432203
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424384:
+_L_1432203:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12521,28 +12521,28 @@ _L_1424384:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424385"
+    je "_L_1432204"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424385:
+_L_1432204:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424387
+    jle _L_1432206
     cmp  $0,%eax
-    jge _L_1424386
-_L_1424387:
+    jge _L_1432205
+_L_1432206:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424386:
+_L_1432205:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "char=?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "char=?") arg2=(vector-ref f195979 0)
@@ -12558,23 +12558,23 @@ _L_1424386:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424388"
+    je "_L_1432207"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424388":
+"_L_1432207":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "char=?"
 # string literal
-    jmp _L_1424390
+    jmp _L_1432209
     .align 8,0x90
-_L_1424389 :
+_L_1432208 :
     .int 24
     .ascii "char=?"
-_L_1424390:
-    movl $_L_1424389, %eax
+_L_1432209:
+    movl $_L_1432208, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg char=?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12595,14 +12595,14 @@ _L_1424390:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424391
+    je _L_1432210
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424391:
+_L_1432210:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12610,28 +12610,28 @@ _L_1424391:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424392"
+    je "_L_1432211"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424392:
+_L_1432211:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424394
+    jle _L_1432213
     cmp  $0,%eax
-    jge _L_1424393
-_L_1424394:
+    jge _L_1432212
+_L_1432213:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424393:
+_L_1432212:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12659,14 +12659,14 @@ _L_1424393:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424395
+    je _L_1432214
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424395:
+_L_1432214:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12674,28 +12674,28 @@ _L_1424395:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424396"
+    je "_L_1432215"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424396:
+_L_1432215:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424398
+    jle _L_1432217
     cmp  $0,%eax
-    jge _L_1424397
-_L_1424398:
+    jge _L_1432216
+_L_1432217:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424397:
+_L_1432216:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "eq?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "eq?") arg2=(vector-ref f195979 0)
@@ -12711,23 +12711,23 @@ _L_1424397:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424399"
+    je "_L_1432218"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424399":
+"_L_1432218":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "eq?"
 # string literal
-    jmp _L_1424401
+    jmp _L_1432220
     .align 8,0x90
-_L_1424400 :
+_L_1432219 :
     .int 12
     .ascii "eq?"
-_L_1424401:
-    movl $_L_1424400, %eax
+_L_1432220:
+    movl $_L_1432219, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg eq?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12748,14 +12748,14 @@ _L_1424401:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424402
+    je _L_1432221
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424402:
+_L_1432221:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12763,28 +12763,28 @@ _L_1424402:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424403"
+    je "_L_1432222"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424403:
+_L_1432222:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424405
+    jle _L_1432224
     cmp  $0,%eax
-    jge _L_1424404
-_L_1424405:
+    jge _L_1432223
+_L_1432224:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424404:
+_L_1432223:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12812,14 +12812,14 @@ _L_1424404:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424406
+    je _L_1432225
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424406:
+_L_1432225:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12827,28 +12827,28 @@ _L_1424406:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424407"
+    je "_L_1432226"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424407:
+_L_1432226:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424409
+    jle _L_1432228
     cmp  $0,%eax
-    jge _L_1424408
-_L_1424409:
+    jge _L_1432227
+_L_1432228:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424408:
+_L_1432227:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "not") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "not") arg2=(vector-ref f195979 0)
@@ -12864,23 +12864,23 @@ _L_1424408:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424410"
+    je "_L_1432229"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424410":
+"_L_1432229":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "not"
 # string literal
-    jmp _L_1424412
+    jmp _L_1432231
     .align 8,0x90
-_L_1424411 :
+_L_1432230 :
     .int 12
     .ascii "not"
-_L_1424412:
-    movl $_L_1424411, %eax
+_L_1432231:
+    movl $_L_1432230, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg not
     movl -20(%esp), %edi   # load new closure to %edi
@@ -12901,14 +12901,14 @@ _L_1424412:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424413
+    je _L_1432232
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424413:
+_L_1432232:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12916,28 +12916,28 @@ _L_1424413:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424414"
+    je "_L_1432233"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424414:
+_L_1432233:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424416
+    jle _L_1432235
     cmp  $0,%eax
-    jge _L_1424415
-_L_1424416:
+    jge _L_1432234
+_L_1432235:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424415:
+_L_1432234:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -12965,14 +12965,14 @@ _L_1424415:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424417
+    je _L_1432236
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424417:
+_L_1432236:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -12980,28 +12980,28 @@ _L_1424417:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424418"
+    je "_L_1432237"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424418:
+_L_1432237:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424420
+    jle _L_1432239
     cmp  $0,%eax
-    jge _L_1424419
-_L_1424420:
+    jge _L_1432238
+_L_1432239:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424419:
+_L_1432238:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "boolean?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "boolean?") arg2=(vector-ref f195979 0)
@@ -13017,23 +13017,23 @@ _L_1424419:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424421"
+    je "_L_1432240"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424421":
+"_L_1432240":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "boolean?"
 # string literal
-    jmp _L_1424423
+    jmp _L_1432242
     .align 8,0x90
-_L_1424422 :
+_L_1432241 :
     .int 32
     .ascii "boolean?"
-_L_1424423:
-    movl $_L_1424422, %eax
+_L_1432242:
+    movl $_L_1432241, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg boolean?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13054,14 +13054,14 @@ _L_1424423:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424424
+    je _L_1432243
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424424:
+_L_1432243:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13069,28 +13069,28 @@ _L_1424424:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424425"
+    je "_L_1432244"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424425:
+_L_1432244:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424427
+    jle _L_1432246
     cmp  $0,%eax
-    jge _L_1424426
-_L_1424427:
+    jge _L_1432245
+_L_1432246:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424426:
+_L_1432245:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13118,14 +13118,14 @@ _L_1424426:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424428
+    je _L_1432247
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424428:
+_L_1432247:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13133,28 +13133,28 @@ _L_1424428:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424429"
+    je "_L_1432248"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424429:
+_L_1432248:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424431
+    jle _L_1432250
     cmp  $0,%eax
-    jge _L_1424430
-_L_1424431:
+    jge _L_1432249
+_L_1432250:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424430:
+_L_1432249:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fixnum?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fixnum?") arg2=(vector-ref f195979 0)
@@ -13170,23 +13170,23 @@ _L_1424430:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424432"
+    je "_L_1432251"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424432":
+"_L_1432251":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fixnum?"
 # string literal
-    jmp _L_1424434
+    jmp _L_1432253
     .align 8,0x90
-_L_1424433 :
+_L_1432252 :
     .int 28
     .ascii "fixnum?"
-_L_1424434:
-    movl $_L_1424433, %eax
+_L_1432253:
+    movl $_L_1432252, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fixnum?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13207,14 +13207,14 @@ _L_1424434:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424435
+    je _L_1432254
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424435:
+_L_1432254:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13222,28 +13222,28 @@ _L_1424435:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424436"
+    je "_L_1432255"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424436:
+_L_1432255:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424438
+    jle _L_1432257
     cmp  $0,%eax
-    jge _L_1424437
-_L_1424438:
+    jge _L_1432256
+_L_1432257:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424437:
+_L_1432256:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13271,14 +13271,14 @@ _L_1424437:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424439
+    je _L_1432258
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424439:
+_L_1432258:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13286,28 +13286,28 @@ _L_1424439:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424440"
+    je "_L_1432259"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424440:
+_L_1432259:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424442
+    jle _L_1432261
     cmp  $0,%eax
-    jge _L_1424441
-_L_1424442:
+    jge _L_1432260
+_L_1432261:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424441:
+_L_1432260:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "char?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "char?") arg2=(vector-ref f195979 0)
@@ -13323,23 +13323,23 @@ _L_1424441:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424443"
+    je "_L_1432262"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424443":
+"_L_1432262":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "char?"
 # string literal
-    jmp _L_1424445
+    jmp _L_1432264
     .align 8,0x90
-_L_1424444 :
+_L_1432263 :
     .int 20
     .ascii "char?"
-_L_1424445:
-    movl $_L_1424444, %eax
+_L_1432264:
+    movl $_L_1432263, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg char?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13360,14 +13360,14 @@ _L_1424445:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424446
+    je _L_1432265
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424446:
+_L_1432265:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13375,28 +13375,28 @@ _L_1424446:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424447"
+    je "_L_1432266"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424447:
+_L_1432266:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424449
+    jle _L_1432268
     cmp  $0,%eax
-    jge _L_1424448
-_L_1424449:
+    jge _L_1432267
+_L_1432268:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424448:
+_L_1432267:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13424,14 +13424,14 @@ _L_1424448:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424450
+    je _L_1432269
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424450:
+_L_1432269:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13439,28 +13439,28 @@ _L_1424450:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424451"
+    je "_L_1432270"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424451:
+_L_1432270:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424453
+    jle _L_1432272
     cmp  $0,%eax
-    jge _L_1424452
-_L_1424453:
+    jge _L_1432271
+_L_1432272:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424452:
+_L_1432271:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "null?") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "null?") arg2=(vector-ref f195979 0)
@@ -13476,23 +13476,23 @@ _L_1424452:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424454"
+    je "_L_1432273"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424454":
+"_L_1432273":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "null?"
 # string literal
-    jmp _L_1424456
+    jmp _L_1432275
     .align 8,0x90
-_L_1424455 :
+_L_1432274 :
     .int 20
     .ascii "null?"
-_L_1424456:
-    movl $_L_1424455, %eax
+_L_1432275:
+    movl $_L_1432274, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg null?
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13513,14 +13513,14 @@ _L_1424456:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424457
+    je _L_1432276
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424457:
+_L_1432276:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13528,28 +13528,28 @@ _L_1424457:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424458"
+    je "_L_1432277"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424458:
+_L_1432277:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424460
+    jle _L_1432279
     cmp  $0,%eax
-    jge _L_1424459
-_L_1424460:
+    jge _L_1432278
+_L_1432279:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424459:
+_L_1432278:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13577,14 +13577,14 @@ _L_1424459:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424461
+    je _L_1432280
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424461:
+_L_1432280:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13592,28 +13592,28 @@ _L_1424461:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424462"
+    je "_L_1432281"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424462:
+_L_1432281:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424464
+    jle _L_1432283
     cmp  $0,%eax
-    jge _L_1424463
-_L_1424464:
+    jge _L_1432282
+_L_1432283:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424463:
+_L_1432282:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "char->fixnum") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "char->fixnum") arg2=(vector-ref f195979 0)
@@ -13629,23 +13629,23 @@ _L_1424463:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424465"
+    je "_L_1432284"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424465":
+"_L_1432284":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "char->fixnum"
 # string literal
-    jmp _L_1424467
+    jmp _L_1432286
     .align 8,0x90
-_L_1424466 :
+_L_1432285 :
     .int 48
     .ascii "char->fixnum"
-_L_1424467:
-    movl $_L_1424466, %eax
+_L_1432286:
+    movl $_L_1432285, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg char->fixnum
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13666,14 +13666,14 @@ _L_1424467:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424468
+    je _L_1432287
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424468:
+_L_1432287:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13681,28 +13681,28 @@ _L_1424468:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424469"
+    je "_L_1432288"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424469:
+_L_1432288:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424471
+    jle _L_1432290
     cmp  $0,%eax
-    jge _L_1424470
-_L_1424471:
+    jge _L_1432289
+_L_1432290:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424470:
+_L_1432289:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13730,14 +13730,14 @@ _L_1424470:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424472
+    je _L_1432291
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424472:
+_L_1432291:
     movl %eax, -4(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13745,28 +13745,28 @@ _L_1424472:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424473"
+    je "_L_1432292"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424473:
+_L_1432292:
 # check bounds on vector index
     movl -4(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424475
+    jle _L_1432294
     cmp  $0,%eax
-    jge _L_1424474
-_L_1424475:
+    jge _L_1432293
+_L_1432294:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424474:
+_L_1432293:
     movl %eax, -8(%esp)
 # emit-expr (cons ((primitive-ref string->symbol) "fixnum->char") (vector-ref f195979 0))
 # cons arg1=((primitive-ref string->symbol) "fixnum->char") arg2=(vector-ref f195979 0)
@@ -13782,23 +13782,23 @@ _L_1424474:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424476"
+    je "_L_1432295"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424476":
+"_L_1432295":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "fixnum->char"
 # string literal
-    jmp _L_1424478
+    jmp _L_1432297
     .align 8,0x90
-_L_1424477 :
+_L_1432296 :
     .int 48
     .ascii "fixnum->char"
-_L_1424478:
-    movl $_L_1424477, %eax
+_L_1432297:
+    movl $_L_1432296, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg fixnum->char
     movl -20(%esp), %edi   # load new closure to %edi
@@ -13819,14 +13819,14 @@ _L_1424478:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424479
+    je _L_1432298
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424479:
+_L_1432298:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13834,28 +13834,28 @@ _L_1424479:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424480"
+    je "_L_1432299"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424480:
+_L_1432299:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424482
+    jle _L_1432301
     cmp  $0,%eax
-    jge _L_1424481
-_L_1424482:
+    jge _L_1432300
+_L_1432301:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424481:
+_L_1432300:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
     movl %eax, 4(%ebp)
@@ -13877,7 +13877,7 @@ _L_1424481:
 # si = -4
 # env = ((f195979 . 0))
 # expr = (closure () (f195979) (let () (vector-ref f195979 0)))
-    movl $_L_1424483, 0(%ebp)  # closure label
+    movl $_L_1432302, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195979 . 0))
 # var=f195979
@@ -13887,17 +13887,17 @@ _L_1424481:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424484            # jump around closure body
-_L_1424483:
+    jmp _L_1432303            # jump around closure body
+_L_1432302:
 # check argument count
     cmp $0,%eax
-    je _L_1424485
+    je _L_1432304
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424485:
+_L_1432304:
 # emit-tail-expr
 # si=-8
 # env=((f195979 . 4) (f195979 . 0))
@@ -13922,14 +13922,14 @@ _L_1424485:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424486
+    je _L_1432305
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424486:
+_L_1432305:
     movl %eax, -8(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -13937,34 +13937,34 @@ _L_1424486:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424487"
+    je "_L_1432306"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424487:
+_L_1432306:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424489
+    jle _L_1432308
     cmp  $0,%eax
-    jge _L_1424488
-_L_1424489:
+    jge _L_1432307
+_L_1432308:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424488:
+_L_1432307:
     movl -8(%esp), %esi
     movl -1(%eax,%esi), %eax
 #return from tail (vector-ref f195979 0)
     ret
     .align 4,0x90
-_L_1424484:
+_L_1432303:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -13995,23 +13995,23 @@ _L_1424484:
 # si = 0
 # env = ()
 # expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "arg 1 must be a procedure")))
-    movl $_L_1424490, 0(%ebp)  # closure label
+    movl $_L_1432309, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var funcall not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424491            # jump around closure body
-_L_1424490:
+    jmp _L_1432310            # jump around closure body
+_L_1432309:
 # check argument count
     cmp $0,%eax
-    je _L_1424492
+    je _L_1432311
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424492:
+_L_1432311:
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
@@ -14045,23 +14045,23 @@ _L_1424492:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424493"
+    je "_L_1432312"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424493":
+"_L_1432312":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "funcall"
 # string literal
-    jmp _L_1424495
+    jmp _L_1432314
     .align 8,0x90
-_L_1424494 :
+_L_1432313 :
     .int 28
     .ascii "funcall"
-_L_1424495:
-    movl $_L_1424494, %eax
+_L_1432314:
+    movl $_L_1432313, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg funcall
     movl -20(%esp), %edi   # load new closure to %edi
@@ -14073,13 +14073,13 @@ _L_1424495:
     mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) funcall)
 # emit-expr "arg 1 must be a procedure"
 # string literal
-    jmp _L_1424497
+    jmp _L_1432316
     .align 8,0x90
-_L_1424496 :
+_L_1432315 :
     .int 100
     .ascii "arg 1 must be a procedure"
-_L_1424497:
-    movl $_L_1424496, %eax
+_L_1432316:
+    movl $_L_1432315, %eax
     orl $6, %eax
     mov %eax, -16(%esp)    # arg arg 1 must be a procedure
     movl -8(%esp), %edi   # load new closure to %edi
@@ -14096,7 +14096,7 @@ _L_1424497:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424491:
+_L_1432310:
      movl %eax, mrc_eh$uprocedure
 # == explicit-begins  ==>
 # (lambda () (error (quote funcall) "wrong number of args"))
@@ -14123,23 +14123,23 @@ _L_1424491:
 # si = 0
 # env = ()
 # expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "wrong number of args")))
-    movl $_L_1424498, 0(%ebp)  # closure label
+    movl $_L_1432317, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var funcall not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424499            # jump around closure body
-_L_1424498:
+    jmp _L_1432318            # jump around closure body
+_L_1432317:
 # check argument count
     cmp $0,%eax
-    je _L_1424500
+    je _L_1432319
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424500:
+_L_1432319:
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
@@ -14173,23 +14173,23 @@ _L_1424500:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424501"
+    je "_L_1432320"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424501":
+"_L_1432320":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "funcall"
 # string literal
-    jmp _L_1424503
+    jmp _L_1432322
     .align 8,0x90
-_L_1424502 :
+_L_1432321 :
     .int 28
     .ascii "funcall"
-_L_1424503:
-    movl $_L_1424502, %eax
+_L_1432322:
+    movl $_L_1432321, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg funcall
     movl -20(%esp), %edi   # load new closure to %edi
@@ -14201,13 +14201,13 @@ _L_1424503:
     mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) funcall)
 # emit-expr "wrong number of args"
 # string literal
-    jmp _L_1424505
+    jmp _L_1432324
     .align 8,0x90
-_L_1424504 :
+_L_1432323 :
     .int 80
     .ascii "wrong number of args"
-_L_1424505:
-    movl $_L_1424504, %eax
+_L_1432324:
+    movl $_L_1432323, %eax
     orl $6, %eax
     mov %eax, -16(%esp)    # arg wrong number of args
     movl -8(%esp), %edi   # load new closure to %edi
@@ -14224,7 +14224,7 @@ _L_1424505:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424499:
+_L_1432318:
      movl %eax, mrc_eh$uargcount
 # == explicit-begins  ==>
 # (lambda () (error (quote funcall) "too few args"))
@@ -14251,23 +14251,23 @@ _L_1424499:
 # si = 0
 # env = ()
 # expr = (closure () ((primitive-ref error) funcall) (let () ((primitive-ref error) ((primitive-ref string->symbol) "funcall") "too few args")))
-    movl $_L_1424506, 0(%ebp)  # closure label
+    movl $_L_1432325, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var funcall not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424507            # jump around closure body
-_L_1424506:
+    jmp _L_1432326            # jump around closure body
+_L_1432325:
 # check argument count
     cmp $0,%eax
-    je _L_1424508
+    je _L_1432327
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424508:
+_L_1432327:
 # emit-tail-expr
 # si=-8
 # env=((funcall . 8) ((primitive-ref error) . 4))
@@ -14301,23 +14301,23 @@ _L_1424508:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424509"
+    je "_L_1432328"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424509":
+"_L_1432328":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
 # emit-expr "funcall"
 # string literal
-    jmp _L_1424511
+    jmp _L_1432330
     .align 8,0x90
-_L_1424510 :
+_L_1432329 :
     .int 28
     .ascii "funcall"
-_L_1424511:
-    movl $_L_1424510, %eax
+_L_1432330:
+    movl $_L_1432329, %eax
     orl $6, %eax
     mov %eax, -24(%esp)  # arg funcall
     movl -20(%esp), %edi   # load new closure to %edi
@@ -14329,13 +14329,13 @@ _L_1424511:
     mov %eax, -12(%esp)    # arg ((primitive-ref string->symbol) funcall)
 # emit-expr "too few args"
 # string literal
-    jmp _L_1424513
+    jmp _L_1432332
     .align 8,0x90
-_L_1424512 :
+_L_1432331 :
     .int 48
     .ascii "too few args"
-_L_1424513:
-    movl $_L_1424512, %eax
+_L_1432332:
+    movl $_L_1432331, %eax
     orl $6, %eax
     mov %eax, -16(%esp)    # arg too few args
     movl -8(%esp), %edi   # load new closure to %edi
@@ -14352,7 +14352,7 @@ _L_1424513:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424507:
+_L_1432326:
      movl %eax, mrc_eh$uargcount$umin
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "arg must be a fixnum"))
@@ -14379,24 +14379,24 @@ _L_1424507:
 # si = 0
 # env = ()
 # expr = (closure (f195980) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195980 f195980)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195980) "arg must be a fixnum")))
-    movl $_L_1424514, 0(%ebp)  # closure label
+    movl $_L_1432333, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424515            # jump around closure body
-_L_1424514:
+    jmp _L_1432334            # jump around closure body
+_L_1432333:
 # check argument count
     cmp $4,%eax
-    je _L_1424516
+    je _L_1432335
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424516:
+_L_1432335:
 # emit-tail-expr
 # si=-12
 # env=((f195980 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -14437,13 +14437,13 @@ _L_1424516:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424517"
+    je "_L_1432336"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424517":
+"_L_1432336":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -14457,13 +14457,13 @@ _L_1424516:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424518"
+    je "_L_1432337"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424518":
+"_L_1432337":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -14488,13 +14488,13 @@ _L_1424516:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195980)
 # emit-expr "arg must be a fixnum"
 # string literal
-    jmp _L_1424520
+    jmp _L_1432339
     .align 8,0x90
-_L_1424519 :
+_L_1432338 :
     .int 80
     .ascii "arg must be a fixnum"
-_L_1424520:
-    movl $_L_1424519, %eax
+_L_1432339:
+    movl $_L_1432338, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg arg must be a fixnum
     movl -16(%esp), %edi   # load new closure to %edi
@@ -14511,7 +14511,7 @@ _L_1424520:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424515:
+_L_1432334:
      movl %eax, mrc_eh$ufixnum
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "arg must be a string"))
@@ -14538,24 +14538,24 @@ _L_1424515:
 # si = 0
 # env = ()
 # expr = (closure (f195981) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195981 f195981)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195981) "arg must be a string")))
-    movl $_L_1424521, 0(%ebp)  # closure label
+    movl $_L_1432340, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424522            # jump around closure body
-_L_1424521:
+    jmp _L_1432341            # jump around closure body
+_L_1432340:
 # check argument count
     cmp $4,%eax
-    je _L_1424523
+    je _L_1432342
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424523:
+_L_1432342:
 # emit-tail-expr
 # si=-12
 # env=((f195981 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -14596,13 +14596,13 @@ _L_1424523:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424524"
+    je "_L_1432343"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424524":
+"_L_1432343":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -14616,13 +14616,13 @@ _L_1424523:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424525"
+    je "_L_1432344"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424525":
+"_L_1432344":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -14647,13 +14647,13 @@ _L_1424523:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195981)
 # emit-expr "arg must be a string"
 # string literal
-    jmp _L_1424527
+    jmp _L_1432346
     .align 8,0x90
-_L_1424526 :
+_L_1432345 :
     .int 80
     .ascii "arg must be a string"
-_L_1424527:
-    movl $_L_1424526, %eax
+_L_1432346:
+    movl $_L_1432345, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg arg must be a string
     movl -16(%esp), %edi   # load new closure to %edi
@@ -14670,7 +14670,7 @@ _L_1424527:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424522:
+_L_1432341:
      movl %eax, mrc_eh$ustring
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "arg must be a character"))
@@ -14697,24 +14697,24 @@ _L_1424522:
 # si = 0
 # env = ()
 # expr = (closure (f195982) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195982 f195982)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195982) "arg must be a character")))
-    movl $_L_1424528, 0(%ebp)  # closure label
+    movl $_L_1432347, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424529            # jump around closure body
-_L_1424528:
+    jmp _L_1432348            # jump around closure body
+_L_1432347:
 # check argument count
     cmp $4,%eax
-    je _L_1424530
+    je _L_1432349
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424530:
+_L_1432349:
 # emit-tail-expr
 # si=-12
 # env=((f195982 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -14755,13 +14755,13 @@ _L_1424530:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424531"
+    je "_L_1432350"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424531":
+"_L_1432350":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -14775,13 +14775,13 @@ _L_1424530:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424532"
+    je "_L_1432351"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424532":
+"_L_1432351":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -14806,13 +14806,13 @@ _L_1424530:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195982)
 # emit-expr "arg must be a character"
 # string literal
-    jmp _L_1424534
+    jmp _L_1432353
     .align 8,0x90
-_L_1424533 :
+_L_1432352 :
     .int 92
     .ascii "arg must be a character"
-_L_1424534:
-    movl $_L_1424533, %eax
+_L_1432353:
+    movl $_L_1432352, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg arg must be a character
     movl -16(%esp), %edi   # load new closure to %edi
@@ -14829,7 +14829,7 @@ _L_1424534:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424529:
+_L_1432348:
      movl %eax, mrc_eh$ucharacter
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "arg must be a pair"))
@@ -14856,24 +14856,24 @@ _L_1424529:
 # si = 0
 # env = ()
 # expr = (closure (f195983) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195983 f195983)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195983) "arg must be a pair")))
-    movl $_L_1424535, 0(%ebp)  # closure label
+    movl $_L_1432354, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424536            # jump around closure body
-_L_1424535:
+    jmp _L_1432355            # jump around closure body
+_L_1432354:
 # check argument count
     cmp $4,%eax
-    je _L_1424537
+    je _L_1432356
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424537:
+_L_1432356:
 # emit-tail-expr
 # si=-12
 # env=((f195983 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -14914,13 +14914,13 @@ _L_1424537:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424538"
+    je "_L_1432357"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424538":
+"_L_1432357":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -14934,13 +14934,13 @@ _L_1424537:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424539"
+    je "_L_1432358"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424539":
+"_L_1432358":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -14965,13 +14965,13 @@ _L_1424537:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195983)
 # emit-expr "arg must be a pair"
 # string literal
-    jmp _L_1424541
+    jmp _L_1432360
     .align 8,0x90
-_L_1424540 :
+_L_1432359 :
     .int 72
     .ascii "arg must be a pair"
-_L_1424541:
-    movl $_L_1424540, %eax
+_L_1432360:
+    movl $_L_1432359, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg arg must be a pair
     movl -16(%esp), %edi   # load new closure to %edi
@@ -14988,7 +14988,7 @@ _L_1424541:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424536:
+_L_1432355:
      movl %eax, mrc_eh$upair
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "arg must be a vector"))
@@ -15015,24 +15015,24 @@ _L_1424536:
 # si = 0
 # env = ()
 # expr = (closure (f195984) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195984 f195984)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195984) "arg must be a vector")))
-    movl $_L_1424542, 0(%ebp)  # closure label
+    movl $_L_1432361, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424543            # jump around closure body
-_L_1424542:
+    jmp _L_1432362            # jump around closure body
+_L_1432361:
 # check argument count
     cmp $4,%eax
-    je _L_1424544
+    je _L_1432363
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424544:
+_L_1432363:
 # emit-tail-expr
 # si=-12
 # env=((f195984 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -15073,13 +15073,13 @@ _L_1424544:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424545"
+    je "_L_1432364"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424545":
+"_L_1432364":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -15093,13 +15093,13 @@ _L_1424544:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424546"
+    je "_L_1432365"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424546":
+"_L_1432365":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -15124,13 +15124,13 @@ _L_1424544:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195984)
 # emit-expr "arg must be a vector"
 # string literal
-    jmp _L_1424548
+    jmp _L_1432367
     .align 8,0x90
-_L_1424547 :
+_L_1432366 :
     .int 80
     .ascii "arg must be a vector"
-_L_1424548:
-    movl $_L_1424547, %eax
+_L_1432367:
+    movl $_L_1432366, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg arg must be a vector
     movl -16(%esp), %edi   # load new closure to %edi
@@ -15147,7 +15147,7 @@ _L_1424548:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424543:
+_L_1432362:
      movl %eax, mrc_eh$uvector
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "length must be a fixnum >= 0"))
@@ -15174,24 +15174,24 @@ _L_1424543:
 # si = 0
 # env = ()
 # expr = (closure (f195985) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195985 f195985)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195985) "length must be a fixnum >= 0")))
-    movl $_L_1424549, 0(%ebp)  # closure label
+    movl $_L_1432368, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424550            # jump around closure body
-_L_1424549:
+    jmp _L_1432369            # jump around closure body
+_L_1432368:
 # check argument count
     cmp $4,%eax
-    je _L_1424551
+    je _L_1432370
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424551:
+_L_1432370:
 # emit-tail-expr
 # si=-12
 # env=((f195985 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -15232,13 +15232,13 @@ _L_1424551:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424552"
+    je "_L_1432371"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424552":
+"_L_1432371":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -15252,13 +15252,13 @@ _L_1424551:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424553"
+    je "_L_1432372"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424553":
+"_L_1432372":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -15283,13 +15283,13 @@ _L_1424551:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195985)
 # emit-expr "length must be a fixnum >= 0"
 # string literal
-    jmp _L_1424555
+    jmp _L_1432374
     .align 8,0x90
-_L_1424554 :
+_L_1432373 :
     .int 112
     .ascii "length must be a fixnum >= 0"
-_L_1424555:
-    movl $_L_1424554, %eax
+_L_1432374:
+    movl $_L_1432373, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg length must be a fixnum >= 0
     movl -16(%esp), %edi   # load new closure to %edi
@@ -15306,7 +15306,7 @@ _L_1424555:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424550:
+_L_1432369:
      movl %eax, mrc_eh$ulength
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "index out of bounds"))
@@ -15333,24 +15333,24 @@ _L_1424550:
 # si = 0
 # env = ()
 # expr = (closure (f195986) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195986 f195986)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195986) "index out of bounds")))
-    movl $_L_1424556, 0(%ebp)  # closure label
+    movl $_L_1432375, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424557            # jump around closure body
-_L_1424556:
+    jmp _L_1432376            # jump around closure body
+_L_1432375:
 # check argument count
     cmp $4,%eax
-    je _L_1424558
+    je _L_1432377
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424558:
+_L_1432377:
 # emit-tail-expr
 # si=-12
 # env=((f195986 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -15391,13 +15391,13 @@ _L_1424558:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424559"
+    je "_L_1432378"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424559":
+"_L_1432378":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -15411,13 +15411,13 @@ _L_1424558:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424560"
+    je "_L_1432379"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424560":
+"_L_1432379":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -15442,13 +15442,13 @@ _L_1424558:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195986)
 # emit-expr "index out of bounds"
 # string literal
-    jmp _L_1424562
+    jmp _L_1432381
     .align 8,0x90
-_L_1424561 :
+_L_1432380 :
     .int 76
     .ascii "index out of bounds"
-_L_1424562:
-    movl $_L_1424561, %eax
+_L_1432381:
+    movl $_L_1432380, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg index out of bounds
     movl -16(%esp), %edi   # load new closure to %edi
@@ -15465,7 +15465,7 @@ _L_1424562:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424557:
+_L_1432376:
      movl %eax, mrc_eh$uvector$uindex
 # == explicit-begins  ==>
 # (lambda (i) (error (list-ref (primitives) i) "index out of bounds"))
@@ -15492,24 +15492,24 @@ _L_1424557:
 # si = 0
 # env = ()
 # expr = (closure (f195987) ((primitive-ref error) (primitive-ref list-ref) (primitive-ref primitives)) (let ((f195987 f195987)) ((primitive-ref error) ((primitive-ref list-ref) ((primitive-ref primitives)) f195987) "index out of bounds")))
-    movl $_L_1424563, 0(%ebp)  # closure label
+    movl $_L_1432382, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var (primitive-ref list-ref) not defined in the environmnet
 # WARNING: free var (primitive-ref primitives) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424564            # jump around closure body
-_L_1424563:
+    jmp _L_1432383            # jump around closure body
+_L_1432382:
 # check argument count
     cmp $4,%eax
-    je _L_1424565
+    je _L_1432384
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424565:
+_L_1432384:
 # emit-tail-expr
 # si=-12
 # env=((f195987 . -8) ((primitive-ref primitives) . 12) ((primitive-ref list-ref) . 8) ((primitive-ref error) . 4))
@@ -15550,13 +15550,13 @@ _L_1424565:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424566"
+    je "_L_1432385"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424566":
+"_L_1432385":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr ((primitive-ref primitives))
 # funcall
@@ -15570,13 +15570,13 @@ _L_1424565:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424567"
+    je "_L_1432386"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424567":
+"_L_1432386":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
@@ -15601,13 +15601,13 @@ _L_1424565:
     mov %eax, -20(%esp)    # arg ((primitive-ref list-ref) ((primitive-ref primitives)) f195987)
 # emit-expr "index out of bounds"
 # string literal
-    jmp _L_1424569
+    jmp _L_1432388
     .align 8,0x90
-_L_1424568 :
+_L_1432387 :
     .int 76
     .ascii "index out of bounds"
-_L_1424569:
-    movl $_L_1424568, %eax
+_L_1432388:
+    movl $_L_1432387, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg index out of bounds
     movl -16(%esp), %edi   # load new closure to %edi
@@ -15624,7 +15624,7 @@ _L_1424569:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424564:
+_L_1432383:
      movl %eax, mrc_eh$ustring$uindex
 # == explicit-begins  ==>
 # (lambda (z) (fxzero? z))
@@ -15651,21 +15651,21 @@ _L_1424564:
 # si = 0
 # env = ()
 # expr = (closure (f195988) () (let ((f195988 f195988)) (fxzero? f195988)))
-    movl $_L_1424570, 0(%ebp)  # closure label
+    movl $_L_1432389, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424571            # jump around closure body
-_L_1424570:
+    jmp _L_1432390            # jump around closure body
+_L_1432389:
 # check argument count
     cmp $4,%eax
-    je _L_1424572
+    je _L_1432391
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424572:
+_L_1432391:
 # emit-tail-expr
 # si=-12
 # env=((f195988 . -8))
@@ -15697,14 +15697,14 @@ _L_1424572:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424573"
+    je "_L_1432392"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $56,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424573:
+_L_1432392:
     cmp $0, %eax
     sete %al
     movzbl %al, %eax
@@ -15713,7 +15713,7 @@ _L_1424573:
 #return from tail (fxzero? f195988)
     ret
     .align 4,0x90
-_L_1424571:
+_L_1432390:
      movl %eax, mrc_zero$q
 # == explicit-begins  ==>
 # (lambda (x) (fx> x 0))
@@ -15740,21 +15740,21 @@ _L_1424571:
 # si = 0
 # env = ()
 # expr = (closure (f195989) () (let ((f195989 f195989)) (fx> f195989 0)))
-    movl $_L_1424574, 0(%ebp)  # closure label
+    movl $_L_1432393, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424575            # jump around closure body
-_L_1424574:
+    jmp _L_1432394            # jump around closure body
+_L_1432393:
 # check argument count
     cmp $4,%eax
-    je _L_1424576
+    je _L_1432395
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424576:
+_L_1432395:
 # emit-tail-expr
 # si=-12
 # env=((f195989 . -8))
@@ -15782,14 +15782,14 @@ _L_1424576:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424577"
+    je "_L_1432396"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $72,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424577:
+_L_1432396:
     movl %eax, -16(%esp)
 # emit-expr f195989
 # emit-variable-ref
@@ -15801,14 +15801,14 @@ _L_1424577:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424578"
+    je "_L_1432397"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $72,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424578:
+_L_1432397:
     cmp -16(%esp), %eax
     setg %al
     movzbl %al, %eax
@@ -15817,7 +15817,7 @@ _L_1424578:
 #return from tail (fx> f195989 0)
     ret
     .align 4,0x90
-_L_1424575:
+_L_1432394:
      movl %eax, mrc_positive$q
 # == explicit-begins  ==>
 # (lambda (x) (fx< x 0))
@@ -15844,21 +15844,21 @@ _L_1424575:
 # si = 0
 # env = ()
 # expr = (closure (f195990) () (let ((f195990 f195990)) (fx< f195990 0)))
-    movl $_L_1424579, 0(%ebp)  # closure label
+    movl $_L_1432398, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424580            # jump around closure body
-_L_1424579:
+    jmp _L_1432399            # jump around closure body
+_L_1432398:
 # check argument count
     cmp $4,%eax
-    je _L_1424581
+    je _L_1432400
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424581:
+_L_1432400:
 # emit-tail-expr
 # si=-12
 # env=((f195990 . -8))
@@ -15886,14 +15886,14 @@ _L_1424581:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424582"
+    je "_L_1432401"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $64,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424582:
+_L_1432401:
     movl %eax, -16(%esp)
 # emit-expr f195990
 # emit-variable-ref
@@ -15905,14 +15905,14 @@ _L_1424582:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424583"
+    je "_L_1432402"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $64,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424583:
+_L_1432402:
     cmp -16(%esp), %eax
     setl %al
     movzbl %al, %eax
@@ -15921,7 +15921,7 @@ _L_1424583:
 #return from tail (fx< f195990 0)
     ret
     .align 4,0x90
-_L_1424580:
+_L_1432399:
      movl %eax, mrc_negative$q
 # == explicit-begins  ==>
 # (lambda (f l) (if (null? l) (quote ()) (cons (f (car l)) (map f (cdr l)))))
@@ -15948,22 +15948,22 @@ _L_1424580:
 # si = 0
 # env = ()
 # expr = (closure (f195991 f195992) ((primitive-ref map)) (let ((f195991 f195991) (f195992 f195992)) (if (null? f195992) () (cons (f195991 (car f195992)) ((primitive-ref map) f195991 (cdr f195992))))))
-    movl $_L_1424584, 0(%ebp)  # closure label
+    movl $_L_1432403, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref map) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424585            # jump around closure body
-_L_1424584:
+    jmp _L_1432404            # jump around closure body
+_L_1432403:
 # check argument count
     cmp $8,%eax
-    je _L_1424586
+    je _L_1432405
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424586:
+_L_1432405:
 # emit-tail-expr
 # si=-16
 # env=((f195992 . -12) (f195991 . -8) ((primitive-ref map) . 4))
@@ -16005,15 +16005,15 @@ _L_1424586:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424587
+    je _L_1432406
 # emit-tail-expr
 # si=-24
 # env=((f195992 . -20) (f195991 . -16) (f195992 . -12) (f195991 . -8) ((primitive-ref map) . 4))
 # expr=()
     movl $63, %eax     # immed ()
     ret                  # immediate tail return
-    jmp _L_1424588
-_L_1424587:
+    jmp _L_1432407
+_L_1432406:
 # emit-tail-expr
 # si=-24
 # env=((f195992 . -20) (f195991 . -16) (f195992 . -12) (f195991 . -8) ((primitive-ref map) . 4))
@@ -16035,13 +16035,13 @@ _L_1424587:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424589"
+    je "_L_1432408"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424589":
+"_L_1432408":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr (car f195992)
 # emit-expr f195992
@@ -16054,14 +16054,14 @@ _L_1424587:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424590
+    je _L_1432409
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424590:
+_L_1432409:
     movl -1(%eax), %eax
     mov %eax, -36(%esp)  # arg (car f195992)
     movl -32(%esp), %edi   # load new closure to %edi
@@ -16083,13 +16083,13 @@ _L_1424590:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424591"
+    je "_L_1432410"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424591":
+"_L_1432410":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr f195991
 # emit-variable-ref
@@ -16109,14 +16109,14 @@ _L_1424590:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424592
+    je _L_1432411
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424592:
+_L_1432411:
     movl 3(%eax), %eax
     mov %eax, -44(%esp)  # arg (cdr f195992)
     movl -36(%esp), %edi   # load new closure to %edi
@@ -16134,9 +16134,9 @@ _L_1424592:
 # cons end
 #return from tail (cons (f195991 (car f195992)) ((primitive-ref map) f195991 (cdr f195992)))
     ret
-_L_1424588:
+_L_1432407:
     .align 4,0x90
-_L_1424585:
+_L_1432404:
      movl %eax, mrc_map
 # == explicit-begins  ==>
 # (lambda (f l) (unless (null? l) (begin (f (car l)) (for-each f (cdr l)))))
@@ -16163,7 +16163,7 @@ _L_1424585:
 # si = 0
 # env = ()
 # expr = (closure (f195993 f195994) (if (not (primitive-ref for-each)) (begin) #f) (let ((f195993 f195993) (f195994 f195994)) (if (not (null? f195994)) (begin (begin (f195993 (car f195994)) ((primitive-ref for-each) f195993 (cdr f195994)))) #f)))
-    movl $_L_1424593, 0(%ebp)  # closure label
+    movl $_L_1432412, 0(%ebp)  # closure label
 # WARNING: free var if not defined in the environmnet
 # WARNING: free var (not (primitive-ref for-each)) not defined in the environmnet
 # WARNING: free var (begin) not defined in the environmnet
@@ -16171,17 +16171,17 @@ _L_1424585:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_1424594            # jump around closure body
-_L_1424593:
+    jmp _L_1432413            # jump around closure body
+_L_1432412:
 # check argument count
     cmp $8,%eax
-    je _L_1424595
+    je _L_1432414
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424595:
+_L_1432414:
 # emit-tail-expr
 # si=-16
 # env=((f195994 . -12) (f195993 . -8) (#f . 16) ((begin) . 12) ((not (primitive-ref for-each)) . 8) (if . 4))
@@ -16229,7 +16229,7 @@ _L_1424595:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424596
+    je _L_1432415
 # emit-tail-expr
 # si=-24
 # env=((f195994 . -20) (f195993 . -16) (f195994 . -12) (f195993 . -8) (#f . 16) ((begin) . 12) ((not (primitive-ref for-each)) . 8) (if . 4))
@@ -16257,13 +16257,13 @@ _L_1424595:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424598"
+    je "_L_1432417"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424598":
+"_L_1432417":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr (car f195994)
 # emit-expr f195994
@@ -16276,14 +16276,14 @@ _L_1424595:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424599
+    je _L_1432418
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424599:
+_L_1432418:
     movl -1(%eax), %eax
     mov %eax, -36(%esp)  # arg (car f195994)
     movl -32(%esp), %edi   # load new closure to %edi
@@ -16328,14 +16328,14 @@ _L_1424599:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424600
+    je _L_1432419
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424600:
+_L_1432419:
     movl 3(%eax), %eax
     mov %eax, -32(%esp)    # arg (cdr f195994)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -16353,17 +16353,17 @@ _L_1424600:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
      ret   # return thru stack
-    jmp _L_1424597
-_L_1424596:
+    jmp _L_1432416
+_L_1432415:
 # emit-tail-expr
 # si=-24
 # env=((f195994 . -20) (f195993 . -16) (f195994 . -12) (f195993 . -8) (#f . 16) ((begin) . 12) ((not (primitive-ref for-each)) . 8) (if . 4))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_1424597:
+_L_1432416:
     .align 4,0x90
-_L_1424594:
+_L_1432413:
      movl %eax, mrc_for$meach
 # == explicit-begins  ==>
 # (let ((p (make-vector 6)) (sz 1024)) (begin (vector-set! p 0 (quote output-port)) (vector-set! p 1 "/dev/stdout") (vector-set! p 2 1) (vector-set! p 3 (make-string sz)) (vector-set! p 4 0) (vector-set! p 5 sz) p))
@@ -16399,24 +16399,24 @@ _L_1424594:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424601"
+    je "_L_1432420"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424601:
+_L_1432420:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424602
+    jge _L_1432421
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424602:
+_L_1432421:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -16444,14 +16444,14 @@ _L_1424602:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424603
+    je _L_1432422
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424603:
+_L_1432422:
     movl %eax, -8(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -16459,28 +16459,28 @@ _L_1424603:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424604"
+    je "_L_1432423"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424604:
+_L_1432423:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424606
+    jle _L_1432425
     cmp  $0,%eax
-    jge _L_1424605
-_L_1424606:
+    jge _L_1432424
+_L_1432425:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424605:
+_L_1432424:
     movl %eax, -12(%esp)
 # emit-expr ((primitive-ref string->symbol) "output-port")
 # funcall
@@ -16494,23 +16494,23 @@ _L_1424605:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424607"
+    je "_L_1432426"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424607":
+"_L_1432426":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr "output-port"
 # string literal
-    jmp _L_1424609
+    jmp _L_1432428
     .align 8,0x90
-_L_1424608 :
+_L_1432427 :
     .int 44
     .ascii "output-port"
-_L_1424609:
-    movl $_L_1424608, %eax
+_L_1432428:
+    movl $_L_1432427, %eax
     orl $6, %eax
     mov %eax, -28(%esp)  # arg output-port
     movl -24(%esp), %edi   # load new closure to %edi
@@ -16537,14 +16537,14 @@ _L_1424609:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424610
+    je _L_1432429
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424610:
+_L_1432429:
     movl %eax, -8(%esp)
 # emit-expr 1
     movl $4, %eax     # immed 1
@@ -16552,38 +16552,38 @@ _L_1424610:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424611"
+    je "_L_1432430"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424611:
+_L_1432430:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424613
+    jle _L_1432432
     cmp  $0,%eax
-    jge _L_1424612
-_L_1424613:
+    jge _L_1432431
+_L_1432432:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424612:
+_L_1432431:
     movl %eax, -12(%esp)
 # emit-expr "/dev/stdout"
 # string literal
-    jmp _L_1424615
+    jmp _L_1432434
     .align 8,0x90
-_L_1424614 :
+_L_1432433 :
     .int 44
     .ascii "/dev/stdout"
-_L_1424615:
-    movl $_L_1424614, %eax
+_L_1432434:
+    movl $_L_1432433, %eax
     orl $6, %eax
     movl -8(%esp), %ebx
     movl -12(%esp), %esi
@@ -16603,14 +16603,14 @@ _L_1424615:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424616
+    je _L_1432435
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424616:
+_L_1432435:
     movl %eax, -8(%esp)
 # emit-expr 2
     movl $8, %eax     # immed 2
@@ -16618,28 +16618,28 @@ _L_1424616:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424617"
+    je "_L_1432436"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424617:
+_L_1432436:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424619
+    jle _L_1432438
     cmp  $0,%eax
-    jge _L_1424618
-_L_1424619:
+    jge _L_1432437
+_L_1432438:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424618:
+_L_1432437:
     movl %eax, -12(%esp)
 # emit-expr 1
     movl $4, %eax     # immed 1
@@ -16661,14 +16661,14 @@ _L_1424618:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424620
+    je _L_1432439
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424620:
+_L_1432439:
     movl %eax, -8(%esp)
 # emit-expr 3
     movl $12, %eax     # immed 3
@@ -16676,28 +16676,28 @@ _L_1424620:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424621"
+    je "_L_1432440"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424621:
+_L_1432440:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424623
+    jle _L_1432442
     cmp  $0,%eax
-    jge _L_1424622
-_L_1424623:
+    jge _L_1432441
+_L_1432442:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424622:
+_L_1432441:
     movl %eax, -12(%esp)
 # emit-expr (make-string f195995)
 # make-string len=f195995
@@ -16711,24 +16711,24 @@ _L_1424622:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424624"
+    je "_L_1432443"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $144,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424624:
+_L_1432443:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424625
+    jge _L_1432444
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $144,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424625:
+_L_1432444:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -16757,14 +16757,14 @@ _L_1424625:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424626
+    je _L_1432445
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424626:
+_L_1432445:
     movl %eax, -8(%esp)
 # emit-expr 4
     movl $16, %eax     # immed 4
@@ -16772,28 +16772,28 @@ _L_1424626:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424627"
+    je "_L_1432446"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424627:
+_L_1432446:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424629
+    jle _L_1432448
     cmp  $0,%eax
-    jge _L_1424628
-_L_1424629:
+    jge _L_1432447
+_L_1432448:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424628:
+_L_1432447:
     movl %eax, -12(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -16815,14 +16815,14 @@ _L_1424628:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424630
+    je _L_1432449
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424630:
+_L_1432449:
     movl %eax, -8(%esp)
 # emit-expr 5
     movl $20, %eax     # immed 5
@@ -16830,28 +16830,28 @@ _L_1424630:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424631"
+    je "_L_1432450"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424631:
+_L_1432450:
 # check bounds on vector index
     movl -8(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424633
+    jle _L_1432452
     cmp  $0,%eax
-    jge _L_1424632
-_L_1424633:
+    jge _L_1432451
+_L_1432452:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424632:
+_L_1432451:
     movl %eax, -12(%esp)
 # emit-expr f195995
 # emit-variable-ref
@@ -16912,7 +16912,7 @@ _L_1424632:
 # si = -4
 # env = ((f195997 . 0))
 # expr = (closure () (f195997) (let () f195997))
-    movl $_L_1424634, 0(%ebp)  # closure label
+    movl $_L_1432453, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f195997 . 0))
 # var=f195997
@@ -16922,17 +16922,17 @@ _L_1424632:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424635            # jump around closure body
-_L_1424634:
+    jmp _L_1432454            # jump around closure body
+_L_1432453:
 # check argument count
     cmp $0,%eax
-    je _L_1424636
+    je _L_1432455
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424636:
+_L_1432455:
 # emit-tail-expr
 # si=-8
 # env=((f195997 . 4) (f195997 . 0))
@@ -16955,7 +16955,7 @@ _L_1424636:
     ret
 # end emit-tail-variable ref
     .align 4,0x90
-_L_1424635:
+_L_1432454:
      movl %eax, mrc_current$moutput$mport
 # == explicit-begins  ==>
 # (lambda (p) (vector-ref p 2))
@@ -16982,21 +16982,21 @@ _L_1424635:
 # si = 0
 # env = ()
 # expr = (closure (f195998) () (let ((f195998 f195998)) (vector-ref f195998 2)))
-    movl $_L_1424637, 0(%ebp)  # closure label
+    movl $_L_1432456, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424638            # jump around closure body
-_L_1424637:
+    jmp _L_1432457            # jump around closure body
+_L_1432456:
 # check argument count
     cmp $4,%eax
-    je _L_1424639
+    je _L_1432458
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424639:
+_L_1432458:
 # emit-tail-expr
 # si=-12
 # env=((f195998 . -8))
@@ -17028,14 +17028,14 @@ _L_1424639:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424640
+    je _L_1432459
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424640:
+_L_1432459:
     movl %eax, -16(%esp)
 # emit-expr 2
     movl $8, %eax     # immed 2
@@ -17043,34 +17043,34 @@ _L_1424640:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424641"
+    je "_L_1432460"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424641:
+_L_1432460:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424643
+    jle _L_1432462
     cmp  $0,%eax
-    jge _L_1424642
-_L_1424643:
+    jge _L_1432461
+_L_1432462:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424642:
+_L_1432461:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
 #return from tail (vector-ref f195998 2)
     ret
     .align 4,0x90
-_L_1424638:
+_L_1432457:
      movl %eax, mrc_port$mfd
 # == explicit-begins  ==>
 # (lambda (p) (vector-ref p 3))
@@ -17097,21 +17097,21 @@ _L_1424638:
 # si = 0
 # env = ()
 # expr = (closure (f195999) () (let ((f195999 f195999)) (vector-ref f195999 3)))
-    movl $_L_1424644, 0(%ebp)  # closure label
+    movl $_L_1432463, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424645            # jump around closure body
-_L_1424644:
+    jmp _L_1432464            # jump around closure body
+_L_1432463:
 # check argument count
     cmp $4,%eax
-    je _L_1424646
+    je _L_1432465
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424646:
+_L_1432465:
 # emit-tail-expr
 # si=-12
 # env=((f195999 . -8))
@@ -17143,14 +17143,14 @@ _L_1424646:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424647
+    je _L_1432466
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424647:
+_L_1432466:
     movl %eax, -16(%esp)
 # emit-expr 3
     movl $12, %eax     # immed 3
@@ -17158,34 +17158,34 @@ _L_1424647:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424648"
+    je "_L_1432467"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424648:
+_L_1432467:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424650
+    jle _L_1432469
     cmp  $0,%eax
-    jge _L_1424649
-_L_1424650:
+    jge _L_1432468
+_L_1432469:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424649:
+_L_1432468:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
 #return from tail (vector-ref f195999 3)
     ret
     .align 4,0x90
-_L_1424645:
+_L_1432464:
      movl %eax, mrc_port$mbuf
 # == explicit-begins  ==>
 # (lambda (p) (vector-ref p 4))
@@ -17212,21 +17212,21 @@ _L_1424645:
 # si = 0
 # env = ()
 # expr = (closure (f196000) () (let ((f196000 f196000)) (vector-ref f196000 4)))
-    movl $_L_1424651, 0(%ebp)  # closure label
+    movl $_L_1432470, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424652            # jump around closure body
-_L_1424651:
+    jmp _L_1432471            # jump around closure body
+_L_1432470:
 # check argument count
     cmp $4,%eax
-    je _L_1424653
+    je _L_1432472
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424653:
+_L_1432472:
 # emit-tail-expr
 # si=-12
 # env=((f196000 . -8))
@@ -17258,14 +17258,14 @@ _L_1424653:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424654
+    je _L_1432473
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424654:
+_L_1432473:
     movl %eax, -16(%esp)
 # emit-expr 4
     movl $16, %eax     # immed 4
@@ -17273,34 +17273,34 @@ _L_1424654:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424655"
+    je "_L_1432474"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424655:
+_L_1432474:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424657
+    jle _L_1432476
     cmp  $0,%eax
-    jge _L_1424656
-_L_1424657:
+    jge _L_1432475
+_L_1432476:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424656:
+_L_1432475:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
 #return from tail (vector-ref f196000 4)
     ret
     .align 4,0x90
-_L_1424652:
+_L_1432471:
      movl %eax, mrc_port$mndx
 # == explicit-begins  ==>
 # (lambda (p) (vector-set! p 4 (fxadd1 (vector-ref p 4))))
@@ -17327,21 +17327,21 @@ _L_1424652:
 # si = 0
 # env = ()
 # expr = (closure (f196001) () (let ((f196001 f196001)) (vector-set! f196001 4 (fxadd1 (vector-ref f196001 4)))))
-    movl $_L_1424658, 0(%ebp)  # closure label
+    movl $_L_1432477, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424659            # jump around closure body
-_L_1424658:
+    jmp _L_1432478            # jump around closure body
+_L_1432477:
 # check argument count
     cmp $4,%eax
-    je _L_1424660
+    je _L_1432479
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424660:
+_L_1432479:
 # emit-tail-expr
 # si=-12
 # env=((f196001 . -8))
@@ -17373,14 +17373,14 @@ _L_1424660:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424661
+    je _L_1432480
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424661:
+_L_1432480:
     movl %eax, -16(%esp)
 # emit-expr 4
     movl $16, %eax     # immed 4
@@ -17388,28 +17388,28 @@ _L_1424661:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424662"
+    je "_L_1432481"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424662:
+_L_1432481:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424664
+    jle _L_1432483
     cmp  $0,%eax
-    jge _L_1424663
-_L_1424664:
+    jge _L_1432482
+_L_1432483:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424663:
+_L_1432482:
     movl %eax, -20(%esp)
 # emit-expr (fxadd1 (vector-ref f196001 4))
 # emit-expr (vector-ref f196001 4)
@@ -17423,14 +17423,14 @@ _L_1424663:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424665
+    je _L_1432484
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424665:
+_L_1432484:
     movl %eax, -24(%esp)
 # emit-expr 4
     movl $16, %eax     # immed 4
@@ -17438,42 +17438,42 @@ _L_1424665:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424666"
+    je "_L_1432485"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424666:
+_L_1432485:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424668
+    jle _L_1432487
     cmp  $0,%eax
-    jge _L_1424667
-_L_1424668:
+    jge _L_1432486
+_L_1432487:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424667:
+_L_1432486:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424669"
+    je "_L_1432488"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $48,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424669:
+_L_1432488:
      addl $4, %eax
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
@@ -17481,7 +17481,7 @@ _L_1424669:
 #return from tail (vector-set! f196001 4 (fxadd1 (vector-ref f196001 4)))
     ret
     .align 4,0x90
-_L_1424659:
+_L_1432478:
      movl %eax, mrc_port$mndx$madd1
 # == explicit-begins  ==>
 # (lambda (p) (vector-set! p 4 0))
@@ -17508,21 +17508,21 @@ _L_1424659:
 # si = 0
 # env = ()
 # expr = (closure (f196002) () (let ((f196002 f196002)) (vector-set! f196002 4 0)))
-    movl $_L_1424670, 0(%ebp)  # closure label
+    movl $_L_1432489, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424671            # jump around closure body
-_L_1424670:
+    jmp _L_1432490            # jump around closure body
+_L_1432489:
 # check argument count
     cmp $4,%eax
-    je _L_1424672
+    je _L_1432491
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424672:
+_L_1432491:
 # emit-tail-expr
 # si=-12
 # env=((f196002 . -8))
@@ -17554,14 +17554,14 @@ _L_1424672:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424673
+    je _L_1432492
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424673:
+_L_1432492:
     movl %eax, -16(%esp)
 # emit-expr 4
     movl $16, %eax     # immed 4
@@ -17569,28 +17569,28 @@ _L_1424673:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424674"
+    je "_L_1432493"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424674:
+_L_1432493:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424676
+    jle _L_1432495
     cmp  $0,%eax
-    jge _L_1424675
-_L_1424676:
+    jge _L_1432494
+_L_1432495:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424675:
+_L_1432494:
     movl %eax, -20(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -17600,7 +17600,7 @@ _L_1424675:
 #return from tail (vector-set! f196002 4 0)
     ret
     .align 4,0x90
-_L_1424671:
+_L_1432490:
      movl %eax, mrc_port$mndx$mreset
 # == explicit-begins  ==>
 # (lambda (p) (vector-ref p 5))
@@ -17627,21 +17627,21 @@ _L_1424671:
 # si = 0
 # env = ()
 # expr = (closure (f196003) () (let ((f196003 f196003)) (vector-ref f196003 5)))
-    movl $_L_1424677, 0(%ebp)  # closure label
+    movl $_L_1432496, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424678            # jump around closure body
-_L_1424677:
+    jmp _L_1432497            # jump around closure body
+_L_1432496:
 # check argument count
     cmp $4,%eax
-    je _L_1424679
+    je _L_1432498
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424679:
+_L_1432498:
 # emit-tail-expr
 # si=-12
 # env=((f196003 . -8))
@@ -17673,14 +17673,14 @@ _L_1424679:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424680
+    je _L_1432499
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424680:
+_L_1432499:
     movl %eax, -16(%esp)
 # emit-expr 5
     movl $20, %eax     # immed 5
@@ -17688,107 +17688,108 @@ _L_1424680:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424681"
+    je "_L_1432500"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424681:
+_L_1432500:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424683
+    jle _L_1432502
     cmp  $0,%eax
-    jge _L_1424682
-_L_1424683:
+    jge _L_1432501
+_L_1432502:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424682:
+_L_1432501:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
 #return from tail (vector-ref f196003 5)
     ret
     .align 4,0x90
-_L_1424678:
+_L_1432497:
      movl %eax, mrc_port$msize
 # == explicit-begins  ==>
-# (lambda (ch) (let ((p (current-output-port))) (begin (string-set! (port-buf p) (port-ndx p) ch) (port-ndx-add1 p))))
+# (lambda (ch) (let ((p (current-output-port))) (begin (when (fx= (port-ndx p) (port-size p)) (flush-output-port p)) (string-set! (port-buf p) (port-ndx p) ch) (port-ndx-add1 p))))
 # == eliminate-let*  ==>
-# (lambda (ch) (let ((p (current-output-port))) (begin (string-set! (port-buf p) (port-ndx p) ch) (port-ndx-add1 p))))
+# (lambda (ch) (let ((p (current-output-port))) (begin (when (fx= (port-ndx p) (port-size p)) (flush-output-port p)) (string-set! (port-buf p) (port-ndx p) ch) (port-ndx-add1 p))))
 # == uniquify-variables  ==>
-# (lambda (f196004) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006))))
+# (lambda (f196004) (let ((f196006 (current-output-port))) (begin (when (fx= (port-ndx f196006) (port-size f196006)) (flush-output-port f196006)) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006))))
 # == vectorize-letrec  ==>
-# (lambda (f196004) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006))))
+# (lambda (f196004) (let ((f196006 (current-output-port))) (begin (when (fx= (port-ndx f196006) (port-size f196006)) (flush-output-port f196006)) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006))))
 # == eliminate-set!  ==>
-# (lambda (f196004) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
+# (lambda (f196004) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (when (fx= (port-ndx f196006) (port-size f196006)) (flush-output-port f196006)) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
 # == close-free-variables  ==>
-# (closure (f196004) (port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
+# (closure (f196004) (when port-ndx port-size flush-output-port port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (when (fx= (port-ndx f196006) (port-size f196006)) (flush-output-port f196006)) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
 # == eliminate-quote  ==>
-# (closure (f196004) (port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
+# (closure (f196004) (when port-ndx port-size flush-output-port port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (when (fx= (port-ndx f196006) (port-size f196006)) (flush-output-port f196006)) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
 # == eliminate-when/unless  ==>
-# (closure (f196004) (port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
+# (closure (f196004) (if port-ndx (begin port-size flush-output-port port-buf port-ndx port-ndx-add1) #f) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (if (fx= (port-ndx f196006) (port-size f196006)) (begin (flush-output-port f196006)) #f) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
 # == eliminate-cond  ==>
-# (closure (f196004) (port-buf port-ndx port-ndx-add1) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
+# (closure (f196004) (if port-ndx (begin port-size flush-output-port port-buf port-ndx port-ndx-add1) #f) (let ((f196004 f196004)) (let ((f196006 (current-output-port))) (begin (if (fx= (port-ndx f196006) (port-size f196006)) (begin (flush-output-port f196006)) #f) (string-set! (port-buf f196006) (port-ndx f196006) f196004) (port-ndx-add1 f196006)))))
 # == external-symbols  ==>
-# (closure (f196004) ((primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
-# emit-expr (closure (f196004) ((primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
+# (closure (f196004) (if (primitive-ref port-ndx) (begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) #f) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
+# emit-expr (closure (f196004) (if (primitive-ref port-ndx) (begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) #f) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f196004) ((primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
-    movl $_L_1424684, 0(%ebp)  # closure label
-# WARNING: free var (primitive-ref port-buf) not defined in the environmnet
+# expr = (closure (f196004) (if (primitive-ref port-ndx) (begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) #f) (let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))))
+    movl $_L_1432503, 0(%ebp)  # closure label
+# WARNING: free var if not defined in the environmnet
 # WARNING: free var (primitive-ref port-ndx) not defined in the environmnet
-# WARNING: free var (primitive-ref port-ndx-add1) not defined in the environmnet
+# WARNING: free var (begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) not defined in the environmnet
+# WARNING: free var #f not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
-    add $16, %ebp     # bump ebp
-    jmp _L_1424685            # jump around closure body
-_L_1424684:
+    add $24, %ebp     # bump ebp
+    jmp _L_1432504            # jump around closure body
+_L_1432503:
 # check argument count
     cmp $4,%eax
-    je _L_1424686
+    je _L_1432505
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424686:
+_L_1432505:
 # emit-tail-expr
 # si=-12
-# env=((f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
-# expr=(let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))))
+# env=((f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# expr=(let ((f196004 f196004)) (let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))))
 # emit-tail-let
 #  si   = -12
-#  env  = ((f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#  env  = ((f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #  bindings = ((f196004 f196004))
-#  body = (let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))
+#  body = (let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))
 # emit-expr f196004
 # emit-variable-ref
-# env=((f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # var=f196004
     movl -8(%esp), %eax  # stack load f196004
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
-# expr=(let ((f196006 ((primitive-ref current-output-port)))) (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))
+# env=((f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# expr=(let ((f196006 ((primitive-ref current-output-port)))) (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#  env  = ((f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #  bindings = ((f196006 ((primitive-ref current-output-port))))
-#  body = (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
+#  body = (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
 # emit-expr ((primitive-ref current-output-port))
 # funcall
 #    si   =-16
-#    env  = ((f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#    env  = ((f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #    expr = (funcall (primitive-ref current-output-port))
 # emit-expr (primitive-ref current-output-port)
     .extern mrc_current$moutput$mport
@@ -17797,13 +17798,13 @@ _L_1424686:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424687"
+    je "_L_1432506"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424687":
+"_L_1432506":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
     movl -24(%esp), %edi   # load new closure to %edi
     add $-16, %esp   # adjust base
@@ -17814,15 +17815,167 @@ _L_1424686:
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# expr=(begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
+# tail-begin (begin (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f) (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
+#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# emit-expr (if (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006)) (begin ((primitive-ref flush-output-port) f196006)) #f)
+# emit-expr (fx= ((primitive-ref port-ndx) f196006) ((primitive-ref port-size) f196006))
+# emit-expr ((primitive-ref port-size) f196006)
+# funcall
+#    si   =-20
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+#    expr = (funcall (primitive-ref port-size) f196006)
+# emit-expr (primitive-ref port-size)
+    .extern mrc_port$msize
+    movl mrc_port$msize,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_1432509"
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_1432509":
+   movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
+# emit-expr f196006
+# emit-variable-ref
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# var=f196006
+    movl -16(%esp), %eax  # stack load f196006
+# end emit-variable-ref
+    mov %eax, -32(%esp)  # arg f196006
+    movl -28(%esp), %edi   # load new closure to %edi
+    add $-20, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $20, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_1432510"
+# error handler eh_fixnum
+    .extern mrc_eh$ufixnum
+    movl mrc_eh$ufixnum, %edi  # load handler
+    movl $4, %eax  # set arg count
+    movl $60,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+_L_1432510:
+    movl %eax, -20(%esp)
+# emit-expr ((primitive-ref port-ndx) f196006)
+# funcall
+#    si   =-24
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+#    expr = (funcall (primitive-ref port-ndx) f196006)
+# emit-expr (primitive-ref port-ndx)
+    .extern mrc_port$mndx
+    movl mrc_port$mndx,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_1432511"
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_1432511":
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr f196006
+# emit-variable-ref
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# var=f196006
+    movl -16(%esp), %eax  # stack load f196006
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg f196006
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# check the argument is a fixnum
+    movl %eax,%ebx
+    and $3, %bl
+    cmp $0, %bl
+    je "_L_1432512"
+# error handler eh_fixnum
+    .extern mrc_eh$ufixnum
+    movl mrc_eh$ufixnum, %edi  # load handler
+    movl $4, %eax  # set arg count
+    movl $60,-8(%esp)
+    jmp *-2(%edi)  # jump to the handler
+_L_1432512:
+    cmp -20(%esp), %eax
+    sete %al
+    movzbl %al, %eax
+    sal $6, %al
+    or $47, %al
+    cmp $47, %al
+    je _L_1432507
+# emit-expr (begin ((primitive-ref flush-output-port) f196006))
+# emit-begin
+#   expr=(begin ((primitive-ref flush-output-port) f196006))
+#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# emit-expr ((primitive-ref flush-output-port) f196006)
+# funcall
+#    si   =-20
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+#    expr = (funcall (primitive-ref flush-output-port) f196006)
+# emit-expr (primitive-ref flush-output-port)
+    .extern mrc_flush$moutput$mport
+    movl mrc_flush$moutput$mport,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_1432513"
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_1432513":
+   movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
+# emit-expr f196006
+# emit-variable-ref
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+# var=f196006
+    movl -16(%esp), %eax  # stack load f196006
+# end emit-variable-ref
+    mov %eax, -32(%esp)  # arg f196006
+    movl -28(%esp), %edi   # load new closure to %edi
+    add $-20, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $20, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-expr (begin)
+# emit-begin
+#   expr=(begin)
+#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
+    jmp _L_1432508
+_L_1432507:
+# emit-expr #f
+    movl $47, %eax     # immed #f
+_L_1432508:
+# emit-tail-expr
+# si=-20
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # expr=(begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
 # tail-begin (begin (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004) ((primitive-ref port-ndx-add1) f196006))
-#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # emit-expr (string-set! ((primitive-ref port-buf) f196006) ((primitive-ref port-ndx) f196006) f196004)
 # emit-expr ((primitive-ref port-buf) f196006)
 # funcall
 #    si   =-20
-#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #    expr = (funcall (primitive-ref port-buf) f196006)
 # emit-expr (primitive-ref port-buf)
     .extern mrc_port$mbuf
@@ -17831,17 +17984,17 @@ _L_1424686:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424688"
+    je "_L_1432514"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424688":
+"_L_1432514":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196006
 # emit-variable-ref
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # var=f196006
     movl -16(%esp), %eax  # stack load f196006
 # end emit-variable-ref
@@ -17856,19 +18009,19 @@ _L_1424686:
     movl %eax,%ebx
     and $7, %bl
     cmp $6, %bl
-    je _L_1424689
+    je _L_1432515
 # invoke error handler eh_string
     .extern mrc_eh$ustring
     movl mrc_eh$ustring, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424689:
+_L_1432515:
     movl %eax, -20(%esp)
 # emit-expr ((primitive-ref port-ndx) f196006)
 # funcall
 #    si   =-20
-#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #    expr = (funcall (primitive-ref port-ndx) f196006)
 # emit-expr (primitive-ref port-ndx)
     .extern mrc_port$mndx
@@ -17877,17 +18030,17 @@ _L_1424689:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424690"
+    je "_L_1432516"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424690":
+"_L_1432516":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196006
 # emit-variable-ref
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # var=f196006
     movl -16(%esp), %eax  # stack load f196006
 # end emit-variable-ref
@@ -17902,32 +18055,32 @@ _L_1424689:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424691"
+    je "_L_1432517"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424691:
+_L_1432517:
 # check bounds on string index
     movl -20(%esp), %ebx
     cmp  %eax,-6(%ebx) 
-    jle _L_1424693
+    jle _L_1432519
     cmp  $0,%eax
-    jge _L_1424692
-_L_1424693:
+    jge _L_1432518
+_L_1432519:
 # invoke error handler eh_string_index
     .extern mrc_eh$ustring$uindex
     movl mrc_eh$ustring$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424692:
+_L_1432518:
     movl %eax, -24(%esp)
 # emit-expr f196004
 # emit-variable-ref
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # var=f196004
     movl -12(%esp), %eax  # stack load f196004
 # end emit-variable-ref
@@ -17935,31 +18088,31 @@ _L_1424692:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_1424694"
+    je "_L_1432520"
 # invoke error handler eh_character
     .extern mrc_eh$ucharacter
     movl mrc_eh$ucharacter, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $160,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424694:
+_L_1432520:
     movl -20(%esp), %ebx
     movl -24(%esp), %esi
     sar $2, %esi
     movb  %ah, -2(%ebx,%esi)
 # emit-tail-expr
 # si=-20
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # expr=(begin ((primitive-ref port-ndx-add1) f196006))
 # tail-begin (begin ((primitive-ref port-ndx-add1) f196006))
-#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#   env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # emit-tail-expr
 # si=-20
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # expr=((primitive-ref port-ndx-add1) f196006)
 # emit-tail-funcall
 #    si   =-20
-#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+#    env  = ((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 #    expr = (funcall (primitive-ref port-ndx-add1) f196006)
 # emit-expr (primitive-ref port-ndx-add1)
     .extern mrc_port$mndx$madd1
@@ -17967,7 +18120,7 @@ _L_1424694:
    movl %eax,  -20(%esp)  # stash funcall-oper in next closure slot
 # emit-expr f196006
 # emit-variable-ref
-# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) ((primitive-ref port-ndx-add1) . 12) ((primitive-ref port-ndx) . 8) ((primitive-ref port-buf) . 4))
+# env=((f196006 . -16) (f196004 . -12) (f196004 . -8) (#f . 16) ((begin (primitive-ref port-size) (primitive-ref flush-output-port) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-add1)) . 12) ((primitive-ref port-ndx) . 8) (if . 4))
 # var=f196006
     movl -16(%esp), %eax  # stack load f196006
 # end emit-variable-ref
@@ -17984,7 +18137,7 @@ _L_1424694:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424685:
+_L_1432504:
      movl %eax, mrc_write$mchar
 # == explicit-begins  ==>
 # (lambda args (let ((p (if (null? args) (current-output-port) (car args)))) (begin (foreign-call "s_write" (port-fd p) (port-buf p) (port-ndx p)) (port-ndx-reset p))))
@@ -18011,7 +18164,7 @@ _L_1424685:
 # si = 0
 # env = ()
 # expr = (closure f196007 ((primitive-ref port-fd) (primitive-ref port-buf) (primitive-ref port-ndx) (primitive-ref port-ndx-reset)) (let () (let ((f196009 (if (null? f196007) ((primitive-ref current-output-port)) (car f196007)))) (begin (foreign-call "s_write" ((primitive-ref port-fd) f196009) ((primitive-ref port-buf) f196009) ((primitive-ref port-ndx) f196009)) ((primitive-ref port-ndx-reset) f196009)))))
-    movl $_L_1424695, 0(%ebp)  # closure label
+    movl $_L_1432521, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref port-fd) not defined in the environmnet
 # WARNING: free var (primitive-ref port-buf) not defined in the environmnet
 # WARNING: free var (primitive-ref port-ndx) not defined in the environmnet
@@ -18019,25 +18172,25 @@ _L_1424685:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_1424696            # jump around closure body
-_L_1424695:
+    jmp _L_1432522            # jump around closure body
+_L_1432521:
 # check argument count
     cmp $0,%eax
-    jge _L_1424697
+    jge _L_1432523
 # invoke error handler eh_argcount_min
     .extern mrc_eh$uargcount$umin
     movl mrc_eh$uargcount$umin, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424697:
+_L_1432523:
 # emit-build-varargs-list
     movl $63, %esi       # args <- () 
     lea -4(%esp),%edi    # edi <- esp-4
     subl %eax, %edi      # edi <- esp-4-eax    addr of arg[K+N] on stack
-_L_1424699:
+_L_1432525:
     lea -4(%esp),%ebx    # addr of arg[K] on stack
     cmp %edi, %ebx       # while edi <> esp+(si+4)
-    je _L_1424698
+    je _L_1432524
     movl (%edi),%ebx     # arg i -> car
     movl %ebx, 0(%ebp)
     movl %esi, 4(%ebp)  # esi -> cdr
@@ -18045,8 +18198,8 @@ _L_1424699:
     addl $1, %esi       # tag as pair
     addl $8,%ebp         # bump heap ptr
     addl $4,%edi         # move to next previous arg from the end
-    jmp _L_1424699
-_L_1424698:
+    jmp _L_1432525
+_L_1432524:
     movl %esi, -8(%esp)  # set args
 # emit-tail-expr
 # si=-12
@@ -18081,7 +18234,7 @@ _L_1424698:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424700
+    je _L_1432526
 # emit-expr ((primitive-ref current-output-port))
 # funcall
 #    si   =-12
@@ -18094,13 +18247,13 @@ _L_1424698:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424702"
+    je "_L_1432528"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424702":
+"_L_1432528":
    movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
     movl -20(%esp), %edi   # load new closure to %edi
     add $-12, %esp   # adjust base
@@ -18108,8 +18261,8 @@ _L_1424698:
     call *-2(%edi)        # call thru closure ptr
     add $12, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    jmp _L_1424701
-_L_1424700:
+    jmp _L_1432527
+_L_1432526:
 # emit-expr (car f196007)
 # emit-expr f196007
 # emit-variable-ref
@@ -18121,16 +18274,16 @@ _L_1424700:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424703
+    je _L_1432529
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424703:
+_L_1432529:
     movl -1(%eax), %eax
-_L_1424701:
+_L_1432527:
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
@@ -18153,13 +18306,13 @@ _L_1424701:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424704"
+    je "_L_1432530"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424704":
+"_L_1432530":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196009
 # emit-variable-ref
@@ -18187,13 +18340,13 @@ _L_1424701:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424705"
+    je "_L_1432531"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424705":
+"_L_1432531":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196009
 # emit-variable-ref
@@ -18221,13 +18374,13 @@ _L_1424701:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424706"
+    je "_L_1432532"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424706":
+"_L_1432532":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196009
 # emit-variable-ref
@@ -18296,7 +18449,7 @@ _L_1424701:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424696:
+_L_1432522:
      movl %eax, mrc_flush$moutput$mport
 # == explicit-begins  ==>
 # (lambda () (begin (flush-output-port) (foreign-call "s_exit")))
@@ -18323,22 +18476,22 @@ _L_1424696:
 # si = 0
 # env = ()
 # expr = (closure () ((primitive-ref flush-output-port)) (let () (begin ((primitive-ref flush-output-port)) (foreign-call "s_exit"))))
-    movl $_L_1424707, 0(%ebp)  # closure label
+    movl $_L_1432533, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref flush-output-port) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424708            # jump around closure body
-_L_1424707:
+    jmp _L_1432534            # jump around closure body
+_L_1432533:
 # check argument count
     cmp $0,%eax
-    je _L_1424709
+    je _L_1432535
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424709:
+_L_1432535:
 # emit-tail-expr
 # si=-8
 # env=(((primitive-ref flush-output-port) . 4))
@@ -18366,13 +18519,13 @@ _L_1424709:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424710"
+    je "_L_1432536"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424710":
+"_L_1432536":
    movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
     movl -16(%esp), %edi   # load new closure to %edi
     add $-8, %esp   # adjust base
@@ -18405,7 +18558,7 @@ _L_1424709:
      ret
      ret   # return thru stack
     .align 4,0x90
-_L_1424708:
+_L_1432534:
      movl %eax, mrc_exit
 # == explicit-begins  ==>
 # (lambda (x) (if (vector? x) (if (fx= 6 (vector-length? x)) (symbol=? (vector-ref x 0) (quote output-port)) #f) #f))
@@ -18432,24 +18585,24 @@ _L_1424708:
 # si = 0
 # env = ()
 # expr = (closure (f196010) (vector-length? symbol=? output-port) (let ((f196010 f196010)) (if (vector? f196010) (if (fx= 6 (vector-length? f196010)) (symbol=? (vector-ref f196010 0) ((primitive-ref string->symbol) "output-port")) #f) #f)))
-    movl $_L_1424711, 0(%ebp)  # closure label
+    movl $_L_1432537, 0(%ebp)  # closure label
 # WARNING: free var vector-length? not defined in the environmnet
 # WARNING: free var symbol=? not defined in the environmnet
 # WARNING: free var output-port not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424712            # jump around closure body
-_L_1424711:
+    jmp _L_1432538            # jump around closure body
+_L_1432537:
 # check argument count
     cmp $4,%eax
-    je _L_1424713
+    je _L_1432539
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424713:
+_L_1432539:
 # emit-tail-expr
 # si=-12
 # env=((f196010 . -8) (output-port . 12) (symbol=? . 8) (vector-length? . 4))
@@ -18484,7 +18637,7 @@ _L_1424713:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424714
+    je _L_1432540
 # emit-tail-expr
 # si=-16
 # env=((f196010 . -12) (f196010 . -8) (output-port . 12) (symbol=? . 8) (vector-length? . 4))
@@ -18505,13 +18658,13 @@ _L_1424713:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424718"
+    je "_L_1432544"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424718":
+"_L_1432544":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196010
 # emit-variable-ref
@@ -18530,14 +18683,14 @@ _L_1424713:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424719"
+    je "_L_1432545"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424719:
+_L_1432545:
     movl %eax, -16(%esp)
 # emit-expr 6
     movl $24, %eax     # immed 6
@@ -18545,21 +18698,21 @@ _L_1424719:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424720"
+    je "_L_1432546"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $60,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424720:
+_L_1432546:
     cmp -16(%esp), %eax
     sete %al
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424716
+    je _L_1432542
 # emit-tail-expr
 # si=-16
 # env=((f196010 . -12) (f196010 . -8) (output-port . 12) (symbol=? . 8) (vector-length? . 4))
@@ -18586,14 +18739,14 @@ _L_1424720:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424721
+    je _L_1432547
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424721:
+_L_1432547:
     movl %eax, -20(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -18601,28 +18754,28 @@ _L_1424721:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424722"
+    je "_L_1432548"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424722:
+_L_1432548:
 # check bounds on vector index
     movl -20(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424724
+    jle _L_1432550
     cmp  $0,%eax
-    jge _L_1424723
-_L_1424724:
+    jge _L_1432549
+_L_1432550:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424723:
+_L_1432549:
     movl -20(%esp), %esi
     movl -1(%eax,%esi), %eax
     mov %eax, -20(%esp)    # arg (vector-ref f196010 0)
@@ -18638,23 +18791,23 @@ _L_1424723:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424725"
+    je "_L_1432551"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424725":
+"_L_1432551":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr "output-port"
 # string literal
-    jmp _L_1424727
+    jmp _L_1432553
     .align 8,0x90
-_L_1424726 :
+_L_1432552 :
     .int 44
     .ascii "output-port"
-_L_1424727:
-    movl $_L_1424726, %eax
+_L_1432553:
+    movl $_L_1432552, %eax
     orl $6, %eax
     mov %eax, -36(%esp)  # arg output-port
     movl -32(%esp), %edi   # load new closure to %edi
@@ -18677,26 +18830,26 @@ _L_1424727:
 # emit-shift-args:  size=0   si=-28  delta=12
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424717
-_L_1424716:
+    jmp _L_1432543
+_L_1432542:
 # emit-tail-expr
 # si=-16
 # env=((f196010 . -12) (f196010 . -8) (output-port . 12) (symbol=? . 8) (vector-length? . 4))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_1424717:
-    jmp _L_1424715
-_L_1424714:
+_L_1432543:
+    jmp _L_1432541
+_L_1432540:
 # emit-tail-expr
 # si=-16
 # env=((f196010 . -12) (f196010 . -8) (output-port . 12) (symbol=? . 8) (vector-length? . 4))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
-_L_1424715:
+_L_1432541:
     .align 4,0x90
-_L_1424712:
+_L_1432538:
      movl %eax, mrc_output$mport$q
 # == explicit-begins  ==>
 # (lambda (x) (error (quote open-output) "not yet implemented"))
@@ -18723,23 +18876,23 @@ _L_1424712:
 # si = 0
 # env = ()
 # expr = (closure (f196011) ((primitive-ref error) open-output) (let ((f196011 f196011)) ((primitive-ref error) ((primitive-ref string->symbol) "open-output") "not yet implemented")))
-    movl $_L_1424728, 0(%ebp)  # closure label
+    movl $_L_1432554, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref error) not defined in the environmnet
 # WARNING: free var open-output not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424729            # jump around closure body
-_L_1424728:
+    jmp _L_1432555            # jump around closure body
+_L_1432554:
 # check argument count
     cmp $4,%eax
-    je _L_1424730
+    je _L_1432556
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424730:
+_L_1432556:
 # emit-tail-expr
 # si=-12
 # env=((f196011 . -8) (open-output . 8) ((primitive-ref error) . 4))
@@ -18780,23 +18933,23 @@ _L_1424730:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424731"
+    je "_L_1432557"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424731":
+"_L_1432557":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr "open-output"
 # string literal
-    jmp _L_1424733
+    jmp _L_1432559
     .align 8,0x90
-_L_1424732 :
+_L_1432558 :
     .int 44
     .ascii "open-output"
-_L_1424733:
-    movl $_L_1424732, %eax
+_L_1432559:
+    movl $_L_1432558, %eax
     orl $6, %eax
     mov %eax, -32(%esp)  # arg open-output
     movl -28(%esp), %edi   # load new closure to %edi
@@ -18808,13 +18961,13 @@ _L_1424733:
     mov %eax, -20(%esp)    # arg ((primitive-ref string->symbol) open-output)
 # emit-expr "not yet implemented"
 # string literal
-    jmp _L_1424735
+    jmp _L_1432561
     .align 8,0x90
-_L_1424734 :
+_L_1432560 :
     .int 76
     .ascii "not yet implemented"
-_L_1424735:
-    movl $_L_1424734, %eax
+_L_1432561:
+    movl $_L_1432560, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg not yet implemented
     movl -16(%esp), %edi   # load new closure to %edi
@@ -18831,7 +18984,7 @@ _L_1424735:
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424729:
+_L_1432555:
      movl %eax, mrc_open$moutput$mfile
 # == explicit-begins  ==>
 # (lambda (p) (flush-output-port p))
@@ -18858,22 +19011,22 @@ _L_1424729:
 # si = 0
 # env = ()
 # expr = (closure (f196012) ((primitive-ref flush-output-port)) (let ((f196012 f196012)) ((primitive-ref flush-output-port) f196012)))
-    movl $_L_1424736, 0(%ebp)  # closure label
+    movl $_L_1432562, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref flush-output-port) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424737            # jump around closure body
-_L_1424736:
+    jmp _L_1432563            # jump around closure body
+_L_1432562:
 # check argument count
     cmp $4,%eax
-    je _L_1424738
+    je _L_1432564
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424738:
+_L_1432564:
 # emit-tail-expr
 # si=-12
 # env=((f196012 . -8) ((primitive-ref flush-output-port) . 4))
@@ -18920,7 +19073,7 @@ _L_1424738:
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424737:
+_L_1432563:
      movl %eax, mrc_close$moutput$mport
 # == explicit-begins  ==>
 # (letrec ((print-boolean (lambda (expr) (begin (write-char #\#) (if expr (write-char #\t) (write-char #\f))))) (print-null (lambda () (begin (write-char #\() (write-char #\))))) (print-char (lambda (expr) (begin (write-char #\#) (write-char #\\) (write-char expr)))) (print-fixnum (lambda (i) (if (negative? i) (begin (write-char #\-) (print-fixnum (fx* -1 i))) (map (lambda (x) (write-char (fixnum->char (fx+ (char->fixnum #\0) x)))) (integer->list i))))) (print-string (lambda (s) (begin (write-char #\") (for-each write-char (string->list s)) (write-char #\")))) (print-pair (lambda (pr) (begin (write-char #\() (print-pairs pr) (write-char #\))))) (print-pairs (lambda (pr) (begin (write (car pr)) (cond ((null? (cdr pr)) #t) ((pair? (cdr pr)) (begin (write-char #\space) (print-pairs (cdr pr)))) (else (begin (write-char #\space) (write-char #\.) (write-char #\space) (write (cdr pr))))))))) (lambda (expr) (cond ((boolean? expr) (print-boolean expr)) ((null? expr) (print-null)) ((char? expr) (print-char expr)) ((fixnum? expr) (print-fixnum expr)) ((string? expr) (print-string expr)) ((pair? expr) (print-pair expr)) (else (error (quote write) "unrecognized expression")))))
@@ -18956,24 +19109,24 @@ _L_1424737:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424739"
+    je "_L_1432565"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424739:
+_L_1432565:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424740
+    jge _L_1432566
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424740:
+_L_1432566:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -18991,24 +19144,24 @@ _L_1424740:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424741"
+    je "_L_1432567"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424741:
+_L_1432567:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424742
+    jge _L_1432568
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424742:
+_L_1432568:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19026,24 +19179,24 @@ _L_1424742:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424743"
+    je "_L_1432569"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424743:
+_L_1432569:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424744
+    jge _L_1432570
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424744:
+_L_1432570:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19061,24 +19214,24 @@ _L_1424744:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424745"
+    je "_L_1432571"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424745:
+_L_1432571:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424746
+    jge _L_1432572
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424746:
+_L_1432572:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19096,24 +19249,24 @@ _L_1424746:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424747"
+    je "_L_1432573"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424747:
+_L_1432573:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424748
+    jge _L_1432574
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424748:
+_L_1432574:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19131,24 +19284,24 @@ _L_1424748:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424749"
+    je "_L_1432575"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424749:
+_L_1432575:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424750
+    jge _L_1432576
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424750:
+_L_1432576:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19166,24 +19319,24 @@ _L_1424750:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424751"
+    je "_L_1432577"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424751:
+_L_1432577:
 # check the argument is a fixnum >= 0
     cmp $0,%eax
-    jge _L_1424752
+    jge _L_1432578
 # invoke error handler eh_length
     .extern mrc_eh$ulength
     movl mrc_eh$ulength, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $128,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424752:
+_L_1432578:
     movl %eax, %esi
     movl %eax, 0(%ebp)
     movl %ebp, %eax
@@ -19212,14 +19365,14 @@ _L_1424752:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424753
+    je _L_1432579
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424753:
+_L_1432579:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -19227,52 +19380,52 @@ _L_1424753:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424754"
+    je "_L_1432580"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424754:
+_L_1432580:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424756
+    jle _L_1432582
     cmp  $0,%eax
-    jge _L_1424755
-_L_1424756:
+    jge _L_1432581
+_L_1432582:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424755:
+_L_1432581:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196035) ((primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char)) (let ((f196035 f196035)) (begin ((primitive-ref write-char) #\#) (if f196035 ((primitive-ref write-char) #\t) ((primitive-ref write-char) #\f)))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196035) ((primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char)) (let ((f196035 f196035)) (begin ((primitive-ref write-char) #\#) (if f196035 ((primitive-ref write-char) #\t) ((primitive-ref write-char) #\f)))))
-    movl $_L_1424757, 0(%ebp)  # closure label
+    movl $_L_1432583, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424758            # jump around closure body
-_L_1424757:
+    jmp _L_1432584            # jump around closure body
+_L_1432583:
 # check argument count
     cmp $4,%eax
-    je _L_1424759
+    je _L_1432585
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424759:
+_L_1432585:
 # emit-tail-expr
 # si=-12
 # env=((f196035 . -8) ((primitive-ref write-char) . 12) ((primitive-ref write-char) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19307,13 +19460,13 @@ _L_1424759:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424760"
+    je "_L_1432586"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424760":
+"_L_1432586":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\#
     movl $8975, %eax     # immed #\#
@@ -19341,7 +19494,7 @@ _L_1424759:
     movl -12(%esp), %eax  # stack load f196035
 # end emit-variable-ref
     cmp $47, %al
-    je _L_1424761
+    je _L_1432587
 # emit-tail-expr
 # si=-16
 # env=((f196035 . -12) (f196035 . -8) ((primitive-ref write-char) . 12) ((primitive-ref write-char) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19367,8 +19520,8 @@ _L_1424759:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424762
-_L_1424761:
+    jmp _L_1432588
+_L_1432587:
 # emit-tail-expr
 # si=-16
 # env=((f196035 . -12) (f196035 . -8) ((primitive-ref write-char) . 12) ((primitive-ref write-char) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19394,10 +19547,10 @@ _L_1424761:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1424762:
+_L_1432588:
      ret   # return thru stack
     .align 4,0x90
-_L_1424758:
+_L_1432584:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -19416,14 +19569,14 @@ _L_1424758:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424763
+    je _L_1432589
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424763:
+_L_1432589:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -19431,51 +19584,51 @@ _L_1424763:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424764"
+    je "_L_1432590"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424764:
+_L_1432590:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424766
+    jle _L_1432592
     cmp  $0,%eax
-    jge _L_1424765
-_L_1424766:
+    jge _L_1432591
+_L_1432592:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424765:
+_L_1432591:
     movl %eax, -32(%esp)
 # emit-expr (closure () ((primitive-ref write-char) (primitive-ref write-char)) (let () (begin ((primitive-ref write-char) #\() ((primitive-ref write-char) #\)))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure () ((primitive-ref write-char) (primitive-ref write-char)) (let () (begin ((primitive-ref write-char) #\() ((primitive-ref write-char) #\)))))
-    movl $_L_1424767, 0(%ebp)  # closure label
+    movl $_L_1432593, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424768            # jump around closure body
-_L_1424767:
+    jmp _L_1432594            # jump around closure body
+_L_1432593:
 # check argument count
     cmp $0,%eax
-    je _L_1424769
+    je _L_1432595
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424769:
+_L_1432595:
 # emit-tail-expr
 # si=-8
 # env=(((primitive-ref write-char) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19503,13 +19656,13 @@ _L_1424769:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424770"
+    je "_L_1432596"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424770":
+"_L_1432596":
    movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\(
     movl $10255, %eax     # immed #\(
@@ -19553,7 +19706,7 @@ _L_1424769:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424768:
+_L_1432594:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -19572,14 +19725,14 @@ _L_1424768:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424771
+    je _L_1432597
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424771:
+_L_1432597:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -19587,52 +19740,52 @@ _L_1424771:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424772"
+    je "_L_1432598"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424772:
+_L_1432598:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424774
+    jle _L_1432600
     cmp  $0,%eax
-    jge _L_1424773
-_L_1424774:
+    jge _L_1432599
+_L_1432600:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424773:
+_L_1432599:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196034) ((primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char)) (let ((f196034 f196034)) (begin ((primitive-ref write-char) #\#) ((primitive-ref write-char) #\\) ((primitive-ref write-char) f196034))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196034) ((primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char)) (let ((f196034 f196034)) (begin ((primitive-ref write-char) #\#) ((primitive-ref write-char) #\\) ((primitive-ref write-char) f196034))))
-    movl $_L_1424775, 0(%ebp)  # closure label
+    movl $_L_1432601, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424776            # jump around closure body
-_L_1424775:
+    jmp _L_1432602            # jump around closure body
+_L_1432601:
 # check argument count
     cmp $4,%eax
-    je _L_1424777
+    je _L_1432603
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424777:
+_L_1432603:
 # emit-tail-expr
 # si=-12
 # env=((f196034 . -8) ((primitive-ref write-char) . 12) ((primitive-ref write-char) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19667,13 +19820,13 @@ _L_1424777:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424778"
+    je "_L_1432604"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424778":
+"_L_1432604":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\#
     movl $8975, %eax     # immed #\#
@@ -19702,13 +19855,13 @@ _L_1424777:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424779"
+    je "_L_1432605"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424779":
+"_L_1432605":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\\
     movl $23567, %eax     # immed #\\
@@ -19756,7 +19909,7 @@ _L_1424777:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424776:
+_L_1432602:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -19775,14 +19928,14 @@ _L_1424776:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424780
+    je _L_1432606
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424780:
+_L_1432606:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -19790,35 +19943,35 @@ _L_1424780:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424781"
+    je "_L_1432607"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424781:
+_L_1432607:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424783
+    jle _L_1432609
     cmp  $0,%eax
-    jge _L_1424782
-_L_1424783:
+    jge _L_1432608
+_L_1432609:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424782:
+_L_1432608:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196031) ((primitive-ref negative?) (primitive-ref write-char) f196016 (primitive-ref map) (primitive-ref write-char) (primitive-ref integer->list)) (let ((f196031 f196031)) (if ((primitive-ref negative?) f196031) (begin ((primitive-ref write-char) #\-) ((vector-ref f196016 0) (fx* -1 f196031))) ((primitive-ref map) (closure (f196033) ((primitive-ref write-char)) (let ((f196033 f196033)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f196033))))) ((primitive-ref integer->list) f196031)))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196031) ((primitive-ref negative?) (primitive-ref write-char) f196016 (primitive-ref map) (primitive-ref write-char) (primitive-ref integer->list)) (let ((f196031 f196031)) (if ((primitive-ref negative?) f196031) (begin ((primitive-ref write-char) #\-) ((vector-ref f196016 0) (fx* -1 f196031))) ((primitive-ref map) (closure (f196033) ((primitive-ref write-char)) (let ((f196033 f196033)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f196033))))) ((primitive-ref integer->list) f196031)))))
-    movl $_L_1424784, 0(%ebp)  # closure label
+    movl $_L_1432610, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref negative?) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # emit-variable-ref
@@ -19833,17 +19986,17 @@ _L_1424782:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $32, %ebp     # bump ebp
-    jmp _L_1424785            # jump around closure body
-_L_1424784:
+    jmp _L_1432611            # jump around closure body
+_L_1432610:
 # check argument count
     cmp $4,%eax
-    je _L_1424786
+    je _L_1432612
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424786:
+_L_1432612:
 # emit-tail-expr
 # si=-12
 # env=((f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19876,13 +20029,13 @@ _L_1424786:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424789"
+    je "_L_1432615"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424789":
+"_L_1432615":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196031
 # emit-variable-ref
@@ -19898,7 +20051,7 @@ _L_1424786:
     add $16, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     cmp $47, %al
-    je _L_1424787
+    je _L_1432613
 # emit-tail-expr
 # si=-16
 # env=((f196031 . -12) (f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -19917,13 +20070,13 @@ _L_1424786:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424790"
+    je "_L_1432616"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424790":
+"_L_1432616":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\-
     movl $11535, %eax     # immed #\-
@@ -19959,14 +20112,14 @@ _L_1424786:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424791
+    je _L_1432617
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424791:
+_L_1432617:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -19974,28 +20127,28 @@ _L_1424791:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424792"
+    je "_L_1432618"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424792:
+_L_1432618:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424794
+    jle _L_1432620
     cmp  $0,%eax
-    jge _L_1424793
-_L_1424794:
+    jge _L_1432619
+_L_1432620:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424793:
+_L_1432619:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -20010,14 +20163,14 @@ _L_1424793:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424795"
+    je "_L_1432621"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $88,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424795:
+_L_1432621:
     sar $2, %eax
     movl %eax, -20(%esp)
 # emit-expr -1
@@ -20026,14 +20179,14 @@ _L_1424795:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424796"
+    je "_L_1432622"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $88,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424796:
+_L_1432622:
     imul -20(%esp), %eax
     mov %eax, -20(%esp)    # arg (fx* -1 f196031)
     movl -16(%esp), %edi   # load new closure to %edi
@@ -20047,8 +20200,8 @@ _L_1424796:
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
-    jmp _L_1424788
-_L_1424787:
+    jmp _L_1432614
+_L_1432613:
 # emit-tail-expr
 # si=-16
 # env=((f196031 . -12) (f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20066,7 +20219,7 @@ _L_1424787:
 # si = -20
 # env = ((f196031 . -12) (f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196033) ((primitive-ref write-char)) (let ((f196033 f196033)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f196033)))))
-    movl $_L_1424797, 0(%ebp)  # closure label
+    movl $_L_1432623, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f196031 . -12) (f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # var=(primitive-ref write-char)
@@ -20076,17 +20229,17 @@ _L_1424787:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424798            # jump around closure body
-_L_1424797:
+    jmp _L_1432624            # jump around closure body
+_L_1432623:
 # check argument count
     cmp $4,%eax
-    je _L_1424799
+    je _L_1432625
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424799:
+_L_1432625:
 # emit-tail-expr
 # si=-12
 # env=((f196033 . -8) ((primitive-ref write-char) . 4) (f196031 . -12) (f196031 . -8) ((primitive-ref integer->list) . 24) ((primitive-ref write-char) . 20) ((primitive-ref map) . 16) (f196016 . 12) ((primitive-ref write-char) . 8) ((primitive-ref negative?) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20127,14 +20280,14 @@ _L_1424799:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424800"
+    je "_L_1432626"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424800:
+_L_1432626:
     movl %eax, -20(%esp)  # fx+ push arg1
 # emit-expr (char->fixnum #\0)
 # emit-expr #\0
@@ -20143,41 +20296,41 @@ _L_1424800:
     movl %eax,%ebx
     and $255, %bl
     cmp $15, %bl
-    je "_L_1424801"
+    je "_L_1432627"
 # invoke error handler eh_character
     .extern mrc_eh$ucharacter
     movl mrc_eh$ucharacter, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $4,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424801:
+_L_1432627:
    shrl $8, %eax
    shll $2, %eax
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424802"
+    je "_L_1432628"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $80,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424802:
+_L_1432628:
     addl -20(%esp), %eax  # fx+ arg1 arg2
 # check the argument is a fixnum
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424803"
+    je "_L_1432629"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $0,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424803:
+_L_1432629:
     shll $6, %eax
     orl $15, %eax
     mov %eax, -20(%esp)    # arg (fixnum->char (fx+ (char->fixnum 0) f196033))
@@ -20192,7 +20345,7 @@ _L_1424803:
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
-_L_1424798:
+_L_1432624:
     mov %eax, -20(%esp)    # arg (closure (f196033) ((primitive-ref write-char)) (let ((f196033 f196033)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum 0) f196033)))))
 # emit-expr ((primitive-ref integer->list) f196031)
 # funcall
@@ -20206,13 +20359,13 @@ _L_1424798:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424804"
+    je "_L_1432630"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424804":
+"_L_1432630":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196031
 # emit-variable-ref
@@ -20241,9 +20394,9 @@ _L_1424798:
 # emit-shift-args:  size=0   si=-28  delta=12
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1424788:
+_L_1432614:
     .align 4,0x90
-_L_1424785:
+_L_1432611:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -20262,14 +20415,14 @@ _L_1424785:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424805
+    je _L_1432631
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424805:
+_L_1432631:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -20277,35 +20430,35 @@ _L_1424805:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424806"
+    je "_L_1432632"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424806:
+_L_1432632:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424808
+    jle _L_1432634
     cmp  $0,%eax
-    jge _L_1424807
-_L_1424808:
+    jge _L_1432633
+_L_1432634:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424807:
+_L_1432633:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196030) ((primitive-ref write-char) (primitive-ref for-each) (primitive-ref write-char) (primitive-ref string->list) (primitive-ref write-char)) (let ((f196030 f196030)) (begin ((primitive-ref write-char) #\") ((primitive-ref for-each) (primitive-ref write-char) ((primitive-ref string->list) f196030)) ((primitive-ref write-char) #\"))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196030) ((primitive-ref write-char) (primitive-ref for-each) (primitive-ref write-char) (primitive-ref string->list) (primitive-ref write-char)) (let ((f196030 f196030)) (begin ((primitive-ref write-char) #\") ((primitive-ref for-each) (primitive-ref write-char) ((primitive-ref string->list) f196030)) ((primitive-ref write-char) #\"))))
-    movl $_L_1424809, 0(%ebp)  # closure label
+    movl $_L_1432635, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # WARNING: free var (primitive-ref for-each) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
@@ -20314,17 +20467,17 @@ _L_1424807:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $24, %ebp     # bump ebp
-    jmp _L_1424810            # jump around closure body
-_L_1424809:
+    jmp _L_1432636            # jump around closure body
+_L_1432635:
 # check argument count
     cmp $4,%eax
-    je _L_1424811
+    je _L_1432637
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424811:
+_L_1432637:
 # emit-tail-expr
 # si=-12
 # env=((f196030 . -8) ((primitive-ref write-char) . 20) ((primitive-ref string->list) . 16) ((primitive-ref write-char) . 12) ((primitive-ref for-each) . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20359,13 +20512,13 @@ _L_1424811:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424812"
+    je "_L_1432638"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424812":
+"_L_1432638":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\"
     movl $8719, %eax     # immed #\"
@@ -20394,13 +20547,13 @@ _L_1424811:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424813"
+    je "_L_1432639"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424813":
+"_L_1432639":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
@@ -20418,13 +20571,13 @@ _L_1424811:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424814"
+    je "_L_1432640"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424814":
+"_L_1432640":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196030
 # emit-variable-ref
@@ -20479,7 +20632,7 @@ _L_1424811:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424810:
+_L_1432636:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -20498,14 +20651,14 @@ _L_1424810:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424815
+    je _L_1432641
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424815:
+_L_1432641:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -20513,35 +20666,35 @@ _L_1424815:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424816"
+    je "_L_1432642"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424816:
+_L_1432642:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424818
+    jle _L_1432644
     cmp  $0,%eax
-    jge _L_1424817
-_L_1424818:
+    jge _L_1432643
+_L_1432644:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424817:
+_L_1432643:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196029) ((primitive-ref write-char) f196013 (primitive-ref write-char)) (let ((f196029 f196029)) (begin ((primitive-ref write-char) #\() ((vector-ref f196013 0) f196029) ((primitive-ref write-char) #\)))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196029) ((primitive-ref write-char) f196013 (primitive-ref write-char)) (let ((f196029 f196029)) (begin ((primitive-ref write-char) #\() ((vector-ref f196013 0) f196029) ((primitive-ref write-char) #\)))))
-    movl $_L_1424819, 0(%ebp)  # closure label
+    movl $_L_1432645, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # emit-variable-ref
 # env=((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20553,17 +20706,17 @@ _L_1424817:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $16, %ebp     # bump ebp
-    jmp _L_1424820            # jump around closure body
-_L_1424819:
+    jmp _L_1432646            # jump around closure body
+_L_1432645:
 # check argument count
     cmp $4,%eax
-    je _L_1424821
+    je _L_1432647
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424821:
+_L_1432647:
 # emit-tail-expr
 # si=-12
 # env=((f196029 . -8) ((primitive-ref write-char) . 12) (f196013 . 8) ((primitive-ref write-char) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20598,13 +20751,13 @@ _L_1424821:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424822"
+    je "_L_1432648"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424822":
+"_L_1432648":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\(
     movl $10255, %eax     # immed #\(
@@ -20637,14 +20790,14 @@ _L_1424821:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424823
+    je _L_1432649
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424823:
+_L_1432649:
     movl %eax, -24(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -20652,41 +20805,41 @@ _L_1424823:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424824"
+    je "_L_1432650"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424824:
+_L_1432650:
 # check bounds on vector index
     movl -24(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424826
+    jle _L_1432652
     cmp  $0,%eax
-    jge _L_1424825
-_L_1424826:
+    jge _L_1432651
+_L_1432652:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424825:
+_L_1432651:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424827"
+    je "_L_1432653"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424827":
+"_L_1432653":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr f196029
 # emit-variable-ref
@@ -20734,7 +20887,7 @@ _L_1424825:
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
     .align 4,0x90
-_L_1424820:
+_L_1432646:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -20753,14 +20906,14 @@ _L_1424820:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424828
+    je _L_1432654
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424828:
+_L_1432654:
     movl %eax, -28(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -20768,35 +20921,35 @@ _L_1424828:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424829"
+    je "_L_1432655"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424829:
+_L_1432655:
 # check bounds on vector index
     movl -28(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424831
+    jle _L_1432657
     cmp  $0,%eax
-    jge _L_1424830
-_L_1424831:
+    jge _L_1432656
+_L_1432657:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $136,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424830:
+_L_1432656:
     movl %eax, -32(%esp)
 # emit-expr (closure (f196028) ((primitive-ref write) (primitive-ref write-char) f196013 else (primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char) (primitive-ref write)) (let ((f196028 f196028)) (begin ((primitive-ref write) (car f196028)) (if (null? (cdr f196028)) #t (if (pair? (cdr f196028)) (begin ((primitive-ref write-char) #\space) ((vector-ref f196013 0) (cdr f196028))) (begin ((primitive-ref write-char) #\space) ((primitive-ref write-char) #\.) ((primitive-ref write-char) #\space) ((primitive-ref write) (cdr f196028))))))))
 # emit-closure
 # si = -36
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196028) ((primitive-ref write) (primitive-ref write-char) f196013 else (primitive-ref write-char) (primitive-ref write-char) (primitive-ref write-char) (primitive-ref write)) (let ((f196028 f196028)) (begin ((primitive-ref write) (car f196028)) (if (null? (cdr f196028)) #t (if (pair? (cdr f196028)) (begin ((primitive-ref write-char) #\space) ((vector-ref f196013 0) (cdr f196028))) (begin ((primitive-ref write-char) #\space) ((primitive-ref write-char) #\.) ((primitive-ref write-char) #\space) ((primitive-ref write) (cdr f196028))))))))
-    movl $_L_1424832, 0(%ebp)  # closure label
+    movl $_L_1432658, 0(%ebp)  # closure label
 # WARNING: free var (primitive-ref write) not defined in the environmnet
 # WARNING: free var (primitive-ref write-char) not defined in the environmnet
 # emit-variable-ref
@@ -20813,17 +20966,17 @@ _L_1424830:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $40, %ebp     # bump ebp
-    jmp _L_1424833            # jump around closure body
-_L_1424832:
+    jmp _L_1432659            # jump around closure body
+_L_1432658:
 # check argument count
     cmp $4,%eax
-    je _L_1424834
+    je _L_1432660
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424834:
+_L_1432660:
 # emit-tail-expr
 # si=-12
 # env=((f196028 . -8) ((primitive-ref write) . 32) ((primitive-ref write-char) . 28) ((primitive-ref write-char) . 24) ((primitive-ref write-char) . 20) (else . 16) (f196013 . 12) ((primitive-ref write-char) . 8) ((primitive-ref write) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20858,13 +21011,13 @@ _L_1424834:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424835"
+    je "_L_1432661"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424835":
+"_L_1432661":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr (car f196028)
 # emit-expr f196028
@@ -20877,14 +21030,14 @@ _L_1424834:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424836
+    je _L_1432662
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $108,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424836:
+_L_1432662:
     movl -1(%eax), %eax
     mov %eax, -28(%esp)  # arg (car f196028)
     movl -24(%esp), %edi   # load new closure to %edi
@@ -20915,14 +21068,14 @@ _L_1424836:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424839
+    je _L_1432665
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424839:
+_L_1432665:
     movl 3(%eax), %eax
     cmp $63, %eax
     mov $0, %eax
@@ -20931,15 +21084,15 @@ _L_1424839:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424837
+    je _L_1432663
 # emit-tail-expr
 # si=-16
 # env=((f196028 . -12) (f196028 . -8) ((primitive-ref write) . 32) ((primitive-ref write-char) . 28) ((primitive-ref write-char) . 24) ((primitive-ref write-char) . 20) (else . 16) (f196013 . 12) ((primitive-ref write-char) . 8) ((primitive-ref write) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
-    jmp _L_1424838
-_L_1424837:
+    jmp _L_1432664
+_L_1432663:
 # emit-tail-expr
 # si=-16
 # env=((f196028 . -12) (f196028 . -8) ((primitive-ref write) . 32) ((primitive-ref write-char) . 28) ((primitive-ref write-char) . 24) ((primitive-ref write-char) . 20) (else . 16) (f196013 . 12) ((primitive-ref write-char) . 8) ((primitive-ref write) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20956,14 +21109,14 @@ _L_1424837:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424842
+    je _L_1432668
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424842:
+_L_1432668:
     movl 3(%eax), %eax
     and $7, %al
     cmp $1, %al
@@ -20972,7 +21125,7 @@ _L_1424842:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424840
+    je _L_1432666
 # emit-tail-expr
 # si=-16
 # env=((f196028 . -12) (f196028 . -8) ((primitive-ref write) . 32) ((primitive-ref write-char) . 28) ((primitive-ref write-char) . 24) ((primitive-ref write-char) . 20) (else . 16) (f196013 . 12) ((primitive-ref write-char) . 8) ((primitive-ref write) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -20991,13 +21144,13 @@ _L_1424842:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424843"
+    je "_L_1432669"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424843":
+"_L_1432669":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
@@ -21033,14 +21186,14 @@ _L_1424842:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424844
+    je _L_1432670
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424844:
+_L_1432670:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21048,28 +21201,28 @@ _L_1424844:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424845"
+    je "_L_1432671"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424845:
+_L_1432671:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424847
+    jle _L_1432673
     cmp  $0,%eax
-    jge _L_1424846
-_L_1424847:
+    jge _L_1432672
+_L_1432673:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424846:
+_L_1432672:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21084,14 +21237,14 @@ _L_1424846:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424848
+    je _L_1432674
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424848:
+_L_1432674:
     movl 3(%eax), %eax
     mov %eax, -20(%esp)    # arg (cdr f196028)
     movl -16(%esp), %edi   # load new closure to %edi
@@ -21105,8 +21258,8 @@ _L_1424848:
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
-    jmp _L_1424841
-_L_1424840:
+    jmp _L_1432667
+_L_1432666:
 # emit-tail-expr
 # si=-16
 # env=((f196028 . -12) (f196028 . -8) ((primitive-ref write) . 32) ((primitive-ref write-char) . 28) ((primitive-ref write-char) . 24) ((primitive-ref write-char) . 20) (else . 16) (f196013 . 12) ((primitive-ref write-char) . 8) ((primitive-ref write) . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21125,13 +21278,13 @@ _L_1424840:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424849"
+    je "_L_1432675"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424849":
+"_L_1432675":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
@@ -21160,13 +21313,13 @@ _L_1424840:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424850"
+    je "_L_1432676"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424850":
+"_L_1432676":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\.
     movl $11791, %eax     # immed #\.
@@ -21195,13 +21348,13 @@ _L_1424840:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424851"
+    je "_L_1432677"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424851":
+"_L_1432677":
    movl %eax,  -24(%esp)  # stash funcall-oper in closure slot
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
@@ -21241,14 +21394,14 @@ _L_1424840:
     movl %eax,%ebx
     and $7, %bl
     cmp $1, %bl
-    je _L_1424852
+    je _L_1432678
 # invoke error handler eh_pair
     .extern mrc_eh$upair
     movl mrc_eh$upair, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $112,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424852:
+_L_1432678:
     movl 3(%eax), %eax
     mov %eax, -20(%esp)    # arg (cdr f196028)
     movl -16(%esp), %edi   # load new closure to %edi
@@ -21262,11 +21415,11 @@ _L_1424852:
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
      ret   # return thru stack
-_L_1424841:
-_L_1424838:
+_L_1432667:
+_L_1432664:
      ret   # return thru stack
     .align 4,0x90
-_L_1424833:
+_L_1432659:
     movl -28(%esp), %ebx
     movl -32(%esp), %esi
     movl %eax, -1(%ebx,%esi)
@@ -21283,7 +21436,7 @@ _L_1424833:
 # si = -28
 # env = ((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # expr = (closure (f196037) (f196019 f196018 f196017 f196016 f196015 f196014 else (primitive-ref error) (primitive-ref write)) (let ((f196037 f196037)) (if (boolean? f196037) ((vector-ref f196019 0) f196037) (if (null? f196037) ((vector-ref f196018 0)) (if (char? f196037) ((vector-ref f196017 0) f196037) (if (fixnum? f196037) ((vector-ref f196016 0) f196037) (if (string? f196037) ((vector-ref f196015 0) f196037) (if (pair? f196037) ((vector-ref f196014 0) f196037) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))
-    movl $_L_1424853, 0(%ebp)  # closure label
+    movl $_L_1432679, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
 # var=f196019
@@ -21326,17 +21479,17 @@ _L_1424833:
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $40, %ebp     # bump ebp
-    jmp _L_1424854            # jump around closure body
-_L_1424853:
+    jmp _L_1432680            # jump around closure body
+_L_1432679:
 # check argument count
     cmp $4,%eax
-    je _L_1424855
+    je _L_1432681
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424855:
+_L_1432681:
 # emit-tail-expr
 # si=-12
 # env=((f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21371,7 +21524,7 @@ _L_1424855:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424856
+    je _L_1432682
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21391,14 +21544,14 @@ _L_1424855:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424858
+    je _L_1432684
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424858:
+_L_1432684:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21406,28 +21559,28 @@ _L_1424858:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424859"
+    je "_L_1432685"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424859:
+_L_1432685:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424861
+    jle _L_1432687
     cmp  $0,%eax
-    jge _L_1424860
-_L_1424861:
+    jge _L_1432686
+_L_1432687:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424860:
+_L_1432686:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21448,8 +21601,8 @@ _L_1424860:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424857
-_L_1424856:
+    jmp _L_1432683
+_L_1432682:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21468,7 +21621,7 @@ _L_1424856:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424862
+    je _L_1432688
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21488,14 +21641,14 @@ _L_1424856:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424864
+    je _L_1432690
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424864:
+_L_1432690:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21503,28 +21656,28 @@ _L_1424864:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424865"
+    je "_L_1432691"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424865:
+_L_1432691:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424867
+    jle _L_1432693
     cmp  $0,%eax
-    jge _L_1424866
-_L_1424867:
+    jge _L_1432692
+_L_1432693:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424866:
+_L_1432692:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21535,8 +21688,8 @@ _L_1424866:
 # emit-shift-args:  size=0   si=-20  delta=12
     movl $0,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424863
-_L_1424862:
+    jmp _L_1432689
+_L_1432688:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21555,7 +21708,7 @@ _L_1424862:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424868
+    je _L_1432694
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21575,14 +21728,14 @@ _L_1424862:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424870
+    je _L_1432696
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424870:
+_L_1432696:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21590,28 +21743,28 @@ _L_1424870:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424871"
+    je "_L_1432697"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424871:
+_L_1432697:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424873
+    jle _L_1432699
     cmp  $0,%eax
-    jge _L_1424872
-_L_1424873:
+    jge _L_1432698
+_L_1432699:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424872:
+_L_1432698:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21632,8 +21785,8 @@ _L_1424872:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424869
-_L_1424868:
+    jmp _L_1432695
+_L_1432694:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21652,7 +21805,7 @@ _L_1424868:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424874
+    je _L_1432700
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21672,14 +21825,14 @@ _L_1424868:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424876
+    je _L_1432702
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424876:
+_L_1432702:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21687,28 +21840,28 @@ _L_1424876:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424877"
+    je "_L_1432703"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424877:
+_L_1432703:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424879
+    jle _L_1432705
     cmp  $0,%eax
-    jge _L_1424878
-_L_1424879:
+    jge _L_1432704
+_L_1432705:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424878:
+_L_1432704:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21729,8 +21882,8 @@ _L_1424878:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424875
-_L_1424874:
+    jmp _L_1432701
+_L_1432700:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21749,7 +21902,7 @@ _L_1424874:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424880
+    je _L_1432706
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21769,14 +21922,14 @@ _L_1424874:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424882
+    je _L_1432708
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424882:
+_L_1432708:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21784,28 +21937,28 @@ _L_1424882:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424883"
+    je "_L_1432709"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424883:
+_L_1432709:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424885
+    jle _L_1432711
     cmp  $0,%eax
-    jge _L_1424884
-_L_1424885:
+    jge _L_1432710
+_L_1432711:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424884:
+_L_1432710:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21826,8 +21979,8 @@ _L_1424884:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424881
-_L_1424880:
+    jmp _L_1432707
+_L_1432706:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21846,7 +21999,7 @@ _L_1424880:
     sal $6, %al
     or $47, %al
     cmp $47, %al
-    je _L_1424886
+    je _L_1432712
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21866,14 +22019,14 @@ _L_1424880:
     movl %eax,%ebx
     and $7, %bl
     cmp $5, %bl
-    je _L_1424888
+    je _L_1432714
 # invoke error handler eh_vector
     .extern mrc_eh$uvector
     movl mrc_eh$uvector, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424888:
+_L_1432714:
     movl %eax, -16(%esp)
 # emit-expr 0
     movl $0, %eax     # immed 0
@@ -21881,28 +22034,28 @@ _L_1424888:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424889"
+    je "_L_1432715"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424889:
+_L_1432715:
 # check bounds on vector index
     movl -16(%esp), %ebx
     cmp  %eax,-5(%ebx) 
-    jle _L_1424891
+    jle _L_1432717
     cmp  $0,%eax
-    jge _L_1424890
-_L_1424891:
+    jge _L_1432716
+_L_1432717:
 # invoke error handler eh_vector_index
     .extern mrc_eh$uvector$uindex
     movl mrc_eh$uvector$uindex,%edi   # load handler
     movl $4, %eax  # set arg count
     movl $140,-8(%esp)
     jmp *-2(%edi)  # jump to handler
-_L_1424890:
+_L_1432716:
     movl -16(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
@@ -21923,8 +22076,8 @@ _L_1424890:
 # emit-shift-args:  size=0   si=-24  delta=12
     movl $4,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-    jmp _L_1424887
-_L_1424886:
+    jmp _L_1432713
+_L_1432712:
 # emit-tail-expr
 # si=-16
 # env=((f196037 . -12) (f196037 . -8) ((primitive-ref write) . 36) ((primitive-ref error) . 32) (else . 28) (f196014 . 24) (f196015 . 20) (f196016 . 16) (f196017 . 12) (f196018 . 8) (f196019 . 4) (f196013 . -24) (f196014 . -20) (f196015 . -16) (f196016 . -12) (f196017 . -8) (f196018 . -4) (f196019 . 0))
@@ -21949,23 +22102,23 @@ _L_1424886:
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_1424892"
+    je "_L_1432718"
 # invoke error handler funcall_non_procedure
     .extern mrc_eh$uprocedure
     movl mrc_eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_1424892":
+"_L_1432718":
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr "write"
 # string literal
-    jmp _L_1424894
+    jmp _L_1432720
     .align 8,0x90
-_L_1424893 :
+_L_1432719 :
     .int 20
     .ascii "write"
-_L_1424894:
-    movl $_L_1424893, %eax
+_L_1432720:
+    movl $_L_1432719, %eax
     orl $6, %eax
     mov %eax, -32(%esp)  # arg write
     movl -28(%esp), %edi   # load new closure to %edi
@@ -21977,13 +22130,13 @@ _L_1424894:
     mov %eax, -20(%esp)    # arg ((primitive-ref string->symbol) write)
 # emit-expr "unrecognized expression"
 # string literal
-    jmp _L_1424896
+    jmp _L_1432722
     .align 8,0x90
-_L_1424895 :
+_L_1432721 :
     .int 92
     .ascii "unrecognized expression"
-_L_1424896:
-    movl $_L_1424895, %eax
+_L_1432722:
+    movl $_L_1432721, %eax
     orl $6, %eax
     mov %eax, -24(%esp)    # arg unrecognized expression
     movl -16(%esp), %edi   # load new closure to %edi
@@ -21999,14 +22152,14 @@ _L_1424896:
 # emit-shift-args:  size=0   si=-28  delta=12
     movl $8,%eax   # save arg count
     jmp *-2(%edi)  # tail-funcall
-_L_1424887:
-_L_1424881:
-_L_1424875:
-_L_1424869:
-_L_1424863:
-_L_1424857:
+_L_1432713:
+_L_1432707:
+_L_1432701:
+_L_1432695:
+_L_1432689:
+_L_1432683:
     .align 4,0x90
-_L_1424854:
+_L_1432680:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
@@ -22037,21 +22190,21 @@ _L_1424854:
 # si = 0
 # env = ()
 # expr = (closure (f196038) () (let ((f196038 f196038)) (fixnum->char f196038)))
-    movl $_L_1424897, 0(%ebp)  # closure label
+    movl $_L_1432723, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
-    jmp _L_1424898            # jump around closure body
-_L_1424897:
+    jmp _L_1432724            # jump around closure body
+_L_1432723:
 # check argument count
     cmp $4,%eax
-    je _L_1424899
+    je _L_1432725
 # invoke error handler eh_argcount
     .extern mrc_eh$uargcount
     movl mrc_eh$uargcount, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to handler
-_L_1424899:
+_L_1432725:
 # emit-tail-expr
 # si=-12
 # env=((f196038 . -8))
@@ -22083,20 +22236,20 @@ _L_1424899:
     movl %eax,%ebx
     and $3, %bl
     cmp $0, %bl
-    je "_L_1424900"
+    je "_L_1432726"
 # error handler eh_fixnum
     .extern mrc_eh$ufixnum
     movl mrc_eh$ufixnum, %edi  # load handler
     movl $4, %eax  # set arg count
     movl $0,-8(%esp)
     jmp *-2(%edi)  # jump to the handler
-_L_1424900:
+_L_1432726:
     shll $6, %eax
     orl $15, %eax
 #return from tail (fixnum->char f196038)
     ret
     .align 4,0x90
-_L_1424898:
+_L_1432724:
      movl %eax, mrc_integer$m$gchar
 # emit-expr (begin #t)
 # emit-begin

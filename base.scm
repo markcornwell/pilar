@@ -341,7 +341,7 @@
    (lambda (ch)
      (let ([p (current-output-port)])
        (begin
-	 ;; (when  (fx= (port-ndx p) (port-size p)) (flush-output-port p))
+	 (when  (fx= (port-ndx p) (port-size p)) (flush-output-port p))
 	 (string-set! (port-buf p) (port-ndx p) ch)
 	 (port-ndx-add1 p))))]
    
