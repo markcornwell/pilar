@@ -1017,8 +1017,12 @@
 ;;
 ;;----------------------------------------------------------------------------------
 
+;; (define (asmify s)
+;;   (list->string (asmify1 (string->list (symbol->string s)))))
+
 (define (asmify s)
-  (list->string (asmify1 (string->list (symbol->string s)))))
+  (string-append "mrc_" (list->string (asmify1 (string->list (symbol->string s))))))
+
 
 (define (asmify1 l)  ;;  TBD expand this list to all scheme specials chars 
     (cond
@@ -1084,6 +1088,7 @@
 	     primitives
 	     list-ref
 	     list-length
+	     reverse
 	     vector
 	     string
 	     standard-out
@@ -1100,6 +1105,14 @@
 	     write-char
 	     exit
 	     write
+	     integer->char
+	     string->list
+	     integer->list  ;; non standard
+	     negative?
+	     positive?
+	     zero?
+	     map
+	     for-each
 	     )
 
 (define-transform (external-symbols expr)

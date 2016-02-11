@@ -1,5 +1,6 @@
 (add-tests-with-string-output "remainder/modulo/quotient"
-  [#\tab => "#\\tab\n"]
+ ; [42 => "42\n"]			      
+ ; [#\tab => "#\\tab\n"]
   [(fxquotient 16 4) => "4\n"]
   [(fxquotient 5 2) => "2\n"]
   [(fxquotient -45 7) => "-6\n"]
@@ -71,6 +72,17 @@
   [(begin (write #\a)(exit)) => "#\\a"]
   [(begin (write #t)(exit)) => "#t"]
   [(begin (write '()) (exit)) => "()"]
+  [(integer->char 42) => "#\\*\n"]
+  [(string->list "mark") => "(#\\m #\\a #\\r #\\k)\n"]
+  [(reverse '(1 2 3)) => "(3 2 1)\n"]  
+  [(integer->list 42) => "(4 2)\n"]
+  [(reverse '(1 2 3)) => "(3 2 1)\n"]
+  [(begin (map write-char '(#\h #\e #\l #\l #\o)) (exit)) => "hello"]
+  [(begin (for-each write-char '(#\h #\e #\l #\l #\o)) (exit)) => "hello"]  
+  [(begin (write 42) (exit)) => "42"]
+  [(begin (write 314159) (exit)) => "314159"]
+  [(begin (write -314159) (exit)) => "-314159"]
+  [(begin (write 0) (exit)) => "0"]  
   [(begin
      (write '(1 2 3))
      (exit)) => "(1 2 3)"]

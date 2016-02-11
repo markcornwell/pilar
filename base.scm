@@ -93,7 +93,7 @@
   [append1
    (lambda (lst elt)
      (if (null? lst)
-	 (cons e nil)
+	 (cons elt nil)
 	 (cons (car lst) (append1 (cdr lst) elt))))]
 
   [list-ref
@@ -107,6 +107,14 @@
      (if (null? l)
 	 0
 	 (fxadd1 (list-length (cdr l)))))]
+
+  [reverse
+   (letrec ([f (lambda (l lrev)
+		 (if (null? l)
+		     lrev
+		     (f (cdr l) (cons (car l) lrev))))])
+     (lambda (l) (f l '())))]
+	 
 
 ;;----------------------------------------------------------------------------------
 ;;                                     Vectors
@@ -140,8 +148,28 @@
   		 (fill-string s (fxadd1 k) (cdr args)))))])	
      (lambda args
        (let ([s (make-string (list-length args))])
-  	   (fill-string s 0 args))))]
-  
+	 (fill-string s 0 args))))]
+
+  [string->list
+   (letrec
+       ([f (lambda (s i)
+	     (if (fx= i (string-length s))
+		 '()
+		 (cons (string-ref s i)
+		       (f s (fxadd1 i)))))])
+     (lambda (s) (f s 0)))]
+
+  [integer->list  ;; assume i>0
+   (letrec
+       ([f (lambda (i l)
+	     (cond
+	      [(fx< i 10) (cons i l)]
+	      [else
+	       (f (fxquotient i 10)
+		  (cons (fxremainder i 10) l))]))])
+     (lambda (i) (f i '())))]
+
+
 ;;----------------------------------------------------------------------------------
 ;;                         Handlers for Runtime Errors
 ;;----------------------------------------------------------------------------------
@@ -158,6 +186,8 @@
      (lambda (sym emsg)
        (write-errmsg sym emsg)
        (foreign-call "s_exit" 1)))]
+
+
 
   ;;--------------------------------------------------------------------------------------
   ;; auto enerated by (generate-primitives)  TBD: Automate incorporation of generated code
@@ -234,7 +264,35 @@
   [eh_vector_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
   [eh_string_index (lambda (i)   (error (list-ref (primitives) i)  "index out of bounds"))]
 
+;;----------------------------------------------------------------------------------------
+;;                                    Numerical Operations
+;;----------------------------------------------------------------------------------------
 
+  [zero? (lambda (z) (fxzero? z))]
+  [positive? (lambda (x) (fx> x 0))]
+  [negative? (lambda (x) (fx< x 0))]
+
+  ;;(odd? n)
+  ;;(even? n)
+
+;;----------------------------------------------------------------------------------------
+;;                                     Map and for-each
+;;----------------------------------------------------------------------------------------
+;;  (map proc list1 list2 ...)
+;;  (for-each proc list1 list2 ...)
+;;
+  
+  [map (lambda (f l)    ;; special case of map   TBD generalize to more arglists
+	  (if (null? l)
+	      (quote ())
+	      (cons (f (car l)) (map f (cdr l)))))]
+
+  [for-each (lambda (f l)   ;; generalize later
+	       (unless (null? l)
+		  (begin
+		    (f (car l))
+		    (for-each f (cdr l)))))]
+  
 ;;----------------------------------------------------------------------------------------
 ;;                                      Output Ports
 ;;----------------------------------------------------------------------------------------
@@ -309,7 +367,6 @@
 	      (symbol=? (vector-ref x 0) 'output-port)
 	      #f)
 	  #f))]
-
    
    [open-output-file
     (lambda (x)
@@ -321,25 +378,65 @@
 ;; TBD
       )]
 
-   [write           ;; <<---- WORK iN PROGRESS
-    (lambda (expr)
-      (cond     ;;  <<-- blow here.  Time to debug eliminate-cond.
-       [(boolean? expr)
-	(begin
-	  (write-char #\#)
-	  (if expr
-	      (write-char #\t)
-	      (write-char #\f)))]
-       [(null? expr)
-	(begin
-	  (write-char #\()
-	  (write-char #\)))]
-       [(char? expr)
-	(begin
-	  (write-char #\#)
-	  (write-char #\\)
-	  (write-char expr))]
-       [else (error 'write "unrecognized expression")]))])
+   [write  ;; <<-- Need to uniquity
+    (letrec
+   	([print-boolean
+   	  (lambda (expr)
+	    (begin
+	      (write-char #\#)
+	      (if expr (write-char #\t) (write-char #\f))))]
+   	 [print-null
+   	  (lambda ()
+   	    (begin (write-char #\() (write-char #\))))]
+   	 [print-char
+   	  (lambda (expr)
+   	    (begin (write-char #\#) (write-char #\\) (write-char expr)))]
+   	 [print-fixnum
+   	  (lambda (i)
+   	    (if (negative? i)
+   		(begin (write-char #\-) (print-fixnum (fx* -1 i)))
+   		(map (lambda (x)
+   			(write-char (fixnum->char (fx+ (char->fixnum #\0) x))))
+   		      (integer->list i))))]
+	 [print-string
+	  (lambda (s)
+	    (write-char #\")
+	    (for-each write-char (string->list s))
+	    (write-char #\"))]
+   	 [print-pair
+   	  (lambda (pr)
+   	    (begin
+   	      (write-char #\()
+   	      (print-pairs pr)
+   	      (write-char #\))))]
+   	 [print-pairs
+   	  (lambda (pr)
+   	    (write (car pr))
+   	    (cond
+   	     [(null? (cdr pr)) #t]
+   	     [(pair? (cdr pr))
+	      (begin
+		(write-char #\space)
+		(print-pairs (cdr pr)))]
+   	     [else
+   	      (begin
+   	 	(write-char #\space)
+   	 	(write-char #\.)
+   	 	(write-char #\space)
+		(write (cdr pr)))]))])
+	 
+	 (lambda (expr)
+	   (cond     ;;  <<-- blow here.  Time to debug eliminate-cond.
+	    [(boolean? expr) (print-boolean expr)]
+	    [(null? expr) (print-null)]
+	    [(char? expr) (print-char expr)]
+	    [(fixnum? expr) (print-fixnum expr)]
+	    [(string? expr) (print-string expr)]
+	    [(pair? expr) (print-pair expr)]
+	    [else (error 'write "unrecognized expression")] )))]
+
+   [integer->char
+    (lambda (i) (fixnum->char i))])
        
  (begin #t)) ; end labels
  
