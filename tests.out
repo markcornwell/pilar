@@ -1,79 +1,39 @@
 Petite Chez Scheme Version 8.4
 Copyright (c) 1985-2011 Cadence Research Systems
 
-> Performing string-set! errors tests ...
-test 0:(let ((t 1)) (and (begin (set! t (fxadd1 t)) t) t)) ... ok
-test 1:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
-test 2:(let ((f 12)) (let ((g (lambda () f))) (g))) ... ok
-test 3:(fx< 1 2) ... ok
-test 4:(let ((f (lambda (x y) (fx< x y)))) (f 10 10)) ... ok
-test 5:(fx< 10 10) ... ok
-test 6:(fx< 10 2) ... ok
-test 7:(fx<= 1 2) ... ok
-test 8:(fx<= 10 10) ... ok
-test 9:(fx<= 10 2) ... ok
-test 10:(let ((x 12)) (string-set! x 0 #\a)) ... ok
-test 11:(let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y)) ... ok
-test 12:(let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 8 y)) ... ok
-test 13:(let ((x (string #\a #\b #\c)) (y #\a)) (string-set! x 8 y)) ... ok
-test 14:(let ((x (string #\a #\b #\c))) (string-set! x 8 #\a)) ... ok
-test 15:(let ((x (string #\a #\b #\c)) (y #\a)) (string-set! x -1 y)) ... ok
-test 16:(let ((s (string #\a #\b #\c)) (i 1) (c #\X)) (string-set! s i c) s) ... ok
-test 17:(let ((s (string #\a #\b #\c)) (i 1)) (string-set! s i #\X) s) ... ok
-test 18:(let ((s (string #\a #\b #\c)) (i 1) (c (quote X))) (string-set! s i c) s) ... ok
-test 19:(let ((s (string #\a #\b #\c)) (i 1) (c #\X)) (string-set! s 1 c) s) ... ok
-test 20:(let ((s (string #\a #\b #\c)) (i 1)) (string-set! s 1 #\X) s) ... ok
-test 21:(let ((s (string #\a #\b #\c)) (i 1) (c (quote X))) (string-set! s 1 c) s) ... ok
-test 22:(let ((s (string #\a #\b #\c)) (i 3) (c #\X)) (string-set! s i c) s) ... ok
-test 23:(let ((s (string #\a #\b #\c)) (i 3)) (string-set! s i #\X) s) ... ok
-test 24:(let ((s (string #\a #\b #\c)) (i 3) (c (quote X))) (string-set! s i c) s) ... ok
-test 25:(let ((s (string #\a #\b #\c)) (i -10) (c #\X)) (string-set! s i c) s) ... ok
-test 26:(let ((s (string #\a #\b #\c)) (i -11)) (string-set! s i #\X) s) ... ok
-test 27:(let ((s (string #\a #\b #\c)) (i -1) (c (quote X))) (string-set! s i c) s) ... ok
-test 28:(let ((s (string #\a #\b #\c)) (i (quote foo)) (c #\X)) (string-set! s i c) s) ... ok
-test 29:(let ((s (string #\a #\b #\c)) (i (quote foo))) (string-set! s i #\X) s) ... ok
-test 30:(let ((s (string #\a #\b #\c)) (i (quote foo)) (c (quote X))) (string-set! s i c) s) ... ok
-test 31:(let ((s (quote (string #\a #\b #\c))) (i 1) (c #\X)) (string-set! s i c) s) ... ok
-test 32:(let ((s (quote (string #\a #\b #\c))) (i 1)) (string-set! s i #\X) s) ... ok
-test 33:(let ((s (quote (string #\a #\b #\c))) (i 1) (c (quote X))) (string-set! s i c) s) ... ok
-test 34:(let ((s (quote (string #\a #\b #\c))) (i 1) (c #\X)) (string-set! s 1 c) s) ... ok
-test 35:(let ((s (quote (string #\a #\b #\c))) (i 1)) (string-set! s 1 #\X) s) ... ok
-test 36:(let ((s (quote (string #\a #\b #\c))) (i 1) (c (quote X))) (string-set! s 1 c) s) ... ok
-test 37:(let ((s (quote (string #\a #\b #\c))) (i 3) (c #\X)) (string-set! s i c) s) ... ok
-test 38:(let ((s (quote (string #\a #\b #\c))) (i 3)) (string-set! s i #\X) s) ... ok
-test 39:(let ((s (quote (string #\a #\b #\c))) (i 3) (c (quote X))) (string-set! s i c) s) ... ok
-test 40:(let ((s (quote (string #\a #\b #\c))) (i -10) (c #\X)) (string-set! s i c) s) ... ok
-test 41:(let ((s (quote (string #\a #\b #\c))) (i -11)) (string-set! s i #\X) s) ... ok
-test 42:(let ((s (quote (string #\a #\b #\c))) (i -1) (c (quote X))) (string-set! s i c) s) ... ok
-test 43:(let ((s (quote (string #\a #\b #\c))) (i (quote foo)) (c #\X)) (string-set! s i c) s) ... ok
-test 44:(let ((s (quote (string #\a #\b #\c))) (i (quote foo))) (string-set! s i #\X) s) ... ok
-test 45:(let ((s (quote (string #\a #\b #\c))) (i (quote foo)) (c (quote X))) (string-set! s i c) s) ... ok
-Performing string errors tests ...
-test 46:(let ((f (lambda (a b c) (string a b c)))) (f #\a #\b #\c)) ... ok
-test 47:(let ((f (lambda (a b c) (string a b c)))) (f #\a 12 #\c)) ... ok
-test 48:(let ((f string)) (f #\a #\b #\c)) ... ok
-test 49:(let ((f string)) (f #\a #\b (quote x))) ... ok
-test 50:(string #\a #\b #\c) ... ok
-test 51:(string #\a #\b #t) ... ok
-Performing remainder/modulo/quotient tests ...
-test 52:#\tab ... ok
-test 53:(fxquotient 16 4) ... ok
-test 54:(fxquotient 5 2) ... ok
-test 55:(fxquotient -45 7) ... ok
-test 56:(fxquotient 10 -3) ... ok
-test 57:(fxquotient -17 -9) ... ok
-test 58:(fxremainder 16 4) ... ok
-test 59:(fxremainder 5 2) ... ok
-test 60:(fxremainder -45 7) ... ok
-test 61:(fxremainder 10 -3) ... ok
-test 62:(fxremainder -17 -9) ... ok
+> Performing remainder/modulo/quotient tests ...
+test 0:#\tab ... ok
+test 1:(fxquotient 16 4) ... ok
+test 2:(fxquotient 5 2) ... ok
+test 3:(fxquotient -45 7) ... ok
+test 4:(fxquotient 10 -3) ... ok
+test 5:(fxquotient -17 -9) ... ok
+test 6:(fxremainder 16 4) ... ok
+test 7:(fxremainder 5 2) ... ok
+test 8:(fxremainder -45 7) ... ok
+test 9:(fxremainder 10 -3) ... ok
+test 10:(fxremainder -17 -9) ... ok
 Performing write-char tests ...
-test 63:(begin (exit)) ... ok
-test 64:(begin (vector-ref (current-output-port) 0)) ... ok
-test 65:(begin (port-size (current-output-port))) ... ok
-test 66:(begin (port-ndx (current-output-port))) ... ok
-test 67:(begin (port-fd (current-output-port))) ... ok
-test 68:(begin (port-buf (current-output-port))) ... ok
-test 69:(begin (flush-output-port (current-output-port)) (exit)) ... ok
-test 70:(begin (write-char #\b) (exit)) ... ok
-test 71:(let ((p (current-output-port))) (write-char #\w) (port-ndx p)) ...> 
+test 11:(begin (exit)) ... ok
+test 12:(begin (vector-ref (current-output-port) 0)) ... ok
+test 13:(begin (port-size (current-output-port))) ... ok
+test 14:(begin (port-ndx (current-output-port))) ... ok
+test 15:(begin (port-fd (current-output-port))) ... ok
+test 16:(begin (flush-output-port (current-output-port)) (exit)) ... ok
+test 17:(begin (write-char #\b) (exit)) ... ok
+test 18:(eq? standard-out standard-out) ... ok
+test 19:(let ((p standard-out)) (port-ndx p)) ... ok
+test 20:(let ((p standard-out)) (port-ndx-add1 p) (port-ndx p)) ... ok
+test 21:(let ((p standard-out)) (write-char #\v) (port-ndx p)) ... ok
+test 22:(let ((p (current-output-port))) (write-char #\w) (port-ndx p)) ... ok
+test 23:(begin (current-output-port) (write-char #\w) (port-ndx (current-output-port))) ... ok
+test 24:(begin (write-char #\w) (port-ndx (current-output-port))) ... ok
+test 25:(begin (write-char #\a) (write-char #\b) (write-char #\c) (write-char #\newline) (flush-output-port (current-output-port)) (exit)) ... ok
+test 26:(begin (write-char #\a) (close-output-port (current-output-port)) (exit)) ... ok
+test 27:(begin (write-char #\H) (write-char #\e) (write-char #\l) (write-char #\l) (write-char #\o) (write-char #\space) (flush-output-port) (write-char #\W) (write-char #\o) (write-char #\r) (write-char #\l) (write-char #\d) (write-char #\!) (flush-output-port (current-output-port)) (exit)) ... ok
+Performing write/display tests ...
+test 28:(fx+ -536870911 -1) ... ok
+test 29:(begin (write #\a) (exit)) ... ok
+test 30:(begin (write #t) (exit)) ... ok
+test 31:(begin (write (quote ())) (exit)) ... ok
+test 32:(begin (write (quote (1 2 3))) (exit)) ...> 

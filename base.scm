@@ -259,17 +259,17 @@
 
   [standard-out
    (let ([p (make-vector 6)]
-	 [sz 10])           ;; We represent output ports by vector containing the following fields:
+	 [sz 1024])                     ;; We represent output ports by vector containing the following fields:
         (vector-set! p 0 'output-port)  ;; 0. A unique identifier to distinguish output ports from ordinary vectors
         (vector-set! p 1 "/dev/stdout") ;; 1. A string denoting the file name associated with the port.
         (vector-set! p 2 1)             ;; 2. A file-descriptor associated with the opened file.
         (vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
         (vector-set! p 4 0)             ;; 4. An index pointing to the next position in the buffer.
         (vector-set! p 5 sz)            ;; 5. The size of the buffer.      
-        (lambda () p))]
+        p)]
 
   [current-output-port
-   (let ([current-out (standard-out)])
+   (let ([current-out standard-out])
      (lambda () current-out))]
 
   [port-fd        (lambda (p) (vector-ref p 2))]
@@ -282,23 +282,65 @@
   [write-char 
    (lambda (ch)
      (let ([p (current-output-port)])
-       (when (fx= (port-ndx p) (port-size p))
-             (flush-output-port p))
-       (string-set! (port-buf p) (port-ndx p) ch)
-       (port-ndx-add1 p)))]
+       (begin
+	 ;; (when  (fx= (port-ndx p) (port-size p)) (flush-output-port p))
+	 (string-set! (port-buf p) (port-ndx p) ch)
+	 (port-ndx-add1 p))))]
    
-   [flush-output-port
-    (lambda (p)
-      (foreign-call "s_write" (port-fd p) (port-buf p) (port-ndx p))
-      (port-ndx-reset p))]
+   [flush-output-port  ;; TBD  add error checking
+    (lambda args
+      (let ([p (if (null? args)
+		   (current-output-port)
+		   (car args))])
+	(begin   ;; TBD investigate why this begin is needed.  early pass should have inserted it for us.
+	  (foreign-call "s_write" (port-fd p) (port-buf p) (port-ndx p))
+	  (port-ndx-reset p))))]
 
-   [exit (lambda () (foreign-call "s_exit"))]
+   [exit
+    (lambda ()
+      (begin
+        (flush-output-port) ;; should be flush all output ports  TBD
+	(foreign-call "s_exit")))]
  
-   [output-port?  (lambda (x) (error 'output-port? "not yet implemented"))]
-   [open-output-file (lambda (x) (error 'open-output "not yet implemented"))]
-   [close-output-port (lambda (x) (error 'close-output-port "not yet implemented"))])
+   [output-port?
+    (lambda (x)
+      (if (vector? x)
+	  (if (fx= 6 (vector-length? x))
+	      (symbol=? (vector-ref x 0) 'output-port)
+	      #f)
+	  #f))]
 
    
+   [open-output-file
+    (lambda (x)
+      (error 'open-output "not yet implemented"))]
+   
+   [close-output-port
+    (lambda (p)
+      (flush-output-port p)
+;; TBD
+      )]
+
+   [write           ;; <<---- WORK iN PROGRESS
+    (lambda (expr)
+      (cond     ;;  <<-- blow here.  Time to debug eliminate-cond.
+       [(boolean? expr)
+	(begin
+	  (write-char #\#)
+	  (if expr
+	      (write-char #\t)
+	      (write-char #\f)))]
+       [(null? expr)
+	(begin
+	  (write-char #\()
+	  (write-char #\)))]
+       [(char? expr)
+	(begin
+	  (write-char #\#)
+	  (write-char #\\)
+	  (write-char expr))]
+       [else (error 'write "unrecognized expression")]))])
+       
  (begin #t)) ; end labels
  
 

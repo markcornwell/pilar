@@ -22,23 +22,27 @@
 (add-tests-with-string-output "write-char"
   [(begin (exit)) => ""]
   [(begin (vector-ref (current-output-port) 0)) => "output-port\n"]
-  [(begin (port-size (current-output-port))) => "10\n"]
+  [(begin (port-size (current-output-port))) => "1024\n"]
   [(begin (port-ndx (current-output-port))) => "0\n"]
   [(begin (port-fd (current-output-port))) => "1\n"]
-  [(begin (port-buf (current-output-port))) => "\"\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]
+;  [(begin (port-buf (current-output-port))) => "\"\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]
   [(begin (flush-output-port (current-output-port)) (exit)) => ""]
-  [(begin (write-char #\b) (exit)) => ""]
-  [(let ([p (current-output-port)]) (write-char #\w) (port-ndx p)) => "1\n"]    ;;; <<---- error got "0\n"
+  [(begin (write-char #\b) (exit)) => "b"]
+  [(eq? standard-out standard-out) => "#t\n"]
+  [(let ((p standard-out)) (port-ndx p)) => "0\n"]
+  [(let ((p standard-out)) (port-ndx-add1 p) (port-ndx p)) => "1\n"]
+  [(let ((p standard-out)) (write-char #\v) (port-ndx p)) => "1\n"]
+  [(let ([p (current-output-port)]) (write-char #\w) (port-ndx p)) => "1\n"]
   [(begin (current-output-port) (write-char #\w) (port-ndx (current-output-port))) => "1\n"]  
   [(begin (write-char #\w) (port-ndx (current-output-port))) => "1\n"]
-  [(begin (write-char #\c) (port-buf (current-output-port))) => "\"c\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]  
+ ; [(begin (write-char #\c) (port-buf (current-output-port))) => "\"c\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\x0;\"\n"]  
   [(begin 
      (write-char #\a)
      (write-char #\b)
      (write-char #\c)
      (write-char #\newline)
     (flush-output-port (current-output-port))
-    (exit)) => "abc"]
+    (exit)) => "abc\n"]
   [(begin 
     (write-char #\a)
     (close-output-port (current-output-port))
@@ -64,10 +68,16 @@
 
 (add-tests-with-string-output "write/display"
   [(fx+ -536870911 -1) => "-536870912\n"]
+  [(begin (write #\a)(exit)) => "#\\a"]
+  [(begin (write #t)(exit)) => "#t"]
+  [(begin (write '()) (exit)) => "()"]
   [(begin
      (write '(1 2 3))
      (exit)) => "(1 2 3)"]
   [(begin
      (write '"Hello World!")
      (exit)) => "\"Hello World!\""]
+
+  ;; TBD -- add lots more tests
+  
 )

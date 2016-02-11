@@ -1,24 +1,24 @@
-# (let ((p (current-output-port))) (write-char #\w) (port-ndx p))
+# (begin (write (quote (1 2 3))) (exit))
 # == explicit-begins  ==>
-# (let ((p (current-output-port))) (begin (write-char #\w) (port-ndx p)))
+# (begin (write (quote (1 2 3))) (exit))
 # == eliminate-let*  ==>
-# (let ((p (current-output-port))) (begin (write-char #\w) (port-ndx p)))
+# (begin (write (quote (1 2 3))) (exit))
 # == uniquify-variables  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (quote (1 2 3))) (exit))
 # == vectorize-letrec  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (quote (1 2 3))) (exit))
 # == eliminate-set!  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (quote (1 2 3))) (exit))
 # == close-free-variables  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (quote (1 2 3))) (exit))
 # == eliminate-quote  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (cons 1 (cons 2 (cons 3 ())))) (exit))
 # == eliminate-when/unless  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (cons 1 (cons 2 (cons 3 ())))) (exit))
 # == eliminate-cond  ==>
-# (let ((f8604 (current-output-port))) (begin (write-char #\w) (port-ndx f8604)))
+# (begin (write (cons 1 (cons 2 (cons 3 ())))) (exit))
 # == external-symbols  ==>
-# (let ((f8604 ((primitive-ref current-output-port)))) (begin ((primitive-ref write-char) #\w) ((primitive-ref port-ndx) f8604)))
+# (begin ((primitive-ref write) (cons 1 (cons 2 (cons 3 ())))) ((primitive-ref exit)))
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -31,31 +31,98 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (let ((f8604 ((primitive-ref current-output-port)))) (begin ((primitive-ref write-char) #\w) ((primitive-ref port-ndx) f8604)))
-# emit-let
-#  si   = -8
-#  env  = ()
-#  bindings = ((f8604 ((primitive-ref current-output-port))))
-#  body = (begin ((primitive-ref write-char) #\w) ((primitive-ref port-ndx) f8604))
-# emit-expr ((primitive-ref current-output-port))
+# emit-expr (begin ((primitive-ref write) (cons 1 (cons 2 (cons 3 ())))) ((primitive-ref exit)))
+# emit-begin
+#   expr=(begin ((primitive-ref write) (cons 1 (cons 2 (cons 3 ())))) ((primitive-ref exit)))
+#   env=()
+# emit-expr ((primitive-ref write) (cons 1 (cons 2 (cons 3 ()))))
 # funcall
 #    si   =-8
 #    env  = ()
-#    expr = (funcall (primitive-ref current-output-port))
-# emit-expr (primitive-ref current-output-port)
-    .extern current$moutput$mport
-    movl current$moutput$mport,%eax
+#    expr = (funcall (primitive-ref write) (cons 1 (cons 2 (cons 3 ()))))
+# emit-expr (primitive-ref write)
+    .extern write
+    movl write,%eax
 # check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
     cmp $2, %bl
-    je "_L_71115"
+    je "_L_33427"
 # invoke error handler funcall_non_procedure
     .extern eh$uprocedure
     movl eh$uprocedure, %edi  # load handler
     movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-"_L_71115":
+"_L_33427":
+   movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
+# emit-expr (cons 1 (cons 2 (cons 3 ())))
+# cons arg1=1 arg2=(cons 2 (cons 3 ()))
+# emit-expr 1
+    movl $4, %eax     # immed 1
+    movl %eax, -20(%esp)
+# emit-expr (cons 2 (cons 3 ()))
+# cons arg1=2 arg2=(cons 3 ())
+# emit-expr 2
+    movl $8, %eax     # immed 2
+    movl %eax, -24(%esp)
+# emit-expr (cons 3 ())
+# cons arg1=3 arg2=()
+# emit-expr 3
+    movl $12, %eax     # immed 3
+    movl %eax, -28(%esp)
+# emit-expr ()
+    movl $63, %eax     # immed ()
+    movl %eax, 4(%ebp)
+    movl -28(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl %eax, 4(%ebp)
+    movl -24(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    movl %eax, 4(%ebp)
+    movl -20(%esp), %eax
+    movl %eax, 0(%ebp)
+    movl %ebp, %eax
+    or   $1, %al
+    add  $8, %ebp
+# cons end
+    mov %eax, -20(%esp)  # arg (cons 1 (cons 2 (cons 3 ())))
+    movl -16(%esp), %edi   # load new closure to %edi
+    add $-8, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $8, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-expr (begin ((primitive-ref exit)))
+# emit-begin
+#   expr=(begin ((primitive-ref exit)))
+#   env=()
+# emit-expr ((primitive-ref exit))
+# funcall
+#    si   =-8
+#    env  = ()
+#    expr = (funcall (primitive-ref exit))
+# emit-expr (primitive-ref exit)
+    .extern exit
+    movl exit,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je "_L_33428"
+# invoke error handler funcall_non_procedure
+    .extern eh$uprocedure
+    movl eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+"_L_33428":
    movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
     movl -16(%esp), %edi   # load new closure to %edi
     add $-8, %esp   # adjust base
@@ -63,81 +130,10 @@ base_init_callback:
     call *-2(%edi)        # call thru closure ptr
     add $8, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    movl %eax, -8(%esp)  # stack save
-# emit-expr (begin ((primitive-ref write-char) #\w) ((primitive-ref port-ndx) f8604))
-# emit-begin
-#   expr=(begin ((primitive-ref write-char) #\w) ((primitive-ref port-ndx) f8604))
-#   env=((f8604 . -8))
-# emit-expr ((primitive-ref write-char) #\w)
-# funcall
-#    si   =-12
-#    env  = ((f8604 . -8))
-#    expr = (funcall (primitive-ref write-char) #\w)
-# emit-expr (primitive-ref write-char)
-    .extern write$mchar
-    movl write$mchar,%eax
-# check the funcall op is a procedure
-    movl %eax,%ebx
-    and $7, %bl
-    cmp $2, %bl
-    je "_L_71116"
-# invoke error handler funcall_non_procedure
-    .extern eh$uprocedure
-    movl eh$uprocedure, %edi  # load handler
-    movl $0, %eax  # set arg count
-    jmp *-2(%edi)  # jump to the handler
-"_L_71116":
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-# emit-expr #\w
-    movl $30479, %eax     # immed #\w
-    mov %eax, -24(%esp)  # arg w
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp   # adjust base
-    movl $4,%eax   # save arg count
-    call *-2(%edi)        # call thru closure ptr
-    add $12, %esp   # adjust base
-    movl -4(%esp), %edi   # restore closure frame ptr
-# emit-expr (begin ((primitive-ref port-ndx) f8604))
-# emit-begin
-#   expr=(begin ((primitive-ref port-ndx) f8604))
-#   env=((f8604 . -8))
-# emit-expr ((primitive-ref port-ndx) f8604)
-# funcall
-#    si   =-12
-#    env  = ((f8604 . -8))
-#    expr = (funcall (primitive-ref port-ndx) f8604)
-# emit-expr (primitive-ref port-ndx)
-    .extern port$mndx
-    movl port$mndx,%eax
-# check the funcall op is a procedure
-    movl %eax,%ebx
-    and $7, %bl
-    cmp $2, %bl
-    je "_L_71117"
-# invoke error handler funcall_non_procedure
-    .extern eh$uprocedure
-    movl eh$uprocedure, %edi  # load handler
-    movl $0, %eax  # set arg count
-    jmp *-2(%edi)  # jump to the handler
-"_L_71117":
-   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
-# emit-expr f8604
-# emit-variable-ref
-# env=((f8604 . -8))
-# var=f8604
-    movl -8(%esp), %eax  # stack load f8604
-# end emit-variable-ref
-    mov %eax, -24(%esp)  # arg f8604
-    movl -20(%esp), %edi   # load new closure to %edi
-    add $-12, %esp   # adjust base
-    movl $4,%eax   # save arg count
-    call *-2(%edi)        # call thru closure ptr
-    add $12, %esp   # adjust base
-    movl -4(%esp), %edi   # restore closure frame ptr
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((f8604 . -8))
+#   env=()
     ret
     .text
     .align 16, 0x90

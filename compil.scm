@@ -164,8 +164,6 @@
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
 
-(load "tests/tests-3.3-req.scm")  ;; string-set! errors
-
 (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
@@ -271,6 +269,7 @@
   (memq x '( apply
 	     begin
 	     closure
+	     cond
 	     foreign-call
 	     if
 	     lambda
@@ -1096,8 +1095,11 @@
 	     port-ndx-add1
 	     port-ndx-reset
 	     flush-output-port
+	     close-output-port
+	     open-output-file
 	     write-char
 	     exit
+	     write
 	     )
 
 (define-transform (external-symbols expr)
