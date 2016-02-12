@@ -378,7 +378,22 @@
 ;; TBD
       )]
 
-   [write  ;; <<-- Need to uniquity
+   ;;---------------------------------------------------------------------------------------- 
+   ;; 3.20 Write and Display
+   ;;---------------------------------------------------------------------------------------- 
+   ;; Once write-char is implemented, implementing the procedures write and display becomes
+   ;; straightforward by dispatching on the type of the argument. The two procedures are
+   ;; identical except for their treatment of strings and characters and therefore can be
+   ;; implemented in terms of one common procedure. In order to write the fixnums, the
+   ;; primitive quotient must be added to the compiler.
+   ;;
+   ;; Implementing write in Scheme allows us to eliminate the now- redundant writer that we
+   ;; implemented as part of the C run-time system.
+   ;;
+   ;; (Ghuloup 2006)
+   ;;----------------------------------------------------------------------------------------    
+   
+   [write
     (letrec
    	([print-boolean
    	  (lambda (expr)
@@ -426,7 +441,7 @@
 		(write (cdr pr)))]))])
 	 
 	 (lambda (expr)
-	   (cond     ;;  <<-- blow here.  Time to debug eliminate-cond.
+	   (cond
 	    [(boolean? expr) (print-boolean expr)]
 	    [(null? expr) (print-null)]
 	    [(char? expr) (print-char expr)]
@@ -434,7 +449,7 @@
 	    [(string? expr) (print-string expr)]
 	    [(pair? expr) (print-pair expr)]
 	    [else (error 'write "unrecognized expression")] )))]
-
+   
    [integer->char
     (lambda (i) (fixnum->char i))])
        
