@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <fcntl.h>
 
 /* runtime.c */
 
@@ -283,6 +284,11 @@ char* string_data(ptr x) {
   return s->ch;
 }
 
+ptr string_len(ptr x) {
+  string s = (string)((int)x - str_tag);
+  return s->len;
+}
+
 //--------------------------------------------------------------------
 // String data we first verify that the ptr is a string object, then
 // we return the pointer to the start of characters as a char*.
@@ -346,5 +352,40 @@ ptr s_write(ptr fd, ptr str, ptr len) {
                     unshift(len));
   return shift(bytes);  // this leaves the bytes in eax?
 }
+
+ptr s_close(ptr fd) {
+  int retval = close(unshift(fd));
+  return shift(retval);
+}
+
+//-------------------------------------------------------------------------
+// errno holds error codes for calls like open(2), close(2), write(2).
+// Specific error codes are given the unix man pages assoicated with the call.
+// https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/
+//-------------------------------------------------------------------------
+
+//ptr s_errno() {
+//  return shift(errno);
+//}
+
+// Open returns -1 on failure and sets errno to indicate the error
+
+ptr s_open(ptr filename) {
+  
+  // convert incomming filename to a null teminated path
+  int len = unshift(string_len(filename));
+  char *f = string_data(filename);
+  char *path = malloc(len+1);
+  memcpy(path,f,len);
+  path[len]=0;
+  
+  // make the call to open the file
+  int fd = open(path, O_RDWR|O_CREAT, 0644);
+  free(path);
+  
+  // return the fd as a fixnum
+  return shift(fd);
+}
+
 
 

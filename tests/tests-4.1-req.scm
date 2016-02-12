@@ -1,3 +1,29 @@
+(add-tests-with-string-output "open-output-file"
+  [(let ([p (open-output-file "tmp1.txt")]) (port-kind p)) => "output-port\n"]
+  [(let ([p (open-output-file "tmp2.txt")]) (port-path p)) => "\"tmp2.txt\"\n"]
+  [(let ([p (open-output-file "tmp3.txt")]) (port-fd p)) => "3\n"]
+  [(let ([p (open-output-file "tmp4.txt")]) (string? (port-buf p))) => "#t\n"]
+  [(let ([p (open-output-file "tmp5.txt")]) (fx= 1024 (string-length (port-buf p)))) => "#t\n"]
+  [(let ([p (open-output-file "tmp6.txt")]) (port-kind p)) => "output-port\n"]
+  [(let ([p (open-output-file "tmp7.txt")]) (vector? p)) => "#t\n"]
+  [(let ([p (open-output-file "tmp8.txt")]) (fx= 6 (vector-length p))) => "#t\n"]
+  [(let ([p (open-output-file "tmp9.txt")])
+     ((lambda (x) (if (vector? x)
+		      (eq? (port-kind x) 'output-port)
+		      #f))
+      p)) => "#t\n"]
+  [(let ([p (open-output-file "tmpa.txt")])
+     ((lambda (x) (and (vector? x)
+		       (eq? (port-kind x) 'output-port)))
+      p)) => "#t\n"]
+  [(let ([p (open-output-file "tmpb.txt")]) (output-port? p)) => "#t\n"]
+  [(let ([p (open-output-file "tmpc.txt")])
+     (begin
+       (write "Hello World" p)
+       (flush-output-port p)
+       (exit))) => ""]
+  )
+
 (add-tests-with-string-output "remainder/modulo/quotient"
  ; [42 => "42\n"]			      
  ; [#\tab => "#\\tab\n"]
@@ -89,7 +115,15 @@
   [(begin
      (write '"Hello World!")
      (exit)) => "\"Hello World!\""]
+  [(begin
+     (display '"Hello World!")
+     (exit)) => "Hello World!"]
+  [(begin
+     (display #\a)
+     (exit)) => "a"]
 
   ;; TBD -- add lots more tests
-  
-)
+  )
+
+
+    				 

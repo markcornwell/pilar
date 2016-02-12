@@ -1047,20 +1047,7 @@
      [(eq? (car l) #\~) (cons #\$ (cons #\t (asmify1 (cdr l))))]  ; tilde
      [else (cons (car l) (asmify1 (cdr l)))]))	
 
-(define-syntax import-from
-  (syntax-rules ()
-    [(import-from (library-name) s)
-     (begin
-       (putprop 's '*is-external* #t)
-       (putprop 's '*library-name* 'library-name)
-       (putprop 's '*label* (asmify 's)))]
-    [(import-from (library-name) s s* ...)
-     (begin
-       (import-from (library-name) s)
-       (import-from (library-name) s* ...))]))
 
-(define (external? symbol)
-  (getprop symbol '*is-external*))
 
 ;;--------------------------------------------------------------------------------
 ;; We need to know what symbols come from separately compiled libraries at compile
@@ -1076,6 +1063,22 @@
 ;;
 ;; There are decent reasons for enumerating imports as we do here.  Makes it
 ;; explicit what we are importing and from where we import it.
+
+
+(define-syntax import-from
+  (syntax-rules ()
+    [(import-from (library-name) s)
+     (begin
+       (putprop 's '*is-external* #t)
+       (putprop 's '*library-name* 'library-name)
+       (putprop 's '*label* (asmify 's)))]
+    [(import-from (library-name) s s* ...)
+     (begin
+       (import-from (library-name) s)
+       (import-from (library-name) s* ...))]))
+
+(define (external? symbol)
+  (getprop symbol '*is-external*))
 
 (import-from (base)
 	     string->symbol
@@ -1093,6 +1096,8 @@
 	     string
 	     standard-out
 	     current-output-port
+	     port-kind
+	     port-path
 	     port-fd
 	     port-buf
 	     port-size
@@ -1100,17 +1105,22 @@
 	     port-ndx-add1
 	     port-ndx-reset
 	     flush-output-port
+	     output-port?
 	     close-output-port
 	     open-output-file
 	     write-char
 	     exit
 	     write
+	     display
+	     base-write
 	     integer->char
 	     string->list
 	     integer->list  ;; non standard
 	     negative?
 	     positive?
 	     zero?
+	     even?
+	     odd?
 	     map
 	     for-each
 	     )
