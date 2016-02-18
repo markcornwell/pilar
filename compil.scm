@@ -162,8 +162,8 @@
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
-;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
 
+(load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
 (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
@@ -1063,7 +1063,7 @@
 ;;
 ;; There are decent reasons for enumerating imports as we do here.  Makes it
 ;; explicit what we are importing and from where we import it.
-
+;;--------------------------------------------------------------------------------
 
 (define-syntax import-from
   (syntax-rules ()
@@ -1081,48 +1081,67 @@
   (getprop symbol '*is-external*))
 
 (import-from (base)
+	     append1
+	     base-write         ;; ns
+	     close-output-port
+	     current-input-port
+	     current-output-port
+	     display
+	     even?
+	     exit
+	     error
+	     eh_procedure       ;; ns
+	     eh_argcount        ;; ns
+
+	     fill-input-buffer
+	     flush-output-port
+	     for-each
+	     input-port?
+	     integer->char
+	     integer->list      ;; non standard
+	     
+	     list
+	     list-ref
+	     list-length
+	     map
+	     negative?	     
+	     odd?
+	     output-port?
+	     open-output-file
+	     open-input-file
+	     peek-char        
+	     port-kind          ;; ns
+	     port-last          ;; ns
+	     port-last-set!     ;; ns
+	     port-path          ;; ns
+	     port-fd            ;; ns
+	     port-buf           ;; ns
+	     port-size          ;; ns
+	     port-ndx           ;; ns
+	     port-ndx-add1      ;; ns
+	     port-ndx-reset     ;; ns
+	     port-unread        ;; ns
+	     port-unread-clear  ;; ns
+	     port-unread-set!   ;; ns
+	     
+	     positive?
+	     primitives         ;; ns
+
+	     read-char
+	     reverse	     
+
+	     string
+	     standard-in        ;; ns
+	     standard-out       ;; ns
 	     string->symbol
 	     symbols
 	     string=?
-	     append1
-	     error
-	     eh_procedure
-	     eh_argcount
-	     primitives
-	     list-ref
-	     list-length
-	     reverse
-	     vector
-	     string
-	     standard-out
-	     current-output-port
-	     port-kind
-	     port-path
-	     port-fd
-	     port-buf
-	     port-size
-	     port-ndx
-	     port-ndx-add1
-	     port-ndx-reset
-	     flush-output-port
-	     output-port?
-	     close-output-port
-	     open-output-file
-	     write-char
-	     exit
-	     write
-	     display
-	     base-write
-	     integer->char
 	     string->list
-	     integer->list  ;; non standard
-	     negative?
-	     positive?
+
+	     vector
+	     write	     
+	     write-char 
 	     zero?
-	     even?
-	     odd?
-	     map
-	     for-each
 	     )
 
 (define-transform (external-symbols expr)
@@ -1353,6 +1372,7 @@
 (define value-offset    4)
 
 (define nil-value    #b00111111) ; #x3F)
+(define eof-value    #b01011111) ; #x5F)   
 (define wordsize        4) ; bytes
 
 (define fixnum-bits (- (* wordsize 8) fixnum-shift))
@@ -1433,6 +1453,19 @@
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
+
+(define-primitive (eof-object? si env arg)
+    (emit-expr si env arg)
+    (emit "    cmp $~s, %eax" eof-value)
+    (emit "    mov $0, %eax")
+     ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (eof-object si env)
+  (emit "    movl $~s,%eax" eof-value))
 
 (define-primitive (char? si env arg)
     (emit-expr si env arg)
@@ -2439,10 +2472,10 @@
 ;;        The caller restores the frame's edi upon return by loading closure from esp-4
 ;;        The callee simply returns and does not mess with the closure slot
 ;;
-;;                                              figure 3
+;;                                            figure 3
 ;;-----------------------------------------------------------------------------------------------
 
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;   Invariants
 ;;
 ;;  esp - si - 12     next frame arg 1
@@ -2455,7 +2488,7 @@
 ;;  esp - 4           closure pointer |  used to restore ecp when callee returns
 ;;  esp - 0           return pointer  |  when the frame goes away
 ;;
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 
 (define funcall-args cddr)
 (define funcall-oper cadr)

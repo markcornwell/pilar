@@ -387,5 +387,12 @@ ptr s_open(ptr filename) {
   return shift(fd);
 }
 
+//------------------------------------------------------------------------------
+//  If successful, the number of bytes actually read is returned.  Upon reading
+//  end-of-file, zero is returned.  Otherwise, a -1 is returned and the global
+//  variable errno is set to indicate the error.
 
-
+ptr s_read(ptr fd, ptr buf, ptr nbyte) {
+  int bytes_read = read(unshift(fd),string_data(buf),unshift(nbyte));
+  return shift(bytes_read);
+}
