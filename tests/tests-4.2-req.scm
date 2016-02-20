@@ -59,8 +59,8 @@
        (display "Hello World!" p)
        (close-output-port p)
        (let ([p (open-input-file "stst.tmp")])
-	 (fill-input-buffer p)
-	 (port-last p)))) => "12\n"] 
+  	 (fill-input-buffer p)
+  	 (port-last p)))) => "12\n"] 
   
   [(begin  
      (let ([p (open-output-file "stst.tmp")])

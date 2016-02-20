@@ -26,4 +26,360 @@ test 19:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" 
 test 20:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (input-port? p)))) ... ok
 test 21:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) 42))) ... ok
 test 22:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) (port-ndx p)))) ... ok
-test 23:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) (port-last p)))) ...> 
+test 23:(begin (let ((p (open-output-file "stst.tmp"))) (begin (display "Hello World!" p) (close-output-port p) (let ((in (open-input-file "stst.tmp"))) (begin (fill-input-buffer in) (string-ref (port-buf in) 0)))))) ... ok
+test 24:(begin (let ((p (open-output-file "stst.tmp"))) (begin (display "Hello World!" p) (close-output-port p) (let ((in (open-input-file "stst.tmp"))) (begin (fill-input-buffer in) (string-ref (port-buf in) 1)))))) ... ok
+test 25:(begin (let ((p (open-output-file "stst.tmp"))) (begin (display "Hello World!" p) (close-output-port p) (let ((in (open-input-file "stst.tmp"))) (begin (fill-input-buffer in) (read-char in)))))) ... ok
+test 26:(begin (let ((p (open-output-file "stst.tmp"))) (begin (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (read-char p))))) ... ok
+test 27:(begin (let ((p (open-output-file "stst.tmp"))) (begin (display "Hello World!" p) (close-output-port p))) (let ((p (open-input-file "stst.tmp"))) (letrec ((loop (lambda () (let ((x (read-char p))) (if (eof-object? x) (begin (close-input-port p) (quote ())) (begin (display x) (loop))))))) (loop))) (exit)) ... ok
+test 28:(let ((s (make-string 10000)) (t "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12344567890<>,./?;:'\"[]{}\\|`~!@#$%^&*()-_=+")) (letrec ((fill-string! (lambda (i j) (unless (fx= i (string-length s)) (if (fx>= j (string-length t)) (fill-string! i (fx- j (string-length t))) (begin (string-set! s i (string-ref t j)) (fill-string! (fxadd1 i) (fx+ j 17))))))) (write-string! (lambda (i p) (cond ((fx= i (string-length s)) (close-output-port p)) (else (begin (write-char (string-ref s i) p) (write-string! (fxadd1 i) p)))))) (verify (lambda (i p) (let ((x (read-char p))) (cond ((eof-object? x) (begin (close-input-port p) (fx= i (string-length s)))) ((fx= i (string-length s)) (error (quote verify) "file too short")) ((char=? (string-ref s i) x) (verify (fxadd1 i) p)) (else (error (quote verify) "mismatch"))))))) (begin (fill-string! 0 0) (write-string! 0 (open-output-file "stst.tmp")) (verify 0 (open-input-file "stst.tmp"))))) ... ok
+Performing open-output-file tests ...
+test 29:(let ((p (open-output-file "tmp1.txt"))) (port-kind p)) ... ok
+test 30:(let ((p (open-output-file "tmp2.txt"))) (port-path p)) ... ok
+test 31:(let ((p (open-output-file "tmp3.txt"))) (port-fd p)) ... ok
+test 32:(let ((p (open-output-file "tmp4.txt"))) (string? (port-buf p))) ... ok
+test 33:(let ((p (open-output-file "tmp5.txt"))) (fx= 1024 (string-length (port-buf p)))) ... ok
+test 34:(let ((p (open-output-file "tmp6.txt"))) (port-kind p)) ... ok
+test 35:(let ((p (open-output-file "tmp7.txt"))) (vector? p)) ... ok
+test 36:(let ((p (open-output-file "tmp8.txt"))) (fx= 6 (vector-length p))) ... ok
+test 37:(let ((p (open-output-file "tmp9.txt"))) ((lambda (x) (if (vector? x) (eq? (port-kind x) (quote output-port)) #f)) p)) ... ok
+test 38:(let ((p (open-output-file "tmpa.txt"))) ((lambda (x) (and (vector? x) (eq? (port-kind x) (quote output-port)))) p)) ... ok
+test 39:(let ((p (open-output-file "tmpb.txt"))) (output-port? p)) ... ok
+test 40:(let ((p (open-output-file "tmpc.txt"))) (begin (write "Hello World" p) (flush-output-port p) (exit))) ... ok
+Performing remainder/modulo/quotient tests ...
+test 41:(fxquotient 16 4) ... ok
+test 42:(fxquotient 5 2) ... ok
+test 43:(fxquotient -45 7) ... ok
+test 44:(fxquotient 10 -3) ... ok
+test 45:(fxquotient -17 -9) ... ok
+test 46:(fxremainder 16 4) ... ok
+test 47:(fxremainder 5 2) ... ok
+test 48:(fxremainder -45 7) ... ok
+test 49:(fxremainder 10 -3) ... ok
+test 50:(fxremainder -17 -9) ... ok
+Performing write-char tests ...
+test 51:(begin (exit)) ... ok
+test 52:(begin (vector-ref (current-output-port) 0)) ... ok
+test 53:(begin (port-size (current-output-port))) ... ok
+test 54:(begin (port-ndx (current-output-port))) ... ok
+test 55:(begin (port-fd (current-output-port))) ... ok
+test 56:(begin (flush-output-port (current-output-port)) (exit)) ... ok
+test 57:(begin (write-char #\b) (exit)) ... ok
+test 58:(eq? standard-out standard-out) ... ok
+test 59:(let ((p standard-out)) (port-ndx p)) ... ok
+test 60:(let ((p standard-out)) (port-ndx-add1 p) (port-ndx p)) ... ok
+test 61:(let ((p standard-out)) (write-char #\v) (port-ndx p)) ... ok
+test 62:(let ((p (current-output-port))) (write-char #\w) (port-ndx p)) ... ok
+test 63:(begin (current-output-port) (write-char #\w) (port-ndx (current-output-port))) ... ok
+test 64:(begin (write-char #\w) (port-ndx (current-output-port))) ... ok
+test 65:(begin (write-char #\a) (write-char #\b) (write-char #\c) (write-char #\newline) (flush-output-port (current-output-port)) (exit)) ... ok
+test 66:(begin (write-char #\a) (close-output-port (current-output-port)) (exit)) ... ok
+test 67:(begin (write-char #\H) (write-char #\e) (write-char #\l) (write-char #\l) (write-char #\o) (write-char #\space) (flush-output-port) (write-char #\W) (write-char #\o) (write-char #\r) (write-char #\l) (write-char #\d) (write-char #\!) (flush-output-port (current-output-port)) (exit)) ... ok
+Performing write/display tests ...
+test 68:(fx+ -536870911 -1) ... ok
+test 69:(begin (write #\a) (exit)) ... ok
+test 70:(begin (write #t) (exit)) ... ok
+test 71:(begin (write (quote ())) (exit)) ... ok
+test 72:(integer->char 42) ... ok
+test 73:(string->list "mark") ... ok
+test 74:(reverse (quote (1 2 3))) ... ok
+test 75:(integer->list 42) ... ok
+test 76:(reverse (quote (1 2 3))) ... ok
+test 77:(begin (map write-char (quote (#\h #\e #\l #\l #\o))) (exit)) ... ok
+test 78:(begin (for-each write-char (quote (#\h #\e #\l #\l #\o))) (exit)) ... ok
+test 79:(begin (write 42) (exit)) ... ok
+test 80:(begin (write 314159) (exit)) ... ok
+test 81:(begin (write -314159) (exit)) ... ok
+test 82:(begin (write 0) (exit)) ... ok
+test 83:(begin (write (quote (1 2 3))) (exit)) ... ok
+test 84:(begin (write (quote "Hello World!")) (exit)) ... ok
+test 85:(begin (display (quote "Hello World!")) (exit)) ... ok
+test 86:(begin (display #\a) (exit)) ... ok
+Performing nontail apply tests ...
+test 87:(let ((f (lambda () 12))) (fx+ (apply f (quote ())) 1)) ... ok
+test 88:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f 13 (quote ())) 1)) ... ok
+test 89:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f (cons 13 (quote ()))) 1)) ... ok
+test 90:(let ((f (lambda (x y z) (fx+ x (fx* y z))))) (fx+ (apply f 12 (quote (7 2))) 1)) ... ok
+test 91:(cons (apply vector (quote (1 2 3 4 5 6 7 8))) (quote ())) ... ok
+test 92:(cons (apply vector 1 (quote (2 3 4 5 6 7 8))) (quote ())) ... ok
+test 93:(cons (apply vector 1 2 (quote (3 4 5 6 7 8))) (quote ())) ... ok
+test 94:(cons (apply vector 1 2 3 (quote (4 5 6 7 8))) (quote ())) ... ok
+test 95:(cons (apply vector 1 2 3 4 (quote (5 6 7 8))) (quote ())) ... ok
+test 96:(cons (apply vector 1 2 3 4 5 (quote (6 7 8))) (quote ())) ... ok
+test 97:(cons (apply vector 1 2 3 4 5 6 (quote (7 8))) (quote ())) ... ok
+test 98:(cons (apply vector 1 2 3 4 5 6 7 (quote (8))) (quote ())) ... ok
+test 99:(cons (apply vector 1 2 3 4 5 6 7 8 ()) (quote ())) ... ok
+Performing tail apply tests ...
+test 100:(let ((f (lambda () 12))) (apply f (quote ()))) ... ok
+test 101:(let ((f (lambda (x) (fx+ x 12)))) (apply f 13 (quote ()))) ... ok
+test 102:(let ((f (lambda (x) (fx+ x 12)))) (apply f (cons 13 (quote ())))) ... ok
+test 103:(let ((f (lambda (x y z) (fx+ x (fx* y z))))) (apply f 12 (quote (7 2)))) ... ok
+test 104:(apply vector (quote (1 2 3 4 5 6 7 8))) ... ok
+test 105:(apply vector 1 (quote (2 3 4 5 6 7 8))) ... ok
+test 106:(apply vector 1 2 (quote (3 4 5 6 7 8))) ... ok
+test 107:(apply vector 1 2 3 (quote (4 5 6 7 8))) ... ok
+test 108:(apply vector 1 2 3 4 (quote (5 6 7 8))) ... ok
+test 109:(apply vector 1 2 3 4 5 (quote (6 7 8))) ... ok
+test 110:(apply vector 1 2 3 4 5 6 (quote (7 8))) ... ok
+test 111:(apply vector 1 2 3 4 5 6 7 (quote (8))) ... ok
+test 112:(apply vector 1 2 3 4 5 6 7 8 ()) ... ok
+Performing nontail apply tests ...
+test 113:(let ((f (lambda () 12))) (fx+ (apply f (quote ())) 1)) ... ok
+test 114:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f 13 (quote ())) 1)) ... ok
+test 115:(let ((f (lambda (x) (fx+ x 12)))) (fx+ (apply f (cons 13 (quote ()))) 1)) ... ok
+test 116:(let ((f (lambda (x y z) (fx+ x (fx* y z))))) (fx+ (apply f 12 (quote (7 2))) 1)) ... ok
+test 117:(cons (apply vector (quote (1 2 3 4 5 6 7 8))) (quote ())) ... ok
+test 118:(cons (apply vector 1 (quote (2 3 4 5 6 7 8))) (quote ())) ... ok
+test 119:(cons (apply vector 1 2 (quote (3 4 5 6 7 8))) (quote ())) ... ok
+test 120:(cons (apply vector 1 2 3 (quote (4 5 6 7 8))) (quote ())) ... ok
+test 121:(cons (apply vector 1 2 3 4 (quote (5 6 7 8))) (quote ())) ... ok
+test 122:(cons (apply vector 1 2 3 4 5 (quote (6 7 8))) (quote ())) ... ok
+test 123:(cons (apply vector 1 2 3 4 5 6 (quote (7 8))) (quote ())) ... ok
+test 124:(cons (apply vector 1 2 3 4 5 6 7 (quote (8))) (quote ())) ... ok
+test 125:(cons (apply vector 1 2 3 4 5 6 7 8 ()) (quote ())) ... ok
+Performing tail apply tests ...
+test 126:(let ((f (lambda () 12))) (apply f (quote ()))) ... ok
+test 127:(let ((f (lambda (x) (fx+ x 12)))) (apply f 13 (quote ()))) ... ok
+test 128:(let ((f (lambda (x) (fx+ x 12)))) (apply f (cons 13 (quote ())))) ... ok
+test 129:(let ((f (lambda (x y z) (fx+ x (fx* y z))))) (apply f 12 (quote (7 2)))) ... ok
+test 130:(apply vector (quote (1 2 3 4 5 6 7 8))) ... ok
+test 131:(apply vector 1 (quote (2 3 4 5 6 7 8))) ... ok
+test 132:(apply vector 1 2 (quote (3 4 5 6 7 8))) ... ok
+test 133:(apply vector 1 2 3 (quote (4 5 6 7 8))) ... ok
+test 134:(apply vector 1 2 3 4 (quote (5 6 7 8))) ... ok
+test 135:(apply vector 1 2 3 4 5 (quote (6 7 8))) ... ok
+test 136:(apply vector 1 2 3 4 5 6 (quote (7 8))) ... ok
+test 137:(apply vector 1 2 3 4 5 6 7 (quote (8))) ... ok
+test 138:(apply vector 1 2 3 4 5 6 7 8 ()) ... ok
+Performing string-set! errors tests ...
+test 139:(let ((t 1)) (and (begin (set! t (fxadd1 t)) t) t)) ... ok
+test 140:(let ((f (if (boolean? (lambda () 12)) (lambda () 13) (lambda () 14)))) (f)) ... ok
+test 141:(let ((f 12)) (let ((g (lambda () f))) (g))) ... ok
+test 142:(fx< 1 2) ... ok
+test 143:(let ((f (lambda (x y) (fx< x y)))) (f 10 10)) ... ok
+test 144:(fx< 10 10) ... ok
+test 145:(fx< 10 2) ... ok
+test 146:(fx<= 1 2) ... ok
+test 147:(fx<= 10 10) ... ok
+test 148:(fx<= 10 2) ... ok
+test 149:(let ((x 12)) (string-set! x 0 #\a)) ... ok
+test 150:(let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 0 y)) ... ok
+test 151:(let ((x (string #\a #\b #\c)) (y 12)) (string-set! x 8 y)) ... ok
+test 152:(let ((x (string #\a #\b #\c)) (y #\a)) (string-set! x 8 y)) ... ok
+test 153:(let ((x (string #\a #\b #\c))) (string-set! x 8 #\a)) ... ok
+test 154:(let ((x (string #\a #\b #\c)) (y #\a)) (string-set! x -1 y)) ... ok
+test 155:(let ((s (string #\a #\b #\c)) (i 1) (c #\X)) (string-set! s i c) s) ... ok
+test 156:(let ((s (string #\a #\b #\c)) (i 1)) (string-set! s i #\X) s) ... ok
+test 157:(let ((s (string #\a #\b #\c)) (i 1) (c (quote X))) (string-set! s i c) s) ... ok
+test 158:(let ((s (string #\a #\b #\c)) (i 1) (c #\X)) (string-set! s 1 c) s) ... ok
+test 159:(let ((s (string #\a #\b #\c)) (i 1)) (string-set! s 1 #\X) s) ... ok
+test 160:(let ((s (string #\a #\b #\c)) (i 1) (c (quote X))) (string-set! s 1 c) s) ... ok
+test 161:(let ((s (string #\a #\b #\c)) (i 3) (c #\X)) (string-set! s i c) s) ... ok
+test 162:(let ((s (string #\a #\b #\c)) (i 3)) (string-set! s i #\X) s) ... ok
+test 163:(let ((s (string #\a #\b #\c)) (i 3) (c (quote X))) (string-set! s i c) s) ... ok
+test 164:(let ((s (string #\a #\b #\c)) (i -10) (c #\X)) (string-set! s i c) s) ... ok
+test 165:(let ((s (string #\a #\b #\c)) (i -11)) (string-set! s i #\X) s) ... ok
+test 166:(let ((s (string #\a #\b #\c)) (i -1) (c (quote X))) (string-set! s i c) s) ... ok
+test 167:(let ((s (string #\a #\b #\c)) (i (quote foo)) (c #\X)) (string-set! s i c) s) ... ok
+test 168:(let ((s (string #\a #\b #\c)) (i (quote foo))) (string-set! s i #\X) s) ... ok
+test 169:(let ((s (string #\a #\b #\c)) (i (quote foo)) (c (quote X))) (string-set! s i c) s) ... ok
+test 170:(let ((s (quote (string #\a #\b #\c))) (i 1) (c #\X)) (string-set! s i c) s) ... ok
+test 171:(let ((s (quote (string #\a #\b #\c))) (i 1)) (string-set! s i #\X) s) ... ok
+test 172:(let ((s (quote (string #\a #\b #\c))) (i 1) (c (quote X))) (string-set! s i c) s) ... ok
+test 173:(let ((s (quote (string #\a #\b #\c))) (i 1) (c #\X)) (string-set! s 1 c) s) ... ok
+test 174:(let ((s (quote (string #\a #\b #\c))) (i 1)) (string-set! s 1 #\X) s) ... ok
+test 175:(let ((s (quote (string #\a #\b #\c))) (i 1) (c (quote X))) (string-set! s 1 c) s) ... ok
+test 176:(let ((s (quote (string #\a #\b #\c))) (i 3) (c #\X)) (string-set! s i c) s) ... ok
+test 177:(let ((s (quote (string #\a #\b #\c))) (i 3)) (string-set! s i #\X) s) ... ok
+test 178:(let ((s (quote (string #\a #\b #\c))) (i 3) (c (quote X))) (string-set! s i c) s) ... ok
+test 179:(let ((s (quote (string #\a #\b #\c))) (i -10) (c #\X)) (string-set! s i c) s) ... ok
+test 180:(let ((s (quote (string #\a #\b #\c))) (i -11)) (string-set! s i #\X) s) ... ok
+test 181:(let ((s (quote (string #\a #\b #\c))) (i -1) (c (quote X))) (string-set! s i c) s) ... ok
+test 182:(let ((s (quote (string #\a #\b #\c))) (i (quote foo)) (c #\X)) (string-set! s i c) s) ... ok
+test 183:(let ((s (quote (string #\a #\b #\c))) (i (quote foo))) (string-set! s i #\X) s) ... ok
+test 184:(let ((s (quote (string #\a #\b #\c))) (i (quote foo)) (c (quote X))) (string-set! s i c) s) ... ok
+Performing string errors tests ...
+test 185:(let ((f (lambda (a b c) (string a b c)))) (f #\a #\b #\c)) ... ok
+test 186:(let ((f (lambda (a b c) (string a b c)))) (f #\a 12 #\c)) ... ok
+test 187:(let ((f string)) (f #\a #\b #\c)) ... ok
+test 188:(let ((f string)) (f #\a #\b (quote x))) ... ok
+test 189:(string #\a #\b #\c) ... ok
+test 190:(string #\a #\b #t) ... ok
+Performing error tests ...
+test 191:(error (quote foo) "here") ... ok
+Performing apply error tests ...
+test 192:(let ((f 6)) (f f)) ... ok
+test 193:(let ((f 6)) (f (f))) ... ok
+test 194:(1 2 3) ... ok
+test 195:(1 (3 4)) ... ok
+test 196:(let ((f (lambda () (1 2 3)))) 12) ... ok
+Performing arg-check for fixed-arg procedures tests ...
+test 197:(let ((f (lambda () 12))) (f)) ... ok
+test 198:(let ((f (lambda () 12))) (f 1)) ... ok
+test 199:(let ((f (lambda () 12))) (f 1 2)) ... ok
+test 200:(let ((f (lambda (x) (fx+ x x)))) (f)) ... ok
+test 201:(let ((f (lambda (x) (fx+ x x)))) (f 1)) ... ok
+test 202:(let ((f (lambda (x) (fx+ x x)))) (f 1 2)) ... ok
+test 203:(let ((f (lambda (x y) (fx* x (fx+ y y))))) (f)) ... ok
+test 204:(let ((f (lambda (x y) (fx* x (fx+ y y))))) (f 2)) ... ok
+test 205:(let ((f (lambda (x y) (fx* x (fx+ y y))))) (f 2 3)) ... ok
+test 206:(let ((f (lambda (x y) (fx* x (fx+ y y))))) (f 2 3 4)) ... ok
+Performing arg-check for var-arg procedures tests ...
+test 207:(let ((f (lambda x x))) (f)) ... ok
+test 208:(let ((f (lambda x x))) (f (quote a))) ... ok
+test 209:(let ((f (lambda x x))) (f (quote a) (quote b))) ... ok
+test 210:(let ((f (lambda x x))) (f (quote a) (quote b) (quote c))) ... ok
+test 211:(let ((f (lambda x x))) (f (quote a) (quote b) (quote c) (quote d))) ... ok
+test 212:(let ((f (lambda (x . rest) (vector x rest)))) (f)) ... ok
+test 213:(let ((f (lambda (x . rest) (vector x rest)))) (f (quote a))) ... ok
+test 214:(let ((f (lambda (x . rest) (vector x rest)))) (f (quote a) (quote b))) ... ok
+test 215:(let ((f (lambda (x . rest) (vector x rest)))) (f (quote a) (quote b) (quote c))) ... ok
+test 216:(let ((f (lambda (x . rest) (vector x rest)))) (f (quote a) (quote b) (quote c) (quote d))) ... ok
+test 217:(let ((f (lambda (x y . rest) (vector x y rest)))) (f)) ... ok
+test 218:(let ((f (lambda (x y . rest) (vector x y rest)))) (f (quote a))) ... ok
+test 219:(let ((f (lambda (x y . rest) (vector x y rest)))) (f (quote a) (quote b))) ... ok
+test 220:(let ((f (lambda (x y . rest) (vector x y rest)))) (f (quote a) (quote b) (quote c))) ... ok
+test 221:(let ((f (lambda (x y . rest) (vector x y rest)))) (f (quote a) (quote b) (quote c) (quote d))) ... ok
+Performing vector tests ...
+test 222:(fx= 1 2) ... ok
+test 223:(vector 1 2 3 4 5) ... ok
+test 224:(let ((f (lambda (f) (f 1 2 3 4 5 6)))) (f vector)) ... ok
+Performing libary extensions tests ...
+test 225:42 ... ok
+test 226:(list-length (quote (1 2 3))) ... ok
+Performing vararg not using rest argument tests ...
+test 227:(let ((f (lambda args 12))) (f)) ... ok
+test 228:(let ((f (lambda args 12))) (f 10)) ... ok
+test 229:(let ((f (lambda args 12))) (f 10 20)) ... ok
+test 230:(let ((f (lambda args 12))) (f 10 20 30)) ... ok
+test 231:(let ((f (lambda args 12))) (f 10 20 30 40)) ... ok
+test 232:(let ((f (lambda args 12))) (f 10 20 30 40 50)) ... ok
+test 233:(let ((f (lambda args 12))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+test 234:(let ((f (lambda (a0 . args) 12))) (f 10)) ... ok
+test 235:(let ((f (lambda (a0 . args) a0))) (f 10)) ... ok
+test 236:(let ((f (lambda (a0 . args) 12))) (f 10 20)) ... ok
+test 237:(let ((f (lambda (a0 . args) a0))) (f 10 20)) ... ok
+test 238:(let ((f (lambda (a0 . args) 12))) (f 10 20 30)) ... ok
+test 239:(let ((f (lambda (a0 . args) a0))) (f 10 20 30)) ... ok
+test 240:(let ((f (lambda (a0 . args) 12))) (f 10 20 30 40)) ... ok
+test 241:(let ((f (lambda (a0 . args) a0))) (f 10 20 30 40)) ... ok
+test 242:(let ((f (lambda (a0 a1 . args) (vector a0 a1)))) (f 10 20 30 40 50 60 70 80 90 100)) ... ok
+test 243:(let ((f (lambda (a0 a1 a2 . args) (vector a0 a1 a2)))) (f 10 20 30 40 50 60 70 80 90 100)) ... ok
+test 244:(let ((f (lambda (a0 a1 a2 a3 . args) (vector a0 a1 a2 a3)))) (f 10 20 30 40 50 60 70 80 90 100)) ... ok
+test 245:(let ((f (lambda (a0 a1 a2 a3 a4 . args) (vector a0 a1 a2 a3 a4)))) (f 10 20 30 40 50 60 70 80 90 100)) ... ok
+test 246:(let ((f (lambda (a0 a1 a2 a3 a4 a5 . args) (vector a0 a1 a2 a3 a4 a5)))) (f 10 20 30 40 50 60 70 80 90 100)) ... ok
+Performing vararg using rest argument tests ...
+test 247:(let ((f (lambda args args))) (f)) ... ok
+test 248:(let ((f (lambda args args))) (f 10)) ... ok
+test 249:(let ((f (lambda args args))) (f 10 20)) ... ok
+test 250:(let ((f (lambda args args))) (f 10 20 30)) ... ok
+test 251:(let ((f (lambda args args))) (f 10 20 30 40)) ... ok
+test 252:(let ((f (lambda (a0 . args) (vector a0 args)))) (f 10)) ... ok
+test 253:(let ((f (lambda (a0 . args) (vector a0 args)))) (f 10 20)) ... ok
+test 254:(let ((f (lambda (a0 . args) (vector a0 args)))) (f 10 20 30)) ... ok
+test 255:(let ((f (lambda (a0 . args) (vector a0 args)))) (f 10 20 30 40)) ... ok
+test 256:(let ((f (lambda (a0 a1 . args) (vector a0 a1 args)))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+test 257:(let ((f (lambda (a0 a1 a2 . args) (vector a0 a1 a2 args)))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+test 258:(let ((f (lambda (a0 a1 a2 a3 . args) (vector a0 a1 a2 a3 args)))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+test 259:(let ((f (lambda (a0 a1 a2 a3 a4 . args) (vector a0 a1 a2 a3 a4 args)))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+test 260:(let ((f (lambda (a0 a1 a2 a3 a4 a5 . args) (vector a0 a1 a2 a3 a4 a5 args)))) (f 10 20 30 40 50 60 70 80 90)) ... ok
+Performing error handlers for vectors tests ...
+test 261:(make-vector #t) ... ok
+test 262:(vector-length 43) ... ok
+test 263:(make-vector -1) ... ok
+test 264:(vector-length (make-vector 1)) ... ok
+test 265:(vector-length (make-vector 666)) ... ok
+test 266:(vector-set! (make-vector 1) 1 #t) ... ok
+test 267:(let ((v (make-vector 1))) (vector-set! v 1 #t)) ... ok
+test 268:(let ((v (make-vector 5))) (vector-set! v -1 42)) ... ok
+test 269:(let ((v (make-vector 2))) (vector-set! v #f 3)) ... ok
+test 270:(let ((v (make-vector 1))) (vector-ref v 1)) ... ok
+test 271:(let ((v (make-vector 5))) (vector-ref v -4)) ... ok
+test 272:(let ((v (make-vector 2))) (vector-ref v #\Z)) ... ok
+Performing error handlers for strings tests ...
+test 273:(make-string #t) ... ok
+test 274:(make-string -42) ... ok
+test 275:(string-ref (make-string 2) 2) ... ok
+test 276:(string-ref (make-string 2) -1) ... ok
+test 277:(string-ref #t -1) ... ok
+test 278:(string-length #t) ... ok
+test 279:(string-set! (make-string 2) 2 #\A) ... ok
+test 280:(string-set! (make-string 2) -1 #\A) ... ok
+test 281:(string-set! #t -1 #\A) ... ok
+test 282:(string-set! (make-string 2) #t #\A) ... ok
+test 283:(string-set! (make-string 2) 0 #f) ... ok
+Performing error handlers for funcall tests ...
+test 284:(funcall #t) ... ok
+test 285:(funcall 14) ... ok
+test 286:(funcall #\A) ... ok
+test 287:(funcall "foo") ... ok
+test 288:(funcall (quote a)) ... ok
+test 289:(funcall (quote fx+) 13 14) ... ok
+test 290:(funcall (quote car)) ... ok
+test 291:(funcall (quote funcall)) ... ok
+test 292:(funcall (let ((x 2)) (fx+ x x))) ... ok
+test 293:(funcall (quote (a b))) ... ok
+test 294:((lambda (x y) (cons x y)) 1 2 3) ... ok
+test 295:((lambda (x y) (cons x y)) 1) ... ok
+Performing error handlers for fixnum tests ...
+test 296:(fixnum->char #t) ... ok
+test 297:(fxlognot #t) ... ok
+test 298:(fxlogand #t #f) ... ok
+test 299:(fxlogor #t 12) ... ok
+test 300:(fxadd1 #f) ... ok
+test 301:(fxsub1 #\M) ... ok
+test 302:(fxzero? #f) ... ok
+test 303:(fx= #f 4) ... ok
+test 304:(fx= 4 #t) ... ok
+test 305:(fx<= #f 3) ... ok
+test 306:(fx<= 3 #t) ... ok
+test 307:(fx< #f 3) ... ok
+test 308:(fx< 3 #t) ... ok
+test 309:(fx>= #f 3) ... ok
+test 310:(fx>= 3 #t) ... ok
+test 311:(fx> #f 3) ... ok
+test 312:(fx> 3 #t) ... ok
+test 313:(fx+ #f 3) ... ok
+test 314:(fx+ 3 #t) ... ok
+test 315:(fx- #f 3) ... ok
+test 316:(fx- 3 #t) ... ok
+test 317:(fx* #f 3) ... ok
+test 318:(fx* 3 #t) ... ok
+Performing error handlers for pair tests ...
+test 319:(cons 1 1) ... ok
+test 320:(car #f) ... ok
+test 321:(cdr 43) ... ok
+test 322:(set-car! "foo" 42) ... ok
+test 323:(set-cdr! #\A #f) ... ok
+test 324:(cons #t (car #f)) ... ok
+Performing error handlers for char tests ...
+test 325:(char->fixnum 42) ... ok
+test 326:(char=? #\A #t) ... ok
+test 327:(char=? #f #\B) ... ok
+test 328:(char=? #t 14) ... ok
+Performing exit tests ...
+test 329:(foreign-call "s_foo") ... ok
+test 330:(foreign-call "exit" 0) ... ok
+Performing write tests ...
+test 331:(foreign-call "s_42") ... ok
+test 332:(foreign-call "s_true") ... ok
+test 333:(foreign-call "s_false") ... ok
+test 334:(foreign-call "s_once" 0) ... ok
+test 335:((lambda () (foreign-call "s_twice" 2))) ... ok
+test 336:(foreign-call "s_once" 1) ... ok
+test 337:(foreign-call "s_once" 2) ... ok
+test 338:(foreign-call "s_twice" 2) ... ok
+test 339:(foreign-call "s_twice" 250) ... ok
+test 340:(foreign-call "s_foo") ... ok
+test 341:(foreign-call "s_write_foo") ... ok
+test 342:(foreign-call "s_write_hello") ... ok
+test 343:(foreign-call "s_exit") ... ok
+test 344:(foreign-call "s_write" 1 "hello world" 11) ... ok
+test 345:(foreign-call "s_write" 1 "hello world" (string-length "hello world")) ... ok
+Performing error tests ...
+test 346:(let* ((write-stderr (lambda (s) (foreign-call "s_write" 1 s (string-length s)))) (write-emsg (lambda (sym emsg) (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))) (write-emsg (quote car) "argument not a pair") #f) ... ok
+test 347:(let* ((write-stderr (lambda (s) (foreign-call "s_write" 1 s (string-length s)))) (write-emsg (lambda (sym emsg) (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n")))) (write-emsg (quote car) "argument not a pair") (foreign-call "s_exit" 1) #f) ... ok
+test 348:(error (quote car) "argument must be a pair") ... ok
+test 349:(error (quote cdr) "argument must be a pair") ... ok
+test 350:(error (quote funcall) "first arg must be a procedure") ... ok
+Performing primitives list tests ...
+test 351:(pair? (primitivies)) ...> 
