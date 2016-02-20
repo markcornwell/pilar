@@ -270,6 +270,7 @@
 	     begin
 	     closure
 	     cond
+	     else
 	     foreign-call
 	     if
 	     lambda
@@ -278,6 +279,8 @@
 	     letrec
 	     primitive-ref
 	     quote
+	     unless
+	     when
 	     )))
 
 ;;-----------------------------------------------------------------------------------
@@ -464,9 +467,10 @@
 ;; Free variables and transforming lambda forms to closure forms
 ;;
 ;; Every lambda expression appearing in the source program is rewritten as a closure
-;; annotated with the set of free variables.  Free variables are any variables
-;; referenced in the body of the lambda that are not either formal parameters of the
-;; lambda or defined locally inside the lambda.
+;; annotated with the set of free variables.
+;;
+;; Free variables are any variables referenced in the body of the lambda that are not
+;; either formal parameters of the lambda or defined locally inside the lambda.*
 ;;
 ;;  (let ((x 5))
 ;;     (lambda (y) (lambda () (fx+ x y))))
@@ -477,8 +481,15 @@
 ;;     (closure (y) (x)
 ;;         (closure () (x y) (fx+ x y))))
 ;;
-;;
 ;; <formals> ::=  (v1...vk) | args | (v1...vk . args)
+;;
+;; *Caveats:
+;;  1. special symbols (cond,let,else,...) are not variables.
+;;     (special-form? x) tells you if a symbol x is special.
+;;  2. primitives are not variables, bad idea to let you rebind them.
+;;  3. external symbols are not variables.  Rationale: external are global and hence
+;;     always available, so upward funargs not a problem.  Exempting them makes many
+;;     fewer closure variables saving both space and time.
 ;;
 ;;-----------------------------------------------------------------------------------
 
@@ -578,6 +589,7 @@
    [(simple-constant? expr) '()]
    [(primitive? expr) '()]
    [(special-form? expr) '()]
+   [(external? expr) '()]   ;; filters out globals
    [(symbol? expr) (if (memq expr bound-vars)
 			 '()
 			 (list expr))]
@@ -1078,11 +1090,12 @@
        (import-from (library-name) s* ...))]))
 
 (define (external? symbol)
-  (getprop symbol '*is-external*))
+  (and (symbol? symbol) (getprop symbol '*is-external*)))
 
 (import-from (base)
 	     append1
 	     base-write         ;; ns
+	     close-input-port
 	     close-output-port
 	     current-input-port
 	     current-output-port

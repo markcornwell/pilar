@@ -12,7 +12,8 @@
 ;;--------------------------------------------------------------------------------------
 ;;
 ;; Here we initialize a list of symbols.  The list is a conventional list of cons nodes
-;; Where the car of each node will hold a symbol.
+;; Where the car of each node will hold a symbol.  We initialize our list with a symbol
+;; whose print name is "nil".
 ;;
 ;;            +-----------+
 ;;   pair --->|  *  | nil | 
@@ -418,6 +419,12 @@
    ;; accepting characters. These routines have no effect if the file has already been
    ;; closed. The value returned is unspecified.
    ;;---------------------------------------------------------------------------------------- 
+
+   [close-input-port
+    (lambda (p)
+      ;;  TBD - free the port resources ???
+      (foreign-call "s_close" (port-fd p)))]
+
    
    [close-output-port
     (lambda (p)
@@ -644,9 +651,10 @@
    	(cond
    	 [(port-unread p)
    	  (let ([ch (port-unread p)])
-   	    (unless (eof-object? (port-unread p))
-		    (port-unread-clear p))
-   	    ch)]
+	    (begin
+	      (unless (eof-object? (port-unread p))
+		      (port-unread-clear p))
+	      ch))]
    	 [else   ;; note fill-input-buffer only called when port-unread is #f
    	  (begin
    	    (when (fx= (port-last p) (port-ndx p))
@@ -654,8 +662,9 @@
 	    (if (port-unread p)
 		(port-unread p)
 		(let ([ch (string-ref (port-buf p) (port-ndx p))])
-		  (port-ndx-add1 p)
-		  ch)))])))]
+		  (begin
+		    (port-ndx-add1 p)
+		    ch))))])))]
 
    [fill-input-buffer
     (lambda (p)

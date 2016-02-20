@@ -26,5 +26,4 @@ test 19:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" 
 test 20:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (input-port? p)))) ... ok
 test 21:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) 42))) ... ok
 test 22:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) (port-ndx p)))) ... ok
-test 23:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) (port-last p)))) ... ok
-test 24:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (read-char p)))) ...> 
+test 23:(begin (let ((p (open-output-file "stst.tmp"))) (display "Hello World!" p) (close-output-port p) (let ((p (open-input-file "stst.tmp"))) (fill-input-buffer p) (port-last p)))) ...> 
