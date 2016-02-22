@@ -145,10 +145,8 @@
     ;; [(list-ref (primitives) 1) => "char->fixnum\n"]
     ;; [(list-ref (primitives) 2) => "null?\n"]
     ;; [(list-ref (primitives) 3) => "char?\n"]
-    [(pair? (primitivies)) => "#t\n"]			      
+    [(pair? (primitives)) => "#t\n"]			      
  )
-
-
 
 ;; (add-tests-with-string-output "S_error"
 ;;  [(let ([error (lambda args

@@ -370,7 +370,11 @@ ptr s_close(ptr fd) {
 
 // Open returns -1 on failure and sets errno to indicate the error
 
-ptr s_open(ptr filename) {
+//-------------------------------------------------------------------------
+//  A couple of variations on open to open a file for read, write, append
+//-------------------------------------------------------------------------
+
+ptr s_open_for_write(ptr filename) {
   
   // convert incomming filename to a null teminated path
   int len = unshift(string_len(filename));
@@ -380,7 +384,41 @@ ptr s_open(ptr filename) {
   path[len]=0;
   
   // make the call to open the file
-  int fd = open(path, O_RDWR|O_CREAT, 0644);
+  int fd = open(path, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+  free(path);
+  
+  // return the fd as a fixnum
+  return shift(fd);
+}
+
+ptr s_open_for_append(ptr filename) {
+  
+  // convert incomming filename to a null teminated path
+  int len = unshift(string_len(filename));
+  char *f = string_data(filename);
+  char *path = malloc(len+1);
+  memcpy(path,f,len);
+  path[len]=0;
+  
+  // make the call to open the file
+  int fd = open(path, O_WRONLY|O_APPEND|O_CREAT, 0644);
+  free(path);
+  
+  // return the fd as a fixnum
+  return shift(fd);
+}
+
+ptr s_open_for_read(ptr filename) {
+  
+  // convert incomming filename to a null teminated path
+  int len = unshift(string_len(filename));
+  char *f = string_data(filename);
+  char *path = malloc(len+1);
+  memcpy(path,f,len);
+  path[len]=0;
+  
+  // make the call to open the file
+  int fd = open(path, O_RDONLY);
   free(path);
   
   // return the fd as a fixnum

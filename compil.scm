@@ -124,6 +124,12 @@
 ;; 3.15 Foreign Functions
 ;; 3.16 Error Handling and Safe Primitives
 ;; 3.17 Variable-arity Procedures
+;; 3.18 Apply
+;; 3.20 Write and Display
+;; 3.21 Input Ports
+;; 3.22 Tokenizer (TBD)
+;; 3.23 Reader (TBD)
+;; 3.24 Interpreter (TBD)
 
 ;;------------------------------------------------------------------------------
 ;;                               Compiler Options
@@ -1925,9 +1931,13 @@
 ;;                                      Strings
 ;;-------------------------------------------------------------------------------
 ;;
+;;-------------------------------------------------------------------------------
+;; (make-string k)                                          procedure
+;; (make-string k char)                                     procedure
 ;;
-;;
-;;
+;; Make-string returns a newly allocated string of length k. If char is given,
+;; then all elements of the string are initialized to char, otherwise the
+;; contents of the string are unspecified.  (R5RS)
 ;;-------------------------------------------------------------------------------
 
 (define-primitive (make-string si env len)
@@ -1947,6 +1957,12 @@
    (emit "    add  %esi, %ebp")           ;; bump heap base to the 8 byte aligned boundary
    (emit "# make-string end"))
 
+;;-------------------------------------------------------------------------------------
+;; (string? obj)                                         procedure
+;;
+;; Returns #t if obj is a string, otherwise returns #f.   (R5RS)
+;;-------------------------------------------------------------------------------------
+
 (define-primitive (string? si env object)
     (emit-expr si env object)
     (emit "    and $~s, %al" string-mask)
@@ -1957,10 +1973,23 @@
     (emit "    sal $~s, %al" bool-bit);
     (emit "    or $~s, %al" bool-f))
 
+;;-------------------------------------------------------------------------------------
+;; (string-length string)                                procedure
+;;
+;; Returns the number of characters in the given string.  (R5RS)
+;;-------------------------------------------------------------------------------------
+
 (define-primitive (string-length si env str)
     (emit-expr si env str)
     (emit-check-string 'string-length)
     (emit "    movl ~s(%eax), %eax" (- string-tag)))
+
+;;-------------------------------------------------------------------------------------
+;; (string-ref string k)                                 procedure
+;;
+;; k must be a valid index of string. String-ref returns character k of string using
+;; zero-origin indexing. (R5RS)
+;;-------------------------------------------------------------------------------------
 
 (define-primitive (string-ref si env str k)
   (emit-expr si env str)
@@ -1969,12 +1998,19 @@
   (emit-expr si env k)                   ;; eax = k (4 x bytes)
   (emit-check-fixnum 'string-ref)
   (emit-check-string-index si 'string-ref)
-  (emit "    sar $~s, %eax" fixnum-shift)     ;; eax = k (bytes)
-  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
-  (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
+  (emit "    sar $~s, %eax" fixnum-shift)    ;; eax = k (bytes)
+  (emit "    movl ~s(%esp), %esi" si)        ;; esi <- string + tag(6)
+  (emit "    movl -2(%eax,%esi), %eax")      ;; eax <- v[k]    tag(-6) + lenfield_size(4)
   (emit "    sal $~s, %eax" char-shift)      ;; shift char to content position
   (emit "    or  $~s, %eax" char-tag))       ;; affix the tag
-   
+
+;;------------------------------------------------------------------------------------
+;; (string-set! string k char)                           procedure
+;;
+;; k must be a valid index of string. String-set! stores char in element k of string
+;; and returns an unspecified value.    (R5Rs)
+;;------------------------------------------------------------------------------------
+
 (define-primitive (string-set! si env str k char)
   (emit-expr si env str)
   (emit-check-string 'string-set!)
