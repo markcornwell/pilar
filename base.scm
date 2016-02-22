@@ -12,7 +12,8 @@
 ;;--------------------------------------------------------------------------------------
 ;;
 ;; Here we initialize a list of symbols.  The list is a conventional list of cons nodes
-;; Where the car of each node will hold a symbol.
+;; Where the car of each node will hold a symbol.  We initialize our list with a symbol
+;; whose print name is "nil".
 ;;
 ;;            +-----------+
 ;;   pair --->|  *  | nil | 
@@ -33,8 +34,9 @@
 ;; tag value from the pointer.
 ;;-------------------------------------------------------------------------------------
 ;;
-;; To read:     (with-input-from-file "symbol.scm" (lambda () (read))
-;; To compile:  (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
+;; To read:   (with-input-from-file "symbol.scm" (lambda () (read))
+;; To compil: (with-input-from-file "symbol.scm" (lambda () (emit-labels 0 '() (read))))
+;;
 ;; (with-output-to-file "symbol.s"
 ;;     (lambda ()
 ;;         (with-input-from-file "symbol.scm"
@@ -48,6 +50,16 @@
 	  (cons (make-symbol "nil" ()) ())])
      (lambda () interned-symbols))]
 
+  ;;-------------------------------------------------------------------------------------
+  ;; (string=? string1 string2)                          library procedure
+  ;; (string-ci=? string1 string2)                       library procedure
+  ;;
+  ;; Returns #t if the two strings are the same length and contain the same characters
+  ;; in the same positions, otherwise returns #f. String-ci=? treats upper and lower case
+  ;; letters as though they were the same character, but string=? treats upper and
+  ;; lower case as distinct characters.  (R5RS)
+  ;;-------------------------------------------------------------------------------------
+  
   [string=?
    (letrec
        ([slen= (lambda (s1 s2)
@@ -69,6 +81,28 @@
 		    (si<n= s1 s2 0 (string-length s1))
 		    #f))])
      ss=)]
+
+  ;;-------------------------------------------------------------------------------------
+  ;;  (string->symbol string)                                procedure
+  ;; 
+  ;; Returns the symbol whose name is string. This procedure can create symbols with
+  ;; names containing special characters or letters in the non-standard case, but it is
+  ;; usually a bad idea to create such symbols because in some implementations of
+  ;; Scheme they cannot be read as themselves. See symbol->string.
+  ;;
+  ;; The following examples assume that the implementation’s standard case is lower case:
+  ;; (eq? ’mISSISSIppi ’mississippi) =⇒ #t
+  ;;   (string->symbol "mISSISSIppi")
+  ;;           =⇒ the symbol with name "mISSISSIppi"
+  ;; (eq? ’bitBlt (string->symbol "bitBlt")) =⇒ #f
+  ;;   (eq? ’JollyWog
+  ;;         (string->symbol
+  ;;              (symbol->string ’JollyWog))) =⇒ #t
+  ;;  (string=? "K. Harper, M.D."
+  ;;            (symbol->string
+  ;;                  (string->symbol "K. Harper, M.D."))) =⇒ #t
+  ;; (R5RS)
+  ;;-------------------------------------------------------------------------------------
   
   [string->symbol
    (letrec
@@ -96,30 +130,79 @@
 	 (cons elt nil)
 	 (cons (car lst) (append1 (cdr lst) elt))))]
 
+  ;;----------------------------------------------------------------------------------
+  ;; (list-ref list k)                                   library procedure
+  ;;
+  ;; Returns the kth element of list. (This is the same as the car of (list-tail list
+  ;; k).) It is an error if list has fewer than k elements.
+  ;; 
+  ;; (list-ref ’(a b c d) 2) =⇒ c
+  ;; (list-ref ’(a b c d)
+  ;;           (inexact->exact (round 1.8)))
+  ;;           =⇒ c
+  ;; (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [list-ref
    (lambda (l k)
      (if (fx= k 0)
 	 (car l)
 	 (list-ref (cdr l) (fx- k 1))))]
 
+
+  ;;----------------------------------------------------------------------------------
+  ;; (length list)                                      library procedure
+  ;;
+  ;; Returns the length of list.
+  ;;   (length ’(a b c))               =⇒ 3
+  ;;   (length ’(a (b) (c d e)))       =⇒ 3
+  ;;   (length ’())                    =⇒ 0
+  ;;
+  ;; (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [list-length
    (lambda (l)
      (if (null? l)
 	 0
 	 (fxadd1 (list-length (cdr l)))))]
 
+  ;;----------------------------------------------------------------------------------
+  ;; (reverse list )                                     library procedure
+  ;;
+  ;; Returns a newly allocated list consisting of the elements of
+  ;; list in reverse order.    (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [reverse
    (letrec ([f (lambda (l lrev)
 		 (if (null? l)
 		     lrev
 		     (f (cdr l) (cons (car l) lrev))))])
      (lambda (l) (f l '())))]
+
+
+  
+
+  [list
+   (lambda args args)]   ;; so cool!
 	 
 
   ;;----------------------------------------------------------------------------------
   ;;                                     Vectors
   ;;----------------------------------------------------------------------------------
 
+  ;;----------------------------------------------------------------------------------
+  ;; (vector obj ... )                                   library procedure
+  ;;
+  ;; Returns a newly allocated vector whose elements contain the given arguments.
+  ;; Analogous to list.
+  ;;
+  ;;     (vector ’a ’b ’c)  =⇒ #(a b c)
+  ;;
+  ;; (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [vector
    (letrec
        ([fill-vector
@@ -137,6 +220,12 @@
   ;;                                     Strings
   ;;----------------------------------------------------------------------------------
 
+  ;;----------------------------------------------------------------------------------
+  ;; (string char ...)                                  library procedure
+  ;;
+  ;; Returns a newly allocated string composed of the arguments.   (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [string
    (letrec
        ([fill-string
@@ -150,6 +239,16 @@
        (let ([s (make-string (list-length args))])
 	 (fill-string s 0 args))))]
 
+  ;;----------------------------------------------------------------------------------
+  ;; (string->list string)                               library procedure
+  ;; (list->string list)                                 library procedure
+  ;;
+  ;; String->list returns a newly allocated list of the charac- ters that make up the
+  ;; given string. List->string returns a newly allocated string formed from the
+  ;; characters in the list list, which must be a list of characters. String->list
+  ;; and list->string are inverses so far as equal? is concerned.      (R5RS)
+  ;;----------------------------------------------------------------------------------
+  
   [string->list
    (letrec
        ([f (lambda (s i)
@@ -244,6 +343,8 @@
      (set! p (cons 'boolean? p))
      (set! p (cons 'fixnum? p))
      (set! p (cons 'char? p))
+     (set! p (cons 'eof-object p))
+     (set! p (cons 'eof-object? p))
      (set! p (cons 'null? p))
      (set! p (cons 'char->fixnum p))
      (set! p (cons 'fixnum->char p))
@@ -269,7 +370,7 @@
   [zero? (lambda (z) (fxzero? z))]
   [positive? (lambda (x) (fx> x 0))]
   [negative? (lambda (x) (fx< x 0))]
-  [even? (lambda (x) (fxzero? (remainder x 2)))]    ;; TBD optimize as bit twiddling
+  [even? (lambda (x) (fxzero? (fxremainder x 2)))]    ;; TBD optimize as bit twiddling
   [odd? (lambda (x) (not (even? x)))]
 
 ;;----------------------------------------------------------------------------------------
@@ -277,19 +378,20 @@
 ;;----------------------------------------------------------------------------------------
 ;;  (map proc list1 list2 ...)
 ;;  (for-each proc list1 list2 ...)
-;;
+  ;;
+  
   
   [map (lambda (f l)    ;; special case of map   TBD generalize to more arglists
 	  (if (null? l)
 	      (quote ())
 	      (cons (f (car l)) (map f (cdr l)))))]
 
-  [for-each (lambda (f l)   ;; generalize later
+  [for-each (lambda (f l)   ;; TBD  generalize later
 	       (unless (null? l)
 		  (begin
 		    (f (car l))
 		    (for-each f (cdr l)))))]
-  
+
 ;;----------------------------------------------------------------------------------------
 ;;                                      Output Ports
 ;;----------------------------------------------------------------------------------------
@@ -314,8 +416,10 @@
 
   [standard-out
    (let ([p (make-vector 6)]
-	 [sz 1024])                     ;; We represent output ports by vector containing the following fields:
-        (vector-set! p 0 'output-port)  ;; 0. A unique identifier to distinguish output ports from ordinary vectors
+  	 [sz 1024])                     ;; We represent output ports by vector containing
+                                        ;; the following fields:
+     (vector-set! p 0 'output-port)     ;; 0. A unique identifier to distinguish output ports from
+                                        ;;    ordinary vectors
         (vector-set! p 1 "/dev/stdout") ;; 1. A string denoting the file name associated with the port.
         (vector-set! p 2 1)             ;; 2. A file-descriptor associated with the opened file.
         (vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
@@ -327,6 +431,10 @@
    (let ([current-out standard-out])
      (lambda () current-out))]
 
+  [current-input-port
+   (let ([current-in standard-in])
+     (lambda () current-in))]
+
   [port-kind      (lambda (p) (vector-ref p 0))]
   [port-path      (lambda (p) (vector-ref p 1))]
   [port-fd        (lambda (p) (vector-ref p 2))]
@@ -336,7 +444,7 @@
   [port-ndx-reset (lambda (p) (vector-set! p 4 0))]
   [port-size      (lambda (p) (vector-ref p 5))]
 
-
+  
   ;;----------------------------------------------------------------------------------------
   ;; (write-char char)                                    procedure
   ;; (write-char char port)                               procedure
@@ -371,46 +479,34 @@
         (flush-output-port) ;; should be flush all output ports  TBD
 	(foreign-call "s_exit")))]
 
-   ;; [output-port?
-   ;;  (lambda (x)
-   ;;    (if (vector? x)
-   ;; 	  (if (fx= 6 (vector-length? x))
-   ;; 	      (symbol=? (vector-ref x 0) 'output-port)
-   ;; 	      #f)
-   ;; 	  #f))]
-
-   [output-port?
-    (lambda (p)
-      (and (vector? p)
-	   (and (fx= (vector-length p) 6)
-		(eq? (port-kind p) 'output-port))))]
 
    ;;---------------------------------------------------------------------------------------- 
-   ;;  (open-output-file filename)                        procedure
+   ;; (open-output-file filename)                          procedure
    ;;
-   ;;  Takes a string naming an output file to be created and returns an output port capable
+   ;; Takes a string naming an output file to be created and returns an output port capable
    ;; of writing cracters to a new file by that name. If the file cannot be opened, an error
    ;; is signalled. If a file with the given name already exists, the effect is unspecified.
+   ;;; (R5RS)
    ;;----------------------------------------------------------------------------------------
 
    [open-output-file
     (lambda (filename)
       (begin
-	(unless (string? filename)
-		(error 'open-output-file "filename must be a string"))
-	(let ([fd (foreign-call "s_open" filename)])  ;; TBD Check if open succeeded
-	  (begin
-	    (when (negative? fd) (error 'open-output-file "open failed"))
-	    (let ([p (make-vector 6)]
-		  [sz 1024])                     ;; We represent output ports by vector containing the following fields:
-	      (begin
-		(vector-set! p 0 'output-port)     ;; 0. A unique id to distinguish output ports from ordinary vectors
-		(vector-set! p 1 filename)         ;; 1. A string denoting the file name associated with the port.
-		(vector-set! p 2 fd)               ;; 2. A file-descriptor associated with the opened file.
-		(vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
-		(vector-set! p 4 0)                ;; 4. An index pointing to the next position in the buffer.
-		(vector-set! p 5 sz)               ;; 5. The size of the buffer.      
-		p))))))]
+   	(unless (string? filename)
+   		(error 'open-output-file "filename must be a string"))
+   	(let ([fd (foreign-call "s_open_for_write" filename)])  ;; TBD Check if open succeeded
+   	  (begin
+   	    (when (negative? fd) (error 'open-output-file "open failed"))
+   	    (let ([p (make-vector 6)]
+   		  [sz 1024])                     ;; We represent output ports by vector containing the following fields:
+   	      (begin
+   		(vector-set! p 0 'output-port)     ;; 0. A unique id to distinguish output ports from ordinary vectors
+   		(vector-set! p 1 filename)         ;; 1. A string denoting the file name associated with the port.
+   		(vector-set! p 2 fd)               ;; 2. A file-descriptor associated with the opened file.
+   		(vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
+   		(vector-set! p 4 0)                ;; 4. An index pointing to the next position in the buffer.
+   		(vector-set! p 5 sz)               ;; 5. The size of the buffer.      
+   		p))))))]
     
    ;;---------------------------------------------------------------------------------------- 
    ;; (close-input-port port)                              procedure
@@ -418,8 +514,14 @@
    ;;
    ;; Closes the file associated with port, rendering the port incapable of delivering or
    ;; accepting characters. These routines have no effect if the file has already been
-   ;; closed. The value returned is unspecified.
+   ;; closed. The value returned is unspecified.  (R5RS)
    ;;---------------------------------------------------------------------------------------- 
+
+   [close-input-port
+    (lambda (p)
+      ;;  TBD - free the port resources ???
+      (foreign-call "s_close" (port-fd p)))]
+
    
    [close-output-port
     (lambda (p)
@@ -489,10 +591,9 @@
    	 	(write-char #\space p)
    	 	(write-char #\. p)
    	 	(write-char #\space p)
-   	 	(write (cdr pr) p))]))]
-	 )
+   	 	(write (cdr pr) p))]))])
 	 
-   	 (lambda (expr p alpha)
+   	 (lambda (expr p alpha)   ;; base-write
    	   (cond
    	    [(boolean? expr) (print-boolean expr p)]
    	    [(null? expr) (print-null p)]
@@ -514,12 +615,9 @@
    ;; written representation are enclosed in doublequotes, and within those strings
    ;; backslash and doublequote characters are escaped by backslashes. Character objects are
    ;; written using the #\ notation. Write returns an unspecified value. The port argument
-   ;; may be omitted, in which case it defaults to the value returned by current-output-port. 
+   ;; may be omitted, in which case it defaults to the value returned by current-output-port.
+   ;; (R5RS)
    ;;----------------------------------------------------------------------------------------
-   
-   ;; [write
-   ;;  (lambda (expr)
-   ;;    (base-write expr #f))]
 
    [write
     (lambda (expr . args)
@@ -541,11 +639,8 @@
    ;; Rationale: Write is intended for producing machine-readable output and display is for
    ;; producing human-readable output. Implementations that allow “slashification” within
    ;; symbols will probably want write but not display to slashify funny characters in symbols.
+   ;; (R5RS)
    ;;----------------------------------------------------------------------------------------
-   
-   ;; [display
-   ;;  (lambda (expr)
-   ;;    (base-write expr #t))]
 
    [display
     (lambda (expr . args)
@@ -555,8 +650,179 @@
       (base-write expr p #t)))]
    
    [integer->char
-    (lambda (i) (fixnum->char i))])
-       
+    (lambda (i) (fixnum->char i))]
+
+   ;;---------------------------------------------------------------------------------------- 
+   ;; 3.21 Input Ports
+   ;;---------------------------------------------------------------------------------------- 
+   ;; The representation of input ports is very similar to output ports. The only difference
+   ;; is that we add one extra field to support “unreading” a character which adds very
+   ;; minor overhead to the primitives read-char and peek-char, but greatly simplifies the
+   ;; implementation of the tokenizer (next step). The primitives added at this stage are
+   ;; input-port?, open-input-file, read-char, unread-char, peek-char, and eof-object? (by
+   ;; adding a special end-of-file object that is similar to the empty-list). (Ghuloum 2006)
+   ;;---------------------------------------------------------------------------------------- 
+
+   [standard-in
+    (let* ([p (make-vector 8)]
+	   [sz 1024])    
+      (begin                               ;; We represent input ports by vector containing the following fields:
+   	(vector-set! p 0 'input-port)      ;; 0. A unique id to distinguish output ports from ordinary vectors
+   	(vector-set! p 1 "/dev/stdin")     ;; 1. A string denoting the file name associated with the port.
+   	(vector-set! p 2 0)                ;; 2. A file-descriptor associated with the opened file.
+   	(vector-set! p 3 (make-string sz)) ;; 3. A string that serves as an output buffer.
+   	(vector-set! p 4 0)                ;; 4. An index pointing to the next position in the buffer.
+   	(vector-set! p 5 sz)               ;; 5. The size of the buffer.
+   	(vector-set! p 6 #f)               ;; 6. unread-char buffer
+	(vector-set! p 7 -1)               ;; 7. position after last valid position in the buffer	
+   	p))]  
+   
+   [port-unread        (lambda (p) (vector-ref p 6))]
+   [port-unread-clear  (lambda (p) (vector-set! p 6 #f))]
+   [port-unread-set!   (lambda (p x) (vector-set! p 6 x))]
+   [port-last          (lambda (p) (vector-ref p 7))]
+   [port-last-set!     (lambda (p i) (vector-set! p 7 i))]
+   
+   ;;---------------------------------------------------------------------------------------- 
+   ;; (input-port? obj)                                  procedure
+   ;; (output-port? obj)                                 procedure
+   ;;
+   ;; Returns #t if obj is an input port or output port respec- tively, otherwise returns #f.
+   ;; (R5RS)
+   ;;---------------------------------------------------------------------------------------- 
+   
+   [input-port?
+    (lambda (p)
+      (and (vector? p)
+	   (and (fx= (vector-length p) 8)
+		(eq? (port-kind p) 'input-port))))]
+
+   [output-port?
+    (lambda (p)
+      (and (vector? p)
+	   (and (fx= (vector-length p) 6)
+		(eq? (port-kind p) 'output-port))))]
+
+   ;;----------------------------------------------------------------------------------------
+   ;; (open-input-file filename)                          procedure
+   ;;
+   ;; Takes a string naming an existing file and returns an input port capable of delivering
+   ;; characters from the file. If the file cannot be opened, an error is signalled. (R5RS)
+   ;;----------------------------------------------------------------------------------------
+   
+   [open-input-file
+    (lambda (filename)
+      (begin
+   	(unless (string? filename)
+   		(error 'open-input-file "filename must be a string"))
+   	(let ([fd (foreign-call "s_open_for_read" filename)])  ;; TBD Check if open succeeded
+   	  (begin
+   	    (when (negative? fd) (error 'open-input-file "open failed"))
+   	    (let ([p (make-vector 8)]
+   		  [sz 1024])                      ;; We represent input ports by vector containing the following fields:
+   	      (begin
+   		(vector-set! p 0 'input-port)     ;; 0. A unique id to distinguish output ports from ordinary vectors
+   		(vector-set! p 1 filename)        ;; 1. A string denoting the file name associated with the port.
+   		(vector-set! p 2 fd)              ;; 2. A file-descriptor associated with the opened file.
+   		(vector-set! p 3 (make-string sz));; 3. A string that serves as an output buffer.
+   		(vector-set! p 4 0)               ;; 4. An index pointing to the next position in the buffer.
+   		(vector-set! p 5 sz)              ;; 5. The size of the buffer.
+   		(vector-set! p 6 #f)              ;; 6. unread-char buffer.
+		(vector-set! p 7 0)               ;; 7. position after last valid position in the buffer
+   		p))))))]
+
+   ;;----------------------------------------------------------------------------------------
+   ;; (read-char)                                        procedure
+   ;; (read-char port )                                  procedure
+   ;;
+   ;; Returns the next character available from the input port, updating the port to point
+   ;; to the following character. If no more characters are available, an end of file object
+   ;; is returned. Port may be omitted, in which case it defaults to the value returned by
+   ;; current-input-port.   (R5RS)
+   ;;----------------------------------------------------------------------------------------
+   
+   [read-char
+    (lambda args
+      (let ([p (if (null? args)
+   		   (current-input-port)
+   		   (car args))])
+   	(cond
+   	 [(port-unread p)
+   	  (let ([ch (port-unread p)])
+	    (begin
+	      (unless (eof-object? (port-unread p))
+		      (port-unread-clear p))
+	      ch))]
+   	 [else   ;; note fill-input-buffer only called when port-unread is #f
+   	  (begin
+   	    (when (fx= (port-last p) (port-ndx p))
+		  (fill-input-buffer p))
+	    (if (port-unread p)
+		(port-unread p)
+		(let ([ch (string-ref (port-buf p) (port-ndx p))])
+		  (begin
+		    (port-ndx-add1 p)
+		    ch))))])))]
+
+   [fill-input-buffer
+    (lambda (p)
+      (let ([nbytes (foreign-call "s_read" (port-fd p) (port-buf p) (port-size p))])
+   	(begin
+	  (port-ndx-reset p)
+	  (port-last-set! p nbytes)
+   	  (when (fxzero? nbytes)
+		(port-unread-set! p (eof-object))))))] 
+                                     ;;  Need to seriously rethink this
+	     
+   [unread-char 'TBD]
+
+   ;;----------------------------------------------------------------------------------------  
+   ;;  (peek-char)                                       procedure 
+   ;;  (peek-char port )                                 procedure
+   ;;
+   ;; Returns the next character available from the input port, without updating the port
+   ;; to point to the following character. If no more characters are available, an end of
+   ;; file object is returned. Port may be omitted, in which case it defaults to the value
+   ;; returned by current-input-port.
+   ;;
+   ;; Note: The value returned by a call to peek-char is the same as the value that would
+   ;; have been returned by a call to read-char with the same port. The only difference is
+   ;; that the very next call to read-char or peek-char on that port will return the value
+   ;; returned by the preceding call to peek-char. In particular, a call to peek-char on
+   ;; an interactive port will hang waiting for input whenever a call to read-char would
+   ;; have hung.  (R5RS)
+   ;;---------------------------------------------------------------------------------------- 
+   
+   ;; [peek-char
+   ;;  (lambda args
+   ;;    (let ([p (if (null? args)
+   ;; 		   (current-input-port)
+   ;; 		   (car args))])
+   ;; 	(if (port-unread p)
+   ;; 	    (port-unread p)
+   ;; 	    (begin
+   ;; 	      (when (fx= (port-ndx p) (port-size p))
+   ;; 		    (fill-input-buffer))	    
+   ;; 	      (string-ref (port-buf) (port-ndx))))))]
+
+   ;;----------------------------------------------------------------------------------------  
+   ;; (char-ready?)                                      procedure
+   ;; (char-ready? port)                                 procedure
+   ;;
+   ;; Returns #t if a character is ready on the input port and returns #f otherwise. If
+   ;; char-ready returns #t then the next read-char operation on the given port is guaranteed
+   ;; not to hang. If the port is at end of file then char-ready? returns #t. Port may be
+   ;; omitted, in which case it defaults to the value returned by current-input-port.
+   ;;
+   ;; Rationale: Char-ready? exists to make it possible for a program to accept characters
+   ;; from interactive ports without getting stuck waiting for input. Any input editors
+   ;; associated with such ports must ensure that characters whose existence has been
+   ;; asserted by char-ready? cannot be rubbed out. If char-ready? were to return #f at end
+   ;; of file, a port at end of file would be indistinguishable from an interactive port that
+   ;; has no ready characters.  (R5RS)
+   ;;----------------------------------------------------------------------------------------  
+   
+   ) ;; end labels bindings
  (begin #t)) ; end labels
  
 

@@ -124,6 +124,12 @@
 ;; 3.15 Foreign Functions
 ;; 3.16 Error Handling and Safe Primitives
 ;; 3.17 Variable-arity Procedures
+;; 3.18 Apply
+;; 3.20 Write and Display
+;; 3.21 Input Ports
+;; 3.22 Tokenizer (TBD)
+;; 3.23 Reader (TBD)
+;; 3.24 Interpreter (TBD)
 
 ;;------------------------------------------------------------------------------
 ;;                               Compiler Options
@@ -162,8 +168,8 @@
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
-;; (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
 
+(load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
 (load "tests/tests-4.1-req.scm")  ;; remainder modulo quotient write-char write/display
 (load "tests/tests-3.4-req.scm")  ;; apply
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
@@ -270,6 +276,7 @@
 	     begin
 	     closure
 	     cond
+	     else
 	     foreign-call
 	     if
 	     lambda
@@ -278,6 +285,8 @@
 	     letrec
 	     primitive-ref
 	     quote
+	     unless
+	     when
 	     )))
 
 ;;-----------------------------------------------------------------------------------
@@ -464,9 +473,10 @@
 ;; Free variables and transforming lambda forms to closure forms
 ;;
 ;; Every lambda expression appearing in the source program is rewritten as a closure
-;; annotated with the set of free variables.  Free variables are any variables
-;; referenced in the body of the lambda that are not either formal parameters of the
-;; lambda or defined locally inside the lambda.
+;; annotated with the set of free variables.
+;;
+;; Free variables are any variables referenced in the body of the lambda that are not
+;; either formal parameters of the lambda or defined locally inside the lambda.*
 ;;
 ;;  (let ((x 5))
 ;;     (lambda (y) (lambda () (fx+ x y))))
@@ -477,8 +487,15 @@
 ;;     (closure (y) (x)
 ;;         (closure () (x y) (fx+ x y))))
 ;;
-;;
 ;; <formals> ::=  (v1...vk) | args | (v1...vk . args)
+;;
+;; *Caveats:
+;;  1. special symbols (cond,let,else,...) are not variables.
+;;     (special-form? x) tells you if a symbol x is special.
+;;  2. primitives are not variables, bad idea to let you rebind them.
+;;  3. external symbols are not variables.  Rationale: external are global and hence
+;;     always available, so upward funargs not a problem.  Exempting them makes many
+;;     fewer closure variables saving both space and time.
 ;;
 ;;-----------------------------------------------------------------------------------
 
@@ -578,6 +595,7 @@
    [(simple-constant? expr) '()]
    [(primitive? expr) '()]
    [(special-form? expr) '()]
+   [(external? expr) '()]   ;; filters out globals
    [(symbol? expr) (if (memq expr bound-vars)
 			 '()
 			 (list expr))]
@@ -1063,7 +1081,7 @@
 ;;
 ;; There are decent reasons for enumerating imports as we do here.  Makes it
 ;; explicit what we are importing and from where we import it.
-
+;;--------------------------------------------------------------------------------
 
 (define-syntax import-from
   (syntax-rules ()
@@ -1078,51 +1096,71 @@
        (import-from (library-name) s* ...))]))
 
 (define (external? symbol)
-  (getprop symbol '*is-external*))
+  (and (symbol? symbol) (getprop symbol '*is-external*)))
 
 (import-from (base)
+	     append1
+	     base-write         ;; ns
+	     close-input-port
+	     close-output-port
+	     current-input-port
+	     current-output-port
+	     display
+	     even?
+	     exit
+	     error
+	     eh_procedure       ;; ns
+	     eh_argcount        ;; ns
+
+	     fill-input-buffer
+	     flush-output-port
+	     for-each
+	     input-port?
+	     integer->char
+	     integer->list      ;; non standard
+	     
+	     list
+	     list-ref
+	     list-length
+	     map
+	     negative?	     
+	     odd?
+	     output-port?
+	     open-output-file
+	     open-input-file
+	     peek-char        
+	     port-kind          ;; ns
+	     port-last          ;; ns
+	     port-last-set!     ;; ns
+	     port-path          ;; ns
+	     port-fd            ;; ns
+	     port-buf           ;; ns
+	     port-size          ;; ns
+	     port-ndx           ;; ns
+	     port-ndx-add1      ;; ns
+	     port-ndx-reset     ;; ns
+	     port-unread        ;; ns
+	     port-unread-clear  ;; ns
+	     port-unread-set!   ;; ns
+	     
+	     positive?
+	     primitives         ;; ns
+
+	     read-char
+	     reverse	     
+
+	     string
+	     standard-in        ;; ns
+	     standard-out       ;; ns
 	     string->symbol
 	     symbols
 	     string=?
-	     append1
-	     error
-	     eh_procedure
-	     eh_argcount
-	     primitives
-	     list-ref
-	     list-length
-	     reverse
-	     vector
-	     string
-	     standard-out
-	     current-output-port
-	     port-kind
-	     port-path
-	     port-fd
-	     port-buf
-	     port-size
-	     port-ndx
-	     port-ndx-add1
-	     port-ndx-reset
-	     flush-output-port
-	     output-port?
-	     close-output-port
-	     open-output-file
-	     write-char
-	     exit
-	     write
-	     display
-	     base-write
-	     integer->char
 	     string->list
-	     integer->list  ;; non standard
-	     negative?
-	     positive?
+
+	     vector
+	     write	     
+	     write-char 
 	     zero?
-	     even?
-	     odd?
-	     map
-	     for-each
 	     )
 
 (define-transform (external-symbols expr)
@@ -1353,6 +1391,7 @@
 (define value-offset    4)
 
 (define nil-value    #b00111111) ; #x3F)
+(define eof-value    #b01011111) ; #x5F)   
 (define wordsize        4) ; bytes
 
 (define fixnum-bits (- (* wordsize 8) fixnum-shift))
@@ -1433,6 +1472,19 @@
     (emit "    movzbl %al, %eax")
     (emit "    sal $~s, %al" bool-bit)
     (emit "    or $~s, %al" bool-f))
+
+(define-primitive (eof-object? si env arg)
+    (emit-expr si env arg)
+    (emit "    cmp $~s, %eax" eof-value)
+    (emit "    mov $0, %eax")
+     ;; convert the cc to a boolean
+    (emit "    sete %al")
+    (emit "    movzbl %al, %eax")
+    (emit "    sal $~s, %al" bool-bit)
+    (emit "    or $~s, %al" bool-f))
+
+(define-primitive (eof-object si env)
+  (emit "    movl $~s,%eax" eof-value))
 
 (define-primitive (char? si env arg)
     (emit-expr si env arg)
@@ -1879,9 +1931,13 @@
 ;;                                      Strings
 ;;-------------------------------------------------------------------------------
 ;;
+;;-------------------------------------------------------------------------------
+;; (make-string k)                                          procedure
+;; (make-string k char)                                     procedure
 ;;
-;;
-;;
+;; Make-string returns a newly allocated string of length k. If char is given,
+;; then all elements of the string are initialized to char, otherwise the
+;; contents of the string are unspecified.  (R5RS)
 ;;-------------------------------------------------------------------------------
 
 (define-primitive (make-string si env len)
@@ -1901,6 +1957,12 @@
    (emit "    add  %esi, %ebp")           ;; bump heap base to the 8 byte aligned boundary
    (emit "# make-string end"))
 
+;;-------------------------------------------------------------------------------------
+;; (string? obj)                                         procedure
+;;
+;; Returns #t if obj is a string, otherwise returns #f.   (R5RS)
+;;-------------------------------------------------------------------------------------
+
 (define-primitive (string? si env object)
     (emit-expr si env object)
     (emit "    and $~s, %al" string-mask)
@@ -1911,10 +1973,23 @@
     (emit "    sal $~s, %al" bool-bit);
     (emit "    or $~s, %al" bool-f))
 
+;;-------------------------------------------------------------------------------------
+;; (string-length string)                                procedure
+;;
+;; Returns the number of characters in the given string.  (R5RS)
+;;-------------------------------------------------------------------------------------
+
 (define-primitive (string-length si env str)
     (emit-expr si env str)
     (emit-check-string 'string-length)
     (emit "    movl ~s(%eax), %eax" (- string-tag)))
+
+;;-------------------------------------------------------------------------------------
+;; (string-ref string k)                                 procedure
+;;
+;; k must be a valid index of string. String-ref returns character k of string using
+;; zero-origin indexing. (R5RS)
+;;-------------------------------------------------------------------------------------
 
 (define-primitive (string-ref si env str k)
   (emit-expr si env str)
@@ -1923,12 +1998,19 @@
   (emit-expr si env k)                   ;; eax = k (4 x bytes)
   (emit-check-fixnum 'string-ref)
   (emit-check-string-index si 'string-ref)
-  (emit "    sar $~s, %eax" fixnum-shift)     ;; eax = k (bytes)
-  (emit "    movl ~s(%esp), %esi" si)    ;; esi <- string + tag(6)
-  (emit "    movl -2(%eax,%esi), %eax")  ;; eax <- v[k]    tag(-6) + lenfield_size(4)
+  (emit "    sar $~s, %eax" fixnum-shift)    ;; eax = k (bytes)
+  (emit "    movl ~s(%esp), %esi" si)        ;; esi <- string + tag(6)
+  (emit "    movl -2(%eax,%esi), %eax")      ;; eax <- v[k]    tag(-6) + lenfield_size(4)
   (emit "    sal $~s, %eax" char-shift)      ;; shift char to content position
   (emit "    or  $~s, %eax" char-tag))       ;; affix the tag
-   
+
+;;------------------------------------------------------------------------------------
+;; (string-set! string k char)                           procedure
+;;
+;; k must be a valid index of string. String-set! stores char in element k of string
+;; and returns an unspecified value.    (R5Rs)
+;;------------------------------------------------------------------------------------
+
 (define-primitive (string-set! si env str k char)
   (emit-expr si env str)
   (emit-check-string 'string-set!)
@@ -2439,10 +2521,10 @@
 ;;        The caller restores the frame's edi upon return by loading closure from esp-4
 ;;        The callee simply returns and does not mess with the closure slot
 ;;
-;;                                              figure 3
+;;                                            figure 3
 ;;-----------------------------------------------------------------------------------------------
 
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 ;;   Invariants
 ;;
 ;;  esp - si - 12     next frame arg 1
@@ -2455,7 +2537,7 @@
 ;;  esp - 4           closure pointer |  used to restore ecp when callee returns
 ;;  esp - 0           return pointer  |  when the frame goes away
 ;;
-;;-----------------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------
 
 (define funcall-args cddr)
 (define funcall-oper cadr)

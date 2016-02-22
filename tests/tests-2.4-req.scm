@@ -128,7 +128,7 @@
   [(or (cons 1 2) ((lambda (x) (x x)) (lambda (x) (x x)))) => "(1 . 2)\n"]
   [(let ([if 12]) (or if 17)) => "12\n"]
   [(let ([if 12]) (and if 17)) => "17\n"]
-; [(let ([let 8]) (or let 18)) => "8\n"]
+; [(let ([let 8]) (or let 18)) => "8\n"]    ;; <<--- binds let (allow this??)
 ; [(let ([let 8]) (and let 18)) => "18\n"]  ;; <<--- ARE WE GOING TO ALLOW REBINDING LET?
   [(let ([t 1])
      (and (begin (set! t (fxadd1 t)) t) t)) => "2\n"]
