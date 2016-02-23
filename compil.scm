@@ -167,6 +167,9 @@
 ;; (load "tests/tests-5.3-req.scm")  ;; call/cc
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
+
+;; (load "tests/tests-4.4-req.scm")   ;; implicit begin revisited
+
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 
 (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
