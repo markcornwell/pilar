@@ -3,14 +3,26 @@
  [(begin 12) => "12\n"]
  [(begin 13 122) => "122\n"]
  [(begin 123 2343 #t) => "#t\n"]
- [(let ([t (begin 12 (cons 1 2))]) (begin t t)) => "(1 . 2)\n"]
- [(let ([t (begin 13 (cons 1 2))])
-    (cons 1 t)
-    t) => "(1 . 2)\n"]
- [(let ([t (cons 1 2)])
-    (if (pair? t) 
-        (begin t)
-        12)) => "(1 . 2)\n"]
+ [(cond [#t 'able 'baker 'charlie 'dog]) => "dog\n"]
+
+ 
+  [(cond [#f 1 2 3] [#t 4 5 6 42]) => "42\n"]
+  [(let ([a 14]) (fx+ a a) (fx- a a)) => "0\n"]
+  [(let* ([a 14] [b (fx+ a 1)]) a b) => "15\n"]
+  [(letrec ([a 20][b (fx+ a 1)]) a b) => "21\n"]
+ ; [(letrec ([b (fx+ a 1)] [a 40]) a b (fx+ b 1)) => "42\n"]    ;; should not work
+  [(when #t 39 40 41 42) => "42\n"]
+  [(unless #f 42 43 44 45) => "45\n"]
+  [((lambda (x) 46 47 48) 42) => "48\n"]
+
+  [(let ([t (begin 12 (cons 1 2))]) (begin t t)) => "(1 . 2)\n"]
+  [(let ([t (begin 13 (cons 1 2))])
+     (cons 1 t)
+     t) => "(1 . 2)\n"]
+  [(let ([t (cons 1 2)])
+     (if (pair? t) 
+	 (begin t)
+	 12)) => "(1 . 2)\n"]
 
   [(let ([n 2])
     (let ([v0 (make-string n)])
@@ -29,16 +41,41 @@
   [(let ([n 3])
     (let ([v0 (make-string n)])
      (let ([v1 (make-string (string-length v0))])
-       (string-length v0)))) =>  "3\n"]  
+       (string-length v0)))) =>  "3\n"]
 
+  [(let ([v0 (make-string 3)])
+     (begin
+       (string-set! v0 0 #\a)
+       #\f)) =>  "#\\f\n"]        
+
+  
+  [(let ([v0 (make-string 3)])
+       (string-set! v0 (fx- (string-length v0) 3) #\a)
+       #\d) =>  "#\\d\n"] 
+
+
+   [(let ([v0 (make-string 3)])
+       (string-set! v0 (fx- (string-length v0) 3) #\a)
+       #\d) =>  "#\\d\n"]    
+
+  [(let ([n 3])
+    (let ([v0 (make-string n)])
+       (string-set! v0 (fx- (string-length v0) 3) #\a)
+       #\c)) =>  "#\\c\n"]                  
+  
   [(let ([n 3])
     (let ([v0 (make-string n)])
      (let ([v1 (make-string (string-length v0))])
        (string-set! v0 (fx- (string-length v0) 3) #\a)
-       (string-ref v0 0)))) =>  "#\\a\n"]  ;;  <<<-----------<<<<  line 1: 13824 Segmentation fault: 11  ./stst >&stst.out
+       #\b))) =>  "#\\b\n"]                    ;; ??
   
-
-;;   ISSUE #15 on GITHUB
+  
+  [(let ([n 3])
+    (let ([v0 (make-string n)])
+     (let ([v1 (make-string (string-length v0))])
+       (string-set! v0 (fx- (string-length v0) 3) #\a)
+       (string-ref v0 0)))) =>  "#\\a\n"] 
+  
   [(let ([n 3])
     (let ([v0 (make-string n)])
      (let ([v1 (make-string (string-length v0))])
@@ -48,7 +85,6 @@
        (string-set! v1 (fx- (string-length v1) 3) #\Z)
        (string-set! v1 (fx- (string-length v0) 2) #\Y)
        (string-set! v1 (fx- (string-length v1) 1) #\X)
-       (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]      ;; line 1: 13391 Segmentation fault: 11  ./stst >&stst.out
-
+       (cons v0 v1)))) =>  "(\"abc\" . \"ZYX\")\n"]  
 )
 

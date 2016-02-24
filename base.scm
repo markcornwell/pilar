@@ -768,12 +768,19 @@
     (lambda (p)
       (let ([nbytes (foreign-call "s_read" (port-fd p) (port-buf p) (port-size p))])
    	(begin
-	  (port-ndx-reset p)
-	  (port-last-set! p nbytes)
+   	  (port-ndx-reset p)
+   	  (port-last-set! p nbytes)
    	  (when (fxzero? nbytes)
-		(port-unread-set! p (eof-object))))))] 
-                                     ;;  Need to seriously rethink this
-	     
+   		(port-unread-set! p (eof-object))))))] 
+
+   ;; [fill-input-buffer
+   ;;  (lambda (p)
+   ;;    (let ([nbytes (foreign-call "s_read" (port-fd p) (port-buf p) (port-size p))])
+   ;; 	  (port-ndx-reset p)
+   ;; 	  (port-last-set! p nbytes)
+   ;; 	  (when (fxzero? nbytes)
+   ;; 		(port-unread-set! p (eof-object)))))] 
+   
    [unread-char 'TBD]
 
    ;;----------------------------------------------------------------------------------------  
