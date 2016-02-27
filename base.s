@@ -379,27 +379,27 @@ _L_1883602:
 # == eliminate-let*  ==>
 # (letrec ((slen= (lambda (s1 s2) (fx= (string-length s1) (string-length s2)))) (si= (lambda (s1 s2 i) (char=? (string-ref s1 i) (string-ref s2 i)))) (si<n= (lambda (s1 s2 i n) (if (fx= i n) #t (if (si= s1 s2 i) (si<n= s1 s2 (fx+ i 1) n) #f)))) (ss= (lambda (s1 s2) (if (slen= s1 s2) (si<n= s1 s2 0 (string-length s1)) #f)))) ss=)
 # == uniquify-variables  ==>
-# (letrec ((f310791 (lambda (f310812 f310813) (fx= (string-length f310812) (string-length f310813)))) (f310790 (lambda (f310809 f310810 f310811) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811)))) (f310789 (lambda (f310805 f310806 f310807 f310808) (if (fx= f310807 f310808) #t (if (f310790 f310805 f310806 f310807) (f310789 f310805 f310806 (fx+ f310807 1) f310808) #f)))) (f310788 (lambda (f310803 f310804) (if (f310791 f310803 f310804) (f310789 f310803 f310804 0 (string-length f310803)) #f)))) f310788)
+# (letrec ((f310791 (lambda (f310813 f310812) (fx= (string-length f310813) (string-length f310812)))) (f310790 (lambda (f310811 f310810 f310809) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809)))) (f310789 (lambda (f310808 f310807 f310806 f310805) (if (fx= f310806 f310805) #t (if (f310790 f310808 f310807 f310806) (f310789 f310808 f310807 (fx+ f310806 1) f310805) #f)))) (f310788 (lambda (f310804 f310803) (if (f310791 f310804 f310803) (f310789 f310804 f310803 0 (string-length f310804)) #f)))) f310788)
 # == vectorize-letrec  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (lambda (f310812 f310813) (fx= (string-length f310812) (string-length f310813)))) (vector-set! f310790 0 (lambda (f310809 f310810 f310811) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811)))) (vector-set! f310789 0 (lambda (f310805 f310806 f310807 f310808) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f)))) (vector-set! f310788 0 (lambda (f310803 f310804) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (lambda (f310813 f310812) (fx= (string-length f310813) (string-length f310812)))) (vector-set! f310790 0 (lambda (f310811 f310810 f310809) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809)))) (vector-set! f310789 0 (lambda (f310808 f310807 f310806 f310805) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f)))) (vector-set! f310788 0 (lambda (f310804 f310803) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))) (vector-ref f310788 0)))
 # == eliminate-set!  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (lambda (f310812 f310813) (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (lambda (f310809 f310810 f310811) (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (lambda (f310805 f310806 f310807 f310808) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (lambda (f310803 f310804) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (lambda (f310813 f310812) (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (lambda (f310811 f310810 f310809) (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (lambda (f310808 f310807 f310806 f310805) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (lambda (f310804 f310803) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # == close-free-variables  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # == eliminate-quote  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # == eliminate-when/unless  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # == eliminate-cond  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # == external-symbols  ==>
-# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
-# emit-expr (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0)))
+# (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
+# emit-expr (let ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1))) (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0)))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310791 (make-vector 1)) (f310790 (make-vector 1)) (f310789 (make-vector 1)) (f310788 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0))
+#  body = (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -540,15 +540,15 @@ _L_1883611:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -12(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0))
+# emit-expr (begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))) (vector-ref f310788 0))
+#   expr=(begin (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))) (vector-ref f310788 0))
 #   env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# emit-expr (begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+# emit-expr (begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 # emit-begin
-#   expr=(begin (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))) (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+#   expr=(begin (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))) (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 #   env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# emit-expr (vector-set! f310791 0 (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813)))))
+# emit-expr (vector-set! f310791 0 (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812)))))
 # emit-expr f310791
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -597,11 +597,11 @@ _L_1883615:
     jmp *-2(%edi)  # jump to handler
 _L_1883614:
     movl %eax, -20(%esp)
-# emit-expr (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))
+# emit-expr (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))
 # emit-closure
 # si = -24
 # env = ((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr = (closure (f310812 f310813) () (let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813))))
+# expr = (closure (f310813 f310812) () (let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812))))
     movl $_L_1883616, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -619,38 +619,38 @@ _L_1883616:
 _L_1883618:
 # emit-tail-expr
 # si=-16
-# env=((f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(let ((f310812 f310812) (f310813 f310813)) (fx= (string-length f310812) (string-length f310813)))
+# env=((f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(let ((f310813 f310813) (f310812 f310812)) (fx= (string-length f310813) (string-length f310812)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#  bindings = ((f310812 f310812) (f310813 f310813))
-#  body = (fx= (string-length f310812) (string-length f310813))
-# emit-expr f310812
-# emit-variable-ref
-# env=((f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310812
-    movl -8(%esp), %eax  # stack load f310812
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#  bindings = ((f310813 f310813) (f310812 f310812))
+#  body = (fx= (string-length f310813) (string-length f310812))
 # emit-expr f310813
 # emit-variable-ref
-# env=((f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310813
-    movl -12(%esp), %eax  # stack load f310813
+    movl -8(%esp), %eax  # stack load f310813
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310812
+# emit-variable-ref
+# env=((f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310812
+    movl -12(%esp), %eax  # stack load f310812
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310813 . -20) (f310812 . -16) (f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(fx= (string-length f310812) (string-length f310813))
+# env=((f310812 . -20) (f310813 . -16) (f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(fx= (string-length f310813) (string-length f310812))
 # tail primcall
-# emit-expr (string-length f310813)
-# emit-expr f310813
+# emit-expr (string-length f310812)
+# emit-expr f310812
 # emit-variable-ref
-# env=((f310813 . -20) (f310812 . -16) (f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310813
-    movl -20(%esp), %eax  # stack load f310813
+# env=((f310812 . -20) (f310813 . -16) (f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310812
+    movl -20(%esp), %eax  # stack load f310812
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -678,12 +678,12 @@ _L_1883619:
     jmp *-2(%edi)  # jump to the handler
 _L_1883620:
     movl %eax, -24(%esp)
-# emit-expr (string-length f310812)
-# emit-expr f310812
+# emit-expr (string-length f310813)
+# emit-expr f310813
 # emit-variable-ref
-# env=((f310813 . -20) (f310812 . -16) (f310813 . -12) (f310812 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310812
-    movl -16(%esp), %eax  # stack load f310812
+# env=((f310812 . -20) (f310813 . -16) (f310812 . -12) (f310813 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310813
+    movl -16(%esp), %eax  # stack load f310813
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -715,18 +715,18 @@ _L_1883622:
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
-#return from tail (fx= (string-length f310812) (string-length f310813))
+#return from tail (fx= (string-length f310813) (string-length f310812))
     ret
     .align 4,0x90
 _L_1883617:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+# emit-expr (begin (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 # emit-begin
-#   expr=(begin (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))) (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+#   expr=(begin (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))) (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 #   env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# emit-expr (vector-set! f310790 0 (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811)))))
+# emit-expr (vector-set! f310790 0 (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809)))))
 # emit-expr f310790
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -775,11 +775,11 @@ _L_1883626:
     jmp *-2(%edi)  # jump to handler
 _L_1883625:
     movl %eax, -20(%esp)
-# emit-expr (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))
+# emit-expr (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))
 # emit-closure
 # si = -24
 # env = ((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr = (closure (f310809 f310810 f310811) () (let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))))
+# expr = (closure (f310811 f310810 f310809) () (let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))))
     movl $_L_1883627, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -797,46 +797,46 @@ _L_1883627:
 _L_1883629:
 # emit-tail-expr
 # si=-20
-# env=((f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(let ((f310809 f310809) (f310810 f310810) (f310811 f310811)) (char=? (string-ref f310809 f310811) (string-ref f310810 f310811)))
+# env=((f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(let ((f310811 f310811) (f310810 f310810) (f310809 f310809)) (char=? (string-ref f310811 f310809) (string-ref f310810 f310809)))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#  bindings = ((f310809 f310809) (f310810 f310810) (f310811 f310811))
-#  body = (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))
-# emit-expr f310809
+#  env  = ((f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#  bindings = ((f310811 f310811) (f310810 f310810) (f310809 f310809))
+#  body = (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))
+# emit-expr f310811
 # emit-variable-ref
-# env=((f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310809
-    movl -8(%esp), %eax  # stack load f310809
+# env=((f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310811
+    movl -8(%esp), %eax  # stack load f310811
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-expr f310810
 # emit-variable-ref
-# env=((f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310810
     movl -12(%esp), %eax  # stack load f310810
 # end emit-variable-ref
     movl %eax, -24(%esp)  # stack save
-# emit-expr f310811
+# emit-expr f310809
 # emit-variable-ref
-# env=((f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310811
-    movl -16(%esp), %eax  # stack load f310811
+# env=((f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310809
+    movl -16(%esp), %eax  # stack load f310809
 # end emit-variable-ref
     movl %eax, -28(%esp)  # stack save
 # emit-tail-expr
 # si=-32
-# env=((f310811 . -28) (f310810 . -24) (f310809 . -20) (f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(char=? (string-ref f310809 f310811) (string-ref f310810 f310811))
+# env=((f310809 . -28) (f310810 . -24) (f310811 . -20) (f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(char=? (string-ref f310811 f310809) (string-ref f310810 f310809))
 # tail primcall
-# char= c1=(string-ref f310809 f310811) c2=(string-ref f310810 f310811)
-# emit-expr (string-ref f310809 f310811)
-# emit-expr f310809
+# char= c1=(string-ref f310811 f310809) c2=(string-ref f310810 f310809)
+# emit-expr (string-ref f310811 f310809)
+# emit-expr f310811
 # emit-variable-ref
-# env=((f310811 . -28) (f310810 . -24) (f310809 . -20) (f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310809
-    movl -20(%esp), %eax  # stack load f310809
+# env=((f310809 . -28) (f310810 . -24) (f310811 . -20) (f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310811
+    movl -20(%esp), %eax  # stack load f310811
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -851,11 +851,11 @@ _L_1883629:
     jmp *-2(%edi)  # jump to the handler
 _L_1883630:
     movl %eax, -32(%esp)
-# emit-expr f310811
+# emit-expr f310809
 # emit-variable-ref
-# env=((f310811 . -28) (f310810 . -24) (f310809 . -20) (f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310811
-    movl -28(%esp), %eax  # stack load f310811
+# env=((f310809 . -28) (f310810 . -24) (f310811 . -20) (f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310809
+    movl -28(%esp), %eax  # stack load f310809
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -901,10 +901,10 @@ _L_1883632:
     jmp *-2(%edi)  # jump to the handler
 _L_1883634:
     movb %ah, -32(%esp)
-# emit-expr (string-ref f310810 f310811)
+# emit-expr (string-ref f310810 f310809)
 # emit-expr f310810
 # emit-variable-ref
-# env=((f310811 . -28) (f310810 . -24) (f310809 . -20) (f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310809 . -28) (f310810 . -24) (f310811 . -20) (f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310810
     movl -24(%esp), %eax  # stack load f310810
 # end emit-variable-ref
@@ -921,11 +921,11 @@ _L_1883634:
     jmp *-2(%edi)  # jump to the handler
 _L_1883635:
     movl %eax, -36(%esp)
-# emit-expr f310811
+# emit-expr f310809
 # emit-variable-ref
-# env=((f310811 . -28) (f310810 . -24) (f310809 . -20) (f310811 . -16) (f310810 . -12) (f310809 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310811
-    movl -28(%esp), %eax  # stack load f310811
+# env=((f310809 . -28) (f310810 . -24) (f310811 . -20) (f310809 . -16) (f310810 . -12) (f310811 . -8) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310809
+    movl -28(%esp), %eax  # stack load f310809
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -975,18 +975,18 @@ _L_1883639:
     movzbl %al, %eax
     sal $6, %al
     or $47, %al
-#return from tail (char=? (string-ref f310809 f310811) (string-ref f310810 f310811))
+#return from tail (char=? (string-ref f310811 f310809) (string-ref f310810 f310809))
     ret
     .align 4,0x90
 _L_1883628:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+# emit-expr (begin (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 # emit-begin
-#   expr=(begin (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))) (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+#   expr=(begin (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))) (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 #   env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# emit-expr (vector-set! f310789 0 (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f)))))
+# emit-expr (vector-set! f310789 0 (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f)))))
 # emit-expr f310789
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -1035,11 +1035,11 @@ _L_1883643:
     jmp *-2(%edi)  # jump to handler
 _L_1883642:
     movl %eax, -20(%esp)
-# emit-expr (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))
+# emit-expr (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))
 # emit-closure
 # si = -24
 # env = ((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr = (closure (f310805 f310806 f310807 f310808) (f310790 f310789) (let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))))
+# expr = (closure (f310808 f310807 f310806 f310805) (f310790 f310789) (let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))))
     movl $_L_1883644, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -1069,51 +1069,51 @@ _L_1883644:
 _L_1883646:
 # emit-tail-expr
 # si=-24
-# env=((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(let ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808)) (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f)))
+# env=((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(let ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805)) (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f)))
 # emit-tail-let
 #  si   = -24
-#  env  = ((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#  bindings = ((f310805 f310805) (f310806 f310806) (f310807 f310807) (f310808 f310808))
-#  body = (if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))
-# emit-expr f310805
-# emit-variable-ref
-# env=((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310805
-    movl -8(%esp), %eax  # stack load f310805
-# end emit-variable-ref
-    movl %eax, -24(%esp)  # stack save
-# emit-expr f310806
-# emit-variable-ref
-# env=((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310806
-    movl -12(%esp), %eax  # stack load f310806
-# end emit-variable-ref
-    movl %eax, -28(%esp)  # stack save
-# emit-expr f310807
-# emit-variable-ref
-# env=((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310807
-    movl -16(%esp), %eax  # stack load f310807
-# end emit-variable-ref
-    movl %eax, -32(%esp)  # stack save
+#  env  = ((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#  bindings = ((f310808 f310808) (f310807 f310807) (f310806 f310806) (f310805 f310805))
+#  body = (if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))
 # emit-expr f310808
 # emit-variable-ref
-# env=((f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310808
-    movl -20(%esp), %eax  # stack load f310808
+    movl -8(%esp), %eax  # stack load f310808
+# end emit-variable-ref
+    movl %eax, -24(%esp)  # stack save
+# emit-expr f310807
+# emit-variable-ref
+# env=((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310807
+    movl -12(%esp), %eax  # stack load f310807
+# end emit-variable-ref
+    movl %eax, -28(%esp)  # stack save
+# emit-expr f310806
+# emit-variable-ref
+# env=((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310806
+    movl -16(%esp), %eax  # stack load f310806
+# end emit-variable-ref
+    movl %eax, -32(%esp)  # stack save
+# emit-expr f310805
+# emit-variable-ref
+# env=((f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310805
+    movl -20(%esp), %eax  # stack load f310805
 # end emit-variable-ref
     movl %eax, -36(%esp)  # stack save
 # emit-tail-expr
 # si=-40
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(if (fx= f310807 f310808) #t (if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f))
-# emit-expr (fx= f310807 f310808)
-# emit-expr f310808
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(if (fx= f310806 f310805) #t (if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f))
+# emit-expr (fx= f310806 f310805)
+# emit-expr f310805
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310808
-    movl -36(%esp), %eax  # stack load f310808
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310805
+    movl -36(%esp), %eax  # stack load f310805
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -1128,11 +1128,11 @@ _L_1883646:
     jmp *-2(%edi)  # jump to the handler
 _L_1883649:
     movl %eax, -40(%esp)
-# emit-expr f310807
+# emit-expr f310806
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310807
-    movl -32(%esp), %eax  # stack load f310807
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310806
+    movl -32(%esp), %eax  # stack load f310806
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -1155,7 +1155,7 @@ _L_1883650:
     je _L_1883647
 # emit-tail-expr
 # si=-40
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
@@ -1163,17 +1163,17 @@ _L_1883650:
 _L_1883647:
 # emit-tail-expr
 # si=-40
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(if ((vector-ref f310790 0) f310805 f310806 f310807) ((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808) #f)
-# emit-expr ((vector-ref f310790 0) f310805 f310806 f310807)
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(if ((vector-ref f310790 0) f310808 f310807 f310806) ((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805) #f)
+# emit-expr ((vector-ref f310790 0) f310808 f310807 f310806)
 # funcall
 #    si   =-40
-#    env  = ((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#    expr = (funcall (vector-ref f310790 0) f310805 f310806 f310807)
+#    env  = ((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#    expr = (funcall (vector-ref f310790 0) f310808 f310807 f310806)
 # emit-expr (vector-ref f310790 0)
 # emit-expr f310790
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310790
     movl 2(%edi), %eax  # frame load f310790
 # end emit-variable-ref
@@ -1232,27 +1232,27 @@ _L_1883655:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883657":
    movl %eax,  -48(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310805
+# emit-expr f310808
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310805
-    movl -24(%esp), %eax  # stack load f310805
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310808
+    movl -24(%esp), %eax  # stack load f310808
 # end emit-variable-ref
-    mov %eax, -52(%esp)  # arg f310805
-# emit-expr f310806
-# emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310806
-    movl -28(%esp), %eax  # stack load f310806
-# end emit-variable-ref
-    mov %eax, -56(%esp)  # arg f310806
+    mov %eax, -52(%esp)  # arg f310808
 # emit-expr f310807
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310807
-    movl -32(%esp), %eax  # stack load f310807
+    movl -28(%esp), %eax  # stack load f310807
 # end emit-variable-ref
-    mov %eax, -60(%esp)  # arg f310807
+    mov %eax, -56(%esp)  # arg f310807
+# emit-expr f310806
+# emit-variable-ref
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310806
+    movl -32(%esp), %eax  # stack load f310806
+# end emit-variable-ref
+    mov %eax, -60(%esp)  # arg f310806
     movl -48(%esp), %edi   # load new closure to %edi
     add $-40, %esp   # adjust base
     movl $12,%eax   # save arg count
@@ -1263,16 +1263,16 @@ _L_1883655:
     je _L_1883651
 # emit-tail-expr
 # si=-40
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=((vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808)
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=((vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805)
 # emit-tail-funcall
 #    si   =-40
-#    env  = ((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#    expr = (funcall (vector-ref f310789 0) f310805 f310806 (fx+ f310807 1) f310808)
+#    env  = ((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#    expr = (funcall (vector-ref f310789 0) f310808 f310807 (fx+ f310806 1) f310805)
 # emit-expr (vector-ref f310789 0)
 # emit-expr f310789
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310789
     movl 6(%edi), %eax  # frame load f310789
 # end emit-variable-ref
@@ -1320,21 +1320,21 @@ _L_1883660:
     movl -40(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -40(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310805
+# emit-expr f310808
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310805
-    movl -24(%esp), %eax  # stack load f310805
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310808
+    movl -24(%esp), %eax  # stack load f310808
 # end emit-variable-ref
-    mov %eax, -44(%esp)    # arg f310805
-# emit-expr f310806
+    mov %eax, -44(%esp)    # arg f310808
+# emit-expr f310807
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310806
-    movl -28(%esp), %eax  # stack load f310806
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310807
+    movl -28(%esp), %eax  # stack load f310807
 # end emit-variable-ref
-    mov %eax, -48(%esp)    # arg f310806
-# emit-expr (fx+ f310807 1)
+    mov %eax, -48(%esp)    # arg f310807
+# emit-expr (fx+ f310806 1)
 # emit-expr 1
     movl $4, %eax     # immed 1
 # check the argument is a fixnum
@@ -1350,11 +1350,11 @@ _L_1883660:
     jmp *-2(%edi)  # jump to the handler
 _L_1883662:
     movl %eax, -52(%esp)  # fx+ push arg1
-# emit-expr f310807
+# emit-expr f310806
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310807
-    movl -32(%esp), %eax  # stack load f310807
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310806
+    movl -32(%esp), %eax  # stack load f310806
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -1369,14 +1369,14 @@ _L_1883662:
     jmp *-2(%edi)  # jump to the handler
 _L_1883663:
     addl -52(%esp), %eax  # fx+ arg1 arg2
-    mov %eax, -52(%esp)    # arg (fx+ f310807 1)
-# emit-expr f310808
+    mov %eax, -52(%esp)    # arg (fx+ f310806 1)
+# emit-expr f310805
 # emit-variable-ref
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310808
-    movl -36(%esp), %eax  # stack load f310808
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310805
+    movl -36(%esp), %eax  # stack load f310805
 # end emit-variable-ref
-    mov %eax, -56(%esp)    # arg f310808
+    mov %eax, -56(%esp)    # arg f310805
     movl -40(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=5   si=-40  delta=36
     mov -40(%esp), %ebx  # shift frame cell
@@ -1400,7 +1400,7 @@ _L_1883663:
 _L_1883651:
 # emit-tail-expr
 # si=-40
-# env=((f310808 . -36) (f310807 . -32) (f310806 . -28) (f310805 . -24) (f310808 . -20) (f310807 . -16) (f310806 . -12) (f310805 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310805 . -36) (f310806 . -32) (f310807 . -28) (f310808 . -24) (f310805 . -20) (f310806 . -16) (f310807 . -12) (f310808 . -8) (f310789 . 8) (f310790 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
@@ -1411,11 +1411,11 @@ _L_1883645:
     movl -16(%esp), %ebx
     movl -20(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+# emit-expr (begin (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 # emit-begin
-#   expr=(begin (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))))
+#   expr=(begin (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))))
 #   env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# emit-expr (vector-set! f310788 0 (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))))
+# emit-expr (vector-set! f310788 0 (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))))
 # emit-expr f310788
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -1464,11 +1464,11 @@ _L_1883667:
     jmp *-2(%edi)  # jump to handler
 _L_1883666:
     movl %eax, -20(%esp)
-# emit-expr (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))
+# emit-expr (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))
 # emit-closure
 # si = -24
 # env = ((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr = (closure (f310803 f310804) (f310791 f310789) (let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)))
+# expr = (closure (f310804 f310803) (f310791 f310789) (let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)))
     movl $_L_1883668, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
@@ -1498,40 +1498,40 @@ _L_1883668:
 _L_1883670:
 # emit-tail-expr
 # si=-16
-# env=((f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(let ((f310803 f310803) (f310804 f310804)) (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f))
+# env=((f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(let ((f310804 f310804) (f310803 f310803)) (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#  bindings = ((f310803 f310803) (f310804 f310804))
-#  body = (if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)
-# emit-expr f310803
-# emit-variable-ref
-# env=((f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310803
-    movl -8(%esp), %eax  # stack load f310803
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#  bindings = ((f310804 f310804) (f310803 f310803))
+#  body = (if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)
 # emit-expr f310804
 # emit-variable-ref
-# env=((f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310804
-    movl -12(%esp), %eax  # stack load f310804
+    movl -8(%esp), %eax  # stack load f310804
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310803
+# emit-variable-ref
+# env=((f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310803
+    movl -12(%esp), %eax  # stack load f310803
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=(if ((vector-ref f310791 0) f310803 f310804) ((vector-ref f310789 0) f310803 f310804 0 (string-length f310803)) #f)
-# emit-expr ((vector-ref f310791 0) f310803 f310804)
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=(if ((vector-ref f310791 0) f310804 f310803) ((vector-ref f310789 0) f310804 f310803 0 (string-length f310804)) #f)
+# emit-expr ((vector-ref f310791 0) f310804 f310803)
 # funcall
 #    si   =-24
-#    env  = ((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#    expr = (funcall (vector-ref f310791 0) f310803 f310804)
+#    env  = ((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#    expr = (funcall (vector-ref f310791 0) f310804 f310803)
 # emit-expr (vector-ref f310791 0)
 # emit-expr f310791
 # emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310791
     movl 2(%edi), %eax  # frame load f310791
 # end emit-variable-ref
@@ -1590,20 +1590,20 @@ _L_1883675:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883677":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310803
-# emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310803
-    movl -16(%esp), %eax  # stack load f310803
-# end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310803
 # emit-expr f310804
 # emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310804
-    movl -20(%esp), %eax  # stack load f310804
+    movl -16(%esp), %eax  # stack load f310804
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310804
+    mov %eax, -36(%esp)  # arg f310804
+# emit-expr f310803
+# emit-variable-ref
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310803
+    movl -20(%esp), %eax  # stack load f310803
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg f310803
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -1614,16 +1614,16 @@ _L_1883675:
     je _L_1883671
 # emit-tail-expr
 # si=-24
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# expr=((vector-ref f310789 0) f310803 f310804 0 (string-length f310803))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# expr=((vector-ref f310789 0) f310804 f310803 0 (string-length f310804))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-#    expr = (funcall (vector-ref f310789 0) f310803 f310804 0 (string-length f310803))
+#    env  = ((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+#    expr = (funcall (vector-ref f310789 0) f310804 f310803 0 (string-length f310804))
 # emit-expr (vector-ref f310789 0)
 # emit-expr f310789
 # emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310789
     movl 6(%edi), %eax  # frame load f310789
 # end emit-variable-ref
@@ -1671,29 +1671,29 @@ _L_1883680:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310803
-# emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310803
-    movl -16(%esp), %eax  # stack load f310803
-# end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f310803
 # emit-expr f310804
 # emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # var=f310804
-    movl -20(%esp), %eax  # stack load f310804
+    movl -16(%esp), %eax  # stack load f310804
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310804
+    mov %eax, -28(%esp)    # arg f310804
+# emit-expr f310803
+# emit-variable-ref
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310803
+    movl -20(%esp), %eax  # stack load f310803
+# end emit-variable-ref
+    mov %eax, -32(%esp)    # arg f310803
 # emit-expr 0
     movl $0, %eax     # immed 0
     mov %eax, -36(%esp)    # arg 0
-# emit-expr (string-length f310803)
-# emit-expr f310803
+# emit-expr (string-length f310804)
+# emit-expr f310804
 # emit-variable-ref
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
-# var=f310803
-    movl -16(%esp), %eax  # stack load f310803
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# var=f310804
+    movl -16(%esp), %eax  # stack load f310804
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -1708,7 +1708,7 @@ _L_1883680:
     jmp *-2(%edi)  # jump to the handler
 _L_1883682:
     movl -6(%eax), %eax
-    mov %eax, -40(%esp)    # arg (string-length f310803)
+    mov %eax, -40(%esp)    # arg (string-length f310804)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=5   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -1732,7 +1732,7 @@ _L_1883682:
 _L_1883671:
 # emit-tail-expr
 # si=-24
-# env=((f310804 . -20) (f310803 . -16) (f310804 . -12) (f310803 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
+# env=((f310803 . -20) (f310804 . -16) (f310803 . -12) (f310804 . -8) (f310789 . 8) (f310791 . 4) (f310788 . -12) (f310789 . -8) (f310790 . -4) (f310791 . 0))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
@@ -1810,27 +1810,27 @@ _L_1883685:
 # == eliminate-let*  ==>
 # (letrec ((str->sym (lambda (str symlist) (if (string=? str (symbol->string (car symlist))) (car symlist) (if (null? (cdr symlist)) (let ((new-sym (make-symbol str #f))) (let ((new-cdr (cons new-sym ()))) (begin (set-cdr! symlist new-cdr) new-sym))) (str->sym str (cdr symlist))))))) (lambda (str) (str->sym str (symbols))))
 # == uniquify-variables  ==>
-# (letrec ((f310814 (lambda (f310823 f310824) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) (f310814 f310823 (cdr f310824))))))) (lambda (f310832) (f310814 f310832 (symbols))))
+# (letrec ((f310814 (lambda (f310824 f310823) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) (f310814 f310824 (cdr f310823))))))) (lambda (f310832) (f310814 f310832 (symbols))))
 # == vectorize-letrec  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (lambda (f310823 f310824) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))))) (lambda (f310832) ((vector-ref f310814 0) f310832 (symbols)))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (lambda (f310824 f310823) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))))) (lambda (f310832) ((vector-ref f310814 0) f310832 (symbols)))))
 # == eliminate-set!  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (lambda (f310823 f310824) (let ((f310823 f310823) (f310824 f310824)) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (lambda (f310832) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (lambda (f310824 f310823) (let ((f310824 f310824) (f310823 f310823)) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (lambda (f310832) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
 # == close-free-variables  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
 # == eliminate-quote  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
 # == eliminate-when/unless  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
 # == eliminate-cond  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if (string=? f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if (string=? f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 (symbols))))))
 # == external-symbols  ==>
-# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols)))))))
-# emit-expr (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols)))))))
+# (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols)))))))
+# emit-expr (let ((f310814 (make-vector 1))) (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols)))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310814 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
+#  body = (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -1866,15 +1866,15 @@ _L_1883688:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
+# emit-expr (begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
+#   expr=(begin (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))) (closure (f310832) (f310814) (let ((f310832 f310832)) ((vector-ref f310814 0) f310832 ((primitive-ref symbols))))))
 #   env=((f310814 . 0))
-# emit-expr (begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))))))
+# emit-expr (begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))))))
+#   expr=(begin (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))))))
 #   env=((f310814 . 0))
-# emit-expr (vector-set! f310814 0 (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))))
+# emit-expr (vector-set! f310814 0 (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))))
 # emit-expr f310814
 # emit-variable-ref
 # env=((f310814 . 0))
@@ -1923,11 +1923,11 @@ _L_1883692:
     jmp *-2(%edi)  # jump to handler
 _L_1883691:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))))
+# emit-expr (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))))
 # emit-closure
 # si = -12
 # env = ((f310814 . 0))
-# expr = (closure (f310823 f310824) (f310814) (let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))))
+# expr = (closure (f310824 f310823) (f310814) (let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))))
     movl $_L_1883693, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310814 . 0))
@@ -1951,36 +1951,36 @@ _L_1883693:
 _L_1883695:
 # emit-tail-expr
 # si=-16
-# env=((f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(let ((f310823 f310823) (f310824 f310824)) (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))))
+# env=((f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(let ((f310824 f310824) (f310823 f310823)) (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-#  bindings = ((f310823 f310823) (f310824 f310824))
-#  body = (if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))
-# emit-expr f310823
-# emit-variable-ref
-# env=((f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310823
-    movl -8(%esp), %eax  # stack load f310823
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+#  bindings = ((f310824 f310824) (f310823 f310823))
+#  body = (if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))
 # emit-expr f310824
 # emit-variable-ref
-# env=((f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310824
-    movl -12(%esp), %eax  # stack load f310824
+    movl -8(%esp), %eax  # stack load f310824
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310823
+# emit-variable-ref
+# env=((f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -12(%esp), %eax  # stack load f310823
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(if ((primitive-ref string=?) f310823 (symbol->string (car f310824))) (car f310824) (if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824))))
-# emit-expr ((primitive-ref string=?) f310823 (symbol->string (car f310824)))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(if ((primitive-ref string=?) f310824 (symbol->string (car f310823))) (car f310823) (if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823))))
+# emit-expr ((primitive-ref string=?) f310824 (symbol->string (car f310823)))
 # funcall
 #    si   =-24
-#    env  = ((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-#    expr = (funcall (primitive-ref string=?) f310823 (symbol->string (car f310824)))
+#    env  = ((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+#    expr = (funcall (primitive-ref string=?) f310824 (symbol->string (car f310823)))
 # emit-expr (primitive-ref string=?)
     .extern mrc_string$e$q
     movl mrc_string$e$q,%eax
@@ -1996,21 +1996,21 @@ _L_1883695:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883698":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310823
-# emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310823
-    movl -16(%esp), %eax  # stack load f310823
-# end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310823
-# emit-expr (symbol->string (car f310824))
-# symbol->string (car f310824)
-# emit-expr (car f310824)
 # emit-expr f310824
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310824
-    movl -20(%esp), %eax  # stack load f310824
+    movl -16(%esp), %eax  # stack load f310824
+# end emit-variable-ref
+    mov %eax, -36(%esp)  # arg f310824
+# emit-expr (symbol->string (car f310823))
+# symbol->string (car f310823)
+# emit-expr (car f310823)
+# emit-expr f310823
+# emit-variable-ref
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -20(%esp), %eax  # stack load f310823
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2026,7 +2026,7 @@ _L_1883695:
 _L_1883699:
     movl -1(%eax), %eax
     movl -3(%eax), %eax
-    mov %eax, -40(%esp)  # arg (symbol->string (car f310824))
+    mov %eax, -40(%esp)  # arg (symbol->string (car f310823))
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -2037,14 +2037,14 @@ _L_1883699:
     je _L_1883696
 # emit-tail-expr
 # si=-24
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(car f310824)
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(car f310823)
 # tail primcall
-# emit-expr f310824
+# emit-expr f310823
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310824
-    movl -20(%esp), %eax  # stack load f310824
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -20(%esp), %eax  # stack load f310823
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2059,21 +2059,21 @@ _L_1883699:
     jmp *-2(%edi)  # jump to the handler
 _L_1883700:
     movl -1(%eax), %eax
-#return from tail (car f310824)
+#return from tail (car f310823)
     ret
     jmp _L_1883697
 _L_1883696:
 # emit-tail-expr
 # si=-24
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(if (null? (cdr f310824)) (let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))) ((vector-ref f310814 0) f310823 (cdr f310824)))
-# emit-expr (null? (cdr f310824))
-# emit-expr (cdr f310824)
-# emit-expr f310824
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(if (null? (cdr f310823)) (let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))) ((vector-ref f310814 0) f310824 (cdr f310823)))
+# emit-expr (null? (cdr f310823))
+# emit-expr (cdr f310823)
+# emit-expr f310823
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310824
-    movl -20(%esp), %eax  # stack load f310824
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -20(%esp), %eax  # stack load f310823
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2098,20 +2098,20 @@ _L_1883703:
     je _L_1883701
 # emit-tail-expr
 # si=-24
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(let ((f310828 (make-symbol f310823 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828)))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(let ((f310828 (make-symbol f310824 #f))) (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828)))
 # emit-tail-let
 #  si   = -24
-#  env  = ((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-#  bindings = ((f310828 (make-symbol f310823 #f)))
-#  body = (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))
-# emit-expr (make-symbol f310823 #f)
-# make-symbol arg1=f310823 arg2=#f
-# emit-expr f310823
+#  env  = ((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+#  bindings = ((f310828 (make-symbol f310824 #f)))
+#  body = (let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))
+# emit-expr (make-symbol f310824 #f)
+# make-symbol arg1=f310824 arg2=#f
+# emit-expr f310824
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310823
-    movl -16(%esp), %eax  # stack load f310823
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310824
+    movl -16(%esp), %eax  # stack load f310824
 # end emit-variable-ref
     movl %eax, -24(%esp)
 # emit-expr #f
@@ -2126,18 +2126,18 @@ _L_1883703:
     movl %eax, -24(%esp)  # stack save
 # emit-tail-expr
 # si=-28
-# env=((f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310824 f310830) f310828))
+# env=((f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(let ((f310830 (cons f310828 ()))) (begin (set-cdr! f310823 f310830) f310828))
 # emit-tail-let
 #  si   = -28
-#  env  = ((f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+#  env  = ((f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 #  bindings = ((f310830 (cons f310828 ())))
-#  body = (begin (set-cdr! f310824 f310830) f310828)
+#  body = (begin (set-cdr! f310823 f310830) f310828)
 # emit-expr (cons f310828 ())
 # cons arg1=f310828 arg2=()
 # emit-expr f310828
 # emit-variable-ref
-# env=((f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310828
     movl -24(%esp), %eax  # stack load f310828
 # end emit-variable-ref
@@ -2154,16 +2154,16 @@ _L_1883703:
     movl %eax, -28(%esp)  # stack save
 # emit-tail-expr
 # si=-32
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=(begin (set-cdr! f310824 f310830) f310828)
-# tail-begin (begin (set-cdr! f310824 f310830) f310828)
-#   env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# emit-expr (set-cdr! f310824 f310830)
-# emit-expr f310824
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=(begin (set-cdr! f310823 f310830) f310828)
+# tail-begin (begin (set-cdr! f310823 f310830) f310828)
+#   env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# emit-expr (set-cdr! f310823 f310830)
+# emit-expr f310823
 # emit-variable-ref
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310824
-    movl -20(%esp), %eax  # stack load f310824
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -20(%esp), %eax  # stack load f310823
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2180,7 +2180,7 @@ _L_1883704:
     movl %eax, -32(%esp)
 # emit-expr f310830
 # emit-variable-ref
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310830
     movl -28(%esp), %eax  # stack load f310830
 # end emit-variable-ref
@@ -2188,17 +2188,17 @@ _L_1883704:
     movl %eax, 3(%ebx)
 # emit-tail-expr
 # si=-32
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # expr=(begin f310828)
 # tail-begin (begin f310828)
-#   env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+#   env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # emit-tail-expr
 # si=-32
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # expr=f310828
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f310830 . -28) (f310828 . -24) (f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310830 . -28) (f310828 . -24) (f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310828
     movl -24(%esp), %eax  # stack load f310828
 # end emit-variable-ref
@@ -2209,16 +2209,16 @@ _L_1883704:
 _L_1883701:
 # emit-tail-expr
 # si=-24
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# expr=((vector-ref f310814 0) f310823 (cdr f310824))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# expr=((vector-ref f310814 0) f310824 (cdr f310823))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-#    expr = (funcall (vector-ref f310814 0) f310823 (cdr f310824))
+#    env  = ((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+#    expr = (funcall (vector-ref f310814 0) f310824 (cdr f310823))
 # emit-expr (vector-ref f310814 0)
 # emit-expr f310814
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310814
     movl 2(%edi), %eax  # frame load f310814
 # end emit-variable-ref
@@ -2266,19 +2266,19 @@ _L_1883707:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310823
-# emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
-# var=f310823
-    movl -16(%esp), %eax  # stack load f310823
-# end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f310823
-# emit-expr (cdr f310824)
 # emit-expr f310824
 # emit-variable-ref
-# env=((f310824 . -20) (f310823 . -16) (f310824 . -12) (f310823 . -8) (f310814 . 4) (f310814 . 0))
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
 # var=f310824
-    movl -20(%esp), %eax  # stack load f310824
+    movl -16(%esp), %eax  # stack load f310824
+# end emit-variable-ref
+    mov %eax, -28(%esp)    # arg f310824
+# emit-expr (cdr f310823)
+# emit-expr f310823
+# emit-variable-ref
+# env=((f310823 . -20) (f310824 . -16) (f310823 . -12) (f310824 . -8) (f310814 . 4) (f310814 . 0))
+# var=f310823
+    movl -20(%esp), %eax  # stack load f310823
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2293,7 +2293,7 @@ _L_1883707:
     jmp *-2(%edi)  # jump to the handler
 _L_1883709:
     movl 3(%eax), %eax
-    mov %eax, -32(%esp)    # arg (cdr f310824)
+    mov %eax, -32(%esp)    # arg (cdr f310823)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -2482,26 +2482,26 @@ _L_1883711:
 # == eliminate-let*  ==>
 # (lambda (lst elt) (if (null? lst) (cons elt nil) (cons (car lst) (append1 (cdr lst) elt))))
 # == uniquify-variables  ==>
-# (lambda (f310833 f310834) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834))))
+# (lambda (f310834 f310833) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833))))
 # == vectorize-letrec  ==>
-# (lambda (f310833 f310834) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834))))
+# (lambda (f310834 f310833) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833))))
 # == eliminate-set!  ==>
-# (lambda (f310833 f310834) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834)))))
+# (lambda (f310834 f310833) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833)))))
 # == close-free-variables  ==>
-# (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834)))))
+# (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833)))))
 # == eliminate-quote  ==>
-# (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834)))))
+# (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833)))))
 # == eliminate-when/unless  ==>
-# (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834)))))
+# (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833)))))
 # == eliminate-cond  ==>
-# (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) (append1 (cdr f310833) f310834)))))
+# (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) (append1 (cdr f310834) f310833)))))
 # == external-symbols  ==>
-# (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834)))))
-# emit-expr (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834)))))
+# (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833)))))
+# emit-expr (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833)))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f310833 f310834) (nil) (let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834)))))
+# expr = (closure (f310834 f310833) (nil) (let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833)))))
     movl $_L_1883718, 0(%ebp)  # closure label
 # WARNING: free var nil not defined in the environmnet
     movl %ebp, %eax   # get the base ptr
@@ -2520,37 +2520,37 @@ _L_1883718:
 _L_1883720:
 # emit-tail-expr
 # si=-16
-# env=((f310834 . -12) (f310833 . -8) (nil . 4))
-# expr=(let ((f310833 f310833) (f310834 f310834)) (if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834))))
+# env=((f310833 . -12) (f310834 . -8) (nil . 4))
+# expr=(let ((f310834 f310834) (f310833 f310833)) (if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310834 . -12) (f310833 . -8) (nil . 4))
-#  bindings = ((f310833 f310833) (f310834 f310834))
-#  body = (if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834)))
-# emit-expr f310833
-# emit-variable-ref
-# env=((f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310833
-    movl -8(%esp), %eax  # stack load f310833
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310833 . -12) (f310834 . -8) (nil . 4))
+#  bindings = ((f310834 f310834) (f310833 f310833))
+#  body = (if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833)))
 # emit-expr f310834
 # emit-variable-ref
-# env=((f310834 . -12) (f310833 . -8) (nil . 4))
+# env=((f310833 . -12) (f310834 . -8) (nil . 4))
 # var=f310834
-    movl -12(%esp), %eax  # stack load f310834
+    movl -8(%esp), %eax  # stack load f310834
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310833
+# emit-variable-ref
+# env=((f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310833
+    movl -12(%esp), %eax  # stack load f310833
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# expr=(if (null? f310833) (cons f310834 nil) (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834)))
-# emit-expr (null? f310833)
-# emit-expr f310833
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# expr=(if (null? f310834) (cons f310833 nil) (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833)))
+# emit-expr (null? f310834)
+# emit-expr f310834
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310833
-    movl -16(%esp), %eax  # stack load f310833
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310834
+    movl -16(%esp), %eax  # stack load f310834
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -2562,20 +2562,20 @@ _L_1883720:
     je _L_1883721
 # emit-tail-expr
 # si=-24
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# expr=(cons f310834 nil)
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# expr=(cons f310833 nil)
 # tail primcall
-# cons arg1=f310834 arg2=nil
-# emit-expr f310834
+# cons arg1=f310833 arg2=nil
+# emit-expr f310833
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310834
-    movl -20(%esp), %eax  # stack load f310834
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310833
+    movl -20(%esp), %eax  # stack load f310833
 # end emit-variable-ref
     movl %eax, -24(%esp)
 # emit-expr nil
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
 # var=nil
     movl 2(%edi), %eax  # frame load nil
 # end emit-variable-ref
@@ -2586,22 +2586,22 @@ _L_1883720:
     or   $1, %al
     add  $8, %ebp
 # cons end
-#return from tail (cons f310834 nil)
+#return from tail (cons f310833 nil)
     ret
     jmp _L_1883722
 _L_1883721:
 # emit-tail-expr
 # si=-24
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# expr=(cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834))
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# expr=(cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833))
 # tail primcall
-# cons arg1=(car f310833) arg2=((primitive-ref append1) (cdr f310833) f310834)
-# emit-expr (car f310833)
-# emit-expr f310833
+# cons arg1=(car f310834) arg2=((primitive-ref append1) (cdr f310834) f310833)
+# emit-expr (car f310834)
+# emit-expr f310834
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310833
-    movl -16(%esp), %eax  # stack load f310833
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310834
+    movl -16(%esp), %eax  # stack load f310834
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2617,11 +2617,11 @@ _L_1883721:
 _L_1883723:
     movl -1(%eax), %eax
     movl %eax, -24(%esp)
-# emit-expr ((primitive-ref append1) (cdr f310833) f310834)
+# emit-expr ((primitive-ref append1) (cdr f310834) f310833)
 # funcall
 #    si   =-28
-#    env  = ((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-#    expr = (funcall (primitive-ref append1) (cdr f310833) f310834)
+#    env  = ((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+#    expr = (funcall (primitive-ref append1) (cdr f310834) f310833)
 # emit-expr (primitive-ref append1)
     .extern mrc_append1
     movl mrc_append1,%eax
@@ -2637,12 +2637,12 @@ _L_1883723:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883724":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
-# emit-expr (cdr f310833)
-# emit-expr f310833
+# emit-expr (cdr f310834)
+# emit-expr f310834
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310833
-    movl -16(%esp), %eax  # stack load f310833
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310834
+    movl -16(%esp), %eax  # stack load f310834
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2657,14 +2657,14 @@ _L_1883723:
     jmp *-2(%edi)  # jump to the handler
 _L_1883725:
     movl 3(%eax), %eax
-    mov %eax, -40(%esp)  # arg (cdr f310833)
-# emit-expr f310834
+    mov %eax, -40(%esp)  # arg (cdr f310834)
+# emit-expr f310833
 # emit-variable-ref
-# env=((f310834 . -20) (f310833 . -16) (f310834 . -12) (f310833 . -8) (nil . 4))
-# var=f310834
-    movl -20(%esp), %eax  # stack load f310834
+# env=((f310833 . -20) (f310834 . -16) (f310833 . -12) (f310834 . -8) (nil . 4))
+# var=f310833
+    movl -20(%esp), %eax  # stack load f310833
 # end emit-variable-ref
-    mov %eax, -44(%esp)  # arg f310834
+    mov %eax, -44(%esp)  # arg f310833
     movl -36(%esp), %edi   # load new closure to %edi
     add $-28, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -2678,7 +2678,7 @@ _L_1883725:
     or   $1, %al
     add  $8, %ebp
 # cons end
-#return from tail (cons (car f310833) ((primitive-ref append1) (cdr f310833) f310834))
+#return from tail (cons (car f310834) ((primitive-ref append1) (cdr f310834) f310833))
     ret
 _L_1883722:
     .align 4,0x90
@@ -2689,26 +2689,26 @@ _L_1883719:
 # == eliminate-let*  ==>
 # (lambda (l k) (if (fx= k 0) (car l) (list-ref (cdr l) (fx- k 1))))
 # == uniquify-variables  ==>
-# (lambda (f310835 f310836) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1))))
+# (lambda (f310836 f310835) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1))))
 # == vectorize-letrec  ==>
-# (lambda (f310835 f310836) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1))))
+# (lambda (f310836 f310835) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1))))
 # == eliminate-set!  ==>
-# (lambda (f310835 f310836) (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1)))))
+# (lambda (f310836 f310835) (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1)))))
 # == close-free-variables  ==>
-# (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1)))))
+# (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1)))))
 # == eliminate-quote  ==>
-# (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1)))))
+# (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1)))))
 # == eliminate-when/unless  ==>
-# (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1)))))
+# (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1)))))
 # == eliminate-cond  ==>
-# (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) (list-ref (cdr f310835) (fx- f310836 1)))))
+# (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) (list-ref (cdr f310836) (fx- f310835 1)))))
 # == external-symbols  ==>
-# (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1)))))
-# emit-expr (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1)))))
+# (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1)))))
+# emit-expr (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1)))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f310835 f310836) () (let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1)))))
+# expr = (closure (f310836 f310835) () (let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1)))))
     movl $_L_1883726, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -2726,32 +2726,32 @@ _L_1883726:
 _L_1883728:
 # emit-tail-expr
 # si=-16
-# env=((f310836 . -12) (f310835 . -8))
-# expr=(let ((f310835 f310835) (f310836 f310836)) (if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1))))
+# env=((f310835 . -12) (f310836 . -8))
+# expr=(let ((f310836 f310836) (f310835 f310835)) (if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310836 . -12) (f310835 . -8))
-#  bindings = ((f310835 f310835) (f310836 f310836))
-#  body = (if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1)))
-# emit-expr f310835
-# emit-variable-ref
-# env=((f310836 . -12) (f310835 . -8))
-# var=f310835
-    movl -8(%esp), %eax  # stack load f310835
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310835 . -12) (f310836 . -8))
+#  bindings = ((f310836 f310836) (f310835 f310835))
+#  body = (if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1)))
 # emit-expr f310836
 # emit-variable-ref
-# env=((f310836 . -12) (f310835 . -8))
+# env=((f310835 . -12) (f310836 . -8))
 # var=f310836
-    movl -12(%esp), %eax  # stack load f310836
+    movl -8(%esp), %eax  # stack load f310836
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310835
+# emit-variable-ref
+# env=((f310835 . -12) (f310836 . -8))
+# var=f310835
+    movl -12(%esp), %eax  # stack load f310835
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# expr=(if (fx= f310836 0) (car f310835) ((primitive-ref list-ref) (cdr f310835) (fx- f310836 1)))
-# emit-expr (fx= f310836 0)
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# expr=(if (fx= f310835 0) (car f310836) ((primitive-ref list-ref) (cdr f310836) (fx- f310835 1)))
+# emit-expr (fx= f310835 0)
 # emit-expr 0
     movl $0, %eax     # immed 0
 # check the argument is a fixnum
@@ -2767,11 +2767,11 @@ _L_1883728:
     jmp *-2(%edi)  # jump to the handler
 _L_1883731:
     movl %eax, -24(%esp)
-# emit-expr f310836
+# emit-expr f310835
 # emit-variable-ref
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# var=f310836
-    movl -20(%esp), %eax  # stack load f310836
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# var=f310835
+    movl -20(%esp), %eax  # stack load f310835
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -2794,14 +2794,14 @@ _L_1883732:
     je _L_1883729
 # emit-tail-expr
 # si=-24
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# expr=(car f310835)
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# expr=(car f310836)
 # tail primcall
-# emit-expr f310835
+# emit-expr f310836
 # emit-variable-ref
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# var=f310835
-    movl -16(%esp), %eax  # stack load f310835
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# var=f310836
+    movl -16(%esp), %eax  # stack load f310836
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2816,28 +2816,28 @@ _L_1883732:
     jmp *-2(%edi)  # jump to the handler
 _L_1883733:
     movl -1(%eax), %eax
-#return from tail (car f310835)
+#return from tail (car f310836)
     ret
     jmp _L_1883730
 _L_1883729:
 # emit-tail-expr
 # si=-24
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# expr=((primitive-ref list-ref) (cdr f310835) (fx- f310836 1))
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# expr=((primitive-ref list-ref) (cdr f310836) (fx- f310835 1))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-#    expr = (funcall (primitive-ref list-ref) (cdr f310835) (fx- f310836 1))
+#    env  = ((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+#    expr = (funcall (primitive-ref list-ref) (cdr f310836) (fx- f310835 1))
 # emit-expr (primitive-ref list-ref)
     .extern mrc_list$mref
     movl mrc_list$mref,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (cdr f310835)
-# emit-expr f310835
+# emit-expr (cdr f310836)
+# emit-expr f310836
 # emit-variable-ref
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# var=f310835
-    movl -16(%esp), %eax  # stack load f310835
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# var=f310836
+    movl -16(%esp), %eax  # stack load f310836
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -2852,8 +2852,8 @@ _L_1883729:
     jmp *-2(%edi)  # jump to the handler
 _L_1883734:
     movl 3(%eax), %eax
-    mov %eax, -28(%esp)    # arg (cdr f310835)
-# emit-expr (fx- f310836 1)
+    mov %eax, -28(%esp)    # arg (cdr f310836)
+# emit-expr (fx- f310835 1)
 # emit-expr 1
     movl $4, %eax     # immed 1
 # check the argument is a fixnum
@@ -2869,11 +2869,11 @@ _L_1883734:
     jmp *-2(%edi)  # jump to the handler
 _L_1883735:
     movl %eax, -32(%esp)
-# emit-expr f310836
+# emit-expr f310835
 # emit-variable-ref
-# env=((f310836 . -20) (f310835 . -16) (f310836 . -12) (f310835 . -8))
-# var=f310836
-    movl -20(%esp), %eax  # stack load f310836
+# env=((f310835 . -20) (f310836 . -16) (f310835 . -12) (f310836 . -8))
+# var=f310835
+    movl -20(%esp), %eax  # stack load f310835
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -2888,7 +2888,7 @@ _L_1883735:
     jmp *-2(%edi)  # jump to the handler
 _L_1883736:
     subl -32(%esp), %eax
-    mov %eax, -32(%esp)    # arg (fx- f310836 1)
+    mov %eax, -32(%esp)    # arg (fx- f310835 1)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -3065,27 +3065,27 @@ _L_1883738:
 # == eliminate-let*  ==>
 # (letrec ((f (lambda (l lrev) (if (null? l) lrev (f (cdr l) (cons (car l) lrev)))))) (lambda (l) (f l (quote ()))))
 # == uniquify-variables  ==>
-# (letrec ((f310838 (lambda (f310841 f310842) (if (null? f310841) f310842 (f310838 (cdr f310841) (cons (car f310841) f310842)))))) (lambda (f310844) (f310838 f310844 (quote ()))))
+# (letrec ((f310838 (lambda (f310842 f310841) (if (null? f310842) f310841 (f310838 (cdr f310842) (cons (car f310842) f310841)))))) (lambda (f310844) (f310838 f310844 (quote ()))))
 # == vectorize-letrec  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (lambda (f310841 f310842) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))))) (lambda (f310844) ((vector-ref f310838 0) f310844 (quote ())))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (lambda (f310842 f310841) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))))) (lambda (f310844) ((vector-ref f310838 0) f310844 (quote ())))))
 # == eliminate-set!  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (lambda (f310841 f310842) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (lambda (f310844) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 (quote ()))))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (lambda (f310842 f310841) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (lambda (f310844) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 (quote ()))))))
 # == close-free-variables  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 (quote ()))))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 (quote ()))))))
 # == eliminate-quote  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
 # == eliminate-when/unless  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
 # == eliminate-cond  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
 # == external-symbols  ==>
-# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
-# emit-expr (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
+# (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
+# emit-expr (let ((f310838 (make-vector 1))) (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ())))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310838 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
+#  body = (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -3121,15 +3121,15 @@ _L_1883746:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
+# emit-expr (begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
+#   expr=(begin (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))) (closure (f310844) (f310838) (let ((f310844 f310844)) ((vector-ref f310838 0) f310844 ()))))
 #   env=((f310838 . 0))
-# emit-expr (begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))))))
+# emit-expr (begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))))))
 # emit-begin
-#   expr=(begin (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))))))
+#   expr=(begin (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))))))
 #   env=((f310838 . 0))
-# emit-expr (vector-set! f310838 0 (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))))
+# emit-expr (vector-set! f310838 0 (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))))
 # emit-expr f310838
 # emit-variable-ref
 # env=((f310838 . 0))
@@ -3178,11 +3178,11 @@ _L_1883750:
     jmp *-2(%edi)  # jump to handler
 _L_1883749:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))))
+# emit-expr (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))))
 # emit-closure
 # si = -12
 # env = ((f310838 . 0))
-# expr = (closure (f310841 f310842) (f310838) (let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))))
+# expr = (closure (f310842 f310841) (f310838) (let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))))
     movl $_L_1883751, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310838 . 0))
@@ -3206,37 +3206,37 @@ _L_1883751:
 _L_1883753:
 # emit-tail-expr
 # si=-16
-# env=((f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# expr=(let ((f310841 f310841) (f310842 f310842)) (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))))
+# env=((f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# expr=(let ((f310842 f310842) (f310841 f310841)) (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-#  bindings = ((f310841 f310841) (f310842 f310842))
-#  body = (if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))
-# emit-expr f310841
-# emit-variable-ref
-# env=((f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310841
-    movl -8(%esp), %eax  # stack load f310841
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+#  bindings = ((f310842 f310842) (f310841 f310841))
+#  body = (if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))
 # emit-expr f310842
 # emit-variable-ref
-# env=((f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
+# env=((f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
 # var=f310842
-    movl -12(%esp), %eax  # stack load f310842
+    movl -8(%esp), %eax  # stack load f310842
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310841
+# emit-variable-ref
+# env=((f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310841
+    movl -12(%esp), %eax  # stack load f310841
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# expr=(if (null? f310841) f310842 ((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842)))
-# emit-expr (null? f310841)
-# emit-expr f310841
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# expr=(if (null? f310842) f310841 ((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841)))
+# emit-expr (null? f310842)
+# emit-expr f310842
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310841
-    movl -16(%esp), %eax  # stack load f310841
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310842
+    movl -16(%esp), %eax  # stack load f310842
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -3248,13 +3248,13 @@ _L_1883753:
     je _L_1883754
 # emit-tail-expr
 # si=-24
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# expr=f310842
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# expr=f310841
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310842
-    movl -20(%esp), %eax  # stack load f310842
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310841
+    movl -20(%esp), %eax  # stack load f310841
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
@@ -3262,16 +3262,16 @@ _L_1883753:
 _L_1883754:
 # emit-tail-expr
 # si=-24
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# expr=((vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# expr=((vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-#    expr = (funcall (vector-ref f310838 0) (cdr f310841) (cons (car f310841) f310842))
+#    env  = ((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+#    expr = (funcall (vector-ref f310838 0) (cdr f310842) (cons (car f310842) f310841))
 # emit-expr (vector-ref f310838 0)
 # emit-expr f310838
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
 # var=f310838
     movl 2(%edi), %eax  # frame load f310838
 # end emit-variable-ref
@@ -3319,12 +3319,12 @@ _L_1883758:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (cdr f310841)
-# emit-expr f310841
+# emit-expr (cdr f310842)
+# emit-expr f310842
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310841
-    movl -16(%esp), %eax  # stack load f310841
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310842
+    movl -16(%esp), %eax  # stack load f310842
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -3339,15 +3339,15 @@ _L_1883758:
     jmp *-2(%edi)  # jump to the handler
 _L_1883760:
     movl 3(%eax), %eax
-    mov %eax, -28(%esp)    # arg (cdr f310841)
-# emit-expr (cons (car f310841) f310842)
-# cons arg1=(car f310841) arg2=f310842
-# emit-expr (car f310841)
-# emit-expr f310841
+    mov %eax, -28(%esp)    # arg (cdr f310842)
+# emit-expr (cons (car f310842) f310841)
+# cons arg1=(car f310842) arg2=f310841
+# emit-expr (car f310842)
+# emit-expr f310842
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310841
-    movl -16(%esp), %eax  # stack load f310841
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310842
+    movl -16(%esp), %eax  # stack load f310842
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -3363,11 +3363,11 @@ _L_1883760:
 _L_1883761:
     movl -1(%eax), %eax
     movl %eax, -32(%esp)
-# emit-expr f310842
+# emit-expr f310841
 # emit-variable-ref
-# env=((f310842 . -20) (f310841 . -16) (f310842 . -12) (f310841 . -8) (f310838 . 4) (f310838 . 0))
-# var=f310842
-    movl -20(%esp), %eax  # stack load f310842
+# env=((f310841 . -20) (f310842 . -16) (f310841 . -12) (f310842 . -8) (f310838 . 4) (f310838 . 0))
+# var=f310841
+    movl -20(%esp), %eax  # stack load f310841
 # end emit-variable-ref
     movl %eax, 4(%ebp)
     movl -32(%esp), %eax
@@ -3376,7 +3376,7 @@ _L_1883761:
     or   $1, %al
     add  $8, %ebp
 # cons end
-    mov %eax, -32(%esp)    # arg (cons (car f310841) f310842)
+    mov %eax, -32(%esp)    # arg (cons (car f310842) f310841)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -3622,27 +3622,27 @@ _L_1883770:
 # == eliminate-let*  ==>
 # (letrec ((fill-vector (lambda (v k args) (if (null? args) v (begin (vector-set! v k (car args)) (fill-vector v (fxadd1 k) (cdr args))))))) (lambda args (let ((v (make-vector (list-length args)))) (fill-vector v 0 args))))
 # == uniquify-variables  ==>
-# (letrec ((f310846 (lambda (f310850 f310851 f310852) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) (f310846 f310850 (fxadd1 f310851) (cdr f310852))))))) (lambda f310856 (let ((f310858 (make-vector (list-length f310856)))) (f310846 f310858 0 f310856))))
+# (letrec ((f310846 (lambda (f310852 f310851 f310850) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) (f310846 f310852 (fxadd1 f310851) (cdr f310850))))))) (lambda f310856 (let ((f310858 (make-vector (list-length f310856)))) (f310846 f310858 0 f310856))))
 # == vectorize-letrec  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (lambda (f310850 f310851 f310852) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))))) (lambda f310856 (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (lambda (f310852 f310851 f310850) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))))) (lambda f310856 (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
 # == eliminate-set!  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (lambda (f310850 f310851 f310852) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (lambda f310856 (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (lambda (f310852 f310851 f310850) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (lambda f310856 (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # == close-free-variables  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # == eliminate-quote  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # == eliminate-when/unless  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # == eliminate-cond  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector (list-length f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # == external-symbols  ==>
-# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
-# emit-expr (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
+# emit-expr (let ((f310846 (make-vector 1))) (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310846 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
+#  body = (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -3678,15 +3678,15 @@ _L_1883775:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
+# emit-expr (begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
+#   expr=(begin (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))) (closure f310856 (f310846) (let () (let ((f310858 (make-vector ((primitive-ref list-length) f310856)))) ((vector-ref f310846 0) f310858 0 f310856)))))
 #   env=((f310846 . 0))
-# emit-expr (begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))))))
+# emit-expr (begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))))))
+#   expr=(begin (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))))))
 #   env=((f310846 . 0))
-# emit-expr (vector-set! f310846 0 (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))))
+# emit-expr (vector-set! f310846 0 (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))))
 # emit-expr f310846
 # emit-variable-ref
 # env=((f310846 . 0))
@@ -3735,11 +3735,11 @@ _L_1883779:
     jmp *-2(%edi)  # jump to handler
 _L_1883778:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))))
+# emit-expr (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))))
 # emit-closure
 # si = -12
 # env = ((f310846 . 0))
-# expr = (closure (f310850 f310851 f310852) (f310846) (let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))))
+# expr = (closure (f310852 f310851 f310850) (f310846) (let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))))
     movl $_L_1883780, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310846 . 0))
@@ -3763,44 +3763,44 @@ _L_1883780:
 _L_1883782:
 # emit-tail-expr
 # si=-20
-# env=((f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=(let ((f310850 f310850) (f310851 f310851) (f310852 f310852)) (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))))
+# env=((f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=(let ((f310852 f310852) (f310851 f310851) (f310850 f310850)) (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-#  bindings = ((f310850 f310850) (f310851 f310851) (f310852 f310852))
-#  body = (if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))
-# emit-expr f310850
+#  env  = ((f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+#  bindings = ((f310852 f310852) (f310851 f310851) (f310850 f310850))
+#  body = (if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))
+# emit-expr f310852
 # emit-variable-ref
-# env=((f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310850
-    movl -8(%esp), %eax  # stack load f310850
+# env=((f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310852
+    movl -8(%esp), %eax  # stack load f310852
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-expr f310851
 # emit-variable-ref
-# env=((f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
+# env=((f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
 # var=f310851
     movl -12(%esp), %eax  # stack load f310851
 # end emit-variable-ref
     movl %eax, -24(%esp)  # stack save
-# emit-expr f310852
+# emit-expr f310850
 # emit-variable-ref
-# env=((f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310852
-    movl -16(%esp), %eax  # stack load f310852
+# env=((f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310850
+    movl -16(%esp), %eax  # stack load f310850
 # end emit-variable-ref
     movl %eax, -28(%esp)  # stack save
 # emit-tail-expr
 # si=-32
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=(if (null? f310852) f310850 (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))))
-# emit-expr (null? f310852)
-# emit-expr f310852
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=(if (null? f310850) f310852 (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))))
+# emit-expr (null? f310850)
+# emit-expr f310850
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310852
-    movl -28(%esp), %eax  # stack load f310852
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310850
+    movl -28(%esp), %eax  # stack load f310850
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -3812,13 +3812,13 @@ _L_1883782:
     je _L_1883783
 # emit-tail-expr
 # si=-32
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=f310850
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=f310852
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310850
-    movl -20(%esp), %eax  # stack load f310850
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310852
+    movl -20(%esp), %eax  # stack load f310852
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
@@ -3826,16 +3826,16 @@ _L_1883782:
 _L_1883783:
 # emit-tail-expr
 # si=-32
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=(begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))
-# tail-begin (begin (vector-set! f310850 f310851 (car f310852)) ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))
-#   env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# emit-expr (vector-set! f310850 f310851 (car f310852))
-# emit-expr f310850
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=(begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))
+# tail-begin (begin (vector-set! f310852 f310851 (car f310850)) ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))
+#   env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# emit-expr (vector-set! f310852 f310851 (car f310850))
+# emit-expr f310852
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310850
-    movl -20(%esp), %eax  # stack load f310850
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310852
+    movl -20(%esp), %eax  # stack load f310852
 # end emit-variable-ref
 # check the argument is a vector
     movl %eax,%ebx
@@ -3852,7 +3852,7 @@ _L_1883785:
     movl %eax, -32(%esp)
 # emit-expr f310851
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
 # var=f310851
     movl -24(%esp), %eax  # stack load f310851
 # end emit-variable-ref
@@ -3883,12 +3883,12 @@ _L_1883788:
     jmp *-2(%edi)  # jump to handler
 _L_1883787:
     movl %eax, -36(%esp)
-# emit-expr (car f310852)
-# emit-expr f310852
+# emit-expr (car f310850)
+# emit-expr f310850
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310852
-    movl -28(%esp), %eax  # stack load f310852
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310850
+    movl -28(%esp), %eax  # stack load f310850
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -3908,22 +3908,22 @@ _L_1883789:
     movl %eax, -1(%ebx,%esi)
 # emit-tail-expr
 # si=-32
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=(begin ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))
-# tail-begin (begin ((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852)))
-#   env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=(begin ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))
+# tail-begin (begin ((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850)))
+#   env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
 # emit-tail-expr
 # si=-32
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# expr=((vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# expr=((vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-#    expr = (funcall (vector-ref f310846 0) f310850 (fxadd1 f310851) (cdr f310852))
+#    env  = ((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+#    expr = (funcall (vector-ref f310846 0) f310852 (fxadd1 f310851) (cdr f310850))
 # emit-expr (vector-ref f310846 0)
 # emit-expr f310846
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
 # var=f310846
     movl 2(%edi), %eax  # frame load f310846
 # end emit-variable-ref
@@ -3971,17 +3971,17 @@ _L_1883792:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310850
+# emit-expr f310852
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310850
-    movl -20(%esp), %eax  # stack load f310850
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310852
+    movl -20(%esp), %eax  # stack load f310852
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f310850
+    mov %eax, -36(%esp)    # arg f310852
 # emit-expr (fxadd1 f310851)
 # emit-expr f310851
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
 # var=f310851
     movl -24(%esp), %eax  # stack load f310851
 # end emit-variable-ref
@@ -3999,12 +3999,12 @@ _L_1883792:
 _L_1883794:
      addl $4, %eax
     mov %eax, -40(%esp)    # arg (fxadd1 f310851)
-# emit-expr (cdr f310852)
-# emit-expr f310852
+# emit-expr (cdr f310850)
+# emit-expr f310850
 # emit-variable-ref
-# env=((f310852 . -28) (f310851 . -24) (f310850 . -20) (f310852 . -16) (f310851 . -12) (f310850 . -8) (f310846 . 4) (f310846 . 0))
-# var=f310852
-    movl -28(%esp), %eax  # stack load f310852
+# env=((f310850 . -28) (f310851 . -24) (f310852 . -20) (f310850 . -16) (f310851 . -12) (f310852 . -8) (f310846 . 4) (f310846 . 0))
+# var=f310850
+    movl -28(%esp), %eax  # stack load f310850
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -4019,7 +4019,7 @@ _L_1883794:
     jmp *-2(%edi)  # jump to the handler
 _L_1883795:
     movl 3(%eax), %eax
-    mov %eax, -44(%esp)    # arg (cdr f310852)
+    mov %eax, -44(%esp)    # arg (cdr f310850)
     movl -32(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=4   si=-32  delta=28
     mov -32(%esp), %ebx  # shift frame cell
@@ -4283,27 +4283,27 @@ _L_1883797:
 # == eliminate-let*  ==>
 # (letrec ((fill-string (lambda (s k args) (if (null? args) s (begin (string-set! s k (car args)) (fill-string s (fxadd1 k) (cdr args))))))) (lambda args (let ((s (make-string (list-length args)))) (fill-string s 0 args))))
 # == uniquify-variables  ==>
-# (letrec ((f310859 (lambda (f310863 f310864 f310865) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) (f310859 f310863 (fxadd1 f310864) (cdr f310865))))))) (lambda f310869 (let ((f310871 (make-string (list-length f310869)))) (f310859 f310871 0 f310869))))
+# (letrec ((f310859 (lambda (f310865 f310864 f310863) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) (f310859 f310865 (fxadd1 f310864) (cdr f310863))))))) (lambda f310869 (let ((f310871 (make-string (list-length f310869)))) (f310859 f310871 0 f310869))))
 # == vectorize-letrec  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (lambda (f310863 f310864 f310865) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))))) (lambda f310869 (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (lambda (f310865 f310864 f310863) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))))) (lambda f310869 (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
 # == eliminate-set!  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (lambda (f310863 f310864 f310865) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (lambda f310869 (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (lambda (f310865 f310864 f310863) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (lambda f310869 (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # == close-free-variables  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # == eliminate-quote  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # == eliminate-when/unless  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # == eliminate-cond  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string (list-length f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # == external-symbols  ==>
-# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
-# emit-expr (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
+# emit-expr (let ((f310859 (make-vector 1))) (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310859 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
+#  body = (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -4339,15 +4339,15 @@ _L_1883809:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
+# emit-expr (begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
+#   expr=(begin (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))) (closure f310869 (f310859) (let () (let ((f310871 (make-string ((primitive-ref list-length) f310869)))) ((vector-ref f310859 0) f310871 0 f310869)))))
 #   env=((f310859 . 0))
-# emit-expr (begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))))))
+# emit-expr (begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))))))
+#   expr=(begin (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))))))
 #   env=((f310859 . 0))
-# emit-expr (vector-set! f310859 0 (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))))
+# emit-expr (vector-set! f310859 0 (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))))
 # emit-expr f310859
 # emit-variable-ref
 # env=((f310859 . 0))
@@ -4396,11 +4396,11 @@ _L_1883813:
     jmp *-2(%edi)  # jump to handler
 _L_1883812:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))))
+# emit-expr (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))))
 # emit-closure
 # si = -12
 # env = ((f310859 . 0))
-# expr = (closure (f310863 f310864 f310865) (f310859) (let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))))
+# expr = (closure (f310865 f310864 f310863) (f310859) (let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))))
     movl $_L_1883814, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310859 . 0))
@@ -4424,44 +4424,44 @@ _L_1883814:
 _L_1883816:
 # emit-tail-expr
 # si=-20
-# env=((f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=(let ((f310863 f310863) (f310864 f310864) (f310865 f310865)) (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))))
+# env=((f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=(let ((f310865 f310865) (f310864 f310864) (f310863 f310863)) (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-#  bindings = ((f310863 f310863) (f310864 f310864) (f310865 f310865))
-#  body = (if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))
-# emit-expr f310863
+#  env  = ((f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+#  bindings = ((f310865 f310865) (f310864 f310864) (f310863 f310863))
+#  body = (if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))
+# emit-expr f310865
 # emit-variable-ref
-# env=((f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310863
-    movl -8(%esp), %eax  # stack load f310863
+# env=((f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310865
+    movl -8(%esp), %eax  # stack load f310865
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-expr f310864
 # emit-variable-ref
-# env=((f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
+# env=((f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
 # var=f310864
     movl -12(%esp), %eax  # stack load f310864
 # end emit-variable-ref
     movl %eax, -24(%esp)  # stack save
-# emit-expr f310865
+# emit-expr f310863
 # emit-variable-ref
-# env=((f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310865
-    movl -16(%esp), %eax  # stack load f310865
+# env=((f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310863
+    movl -16(%esp), %eax  # stack load f310863
 # end emit-variable-ref
     movl %eax, -28(%esp)  # stack save
 # emit-tail-expr
 # si=-32
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=(if (null? f310865) f310863 (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))))
-# emit-expr (null? f310865)
-# emit-expr f310865
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=(if (null? f310863) f310865 (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))))
+# emit-expr (null? f310863)
+# emit-expr f310863
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310865
-    movl -28(%esp), %eax  # stack load f310865
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310863
+    movl -28(%esp), %eax  # stack load f310863
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -4473,13 +4473,13 @@ _L_1883816:
     je _L_1883817
 # emit-tail-expr
 # si=-32
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=f310863
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=f310865
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310863
-    movl -20(%esp), %eax  # stack load f310863
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310865
+    movl -20(%esp), %eax  # stack load f310865
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
@@ -4487,16 +4487,16 @@ _L_1883816:
 _L_1883817:
 # emit-tail-expr
 # si=-32
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=(begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))
-# tail-begin (begin (string-set! f310863 f310864 (car f310865)) ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))
-#   env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# emit-expr (string-set! f310863 f310864 (car f310865))
-# emit-expr f310863
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=(begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))
+# tail-begin (begin (string-set! f310865 f310864 (car f310863)) ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))
+#   env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# emit-expr (string-set! f310865 f310864 (car f310863))
+# emit-expr f310865
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310863
-    movl -20(%esp), %eax  # stack load f310863
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310865
+    movl -20(%esp), %eax  # stack load f310865
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -4513,7 +4513,7 @@ _L_1883819:
     movl %eax, -32(%esp)
 # emit-expr f310864
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
 # var=f310864
     movl -24(%esp), %eax  # stack load f310864
 # end emit-variable-ref
@@ -4544,12 +4544,12 @@ _L_1883822:
     jmp *-2(%edi)  # jump to handler
 _L_1883821:
     movl %eax, -36(%esp)
-# emit-expr (car f310865)
-# emit-expr f310865
+# emit-expr (car f310863)
+# emit-expr f310863
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310865
-    movl -28(%esp), %eax  # stack load f310865
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310863
+    movl -28(%esp), %eax  # stack load f310863
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -4582,22 +4582,22 @@ _L_1883824:
     movb  %ah, -2(%ebx,%esi)
 # emit-tail-expr
 # si=-32
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=(begin ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))
-# tail-begin (begin ((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865)))
-#   env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=(begin ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))
+# tail-begin (begin ((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863)))
+#   env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
 # emit-tail-expr
 # si=-32
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# expr=((vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# expr=((vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-#    expr = (funcall (vector-ref f310859 0) f310863 (fxadd1 f310864) (cdr f310865))
+#    env  = ((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+#    expr = (funcall (vector-ref f310859 0) f310865 (fxadd1 f310864) (cdr f310863))
 # emit-expr (vector-ref f310859 0)
 # emit-expr f310859
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
 # var=f310859
     movl 2(%edi), %eax  # frame load f310859
 # end emit-variable-ref
@@ -4645,17 +4645,17 @@ _L_1883827:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310863
+# emit-expr f310865
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310863
-    movl -20(%esp), %eax  # stack load f310863
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310865
+    movl -20(%esp), %eax  # stack load f310865
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f310863
+    mov %eax, -36(%esp)    # arg f310865
 # emit-expr (fxadd1 f310864)
 # emit-expr f310864
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
 # var=f310864
     movl -24(%esp), %eax  # stack load f310864
 # end emit-variable-ref
@@ -4673,12 +4673,12 @@ _L_1883827:
 _L_1883829:
      addl $4, %eax
     mov %eax, -40(%esp)    # arg (fxadd1 f310864)
-# emit-expr (cdr f310865)
-# emit-expr f310865
+# emit-expr (cdr f310863)
+# emit-expr f310863
 # emit-variable-ref
-# env=((f310865 . -28) (f310864 . -24) (f310863 . -20) (f310865 . -16) (f310864 . -12) (f310863 . -8) (f310859 . 4) (f310859 . 0))
-# var=f310865
-    movl -28(%esp), %eax  # stack load f310865
+# env=((f310863 . -28) (f310864 . -24) (f310865 . -20) (f310863 . -16) (f310864 . -12) (f310865 . -8) (f310859 . 4) (f310859 . 0))
+# var=f310863
+    movl -28(%esp), %eax  # stack load f310863
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -4693,7 +4693,7 @@ _L_1883829:
     jmp *-2(%edi)  # jump to the handler
 _L_1883830:
     movl 3(%eax), %eax
-    mov %eax, -44(%esp)    # arg (cdr f310865)
+    mov %eax, -44(%esp)    # arg (cdr f310863)
     movl -32(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=4   si=-32  delta=28
     mov -32(%esp), %ebx  # shift frame cell
@@ -4959,27 +4959,27 @@ _L_1883832:
 # == eliminate-let*  ==>
 # (letrec ((f (lambda (s i) (if (fx= i (string-length s)) (quote ()) (cons (string-ref s i) (f s (fxadd1 i))))))) (lambda (s) (f s 0)))
 # == uniquify-variables  ==>
-# (letrec ((f310872 (lambda (f310875 f310876) (if (fx= f310876 (string-length f310875)) (quote ()) (cons (string-ref f310875 f310876) (f310872 f310875 (fxadd1 f310876))))))) (lambda (f310878) (f310872 f310878 0)))
+# (letrec ((f310872 (lambda (f310876 f310875) (if (fx= f310875 (string-length f310876)) (quote ()) (cons (string-ref f310876 f310875) (f310872 f310876 (fxadd1 f310875))))))) (lambda (f310878) (f310872 f310878 0)))
 # == vectorize-letrec  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (lambda (f310875 f310876) (if (fx= f310876 (string-length f310875)) (quote ()) (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))))) (lambda (f310878) ((vector-ref f310872 0) f310878 0))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (lambda (f310876 f310875) (if (fx= f310875 (string-length f310876)) (quote ()) (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))))) (lambda (f310878) ((vector-ref f310872 0) f310878 0))))
 # == eliminate-set!  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (lambda (f310875 f310876) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) (quote ()) (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (lambda (f310878) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (lambda (f310876 f310875) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) (quote ()) (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (lambda (f310878) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # == close-free-variables  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) (quote ()) (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) (quote ()) (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # == eliminate-quote  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # == eliminate-when/unless  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # == eliminate-cond  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # == external-symbols  ==>
-# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
-# emit-expr (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
+# emit-expr (let ((f310872 (make-vector 1))) (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0)))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310872 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
+#  body = (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -5015,15 +5015,15 @@ _L_1883844:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
+# emit-expr (begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
+#   expr=(begin (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))) (closure (f310878) (f310872) (let ((f310878 f310878)) ((vector-ref f310872 0) f310878 0))))
 #   env=((f310872 . 0))
-# emit-expr (begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))))))
+# emit-expr (begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))))))
+#   expr=(begin (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))))))
 #   env=((f310872 . 0))
-# emit-expr (vector-set! f310872 0 (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))))
+# emit-expr (vector-set! f310872 0 (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))))
 # emit-expr f310872
 # emit-variable-ref
 # env=((f310872 . 0))
@@ -5072,11 +5072,11 @@ _L_1883848:
     jmp *-2(%edi)  # jump to handler
 _L_1883847:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))))
+# emit-expr (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))))
 # emit-closure
 # si = -12
 # env = ((f310872 . 0))
-# expr = (closure (f310875 f310876) (f310872) (let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))))
+# expr = (closure (f310876 f310875) (f310872) (let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))))
     movl $_L_1883849, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310872 . 0))
@@ -5100,38 +5100,38 @@ _L_1883849:
 _L_1883851:
 # emit-tail-expr
 # si=-16
-# env=((f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# expr=(let ((f310875 f310875) (f310876 f310876)) (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))))
+# env=((f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# expr=(let ((f310876 f310876) (f310875 f310875)) (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-#  bindings = ((f310875 f310875) (f310876 f310876))
-#  body = (if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))
-# emit-expr f310875
-# emit-variable-ref
-# env=((f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310875
-    movl -8(%esp), %eax  # stack load f310875
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+#  bindings = ((f310876 f310876) (f310875 f310875))
+#  body = (if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))
 # emit-expr f310876
 # emit-variable-ref
-# env=((f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
+# env=((f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
 # var=f310876
-    movl -12(%esp), %eax  # stack load f310876
+    movl -8(%esp), %eax  # stack load f310876
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310875
+# emit-variable-ref
+# env=((f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310875
+    movl -12(%esp), %eax  # stack load f310875
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# expr=(if (fx= f310876 (string-length f310875)) () (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876))))
-# emit-expr (fx= f310876 (string-length f310875))
-# emit-expr (string-length f310875)
-# emit-expr f310875
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# expr=(if (fx= f310875 (string-length f310876)) () (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875))))
+# emit-expr (fx= f310875 (string-length f310876))
+# emit-expr (string-length f310876)
+# emit-expr f310876
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310875
-    movl -16(%esp), %eax  # stack load f310875
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310876
+    movl -16(%esp), %eax  # stack load f310876
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -5159,11 +5159,11 @@ _L_1883854:
     jmp *-2(%edi)  # jump to the handler
 _L_1883855:
     movl %eax, -24(%esp)
-# emit-expr f310876
+# emit-expr f310875
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310876
-    movl -20(%esp), %eax  # stack load f310876
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310875
+    movl -20(%esp), %eax  # stack load f310875
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5186,7 +5186,7 @@ _L_1883856:
     je _L_1883852
 # emit-tail-expr
 # si=-24
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
 # expr=()
     movl $63, %eax     # immed ()
     ret                  # immediate tail return
@@ -5194,16 +5194,16 @@ _L_1883856:
 _L_1883852:
 # emit-tail-expr
 # si=-24
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# expr=(cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# expr=(cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))
 # tail primcall
-# cons arg1=(string-ref f310875 f310876) arg2=((vector-ref f310872 0) f310875 (fxadd1 f310876))
-# emit-expr (string-ref f310875 f310876)
-# emit-expr f310875
+# cons arg1=(string-ref f310876 f310875) arg2=((vector-ref f310872 0) f310876 (fxadd1 f310875))
+# emit-expr (string-ref f310876 f310875)
+# emit-expr f310876
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310875
-    movl -16(%esp), %eax  # stack load f310875
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310876
+    movl -16(%esp), %eax  # stack load f310876
 # end emit-variable-ref
 # check the argument is a string
     movl %eax,%ebx
@@ -5218,11 +5218,11 @@ _L_1883852:
     jmp *-2(%edi)  # jump to the handler
 _L_1883857:
     movl %eax, -24(%esp)
-# emit-expr f310876
+# emit-expr f310875
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310876
-    movl -20(%esp), %eax  # stack load f310876
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310875
+    movl -20(%esp), %eax  # stack load f310875
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5256,15 +5256,15 @@ _L_1883859:
     sal $8, %eax
     or  $15, %eax
     movl %eax, -24(%esp)
-# emit-expr ((vector-ref f310872 0) f310875 (fxadd1 f310876))
+# emit-expr ((vector-ref f310872 0) f310876 (fxadd1 f310875))
 # funcall
 #    si   =-28
-#    env  = ((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-#    expr = (funcall (vector-ref f310872 0) f310875 (fxadd1 f310876))
+#    env  = ((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+#    expr = (funcall (vector-ref f310872 0) f310876 (fxadd1 f310875))
 # emit-expr (vector-ref f310872 0)
 # emit-expr f310872
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
 # var=f310872
     movl 2(%edi), %eax  # frame load f310872
 # end emit-variable-ref
@@ -5323,19 +5323,19 @@ _L_1883863:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883865":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310875
-# emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
-# var=f310875
-    movl -16(%esp), %eax  # stack load f310875
-# end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310875
-# emit-expr (fxadd1 f310876)
 # emit-expr f310876
 # emit-variable-ref
-# env=((f310876 . -20) (f310875 . -16) (f310876 . -12) (f310875 . -8) (f310872 . 4) (f310872 . 0))
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
 # var=f310876
-    movl -20(%esp), %eax  # stack load f310876
+    movl -16(%esp), %eax  # stack load f310876
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg f310876
+# emit-expr (fxadd1 f310875)
+# emit-expr f310875
+# emit-variable-ref
+# env=((f310875 . -20) (f310876 . -16) (f310875 . -12) (f310876 . -8) (f310872 . 4) (f310872 . 0))
+# var=f310875
+    movl -20(%esp), %eax  # stack load f310875
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5350,7 +5350,7 @@ _L_1883863:
     jmp *-2(%edi)  # jump to the handler
 _L_1883866:
      addl $4, %eax
-    mov %eax, -44(%esp)  # arg (fxadd1 f310876)
+    mov %eax, -44(%esp)  # arg (fxadd1 f310875)
     movl -36(%esp), %edi   # load new closure to %edi
     add $-28, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -5364,7 +5364,7 @@ _L_1883866:
     or   $1, %al
     add  $8, %ebp
 # cons end
-#return from tail (cons (string-ref f310875 f310876) ((vector-ref f310872 0) f310875 (fxadd1 f310876)))
+#return from tail (cons (string-ref f310876 f310875) ((vector-ref f310872 0) f310876 (fxadd1 f310875)))
     ret
 _L_1883853:
     .align 4,0x90
@@ -5516,27 +5516,27 @@ _L_1883868:
 # == eliminate-let*  ==>
 # (letrec ((f (lambda (i l) (cond ((fx< i 10) (cons i l)) (else (f (fxquotient i 10) (cons (fxremainder i 10) l))))))) (lambda (i) (f i (quote ()))))
 # == uniquify-variables  ==>
-# (letrec ((f310879 (lambda (f310882 f310883) (cond ((fx< f310882 10) (cons f310882 f310883)) (else (f310879 (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (lambda (f310885) (f310879 f310885 (quote ()))))
+# (letrec ((f310879 (lambda (f310883 f310882) (cond ((fx< f310883 10) (cons f310883 f310882)) (else (f310879 (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (lambda (f310885) (f310879 f310885 (quote ()))))
 # == vectorize-letrec  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (lambda (f310882 f310883) (cond ((fx< f310882 10) (cons f310882 f310883)) (else ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (lambda (f310885) ((vector-ref f310879 0) f310885 (quote ())))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (lambda (f310883 f310882) (cond ((fx< f310883 10) (cons f310883 f310882)) (else ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (lambda (f310885) ((vector-ref f310879 0) f310885 (quote ())))))
 # == eliminate-set!  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (lambda (f310882 f310883) (let ((f310882 f310882) (f310883 f310883)) (cond ((fx< f310882 10) (cons f310882 f310883)) (else ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))) (lambda (f310885) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 (quote ()))))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (lambda (f310883 f310882) (let ((f310883 f310883) (f310882 f310882)) (cond ((fx< f310883 10) (cons f310883 f310882)) (else ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))) (lambda (f310885) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 (quote ()))))))
 # == close-free-variables  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (cond ((fx< f310882 10) (cons f310882 f310883)) (else ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 (quote ()))))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (cond ((fx< f310883 10) (cons f310883 f310882)) (else ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 (quote ()))))))
 # == eliminate-quote  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (cond ((fx< f310882 10) (cons f310882 f310883)) (else ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (cond ((fx< f310883 10) (cons f310883 f310882)) (else ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
 # == eliminate-when/unless  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (cond ((fx< f310882 10) (cons f310882 f310883)) (else ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (cond ((fx< f310883 10) (cons f310883 f310882)) (else ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
 # == eliminate-cond  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
 # == external-symbols  ==>
-# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
-# emit-expr (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
+# (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
+# emit-expr (let ((f310879 (make-vector 1))) (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ())))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310879 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
+#  body = (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -5572,15 +5572,15 @@ _L_1883875:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, 0(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
+# emit-expr (begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
+#   expr=(begin (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))) (closure (f310885) (f310879) (let ((f310885 f310885)) ((vector-ref f310879 0) f310885 ()))))
 #   env=((f310879 . 0))
-# emit-expr (begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))
+# emit-expr (begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))
 # emit-begin
-#   expr=(begin (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))))
+#   expr=(begin (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))))
 #   env=((f310879 . 0))
-# emit-expr (vector-set! f310879 0 (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))))
+# emit-expr (vector-set! f310879 0 (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))))
 # emit-expr f310879
 # emit-variable-ref
 # env=((f310879 . 0))
@@ -5629,11 +5629,11 @@ _L_1883879:
     jmp *-2(%edi)  # jump to handler
 _L_1883878:
     movl %eax, -8(%esp)
-# emit-expr (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))
+# emit-expr (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))
 # emit-closure
 # si = -12
 # env = ((f310879 . 0))
-# expr = (closure (f310882 f310883) (f310879) (let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))))
+# expr = (closure (f310883 f310882) (f310879) (let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))))
     movl $_L_1883880, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310879 . 0))
@@ -5657,32 +5657,32 @@ _L_1883880:
 _L_1883882:
 # emit-tail-expr
 # si=-16
-# env=((f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# expr=(let ((f310882 f310882) (f310883 f310883)) (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))))
+# env=((f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# expr=(let ((f310883 f310883) (f310882 f310882)) (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-#  bindings = ((f310882 f310882) (f310883 f310883))
-#  body = (if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))
-# emit-expr f310882
-# emit-variable-ref
-# env=((f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310882
-    movl -8(%esp), %eax  # stack load f310882
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+#  bindings = ((f310883 f310883) (f310882 f310882))
+#  body = (if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))
 # emit-expr f310883
 # emit-variable-ref
-# env=((f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
+# env=((f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
 # var=f310883
-    movl -12(%esp), %eax  # stack load f310883
+    movl -8(%esp), %eax  # stack load f310883
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310882
+# emit-variable-ref
+# env=((f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310882
+    movl -12(%esp), %eax  # stack load f310882
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# expr=(if (fx< f310882 10) (cons f310882 f310883) ((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883)))
-# emit-expr (fx< f310882 10)
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# expr=(if (fx< f310883 10) (cons f310883 f310882) ((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882)))
+# emit-expr (fx< f310883 10)
 # emit-expr 10
     movl $40, %eax     # immed 10
 # check the argument is a fixnum
@@ -5698,11 +5698,11 @@ _L_1883882:
     jmp *-2(%edi)  # jump to the handler
 _L_1883885:
     movl %eax, -24(%esp)
-# emit-expr f310882
+# emit-expr f310883
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310882
-    movl -16(%esp), %eax  # stack load f310882
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310883
+    movl -16(%esp), %eax  # stack load f310883
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5725,22 +5725,22 @@ _L_1883886:
     je _L_1883883
 # emit-tail-expr
 # si=-24
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# expr=(cons f310882 f310883)
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# expr=(cons f310883 f310882)
 # tail primcall
-# cons arg1=f310882 arg2=f310883
-# emit-expr f310882
-# emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310882
-    movl -16(%esp), %eax  # stack load f310882
-# end emit-variable-ref
-    movl %eax, -24(%esp)
+# cons arg1=f310883 arg2=f310882
 # emit-expr f310883
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
 # var=f310883
-    movl -20(%esp), %eax  # stack load f310883
+    movl -16(%esp), %eax  # stack load f310883
+# end emit-variable-ref
+    movl %eax, -24(%esp)
+# emit-expr f310882
+# emit-variable-ref
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310882
+    movl -20(%esp), %eax  # stack load f310882
 # end emit-variable-ref
     movl %eax, 4(%ebp)
     movl -24(%esp), %eax
@@ -5749,22 +5749,22 @@ _L_1883886:
     or   $1, %al
     add  $8, %ebp
 # cons end
-#return from tail (cons f310882 f310883)
+#return from tail (cons f310883 f310882)
     ret
     jmp _L_1883884
 _L_1883883:
 # emit-tail-expr
 # si=-24
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# expr=((vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# expr=((vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-#    expr = (funcall (vector-ref f310879 0) (fxquotient f310882 10) (cons (fxremainder f310882 10) f310883))
+#    env  = ((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+#    expr = (funcall (vector-ref f310879 0) (fxquotient f310883 10) (cons (fxremainder f310883 10) f310882))
 # emit-expr (vector-ref f310879 0)
 # emit-expr f310879
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
 # var=f310879
     movl 2(%edi), %eax  # frame load f310879
 # end emit-variable-ref
@@ -5812,7 +5812,7 @@ _L_1883889:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (fxquotient f310882 10)
+# emit-expr (fxquotient f310883 10)
 # emit-expr 10
     movl $40, %eax     # immed 10
 # check the argument is a fixnum
@@ -5828,11 +5828,11 @@ _L_1883889:
     jmp *-2(%edi)  # jump to the handler
 _L_1883892:
     movl %eax, -28(%esp)  # denominator
-# emit-expr f310882
+# emit-expr f310883
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310882
-    movl -16(%esp), %eax  # stack load f310882
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310883
+    movl -16(%esp), %eax  # stack load f310883
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5854,10 +5854,10 @@ _L_1883893:
 _L_1883891:
     idiv %ebx            # eax <- edx:eax/ebx
     sal $2,%eax          # eax <- eax*4 (since it was divided away)
-    mov %eax, -28(%esp)    # arg (fxquotient f310882 10)
-# emit-expr (cons (fxremainder f310882 10) f310883)
-# cons arg1=(fxremainder f310882 10) arg2=f310883
-# emit-expr (fxremainder f310882 10)
+    mov %eax, -28(%esp)    # arg (fxquotient f310883 10)
+# emit-expr (cons (fxremainder f310883 10) f310882)
+# cons arg1=(fxremainder f310883 10) arg2=f310882
+# emit-expr (fxremainder f310883 10)
 # emit-expr 10
     movl $40, %eax     # immed 10
 # check the argument is a fixnum
@@ -5873,11 +5873,11 @@ _L_1883891:
     jmp *-2(%edi)  # jump to the handler
 _L_1883895:
     movl %eax, -32(%esp)  # denominator
-# emit-expr f310882
+# emit-expr f310883
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310882
-    movl -16(%esp), %eax  # stack load f310882
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310883
+    movl -16(%esp), %eax  # stack load f310883
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -5900,11 +5900,11 @@ _L_1883894:
     idiv %ebx            # edx <- edx:eax/ebx  remainder
     movl %edx,%eax
     movl %eax, -32(%esp)
-# emit-expr f310883
+# emit-expr f310882
 # emit-variable-ref
-# env=((f310883 . -20) (f310882 . -16) (f310883 . -12) (f310882 . -8) (f310879 . 4) (f310879 . 0))
-# var=f310883
-    movl -20(%esp), %eax  # stack load f310883
+# env=((f310882 . -20) (f310883 . -16) (f310882 . -12) (f310883 . -8) (f310879 . 4) (f310879 . 0))
+# var=f310882
+    movl -20(%esp), %eax  # stack load f310882
 # end emit-variable-ref
     movl %eax, 4(%ebp)
     movl -32(%esp), %eax
@@ -5913,7 +5913,7 @@ _L_1883894:
     or   $1, %al
     add  $8, %ebp
 # cons end
-    mov %eax, -32(%esp)    # arg (cons (fxremainder f310882 10) f310883)
+    mov %eax, -32(%esp)    # arg (cons (fxremainder f310883 10) f310882)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -6077,27 +6077,27 @@ _L_1883898:
 # == eliminate-let*  ==>
 # (let ((write-stderr (lambda (s) (foreign-call "s_write" 2 s (string-length s))))) (let ((write-errmsg (lambda (sym emsg) (begin (write-stderr "error:") (write-stderr (symbol->string sym)) (write-stderr ": ") (write-stderr emsg) (write-stderr "\n"))))) (lambda (sym emsg) (begin (write-errmsg sym emsg) (foreign-call "s_exit" 1)))))
 # == uniquify-variables  ==>
-# (let ((f310886 (lambda (f310887) (foreign-call "s_write" 2 f310887 (string-length f310887))))) (let ((f310895 (lambda (f310896 f310897) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))))) (lambda (f310900 f310901) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1)))))
+# (let ((f310886 (lambda (f310887) (foreign-call "s_write" 2 f310887 (string-length f310887))))) (let ((f310895 (lambda (f310897 f310896) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))))) (lambda (f310901 f310900) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1)))))
 # == vectorize-letrec  ==>
-# (let ((f310886 (lambda (f310887) (foreign-call "s_write" 2 f310887 (string-length f310887))))) (let ((f310895 (lambda (f310896 f310897) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))))) (lambda (f310900 f310901) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1)))))
+# (let ((f310886 (lambda (f310887) (foreign-call "s_write" 2 f310887 (string-length f310887))))) (let ((f310895 (lambda (f310897 f310896) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))))) (lambda (f310901 f310900) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1)))))
 # == eliminate-set!  ==>
-# (let ((f310886 (lambda (f310887) (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (lambda (f310896 f310897) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (lambda (f310900 f310901) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (lambda (f310887) (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (lambda (f310897 f310896) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (lambda (f310901 f310900) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # == close-free-variables  ==>
-# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # == eliminate-quote  ==>
-# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # == eliminate-when/unless  ==>
-# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # == eliminate-cond  ==>
-# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # == external-symbols  ==>
-# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
-# emit-expr (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))))
+# (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
+# emit-expr (let ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887)))))) (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310886 (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887))))))
-#  body = (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1)))))
+#  body = (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1)))))
 # emit-expr (closure (f310887) () (let ((f310887 f310887)) (foreign-call "s_write" 2 f310887 (string-length f310887))))
 # emit-closure
 # si = 0
@@ -6191,17 +6191,17 @@ _L_1883907:
     .align 4,0x90
 _L_1883905:
     movl %eax, 0(%esp)  # stack save
-# emit-expr (let ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))))) (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1)))))
+# emit-expr (let ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))))) (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1)))))
 # emit-let
 #  si   = -4
 #  env  = ((f310886 . 0))
-#  bindings = ((f310895 (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))))))
-#  body = (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))
-# emit-expr (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))))
+#  bindings = ((f310895 (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))))))
+#  body = (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))
+# emit-expr (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))))
 # emit-closure
 # si = -4
 # env = ((f310886 . 0))
-# expr = (closure (f310896 f310897) (f310886 f310886 f310886 f310886 f310886) (let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))))
+# expr = (closure (f310897 f310896) (f310886 f310886 f310886 f310886 f310886) (let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))))
     movl $_L_1883908, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310886 . 0))
@@ -6249,41 +6249,41 @@ _L_1883908:
 _L_1883910:
 # emit-tail-expr
 # si=-16
-# env=((f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# expr=(let ((f310896 f310896) (f310897 f310897)) (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n")))
+# env=((f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# expr=(let ((f310897 f310897) (f310896 f310896)) (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n")))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-#  bindings = ((f310896 f310896) (f310897 f310897))
-#  body = (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-# emit-expr f310896
-# emit-variable-ref
-# env=((f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# var=f310896
-    movl -8(%esp), %eax  # stack load f310896
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#  bindings = ((f310897 f310897) (f310896 f310896))
+#  body = (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))
 # emit-expr f310897
 # emit-variable-ref
-# env=((f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310897
-    movl -12(%esp), %eax  # stack load f310897
+    movl -8(%esp), %eax  # stack load f310897
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310896
+# emit-variable-ref
+# env=((f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# var=f310896
+    movl -12(%esp), %eax  # stack load f310896
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# expr=(begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-# tail-begin (begin (f310886 "error:") (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-#   env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# expr=(begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+# tail-begin (begin (f310886 "error:") (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+#   env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # emit-expr (f310886 "error:")
 # funcall
 #    si   =-24
-#    env  = ((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#    env  = ((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 #    expr = (funcall f310886 "error:")
 # emit-expr f310886
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310886
     movl 18(%edi), %eax  # frame load f310886
 # end emit-variable-ref
@@ -6318,18 +6318,18 @@ _L_1883913:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# expr=(begin (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-# tail-begin (begin (f310886 (symbol->string f310896)) (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-#   env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# emit-expr (f310886 (symbol->string f310896))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# expr=(begin (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+# tail-begin (begin (f310886 (symbol->string f310897)) (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+#   env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# emit-expr (f310886 (symbol->string f310897))
 # funcall
 #    si   =-24
-#    env  = ((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-#    expr = (funcall f310886 (symbol->string f310896))
+#    env  = ((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#    expr = (funcall f310886 (symbol->string f310897))
 # emit-expr f310886
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310886
     movl 18(%edi), %eax  # frame load f310886
 # end emit-variable-ref
@@ -6345,16 +6345,16 @@ _L_1883913:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883914":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr (symbol->string f310896)
-# symbol->string f310896
-# emit-expr f310896
+# emit-expr (symbol->string f310897)
+# symbol->string f310897
+# emit-expr f310897
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# var=f310896
-    movl -16(%esp), %eax  # stack load f310896
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# var=f310897
+    movl -16(%esp), %eax  # stack load f310897
 # end emit-variable-ref
     movl -3(%eax), %eax
-    mov %eax, -36(%esp)  # arg (symbol->string f310896)
+    mov %eax, -36(%esp)  # arg (symbol->string f310897)
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $4,%eax   # save arg count
@@ -6363,18 +6363,18 @@ _L_1883913:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# expr=(begin (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-# tail-begin (begin (f310886 ": ") (f310886 f310897) (f310886 "\n"))
-#   env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# expr=(begin (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+# tail-begin (begin (f310886 ": ") (f310886 f310896) (f310886 "\n"))
+#   env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # emit-expr (f310886 ": ")
 # funcall
 #    si   =-24
-#    env  = ((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#    env  = ((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 #    expr = (funcall f310886 ": ")
 # emit-expr f310886
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310886
     movl 18(%edi), %eax  # frame load f310886
 # end emit-variable-ref
@@ -6409,18 +6409,18 @@ _L_1883917:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# expr=(begin (f310886 f310897) (f310886 "\n"))
-# tail-begin (begin (f310886 f310897) (f310886 "\n"))
-#   env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# emit-expr (f310886 f310897)
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# expr=(begin (f310886 f310896) (f310886 "\n"))
+# tail-begin (begin (f310886 f310896) (f310886 "\n"))
+#   env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# emit-expr (f310886 f310896)
 # funcall
 #    si   =-24
-#    env  = ((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-#    expr = (funcall f310886 f310897)
+#    env  = ((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#    expr = (funcall f310886 f310896)
 # emit-expr f310886
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310886
     movl 18(%edi), %eax  # frame load f310886
 # end emit-variable-ref
@@ -6436,13 +6436,13 @@ _L_1883917:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883918":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310897
+# emit-expr f310896
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
-# var=f310897
-    movl -20(%esp), %eax  # stack load f310897
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# var=f310896
+    movl -20(%esp), %eax  # stack load f310896
 # end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310897
+    mov %eax, -36(%esp)  # arg f310896
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $4,%eax   # save arg count
@@ -6451,21 +6451,21 @@ _L_1883917:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # expr=(begin (f310886 "\n"))
 # tail-begin (begin (f310886 "\n"))
-#   env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#   env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # expr=(f310886 "\n")
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+#    env  = ((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 #    expr = (funcall f310886 "\n")
 # emit-expr f310886
 # emit-variable-ref
-# env=((f310897 . -20) (f310896 . -16) (f310897 . -12) (f310896 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
+# env=((f310896 . -20) (f310897 . -16) (f310896 . -12) (f310897 . -8) (f310886 . 20) (f310886 . 16) (f310886 . 12) (f310886 . 8) (f310886 . 4) (f310886 . 0))
 # var=f310886
     movl 18(%edi), %eax  # frame load f310886
 # end emit-variable-ref
@@ -6496,11 +6496,11 @@ _L_1883920:
     .align 4,0x90
 _L_1883909:
     movl %eax, -4(%esp)  # stack save
-# emit-expr (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))
+# emit-expr (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))
 # emit-closure
 # si = -8
 # env = ((f310895 . -4) (f310886 . 0))
-# expr = (closure (f310900 f310901) (f310895) (let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))))
+# expr = (closure (f310901 f310900) (f310895) (let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))))
     movl $_L_1883921, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310895 . -4) (f310886 . 0))
@@ -6524,41 +6524,41 @@ _L_1883921:
 _L_1883923:
 # emit-tail-expr
 # si=-16
-# env=((f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-# expr=(let ((f310900 f310900) (f310901 f310901)) (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1)))
+# env=((f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# expr=(let ((f310901 f310901) (f310900 f310900)) (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-#  bindings = ((f310900 f310900) (f310901 f310901))
-#  body = (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))
-# emit-expr f310900
-# emit-variable-ref
-# env=((f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-# var=f310900
-    movl -8(%esp), %eax  # stack load f310900
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+#  bindings = ((f310901 f310901) (f310900 f310900))
+#  body = (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))
 # emit-expr f310901
 # emit-variable-ref
-# env=((f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# env=((f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # var=f310901
-    movl -12(%esp), %eax  # stack load f310901
+    movl -8(%esp), %eax  # stack load f310901
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310900
+# emit-variable-ref
+# env=((f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# var=f310900
+    movl -12(%esp), %eax  # stack load f310900
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-# expr=(begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))
-# tail-begin (begin (f310895 f310900 f310901) (foreign-call "s_exit" 1))
-#   env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-# emit-expr (f310895 f310900 f310901)
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# expr=(begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))
+# tail-begin (begin (f310895 f310901 f310900) (foreign-call "s_exit" 1))
+#   env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# emit-expr (f310895 f310901 f310900)
 # funcall
 #    si   =-24
-#    env  = ((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-#    expr = (funcall f310895 f310900 f310901)
+#    env  = ((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+#    expr = (funcall f310895 f310901 f310900)
 # emit-expr f310895
 # emit-variable-ref
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # var=f310895
     movl 2(%edi), %eax  # frame load f310895
 # end emit-variable-ref
@@ -6574,20 +6574,20 @@ _L_1883923:
     jmp *-2(%edi)  # jump to the handler
 "_L_1883924":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310900
-# emit-variable-ref
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
-# var=f310900
-    movl -16(%esp), %eax  # stack load f310900
-# end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310900
 # emit-expr f310901
 # emit-variable-ref
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # var=f310901
-    movl -20(%esp), %eax  # stack load f310901
+    movl -16(%esp), %eax  # stack load f310901
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310901
+    mov %eax, -36(%esp)  # arg f310901
+# emit-expr f310900
+# emit-variable-ref
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# var=f310900
+    movl -20(%esp), %eax  # stack load f310900
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg f310900
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -6596,13 +6596,13 @@ _L_1883923:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # expr=(begin (foreign-call "s_exit" 1))
 # tail-begin (begin (foreign-call "s_exit" 1))
-#   env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+#   env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310901 . -20) (f310900 . -16) (f310901 . -12) (f310900 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
+# env=((f310900 . -20) (f310901 . -16) (f310900 . -12) (f310901 . -8) (f310895 . 4) (f310895 . -4) (f310886 . 0))
 # expr=(foreign-call "s_exit" 1)
     movl %ecx,-24(%esp)
     movl %esp,-28(%esp)
@@ -16592,26 +16592,26 @@ _L_1884585:
 # == eliminate-let*  ==>
 # (lambda (f l) (if (null? l) (quote ()) (cons (f (car l)) (map f (cdr l)))))
 # == uniquify-variables  ==>
-# (lambda (f310916 f310917) (if (null? f310917) (quote ()) (cons (f310916 (car f310917)) (map f310916 (cdr f310917)))))
+# (lambda (f310917 f310916) (if (null? f310916) (quote ()) (cons (f310917 (car f310916)) (map f310917 (cdr f310916)))))
 # == vectorize-letrec  ==>
-# (lambda (f310916 f310917) (if (null? f310917) (quote ()) (cons (f310916 (car f310917)) (map f310916 (cdr f310917)))))
+# (lambda (f310917 f310916) (if (null? f310916) (quote ()) (cons (f310917 (car f310916)) (map f310917 (cdr f310916)))))
 # == eliminate-set!  ==>
-# (lambda (f310916 f310917) (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) (quote ()) (cons (f310916 (car f310917)) (map f310916 (cdr f310917))))))
+# (lambda (f310917 f310916) (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) (quote ()) (cons (f310917 (car f310916)) (map f310917 (cdr f310916))))))
 # == close-free-variables  ==>
-# (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) (quote ()) (cons (f310916 (car f310917)) (map f310916 (cdr f310917))))))
+# (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) (quote ()) (cons (f310917 (car f310916)) (map f310917 (cdr f310916))))))
 # == eliminate-quote  ==>
-# (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) (map f310916 (cdr f310917))))))
+# (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) (map f310917 (cdr f310916))))))
 # == eliminate-when/unless  ==>
-# (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) (map f310916 (cdr f310917))))))
+# (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) (map f310917 (cdr f310916))))))
 # == eliminate-cond  ==>
-# (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) (map f310916 (cdr f310917))))))
+# (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) (map f310917 (cdr f310916))))))
 # == external-symbols  ==>
-# (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917))))))
-# emit-expr (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917))))))
+# (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916))))))
+# emit-expr (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916))))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f310916 f310917) () (let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917))))))
+# expr = (closure (f310917 f310916) () (let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916))))))
     movl $_L_1884588, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -16629,37 +16629,37 @@ _L_1884588:
 _L_1884590:
 # emit-tail-expr
 # si=-16
-# env=((f310917 . -12) (f310916 . -8))
-# expr=(let ((f310916 f310916) (f310917 f310917)) (if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917)))))
+# env=((f310916 . -12) (f310917 . -8))
+# expr=(let ((f310917 f310917) (f310916 f310916)) (if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916)))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310917 . -12) (f310916 . -8))
-#  bindings = ((f310916 f310916) (f310917 f310917))
-#  body = (if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917))))
-# emit-expr f310916
-# emit-variable-ref
-# env=((f310917 . -12) (f310916 . -8))
-# var=f310916
-    movl -8(%esp), %eax  # stack load f310916
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310916 . -12) (f310917 . -8))
+#  bindings = ((f310917 f310917) (f310916 f310916))
+#  body = (if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916))))
 # emit-expr f310917
 # emit-variable-ref
-# env=((f310917 . -12) (f310916 . -8))
+# env=((f310916 . -12) (f310917 . -8))
 # var=f310917
-    movl -12(%esp), %eax  # stack load f310917
+    movl -8(%esp), %eax  # stack load f310917
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310916
+# emit-variable-ref
+# env=((f310916 . -12) (f310917 . -8))
+# var=f310916
+    movl -12(%esp), %eax  # stack load f310916
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# expr=(if (null? f310917) () (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917))))
-# emit-expr (null? f310917)
-# emit-expr f310917
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# expr=(if (null? f310916) () (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916))))
+# emit-expr (null? f310916)
+# emit-expr f310916
 # emit-variable-ref
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# var=f310917
-    movl -20(%esp), %eax  # stack load f310917
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# var=f310916
+    movl -20(%esp), %eax  # stack load f310916
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -16671,7 +16671,7 @@ _L_1884590:
     je _L_1884591
 # emit-tail-expr
 # si=-24
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
 # expr=()
     movl $63, %eax     # immed ()
     ret                  # immediate tail return
@@ -16679,20 +16679,20 @@ _L_1884590:
 _L_1884591:
 # emit-tail-expr
 # si=-24
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# expr=(cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917)))
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# expr=(cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916)))
 # tail primcall
-# cons arg1=(f310916 (car f310917)) arg2=((primitive-ref map) f310916 (cdr f310917))
-# emit-expr (f310916 (car f310917))
+# cons arg1=(f310917 (car f310916)) arg2=((primitive-ref map) f310917 (cdr f310916))
+# emit-expr (f310917 (car f310916))
 # funcall
 #    si   =-24
-#    env  = ((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-#    expr = (funcall f310916 (car f310917))
-# emit-expr f310916
+#    env  = ((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+#    expr = (funcall f310917 (car f310916))
+# emit-expr f310917
 # emit-variable-ref
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# var=f310916
-    movl -16(%esp), %eax  # stack load f310916
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# var=f310917
+    movl -16(%esp), %eax  # stack load f310917
 # end emit-variable-ref
 # check the funcall op is a procedure
     movl %eax,%ebx
@@ -16706,12 +16706,12 @@ _L_1884591:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884593":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr (car f310917)
-# emit-expr f310917
+# emit-expr (car f310916)
+# emit-expr f310916
 # emit-variable-ref
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# var=f310917
-    movl -20(%esp), %eax  # stack load f310917
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# var=f310916
+    movl -20(%esp), %eax  # stack load f310916
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -16726,7 +16726,7 @@ _L_1884591:
     jmp *-2(%edi)  # jump to the handler
 _L_1884594:
     movl -1(%eax), %eax
-    mov %eax, -36(%esp)  # arg (car f310917)
+    mov %eax, -36(%esp)  # arg (car f310916)
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $4,%eax   # save arg count
@@ -16734,11 +16734,11 @@ _L_1884594:
     add $24, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
     movl %eax, -24(%esp)
-# emit-expr ((primitive-ref map) f310916 (cdr f310917))
+# emit-expr ((primitive-ref map) f310917 (cdr f310916))
 # funcall
 #    si   =-28
-#    env  = ((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-#    expr = (funcall (primitive-ref map) f310916 (cdr f310917))
+#    env  = ((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+#    expr = (funcall (primitive-ref map) f310917 (cdr f310916))
 # emit-expr (primitive-ref map)
     .extern mrc_map
     movl mrc_map,%eax
@@ -16754,19 +16754,19 @@ _L_1884594:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884595":
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310916
-# emit-variable-ref
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
-# var=f310916
-    movl -16(%esp), %eax  # stack load f310916
-# end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310916
-# emit-expr (cdr f310917)
 # emit-expr f310917
 # emit-variable-ref
-# env=((f310917 . -20) (f310916 . -16) (f310917 . -12) (f310916 . -8))
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
 # var=f310917
-    movl -20(%esp), %eax  # stack load f310917
+    movl -16(%esp), %eax  # stack load f310917
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg f310917
+# emit-expr (cdr f310916)
+# emit-expr f310916
+# emit-variable-ref
+# env=((f310916 . -20) (f310917 . -16) (f310916 . -12) (f310917 . -8))
+# var=f310916
+    movl -20(%esp), %eax  # stack load f310916
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -16781,7 +16781,7 @@ _L_1884594:
     jmp *-2(%edi)  # jump to the handler
 _L_1884596:
     movl 3(%eax), %eax
-    mov %eax, -44(%esp)  # arg (cdr f310917)
+    mov %eax, -44(%esp)  # arg (cdr f310916)
     movl -36(%esp), %edi   # load new closure to %edi
     add $-28, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -16795,7 +16795,7 @@ _L_1884596:
     or   $1, %al
     add  $8, %ebp
 # cons end
-#return from tail (cons (f310916 (car f310917)) ((primitive-ref map) f310916 (cdr f310917)))
+#return from tail (cons (f310917 (car f310916)) ((primitive-ref map) f310917 (cdr f310916)))
     ret
 _L_1884592:
     .align 4,0x90
@@ -16806,26 +16806,26 @@ _L_1884589:
 # == eliminate-let*  ==>
 # (lambda (f l) (unless (null? l) (begin (f (car l)) (for-each f (cdr l)))))
 # == uniquify-variables  ==>
-# (lambda (f310918 f310919) (unless (null? f310919) (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919)))))
+# (lambda (f310919 f310918) (unless (null? f310918) (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918)))))
 # == vectorize-letrec  ==>
-# (lambda (f310918 f310919) (unless (null? f310919) (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919)))))
+# (lambda (f310919 f310918) (unless (null? f310918) (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918)))))
 # == eliminate-set!  ==>
-# (lambda (f310918 f310919) (let ((f310918 f310918) (f310919 f310919)) (unless (null? f310919) (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919))))))
+# (lambda (f310919 f310918) (let ((f310919 f310919) (f310918 f310918)) (unless (null? f310918) (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918))))))
 # == close-free-variables  ==>
-# (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (unless (null? f310919) (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919))))))
+# (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (unless (null? f310918) (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918))))))
 # == eliminate-quote  ==>
-# (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (unless (null? f310919) (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919))))))
+# (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (unless (null? f310918) (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918))))))
 # == eliminate-when/unless  ==>
-# (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919)))) #f)))
+# (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918)))) #f)))
 # == eliminate-cond  ==>
-# (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) (for-each f310918 (cdr f310919)))) #f)))
+# (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) (for-each f310919 (cdr f310918)))) #f)))
 # == external-symbols  ==>
-# (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f)))
-# emit-expr (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f)))
+# (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f)))
+# emit-expr (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f)))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f310918 f310919) () (let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f)))
+# expr = (closure (f310919 f310918) () (let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f)))
     movl $_L_1884597, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -16843,38 +16843,38 @@ _L_1884597:
 _L_1884599:
 # emit-tail-expr
 # si=-16
-# env=((f310919 . -12) (f310918 . -8))
-# expr=(let ((f310918 f310918) (f310919 f310919)) (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f))
+# env=((f310918 . -12) (f310919 . -8))
+# expr=(let ((f310919 f310919) (f310918 f310918)) (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310919 . -12) (f310918 . -8))
-#  bindings = ((f310918 f310918) (f310919 f310919))
-#  body = (if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f)
-# emit-expr f310918
-# emit-variable-ref
-# env=((f310919 . -12) (f310918 . -8))
-# var=f310918
-    movl -8(%esp), %eax  # stack load f310918
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310918 . -12) (f310919 . -8))
+#  bindings = ((f310919 f310919) (f310918 f310918))
+#  body = (if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f)
 # emit-expr f310919
 # emit-variable-ref
-# env=((f310919 . -12) (f310918 . -8))
+# env=((f310918 . -12) (f310919 . -8))
 # var=f310919
-    movl -12(%esp), %eax  # stack load f310919
+    movl -8(%esp), %eax  # stack load f310919
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310918
+# emit-variable-ref
+# env=((f310918 . -12) (f310919 . -8))
+# var=f310918
+    movl -12(%esp), %eax  # stack load f310918
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# expr=(if (not (null? f310919)) (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))) #f)
-# emit-expr (not (null? f310919))
-# emit-expr (null? f310919)
-# emit-expr f310919
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# expr=(if (not (null? f310918)) (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))) #f)
+# emit-expr (not (null? f310918))
+# emit-expr (null? f310918)
+# emit-expr f310918
 # emit-variable-ref
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# var=f310919
-    movl -20(%esp), %eax  # stack load f310919
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# var=f310918
+    movl -20(%esp), %eax  # stack load f310918
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -16891,26 +16891,26 @@ _L_1884599:
     je _L_1884600
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# expr=(begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919))))
-# tail-begin (begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919))))
-#   env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# expr=(begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918))))
+# tail-begin (begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918))))
+#   env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# expr=(begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))
-# tail-begin (begin (f310918 (car f310919)) ((primitive-ref for-each) f310918 (cdr f310919)))
-#   env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# emit-expr (f310918 (car f310919))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# expr=(begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))
+# tail-begin (begin (f310919 (car f310918)) ((primitive-ref for-each) f310919 (cdr f310918)))
+#   env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# emit-expr (f310919 (car f310918))
 # funcall
 #    si   =-24
-#    env  = ((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-#    expr = (funcall f310918 (car f310919))
-# emit-expr f310918
+#    env  = ((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+#    expr = (funcall f310919 (car f310918))
+# emit-expr f310919
 # emit-variable-ref
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# var=f310918
-    movl -16(%esp), %eax  # stack load f310918
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# var=f310919
+    movl -16(%esp), %eax  # stack load f310919
 # end emit-variable-ref
 # check the funcall op is a procedure
     movl %eax,%ebx
@@ -16924,12 +16924,12 @@ _L_1884599:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884602":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr (car f310919)
-# emit-expr f310919
+# emit-expr (car f310918)
+# emit-expr f310918
 # emit-variable-ref
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# var=f310919
-    movl -20(%esp), %eax  # stack load f310919
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# var=f310918
+    movl -20(%esp), %eax  # stack load f310918
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -16944,7 +16944,7 @@ _L_1884599:
     jmp *-2(%edi)  # jump to the handler
 _L_1884603:
     movl -1(%eax), %eax
-    mov %eax, -36(%esp)  # arg (car f310919)
+    mov %eax, -36(%esp)  # arg (car f310918)
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $4,%eax   # save arg count
@@ -16953,35 +16953,35 @@ _L_1884603:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# expr=(begin ((primitive-ref for-each) f310918 (cdr f310919)))
-# tail-begin (begin ((primitive-ref for-each) f310918 (cdr f310919)))
-#   env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# expr=(begin ((primitive-ref for-each) f310919 (cdr f310918)))
+# tail-begin (begin ((primitive-ref for-each) f310919 (cdr f310918)))
+#   env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# expr=((primitive-ref for-each) f310918 (cdr f310919))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# expr=((primitive-ref for-each) f310919 (cdr f310918))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-#    expr = (funcall (primitive-ref for-each) f310918 (cdr f310919))
+#    env  = ((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+#    expr = (funcall (primitive-ref for-each) f310919 (cdr f310918))
 # emit-expr (primitive-ref for-each)
     .extern mrc_for$meach
     movl mrc_for$meach,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310918
-# emit-variable-ref
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
-# var=f310918
-    movl -16(%esp), %eax  # stack load f310918
-# end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f310918
-# emit-expr (cdr f310919)
 # emit-expr f310919
 # emit-variable-ref
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
 # var=f310919
-    movl -20(%esp), %eax  # stack load f310919
+    movl -16(%esp), %eax  # stack load f310919
+# end emit-variable-ref
+    mov %eax, -28(%esp)    # arg f310919
+# emit-expr (cdr f310918)
+# emit-expr f310918
+# emit-variable-ref
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
+# var=f310918
+    movl -20(%esp), %eax  # stack load f310918
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -16996,7 +16996,7 @@ _L_1884603:
     jmp *-2(%edi)  # jump to the handler
 _L_1884604:
     movl 3(%eax), %eax
-    mov %eax, -32(%esp)    # arg (cdr f310919)
+    mov %eax, -32(%esp)    # arg (cdr f310918)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -17016,7 +17016,7 @@ _L_1884604:
 _L_1884600:
 # emit-tail-expr
 # si=-24
-# env=((f310919 . -20) (f310918 . -16) (f310919 . -12) (f310918 . -8))
+# env=((f310918 . -20) (f310919 . -16) (f310918 . -12) (f310919 . -8))
 # expr=#f
     movl $47, %eax     # immed #f
     ret                  # immediate tail return
@@ -18691,26 +18691,26 @@ _L_1884699:
 # == eliminate-let*  ==>
 # (lambda (ch . args) (let ((p (if (null? args) (current-output-port) (car args)))) (begin (when (fx= (port-ndx p) (port-size p)) (flush-output-port p)) (string-set! (port-buf p) (port-ndx p) ch) (port-ndx-add1 p))))
 # == uniquify-variables  ==>
-# (lambda (f310932 . f310933) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935))))
+# (lambda (f310933 . f310932) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935))))
 # == vectorize-letrec  ==>
-# (lambda (f310932 . f310933) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935))))
+# (lambda (f310933 . f310932) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935))))
 # == eliminate-set!  ==>
-# (lambda (f310932 . f310933) (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935)))))
+# (lambda (f310933 . f310932) (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935)))))
 # == close-free-variables  ==>
-# (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935)))))
+# (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935)))))
 # == eliminate-quote  ==>
-# (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935)))))
+# (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (when (fx= (port-ndx f310935) (port-size f310935)) (flush-output-port f310935)) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935)))))
 # == eliminate-when/unless  ==>
-# (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (if (fx= (port-ndx f310935) (port-size f310935)) (begin (flush-output-port f310935)) #f) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935)))))
+# (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (if (fx= (port-ndx f310935) (port-size f310935)) (begin (flush-output-port f310935)) #f) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935)))))
 # == eliminate-cond  ==>
-# (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) (current-output-port) (car f310933)))) (begin (if (fx= (port-ndx f310935) (port-size f310935)) (begin (flush-output-port f310935)) #f) (string-set! (port-buf f310935) (port-ndx f310935) f310932) (port-ndx-add1 f310935)))))
+# (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) (current-output-port) (car f310932)))) (begin (if (fx= (port-ndx f310935) (port-size f310935)) (begin (flush-output-port f310935)) #f) (string-set! (port-buf f310935) (port-ndx f310935) f310933) (port-ndx-add1 f310935)))))
 # == external-symbols  ==>
-# (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935)))))
-# emit-expr (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935)))))
+# (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935)))))
+# emit-expr (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935)))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f310932 . f310933) () (let ((f310932 f310932)) (let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935)))))
+# expr = (closure (f310933 . f310932) () (let ((f310933 f310933)) (let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935)))))
     movl $_L_1884705, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -18746,36 +18746,36 @@ _L_1884708:
     movl %esi, -12(%esp)  # set args
 # emit-tail-expr
 # si=-16
-# env=((f310933 . -12) (f310932 . -8))
-# expr=(let ((f310932 f310932)) (let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))))
+# env=((f310932 . -12) (f310933 . -8))
+# expr=(let ((f310933 f310933)) (let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310933 . -12) (f310932 . -8))
-#  bindings = ((f310932 f310932))
-#  body = (let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935)))
-# emit-expr f310932
+#  env  = ((f310932 . -12) (f310933 . -8))
+#  bindings = ((f310933 f310933))
+#  body = (let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935)))
+# emit-expr f310933
 # emit-variable-ref
-# env=((f310933 . -12) (f310932 . -8))
-# var=f310932
-    movl -8(%esp), %eax  # stack load f310932
+# env=((f310932 . -12) (f310933 . -8))
+# var=f310933
+    movl -8(%esp), %eax  # stack load f310933
 # end emit-variable-ref
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f310932 . -16) (f310933 . -12) (f310932 . -8))
-# expr=(let ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935)))
+# env=((f310933 . -16) (f310932 . -12) (f310933 . -8))
+# expr=(let ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932)))) (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935)))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f310932 . -16) (f310933 . -12) (f310932 . -8))
-#  bindings = ((f310935 (if (null? f310933) ((primitive-ref current-output-port)) (car f310933))))
-#  body = (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))
-# emit-expr (if (null? f310933) ((primitive-ref current-output-port)) (car f310933))
-# emit-expr (null? f310933)
-# emit-expr f310933
+#  env  = ((f310933 . -16) (f310932 . -12) (f310933 . -8))
+#  bindings = ((f310935 (if (null? f310932) ((primitive-ref current-output-port)) (car f310932))))
+#  body = (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))
+# emit-expr (if (null? f310932) ((primitive-ref current-output-port)) (car f310932))
+# emit-expr (null? f310932)
+# emit-expr f310932
 # emit-variable-ref
-# env=((f310932 . -16) (f310933 . -12) (f310932 . -8))
-# var=f310933
-    movl -12(%esp), %eax  # stack load f310933
+# env=((f310933 . -16) (f310932 . -12) (f310933 . -8))
+# var=f310932
+    movl -12(%esp), %eax  # stack load f310932
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -18788,7 +18788,7 @@ _L_1884708:
 # emit-expr ((primitive-ref current-output-port))
 # funcall
 #    si   =-20
-#    env  = ((f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref current-output-port))
 # emit-expr (primitive-ref current-output-port)
     .extern mrc_current$moutput$mport
@@ -18813,12 +18813,12 @@ _L_1884708:
     movl -4(%esp), %edi   # restore closure frame ptr
     jmp _L_1884711
 _L_1884710:
-# emit-expr (car f310933)
-# emit-expr f310933
+# emit-expr (car f310932)
+# emit-expr f310932
 # emit-variable-ref
-# env=((f310932 . -16) (f310933 . -12) (f310932 . -8))
-# var=f310933
-    movl -12(%esp), %eax  # stack load f310933
+# env=((f310933 . -16) (f310932 . -12) (f310933 . -8))
+# var=f310932
+    movl -12(%esp), %eax  # stack load f310932
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -18837,16 +18837,16 @@ _L_1884711:
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
-# expr=(begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))
-# tail-begin (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))
-#   env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
+# expr=(begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))
+# tail-begin (begin (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f) (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))
+#   env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # emit-expr (if (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935)) (begin ((primitive-ref flush-output-port) f310935)) #f)
 # emit-expr (fx= ((primitive-ref port-ndx) f310935) ((primitive-ref port-size) f310935))
 # emit-expr ((primitive-ref port-size) f310935)
 # funcall
 #    si   =-24
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref port-size) f310935)
 # emit-expr (primitive-ref port-size)
     .extern mrc_port$msize
@@ -18865,7 +18865,7 @@ _L_1884711:
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -18892,7 +18892,7 @@ _L_1884717:
 # emit-expr ((primitive-ref port-ndx) f310935)
 # funcall
 #    si   =-28
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref port-ndx) f310935)
 # emit-expr (primitive-ref port-ndx)
     .extern mrc_port$mndx
@@ -18911,7 +18911,7 @@ _L_1884717:
    movl %eax,  -36(%esp)  # stash funcall-oper in closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -18944,11 +18944,11 @@ _L_1884719:
 # emit-expr (begin ((primitive-ref flush-output-port) f310935))
 # emit-begin
 #   expr=(begin ((primitive-ref flush-output-port) f310935))
-#   env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#   env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # emit-expr ((primitive-ref flush-output-port) f310935)
 # funcall
 #    si   =-24
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref flush-output-port) f310935)
 # emit-expr (primitive-ref flush-output-port)
     .extern mrc_flush$moutput$mport
@@ -18967,7 +18967,7 @@ _L_1884719:
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -18981,7 +18981,7 @@ _L_1884719:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#   env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
     jmp _L_1884715
 _L_1884714:
 # emit-expr #f
@@ -18989,15 +18989,15 @@ _L_1884714:
 _L_1884715:
 # emit-tail-expr
 # si=-24
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
-# expr=(begin (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))
-# tail-begin (begin (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932) ((primitive-ref port-ndx-add1) f310935))
-#   env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
-# emit-expr (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310932)
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
+# expr=(begin (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))
+# tail-begin (begin (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933) ((primitive-ref port-ndx-add1) f310935))
+#   env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
+# emit-expr (string-set! ((primitive-ref port-buf) f310935) ((primitive-ref port-ndx) f310935) f310933)
 # emit-expr ((primitive-ref port-buf) f310935)
 # funcall
 #    si   =-24
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref port-buf) f310935)
 # emit-expr (primitive-ref port-buf)
     .extern mrc_port$mbuf
@@ -19016,7 +19016,7 @@ _L_1884715:
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -19043,7 +19043,7 @@ _L_1884722:
 # emit-expr ((primitive-ref port-ndx) f310935)
 # funcall
 #    si   =-24
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref port-ndx) f310935)
 # emit-expr (primitive-ref port-ndx)
     .extern mrc_port$mndx
@@ -19062,7 +19062,7 @@ _L_1884722:
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -19100,11 +19100,11 @@ _L_1884726:
     jmp *-2(%edi)  # jump to handler
 _L_1884725:
     movl %eax, -28(%esp)
-# emit-expr f310932
+# emit-expr f310933
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
-# var=f310932
-    movl -16(%esp), %eax  # stack load f310932
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
+# var=f310933
+    movl -16(%esp), %eax  # stack load f310933
 # end emit-variable-ref
 # check the argument is a char
     movl %eax,%ebx
@@ -19124,17 +19124,17 @@ _L_1884727:
     movb  %ah, -2(%ebx,%esi)
 # emit-tail-expr
 # si=-24
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # expr=(begin ((primitive-ref port-ndx-add1) f310935))
 # tail-begin (begin ((primitive-ref port-ndx-add1) f310935))
-#   env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#   env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # emit-tail-expr
 # si=-24
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # expr=((primitive-ref port-ndx-add1) f310935)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+#    env  = ((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 #    expr = (funcall (primitive-ref port-ndx-add1) f310935)
 # emit-expr (primitive-ref port-ndx-add1)
     .extern mrc_port$mndx$madd1
@@ -19142,7 +19142,7 @@ _L_1884727:
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
 # emit-expr f310935
 # emit-variable-ref
-# env=((f310935 . -20) (f310932 . -16) (f310933 . -12) (f310932 . -8))
+# env=((f310935 . -20) (f310933 . -16) (f310932 . -12) (f310933 . -8))
 # var=f310935
     movl -20(%esp), %eax  # stack load f310935
 # end emit-variable-ref
@@ -20715,27 +20715,27 @@ _L_1884800:
 # == eliminate-let*  ==>
 # (letrec ((print-boolean (lambda (expr p) (begin (write-char #\# p) (if expr (write-char #\t p) (write-char #\f p))))) (print-null (lambda (p) (begin (write-char #\( p) (write-char #\) p)))) (print-char (lambda (expr p) (begin (write-char #\# p) (write-char #\\ p) (write-char expr p)))) (print-fixnum (lambda (i p) (if (negative? i) (begin (write-char #\- p) (print-fixnum (fx* -1 i) p)) (map (lambda (x) (write-char (fixnum->char (fx+ (char->fixnum #\0) x)) p)) (integer->list i))))) (print-string (lambda (s p) (begin (write-char #\" p) (for-each (lambda (c) (write-char c p)) (string->list s)) (write-char #\" p)))) (print-string-alpha (lambda (s p) (for-each (lambda (c) (write-char c p)) (string->list s)))) (print-pair (lambda (pr p) (begin (write-char #\( p) (print-pairs pr p) (write-char #\) p)))) (print-pairs (lambda (pr p) (begin (write (car pr) p) (cond ((null? (cdr pr)) #t) ((pair? (cdr pr)) (begin (write-char #\space p) (print-pairs (cdr pr) p))) (else (begin (write-char #\space p) (write-char #\. p) (write-char #\space p) (write (cdr pr) p)))))))) (lambda (expr p alpha) (cond ((boolean? expr) (print-boolean expr p)) ((null? expr) (print-null p)) ((char? expr) (if alpha (write-char expr p) (print-char expr p))) ((fixnum? expr) (print-fixnum expr p)) ((string? expr) (if alpha (print-string-alpha expr p) (print-string expr p))) ((pair? expr) (print-pair expr p)) (else (error (quote write) "unrecognized expression")))))
 # == uniquify-variables  ==>
-# (letrec ((f310959 (lambda (f311000 f311001) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001))))) (f310958 (lambda (f310999) (begin (write-char #\( f310999) (write-char #\) f310999)))) (f310957 (lambda (f310997 f310998) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998)))) (f310956 (lambda (f310993 f310994) (if (negative? f310993) (begin (write-char #\- f310994) (f310956 (fx* -1 f310993) f310994)) (map (lambda (f310996) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)) (integer->list f310993))))) (f310955 (lambda (f310989 f310990) (begin (write-char #\" f310990) (for-each (lambda (f310992) (write-char f310992 f310990)) (string->list f310989)) (write-char #\" f310990)))) (f310954 (lambda (f310985 f310986) (for-each (lambda (f310988) (write-char f310988 f310986)) (string->list f310985)))) (f310953 (lambda (f310983 f310984) (begin (write-char #\( f310984) (f310952 f310983 f310984) (write-char #\) f310984)))) (f310952 (lambda (f310981 f310982) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) (f310952 (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982)))))))) (lambda (f311005 f311006 f311007) (cond ((boolean? f311005) (f310959 f311005 f311006)) ((null? f311005) (f310958 f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) (f310957 f311005 f311006))) ((fixnum? f311005) (f310956 f311005 f311006)) ((string? f311005) (if f311007 (f310954 f311005 f311006) (f310955 f311005 f311006))) ((pair? f311005) (f310953 f311005 f311006)) (else (error (quote write) "unrecognized expression")))))
+# (letrec ((f310959 (lambda (f311001 f311000) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000))))) (f310958 (lambda (f310999) (begin (write-char #\( f310999) (write-char #\) f310999)))) (f310957 (lambda (f310998 f310997) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997)))) (f310956 (lambda (f310994 f310993) (if (negative? f310994) (begin (write-char #\- f310993) (f310956 (fx* -1 f310994) f310993)) (map (lambda (f310996) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)) (integer->list f310994))))) (f310955 (lambda (f310990 f310989) (begin (write-char #\" f310989) (for-each (lambda (f310992) (write-char f310992 f310989)) (string->list f310990)) (write-char #\" f310989)))) (f310954 (lambda (f310986 f310985) (for-each (lambda (f310988) (write-char f310988 f310985)) (string->list f310986)))) (f310953 (lambda (f310984 f310983) (begin (write-char #\( f310983) (f310952 f310984 f310983) (write-char #\) f310983)))) (f310952 (lambda (f310982 f310981) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) (f310952 (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981)))))))) (lambda (f311007 f311006 f311005) (cond ((boolean? f311007) (f310959 f311007 f311006)) ((null? f311007) (f310958 f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) (f310957 f311007 f311006))) ((fixnum? f311007) (f310956 f311007 f311006)) ((string? f311007) (if f311005 (f310954 f311007 f311006) (f310955 f311007 f311006))) ((pair? f311007) (f310953 f311007 f311006)) (else (error (quote write) "unrecognized expression")))))
 # == vectorize-letrec  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (lambda (f311000 f311001) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001))))) (vector-set! f310958 0 (lambda (f310999) (begin (write-char #\( f310999) (write-char #\) f310999)))) (vector-set! f310957 0 (lambda (f310997 f310998) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998)))) (vector-set! f310956 0 (lambda (f310993 f310994) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (lambda (f310996) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)) (integer->list f310993))))) (vector-set! f310955 0 (lambda (f310989 f310990) (begin (write-char #\" f310990) (for-each (lambda (f310992) (write-char f310992 f310990)) (string->list f310989)) (write-char #\" f310990)))) (vector-set! f310954 0 (lambda (f310985 f310986) (for-each (lambda (f310988) (write-char f310988 f310986)) (string->list f310985)))) (vector-set! f310953 0 (lambda (f310983 f310984) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984)))) (vector-set! f310952 0 (lambda (f310981 f310982) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982)))))))) (lambda (f311005 f311006 f311007) (cond ((boolean? f311005) ((vector-ref f310959 0) f311005 f311006)) ((null? f311005) ((vector-ref f310958 0) f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006))) ((fixnum? f311005) ((vector-ref f310956 0) f311005 f311006)) ((string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))) ((pair? f311005) ((vector-ref f310953 0) f311005 f311006)) (else (error (quote write) "unrecognized expression"))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (lambda (f311001 f311000) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000))))) (vector-set! f310958 0 (lambda (f310999) (begin (write-char #\( f310999) (write-char #\) f310999)))) (vector-set! f310957 0 (lambda (f310998 f310997) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997)))) (vector-set! f310956 0 (lambda (f310994 f310993) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (lambda (f310996) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)) (integer->list f310994))))) (vector-set! f310955 0 (lambda (f310990 f310989) (begin (write-char #\" f310989) (for-each (lambda (f310992) (write-char f310992 f310989)) (string->list f310990)) (write-char #\" f310989)))) (vector-set! f310954 0 (lambda (f310986 f310985) (for-each (lambda (f310988) (write-char f310988 f310985)) (string->list f310986)))) (vector-set! f310953 0 (lambda (f310984 f310983) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983)))) (vector-set! f310952 0 (lambda (f310982 f310981) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981)))))))) (lambda (f311007 f311006 f311005) (cond ((boolean? f311007) ((vector-ref f310959 0) f311007 f311006)) ((null? f311007) ((vector-ref f310958 0) f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006))) ((fixnum? f311007) ((vector-ref f310956 0) f311007 f311006)) ((string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))) ((pair? f311007) ((vector-ref f310953 0) f311007 f311006)) (else (error (quote write) "unrecognized expression"))))))
 # == eliminate-set!  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (lambda (f311000 f311001) (let ((f311000 f311000) (f311001 f311001)) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001)))))) (vector-set! f310958 0 (lambda (f310999) (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (lambda (f310997 f310998) (let ((f310997 f310997) (f310998 f310998)) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998))))) (vector-set! f310956 0 (lambda (f310993 f310994) (let ((f310993 f310993) (f310994 f310994)) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (lambda (f310996) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) (integer->list f310993)))))) (vector-set! f310955 0 (lambda (f310989 f310990) (let ((f310989 f310989) (f310990 f310990)) (begin (write-char #\" f310990) (for-each (lambda (f310992) (let ((f310992 f310992)) (write-char f310992 f310990))) (string->list f310989)) (write-char #\" f310990))))) (vector-set! f310954 0 (lambda (f310985 f310986) (let ((f310985 f310985) (f310986 f310986)) (for-each (lambda (f310988) (let ((f310988 f310988)) (write-char f310988 f310986))) (string->list f310985))))) (vector-set! f310953 0 (lambda (f310983 f310984) (let ((f310983 f310983) (f310984 f310984)) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984))))) (vector-set! f310952 0 (lambda (f310981 f310982) (let ((f310981 f310981) (f310982 f310982)) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982))))))))) (lambda (f311005 f311006 f311007) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (cond ((boolean? f311005) ((vector-ref f310959 0) f311005 f311006)) ((null? f311005) ((vector-ref f310958 0) f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006))) ((fixnum? f311005) ((vector-ref f310956 0) f311005 f311006)) ((string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))) ((pair? f311005) ((vector-ref f310953 0) f311005 f311006)) (else (error (quote write) "unrecognized expression")))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (lambda (f311001 f311000) (let ((f311001 f311001) (f311000 f311000)) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000)))))) (vector-set! f310958 0 (lambda (f310999) (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (lambda (f310998 f310997) (let ((f310998 f310998) (f310997 f310997)) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997))))) (vector-set! f310956 0 (lambda (f310994 f310993) (let ((f310994 f310994) (f310993 f310993)) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (lambda (f310996) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) (integer->list f310994)))))) (vector-set! f310955 0 (lambda (f310990 f310989) (let ((f310990 f310990) (f310989 f310989)) (begin (write-char #\" f310989) (for-each (lambda (f310992) (let ((f310992 f310992)) (write-char f310992 f310989))) (string->list f310990)) (write-char #\" f310989))))) (vector-set! f310954 0 (lambda (f310986 f310985) (let ((f310986 f310986) (f310985 f310985)) (for-each (lambda (f310988) (let ((f310988 f310988)) (write-char f310988 f310985))) (string->list f310986))))) (vector-set! f310953 0 (lambda (f310984 f310983) (let ((f310984 f310984) (f310983 f310983)) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983))))) (vector-set! f310952 0 (lambda (f310982 f310981) (let ((f310982 f310982) (f310981 f310981)) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981))))))))) (lambda (f311007 f311006 f311005) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (cond ((boolean? f311007) ((vector-ref f310959 0) f311007 f311006)) ((null? f311007) ((vector-ref f310958 0) f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006))) ((fixnum? f311007) ((vector-ref f310956 0) f311007 f311006)) ((string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))) ((pair? f311007) ((vector-ref f310953 0) f311007 f311006)) (else (error (quote write) "unrecognized expression")))))))
 # == close-free-variables  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (closure (f310996) (f310994) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) (integer->list f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin (write-char #\" f310990) (for-each (closure (f310992) (f310990) (let ((f310992 f310992)) (write-char f310992 f310990))) (string->list f310989)) (write-char #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) (for-each (closure (f310988) (f310986) (let ((f310988 f310988)) (write-char f310988 f310986))) (string->list f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (cond ((boolean? f311005) ((vector-ref f310959 0) f311005 f311006)) ((null? f311005) ((vector-ref f310958 0) f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006))) ((fixnum? f311005) ((vector-ref f310956 0) f311005 f311006)) ((string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))) ((pair? f311005) ((vector-ref f310953 0) f311005 f311006)) (else (error (quote write) "unrecognized expression")))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (closure (f310996) (f310993) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) (integer->list f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin (write-char #\" f310989) (for-each (closure (f310992) (f310989) (let ((f310992 f310992)) (write-char f310992 f310989))) (string->list f310990)) (write-char #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) (for-each (closure (f310988) (f310985) (let ((f310988 f310988)) (write-char f310988 f310985))) (string->list f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (cond ((boolean? f311007) ((vector-ref f310959 0) f311007 f311006)) ((null? f311007) ((vector-ref f310958 0) f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006))) ((fixnum? f311007) ((vector-ref f310956 0) f311007 f311006)) ((string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))) ((pair? f311007) ((vector-ref f310953 0) f311007 f311006)) (else (error (quote write) "unrecognized expression")))))))
 # == eliminate-quote  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (closure (f310996) (f310994) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) (integer->list f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin (write-char #\" f310990) (for-each (closure (f310992) (f310990) (let ((f310992 f310992)) (write-char f310992 f310990))) (string->list f310989)) (write-char #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) (for-each (closure (f310988) (f310986) (let ((f310988 f310988)) (write-char f310988 f310986))) (string->list f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (cond ((boolean? f311005) ((vector-ref f310959 0) f311005 f311006)) ((null? f311005) ((vector-ref f310958 0) f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006))) ((fixnum? f311005) ((vector-ref f310956 0) f311005 f311006)) ((string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))) ((pair? f311005) ((vector-ref f310953 0) f311005 f311006)) (else (error (string->symbol "write") "unrecognized expression")))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (closure (f310996) (f310993) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) (integer->list f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin (write-char #\" f310989) (for-each (closure (f310992) (f310989) (let ((f310992 f310992)) (write-char f310992 f310989))) (string->list f310990)) (write-char #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) (for-each (closure (f310988) (f310985) (let ((f310988 f310988)) (write-char f310988 f310985))) (string->list f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (cond ((boolean? f311007) ((vector-ref f310959 0) f311007 f311006)) ((null? f311007) ((vector-ref f310958 0) f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006))) ((fixnum? f311007) ((vector-ref f310956 0) f311007 f311006)) ((string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))) ((pair? f311007) ((vector-ref f310953 0) f311007 f311006)) (else (error (string->symbol "write") "unrecognized expression")))))))
 # == eliminate-when/unless  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (closure (f310996) (f310994) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) (integer->list f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin (write-char #\" f310990) (for-each (closure (f310992) (f310990) (let ((f310992 f310992)) (write-char f310992 f310990))) (string->list f310989)) (write-char #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) (for-each (closure (f310988) (f310986) (let ((f310988 f310988)) (write-char f310988 f310986))) (string->list f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin (write (car f310981) f310982) (cond ((null? (cdr f310981)) #t) ((pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))) (else (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (cond ((boolean? f311005) ((vector-ref f310959 0) f311005 f311006)) ((null? f311005) ((vector-ref f310958 0) f311006)) ((char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006))) ((fixnum? f311005) ((vector-ref f310956 0) f311005 f311006)) ((string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))) ((pair? f311005) ((vector-ref f310953 0) f311005 f311006)) (else (error (string->symbol "write") "unrecognized expression")))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (closure (f310996) (f310993) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) (integer->list f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin (write-char #\" f310989) (for-each (closure (f310992) (f310989) (let ((f310992 f310992)) (write-char f310992 f310989))) (string->list f310990)) (write-char #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) (for-each (closure (f310988) (f310985) (let ((f310988 f310988)) (write-char f310988 f310985))) (string->list f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin (write (car f310982) f310981) (cond ((null? (cdr f310982)) #t) ((pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))) (else (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (cond ((boolean? f311007) ((vector-ref f310959 0) f311007 f311006)) ((null? f311007) ((vector-ref f310958 0) f311006)) ((char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006))) ((fixnum? f311007) ((vector-ref f310956 0) f311007 f311006)) ((string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))) ((pair? f311007) ((vector-ref f310953 0) f311007 f311006)) (else (error (string->symbol "write") "unrecognized expression")))))))
 # == eliminate-cond  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin (write-char #\# f311001) (if f311000 (write-char #\t f311001) (write-char #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin (write-char #\# f310998) (write-char #\\ f310998) (write-char f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if (negative? f310993) (begin (write-char #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) (map (closure (f310996) (f310994) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) (integer->list f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin (write-char #\" f310990) (for-each (closure (f310992) (f310990) (let ((f310992 f310992)) (write-char f310992 f310990))) (string->list f310989)) (write-char #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) (for-each (closure (f310988) (f310986) (let ((f310988 f310988)) (write-char f310988 f310986))) (string->list f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin (write-char #\( f310984) ((vector-ref f310952 0) f310983 f310984) (write-char #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin (write (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin (write-char #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin (write-char #\space f310982) (write-char #\. f310982) (write-char #\space f310982) (write (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 (write-char f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) (error (string->symbol "write") "unrecognized expression")))))))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin (write-char #\# f311000) (if f311001 (write-char #\t f311000) (write-char #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin (write-char #\( f310999) (write-char #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin (write-char #\# f310997) (write-char #\\ f310997) (write-char f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if (negative? f310994) (begin (write-char #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) (map (closure (f310996) (f310993) (let ((f310996 f310996)) (write-char (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) (integer->list f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin (write-char #\" f310989) (for-each (closure (f310992) (f310989) (let ((f310992 f310992)) (write-char f310992 f310989))) (string->list f310990)) (write-char #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) (for-each (closure (f310988) (f310985) (let ((f310988 f310988)) (write-char f310988 f310985))) (string->list f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin (write-char #\( f310983) ((vector-ref f310952 0) f310984 f310983) (write-char #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin (write (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin (write-char #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin (write-char #\space f310981) (write-char #\. f310981) (write-char #\space f310981) (write (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 (write-char f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) (error (string->symbol "write") "unrecognized expression")))))))))))
 # == external-symbols  ==>
-# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))))
-# emit-expr (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))))
+# (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))))
+# emit-expr (let ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1))) (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))))
 # emit-let
 #  si   = 0
 #  env  = ()
 #  bindings = ((f310959 (make-vector 1)) (f310958 (make-vector 1)) (f310957 (make-vector 1)) (f310956 (make-vector 1)) (f310955 (make-vector 1)) (f310954 (make-vector 1)) (f310953 (make-vector 1)) (f310952 (make-vector 1)))
-#  body = (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
+#  body = (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
 # emit-expr (make-vector 1)
 # make-vector 1
 # emit-expr 1
@@ -21016,15 +21016,15 @@ _L_1884819:
     andl $-8, %esi
     addl %esi, %ebp
     movl %eax, -28(%esp)  # stack save
-# emit-expr (begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
+# emit-expr (begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
 # emit-begin
-#   expr=(begin (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))) (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
+#   expr=(begin (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))) (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))) (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310959 0 (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001))))))
+# emit-expr (vector-set! f310959 0 (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000))))))
 # emit-expr f310959
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -21073,11 +21073,11 @@ _L_1884823:
     jmp *-2(%edi)  # jump to handler
 _L_1884822:
     movl %eax, -36(%esp)
-# emit-expr (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))
+# emit-expr (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f311000 f311001) () (let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))))
+# expr = (closure (f311001 f311000) () (let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))))
     movl $_L_1884824, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -21095,38 +21095,38 @@ _L_1884824:
 _L_1884826:
 # emit-tail-expr
 # si=-16
-# env=((f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f311000 f311000) (f311001 f311001)) (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001))))
+# env=((f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f311001 f311001) (f311000 f311000)) (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f311000 f311000) (f311001 f311001))
-#  body = (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))
-# emit-expr f311000
-# emit-variable-ref
-# env=((f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311000
-    movl -8(%esp), %eax  # stack load f311000
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f311001 f311001) (f311000 f311000))
+#  body = (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))
 # emit-expr f311001
 # emit-variable-ref
-# env=((f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311001
-    movl -12(%esp), %eax  # stack load f311001
+    movl -8(%esp), %eax  # stack load f311001
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f311000
+# emit-variable-ref
+# env=((f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311000
+    movl -12(%esp), %eax  # stack load f311000
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))
-# tail-begin (begin ((primitive-ref write-char) #\# f311001) (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))
-#   env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\# f311001)
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))
+# tail-begin (begin ((primitive-ref write-char) #\# f311000) (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))
+#   env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\# f311000)
 # funcall
 #    si   =-24
-#    env  = ((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\# f311001)
+#    env  = ((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\# f311000)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21145,13 +21145,13 @@ _L_1884826:
 # emit-expr #\#
     movl $8975, %eax     # immed #\#
     mov %eax, -36(%esp)  # arg #
-# emit-expr f311001
+# emit-expr f311000
 # emit-variable-ref
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311001
-    movl -20(%esp), %eax  # stack load f311001
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311000
+    movl -20(%esp), %eax  # stack load f311000
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f311001
+    mov %eax, -40(%esp)  # arg f311000
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -21160,30 +21160,30 @@ _L_1884826:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))
-# tail-begin (begin (if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001)))
-#   env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))
+# tail-begin (begin (if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000)))
+#   env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if f311000 ((primitive-ref write-char) #\t f311001) ((primitive-ref write-char) #\f f311001))
-# emit-expr f311000
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if f311001 ((primitive-ref write-char) #\t f311000) ((primitive-ref write-char) #\f f311000))
+# emit-expr f311001
 # emit-variable-ref
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311000
-    movl -16(%esp), %eax  # stack load f311000
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311001
+    movl -16(%esp), %eax  # stack load f311001
 # end emit-variable-ref
     cmp $47, %al
     je _L_1884828
 # emit-tail-expr
 # si=-24
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) #\t f311001)
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) #\t f311000)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\t f311001)
+#    env  = ((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\t f311000)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21191,13 +21191,13 @@ _L_1884826:
 # emit-expr #\t
     movl $29711, %eax     # immed #\t
     mov %eax, -28(%esp)    # arg t
-# emit-expr f311001
+# emit-expr f311000
 # emit-variable-ref
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311001
-    movl -20(%esp), %eax  # stack load f311001
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311000
+    movl -20(%esp), %eax  # stack load f311000
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f311001
+    mov %eax, -32(%esp)    # arg f311000
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -21215,12 +21215,12 @@ _L_1884826:
 _L_1884828:
 # emit-tail-expr
 # si=-24
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) #\f f311001)
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) #\f f311000)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\f f311001)
+#    env  = ((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\f f311000)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21228,13 +21228,13 @@ _L_1884828:
 # emit-expr #\f
     movl $26127, %eax     # immed #\f
     mov %eax, -28(%esp)    # arg f
-# emit-expr f311001
+# emit-expr f311000
 # emit-variable-ref
-# env=((f311001 . -20) (f311000 . -16) (f311001 . -12) (f311000 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311001
-    movl -20(%esp), %eax  # stack load f311001
+# env=((f311000 . -20) (f311001 . -16) (f311000 . -12) (f311001 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311000
+    movl -20(%esp), %eax  # stack load f311000
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f311001
+    mov %eax, -32(%esp)    # arg f311000
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -21255,9 +21255,9 @@ _L_1884825:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999))))) (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-expr (vector-set! f310958 0 (closure (f310999) () (let ((f310999 f310999)) (begin ((primitive-ref write-char) #\( f310999) ((primitive-ref write-char) #\) f310999)))))
 # emit-expr f310958
@@ -21433,11 +21433,11 @@ _L_1884835:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))) (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))) (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310957 0 (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998)))))
+# emit-expr (vector-set! f310957 0 (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997)))))
 # emit-expr f310957
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -21486,11 +21486,11 @@ _L_1884841:
     jmp *-2(%edi)  # jump to handler
 _L_1884840:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))
+# emit-expr (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310997 f310998) () (let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))))
+# expr = (closure (f310998 f310997) () (let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))))
     movl $_L_1884842, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -21508,38 +21508,38 @@ _L_1884842:
 _L_1884844:
 # emit-tail-expr
 # si=-16
-# env=((f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310997 f310997) (f310998 f310998)) (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998)))
+# env=((f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310998 f310998) (f310997 f310997)) (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310997 f310997) (f310998 f310998))
-#  body = (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))
-# emit-expr f310997
-# emit-variable-ref
-# env=((f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310997
-    movl -8(%esp), %eax  # stack load f310997
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310998 f310998) (f310997 f310997))
+#  body = (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))
 # emit-expr f310998
 # emit-variable-ref
-# env=((f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310998
-    movl -12(%esp), %eax  # stack load f310998
+    movl -8(%esp), %eax  # stack load f310998
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310997
+# emit-variable-ref
+# env=((f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310997
+    movl -12(%esp), %eax  # stack load f310997
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))
-# tail-begin (begin ((primitive-ref write-char) #\# f310998) ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))
-#   env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\# f310998)
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))
+# tail-begin (begin ((primitive-ref write-char) #\# f310997) ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))
+#   env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\# f310997)
 # funcall
 #    si   =-24
-#    env  = ((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\# f310998)
+#    env  = ((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\# f310997)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21558,13 +21558,13 @@ _L_1884844:
 # emit-expr #\#
     movl $8975, %eax     # immed #\#
     mov %eax, -36(%esp)  # arg #
-# emit-expr f310998
+# emit-expr f310997
 # emit-variable-ref
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310998
-    movl -20(%esp), %eax  # stack load f310998
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310997
+    movl -20(%esp), %eax  # stack load f310997
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310998
+    mov %eax, -40(%esp)  # arg f310997
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -21573,15 +21573,15 @@ _L_1884844:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))
-# tail-begin (begin ((primitive-ref write-char) #\\ f310998) ((primitive-ref write-char) f310997 f310998))
-#   env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\\ f310998)
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))
+# tail-begin (begin ((primitive-ref write-char) #\\ f310997) ((primitive-ref write-char) f310998 f310997))
+#   env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\\ f310997)
 # funcall
 #    si   =-24
-#    env  = ((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\\ f310998)
+#    env  = ((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\\ f310997)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21600,13 +21600,13 @@ _L_1884844:
 # emit-expr #\\
     movl $23567, %eax     # immed #\\
     mov %eax, -36(%esp)  # arg \
-# emit-expr f310998
+# emit-expr f310997
 # emit-variable-ref
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310998
-    movl -20(%esp), %eax  # stack load f310998
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310997
+    movl -20(%esp), %eax  # stack load f310997
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310998
+    mov %eax, -40(%esp)  # arg f310997
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -21615,36 +21615,36 @@ _L_1884844:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) f310997 f310998))
-# tail-begin (begin ((primitive-ref write-char) f310997 f310998))
-#   env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) f310998 f310997))
+# tail-begin (begin ((primitive-ref write-char) f310998 f310997))
+#   env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) f310997 f310998)
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) f310998 f310997)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) f310997 f310998)
+#    env  = ((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) f310998 f310997)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f310997
-# emit-variable-ref
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310997
-    movl -16(%esp), %eax  # stack load f310997
-# end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f310997
 # emit-expr f310998
 # emit-variable-ref
-# env=((f310998 . -20) (f310997 . -16) (f310998 . -12) (f310997 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310998
-    movl -20(%esp), %eax  # stack load f310998
+    movl -16(%esp), %eax  # stack load f310998
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310998
+    mov %eax, -28(%esp)    # arg f310998
+# emit-expr f310997
+# emit-variable-ref
+# env=((f310997 . -20) (f310998 . -16) (f310997 . -12) (f310998 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310997
+    movl -20(%esp), %eax  # stack load f310997
+# end emit-variable-ref
+    mov %eax, -32(%esp)    # arg f310997
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -21664,11 +21664,11 @@ _L_1884843:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))) (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))) (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310956 0 (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993))))))
+# emit-expr (vector-set! f310956 0 (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994))))))
 # emit-expr f310956
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -21717,11 +21717,11 @@ _L_1884850:
     jmp *-2(%edi)  # jump to handler
 _L_1884849:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))
+# emit-expr (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310993 f310994) (f310956) (let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))))
+# expr = (closure (f310994 f310993) (f310956) (let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))))
     movl $_L_1884851, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -21745,36 +21745,36 @@ _L_1884851:
 _L_1884853:
 # emit-tail-expr
 # si=-16
-# env=((f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310993 f310993) (f310994 f310994)) (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993))))
+# env=((f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310994 f310994) (f310993 f310993)) (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310993 f310993) (f310994 f310994))
-#  body = (if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))
-# emit-expr f310993
-# emit-variable-ref
-# env=((f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310993
-    movl -8(%esp), %eax  # stack load f310993
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310994 f310994) (f310993 f310993))
+#  body = (if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))
 # emit-expr f310994
 # emit-variable-ref
-# env=((f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310994
-    movl -12(%esp), %eax  # stack load f310994
+    movl -8(%esp), %eax  # stack load f310994
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310993
+# emit-variable-ref
+# env=((f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310993
+    movl -12(%esp), %eax  # stack load f310993
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if ((primitive-ref negative?) f310993) (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994)) ((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993)))
-# emit-expr ((primitive-ref negative?) f310993)
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if ((primitive-ref negative?) f310994) (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993)) ((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994)))
+# emit-expr ((primitive-ref negative?) f310994)
 # funcall
 #    si   =-24
-#    env  = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref negative?) f310993)
+#    env  = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref negative?) f310994)
 # emit-expr (primitive-ref negative?)
     .extern mrc_negative$q
     movl mrc_negative$q,%eax
@@ -21790,13 +21790,13 @@ _L_1884853:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884856":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310993
+# emit-expr f310994
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310993
-    movl -16(%esp), %eax  # stack load f310993
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310994
+    movl -16(%esp), %eax  # stack load f310994
 # end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310993
+    mov %eax, -36(%esp)  # arg f310994
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $4,%eax   # save arg count
@@ -21807,15 +21807,15 @@ _L_1884853:
     je _L_1884854
 # emit-tail-expr
 # si=-24
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994))
-# tail-begin (begin ((primitive-ref write-char) #\- f310994) ((vector-ref f310956 0) (fx* -1 f310993) f310994))
-#   env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\- f310994)
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993))
+# tail-begin (begin ((primitive-ref write-char) #\- f310993) ((vector-ref f310956 0) (fx* -1 f310994) f310993))
+#   env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\- f310993)
 # funcall
 #    si   =-24
-#    env  = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\- f310994)
+#    env  = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\- f310993)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -21834,13 +21834,13 @@ _L_1884853:
 # emit-expr #\-
     movl $11535, %eax     # immed #\-
     mov %eax, -36(%esp)  # arg -
-# emit-expr f310994
+# emit-expr f310993
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310994
-    movl -20(%esp), %eax  # stack load f310994
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310993
+    movl -20(%esp), %eax  # stack load f310993
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310994
+    mov %eax, -40(%esp)  # arg f310993
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -21849,22 +21849,22 @@ _L_1884853:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((vector-ref f310956 0) (fx* -1 f310993) f310994))
-# tail-begin (begin ((vector-ref f310956 0) (fx* -1 f310993) f310994))
-#   env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((vector-ref f310956 0) (fx* -1 f310994) f310993))
+# tail-begin (begin ((vector-ref f310956 0) (fx* -1 f310994) f310993))
+#   env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310956 0) (fx* -1 f310993) f310994)
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310956 0) (fx* -1 f310994) f310993)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310956 0) (fx* -1 f310993) f310994)
+#    env  = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310956 0) (fx* -1 f310994) f310993)
 # emit-expr (vector-ref f310956 0)
 # emit-expr f310956
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310956
     movl 2(%edi), %eax  # frame load f310956
 # end emit-variable-ref
@@ -21912,12 +21912,12 @@ _L_1884860:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (fx* -1 f310993)
-# emit-expr f310993
+# emit-expr (fx* -1 f310994)
+# emit-expr f310994
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310993
-    movl -16(%esp), %eax  # stack load f310993
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310994
+    movl -16(%esp), %eax  # stack load f310994
 # end emit-variable-ref
 # check the argument is a fixnum
     movl %eax,%ebx
@@ -21948,14 +21948,14 @@ _L_1884862:
     jmp *-2(%edi)  # jump to the handler
 _L_1884863:
     imul -28(%esp), %eax
-    mov %eax, -28(%esp)    # arg (fx* -1 f310993)
-# emit-expr f310994
+    mov %eax, -28(%esp)    # arg (fx* -1 f310994)
+# emit-expr f310993
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310994
-    movl -20(%esp), %eax  # stack load f310994
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310993
+    movl -20(%esp), %eax  # stack load f310993
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310994
+    mov %eax, -32(%esp)    # arg f310993
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -21974,28 +21974,28 @@ _L_1884863:
 _L_1884854:
 # emit-tail-expr
 # si=-24
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993))
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref map) (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))) ((primitive-ref integer->list) f310993))
+#    env  = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref map) (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))) ((primitive-ref integer->list) f310994))
 # emit-expr (primitive-ref map)
     .extern mrc_map
     movl mrc_map,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)))
+# emit-expr (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)))
 # emit-closure
 # si = -28
-# env = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)))
+# env = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr = (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)))
     movl $_L_1884864, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310994
-    movl -20(%esp), %eax  # stack load f310994
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310993
+    movl -20(%esp), %eax  # stack load f310993
 # end emit-variable-ref
-   movl  %eax, 4(%ebp)  # f310994
+   movl  %eax, 4(%ebp)  # f310993
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
@@ -22012,28 +22012,28 @@ _L_1884864:
 _L_1884866:
 # emit-tail-expr
 # si=-12
-# env=((f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994))
+# env=((f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993))
 # emit-tail-let
 #  si   = -12
-#  env  = ((f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  env  = ((f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #  bindings = ((f310996 f310996))
-#  body = ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)
+#  body = ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)
 # emit-expr f310996
 # emit-variable-ref
-# env=((f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310996
     movl -8(%esp), %eax  # stack load f310996
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((f310996 . -12) (f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)
+# env=((f310996 . -12) (f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)
 # emit-tail-funcall
 #    si   =-16
-#    env  = ((f310996 . -12) (f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310994)
+#    env  = ((f310996 . -12) (f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) (fixnum->char (fx+ (char->fixnum #\0) f310996)) f310993)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -22042,7 +22042,7 @@ _L_1884866:
 # emit-expr (fx+ (char->fixnum #\0) f310996)
 # emit-expr f310996
 # emit-variable-ref
-# env=((f310996 . -12) (f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310996 . -12) (f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310996
     movl -12(%esp), %eax  # stack load f310996
 # end emit-variable-ref
@@ -22104,13 +22104,13 @@ _L_1884870:
     shll $6, %eax
     orl $15, %eax
     mov %eax, -20(%esp)    # arg (fixnum->char (fx+ (char->fixnum 0) f310996))
-# emit-expr f310994
+# emit-expr f310993
 # emit-variable-ref
-# env=((f310996 . -12) (f310996 . -8) (f310994 . 4) (f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310994
-    movl 2(%edi), %eax  # frame load f310994
+# env=((f310996 . -12) (f310996 . -8) (f310993 . 4) (f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310993
+    movl 2(%edi), %eax  # frame load f310993
 # end emit-variable-ref
-    mov %eax, -24(%esp)    # arg f310994
+    mov %eax, -24(%esp)    # arg f310993
     movl -16(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
@@ -22126,12 +22126,12 @@ _L_1884870:
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
 _L_1884865:
-    mov %eax, -28(%esp)    # arg (closure (f310996) (f310994) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum 0) f310996)) f310994)))
-# emit-expr ((primitive-ref integer->list) f310993)
+    mov %eax, -28(%esp)    # arg (closure (f310996) (f310993) (let ((f310996 f310996)) ((primitive-ref write-char) (fixnum->char (fx+ (char->fixnum 0) f310996)) f310993)))
+# emit-expr ((primitive-ref integer->list) f310994)
 # funcall
 #    si   =-32
-#    env  = ((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref integer->list) f310993)
+#    env  = ((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref integer->list) f310994)
 # emit-expr (primitive-ref integer->list)
     .extern mrc_integer$m$glist
     movl mrc_integer$m$glist,%eax
@@ -22147,20 +22147,20 @@ _L_1884865:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884871":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310993
+# emit-expr f310994
 # emit-variable-ref
-# env=((f310994 . -20) (f310993 . -16) (f310994 . -12) (f310993 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310993
-    movl -16(%esp), %eax  # stack load f310993
+# env=((f310993 . -20) (f310994 . -16) (f310993 . -12) (f310994 . -8) (f310956 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310994
+    movl -16(%esp), %eax  # stack load f310994
 # end emit-variable-ref
-    mov %eax, -44(%esp)  # arg f310993
+    mov %eax, -44(%esp)  # arg f310994
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
     movl $4,%eax   # save arg count
     call *-2(%edi)        # call thru closure ptr
     add $32, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -32(%esp)    # arg ((primitive-ref integer->list) f310993)
+    mov %eax, -32(%esp)    # arg ((primitive-ref integer->list) f310994)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -22180,11 +22180,11 @@ _L_1884852:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))) (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))) (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310955 0 (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990)))))
+# emit-expr (vector-set! f310955 0 (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989)))))
 # emit-expr f310955
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -22233,11 +22233,11 @@ _L_1884875:
     jmp *-2(%edi)  # jump to handler
 _L_1884874:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))
+# emit-expr (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310989 f310990) () (let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))))
+# expr = (closure (f310990 f310989) () (let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))))
     movl $_L_1884876, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -22255,38 +22255,38 @@ _L_1884876:
 _L_1884878:
 # emit-tail-expr
 # si=-16
-# env=((f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310989 f310989) (f310990 f310990)) (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990)))
+# env=((f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310990 f310990) (f310989 f310989)) (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310989 f310989) (f310990 f310990))
-#  body = (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))
-# emit-expr f310989
-# emit-variable-ref
-# env=((f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310989
-    movl -8(%esp), %eax  # stack load f310989
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310990 f310990) (f310989 f310989))
+#  body = (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))
 # emit-expr f310990
 # emit-variable-ref
-# env=((f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310990
-    movl -12(%esp), %eax  # stack load f310990
+    movl -8(%esp), %eax  # stack load f310990
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310989
+# emit-variable-ref
+# env=((f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310989
+    movl -12(%esp), %eax  # stack load f310989
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))
-# tail-begin (begin ((primitive-ref write-char) #\" f310990) ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))
-#   env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\" f310990)
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))
+# tail-begin (begin ((primitive-ref write-char) #\" f310989) ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))
+#   env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\" f310989)
 # funcall
 #    si   =-24
-#    env  = ((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\" f310990)
+#    env  = ((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\" f310989)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -22305,13 +22305,13 @@ _L_1884878:
 # emit-expr #\"
     movl $8719, %eax     # immed #\"
     mov %eax, -36(%esp)  # arg "
-# emit-expr f310990
+# emit-expr f310989
 # emit-variable-ref
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310990
-    movl -20(%esp), %eax  # stack load f310990
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310989
+    movl -20(%esp), %eax  # stack load f310989
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310990
+    mov %eax, -40(%esp)  # arg f310989
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -22320,15 +22320,15 @@ _L_1884878:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))
-# tail-begin (begin ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989)) ((primitive-ref write-char) #\" f310990))
-#   env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989))
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))
+# tail-begin (begin ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990)) ((primitive-ref write-char) #\" f310989))
+#   env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990))
 # funcall
 #    si   =-24
-#    env  = ((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref for-each) (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))) ((primitive-ref string->list) f310989))
+#    env  = ((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref for-each) (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))) ((primitive-ref string->list) f310990))
 # emit-expr (primitive-ref for-each)
     .extern mrc_for$meach
     movl mrc_for$meach,%eax
@@ -22344,18 +22344,18 @@ _L_1884878:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884880":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990)))
+# emit-expr (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989)))
 # emit-closure
 # si = -36
-# env = ((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990)))
+# env = ((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr = (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989)))
     movl $_L_1884881, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310990
-    movl -20(%esp), %eax  # stack load f310990
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310989
+    movl -20(%esp), %eax  # stack load f310989
 # end emit-variable-ref
-   movl  %eax, 4(%ebp)  # f310990
+   movl  %eax, 4(%ebp)  # f310989
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
@@ -22372,46 +22372,46 @@ _L_1884881:
 _L_1884883:
 # emit-tail-expr
 # si=-12
-# env=((f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990))
+# env=((f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989))
 # emit-tail-let
 #  si   = -12
-#  env  = ((f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  env  = ((f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #  bindings = ((f310992 f310992))
-#  body = ((primitive-ref write-char) f310992 f310990)
+#  body = ((primitive-ref write-char) f310992 f310989)
 # emit-expr f310992
 # emit-variable-ref
-# env=((f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310992
     movl -8(%esp), %eax  # stack load f310992
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((f310992 . -12) (f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) f310992 f310990)
+# env=((f310992 . -12) (f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) f310992 f310989)
 # emit-tail-funcall
 #    si   =-16
-#    env  = ((f310992 . -12) (f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) f310992 f310990)
+#    env  = ((f310992 . -12) (f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) f310992 f310989)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
 # emit-expr f310992
 # emit-variable-ref
-# env=((f310992 . -12) (f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310992 . -12) (f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310992
     movl -12(%esp), %eax  # stack load f310992
 # end emit-variable-ref
     mov %eax, -20(%esp)    # arg f310992
-# emit-expr f310990
+# emit-expr f310989
 # emit-variable-ref
-# env=((f310992 . -12) (f310992 . -8) (f310990 . 4) (f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310990
-    movl 2(%edi), %eax  # frame load f310990
+# env=((f310992 . -12) (f310992 . -8) (f310989 . 4) (f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310989
+    movl 2(%edi), %eax  # frame load f310989
 # end emit-variable-ref
-    mov %eax, -24(%esp)    # arg f310990
+    mov %eax, -24(%esp)    # arg f310989
     movl -16(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
@@ -22427,12 +22427,12 @@ _L_1884883:
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
 _L_1884882:
-    mov %eax, -36(%esp)  # arg (closure (f310992) (f310990) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310990)))
-# emit-expr ((primitive-ref string->list) f310989)
+    mov %eax, -36(%esp)  # arg (closure (f310992) (f310989) (let ((f310992 f310992)) ((primitive-ref write-char) f310992 f310989)))
+# emit-expr ((primitive-ref string->list) f310990)
 # funcall
 #    si   =-40
-#    env  = ((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref string->list) f310989)
+#    env  = ((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref string->list) f310990)
 # emit-expr (primitive-ref string->list)
     .extern mrc_string$m$glist
     movl mrc_string$m$glist,%eax
@@ -22448,20 +22448,20 @@ _L_1884882:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884884":
    movl %eax,  -48(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310989
+# emit-expr f310990
 # emit-variable-ref
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310989
-    movl -16(%esp), %eax  # stack load f310989
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310990
+    movl -16(%esp), %eax  # stack load f310990
 # end emit-variable-ref
-    mov %eax, -52(%esp)  # arg f310989
+    mov %eax, -52(%esp)  # arg f310990
     movl -48(%esp), %edi   # load new closure to %edi
     add $-40, %esp   # adjust base
     movl $4,%eax   # save arg count
     call *-2(%edi)        # call thru closure ptr
     add $40, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -40(%esp)  # arg ((primitive-ref string->list) f310989)
+    mov %eax, -40(%esp)  # arg ((primitive-ref string->list) f310990)
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -22470,18 +22470,18 @@ _L_1884882:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\" f310990))
-# tail-begin (begin ((primitive-ref write-char) #\" f310990))
-#   env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\" f310989))
+# tail-begin (begin ((primitive-ref write-char) #\" f310989))
+#   env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) #\" f310990)
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) #\" f310989)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\" f310990)
+#    env  = ((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\" f310989)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -22489,13 +22489,13 @@ _L_1884882:
 # emit-expr #\"
     movl $8719, %eax     # immed #\"
     mov %eax, -28(%esp)    # arg "
-# emit-expr f310990
+# emit-expr f310989
 # emit-variable-ref
-# env=((f310990 . -20) (f310989 . -16) (f310990 . -12) (f310989 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310990
-    movl -20(%esp), %eax  # stack load f310990
+# env=((f310989 . -20) (f310990 . -16) (f310989 . -12) (f310990 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310989
+    movl -20(%esp), %eax  # stack load f310989
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310990
+    mov %eax, -32(%esp)    # arg f310989
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -22515,11 +22515,11 @@ _L_1884877:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))) (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))) (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310954 0 (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985)))))
+# emit-expr (vector-set! f310954 0 (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986)))))
 # emit-expr f310954
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -22568,11 +22568,11 @@ _L_1884888:
     jmp *-2(%edi)  # jump to handler
 _L_1884887:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))
+# emit-expr (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310985 f310986) () (let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))))
+# expr = (closure (f310986 f310985) () (let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))))
     movl $_L_1884889, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -22590,51 +22590,51 @@ _L_1884889:
 _L_1884891:
 # emit-tail-expr
 # si=-16
-# env=((f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310985 f310985) (f310986 f310986)) ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985)))
+# env=((f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310986 f310986) (f310985 f310985)) ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310985 f310985) (f310986 f310986))
-#  body = ((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))
-# emit-expr f310985
-# emit-variable-ref
-# env=((f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310985
-    movl -8(%esp), %eax  # stack load f310985
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310986 f310986) (f310985 f310985))
+#  body = ((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))
 # emit-expr f310986
 # emit-variable-ref
-# env=((f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310986
-    movl -12(%esp), %eax  # stack load f310986
+    movl -8(%esp), %eax  # stack load f310986
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310985
+# emit-variable-ref
+# env=((f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310985
+    movl -12(%esp), %eax  # stack load f310985
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))
+# env=((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref for-each) (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))) ((primitive-ref string->list) f310985))
+#    env  = ((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref for-each) (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))) ((primitive-ref string->list) f310986))
 # emit-expr (primitive-ref for-each)
     .extern mrc_for$meach
     movl mrc_for$meach,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986)))
+# emit-expr (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985)))
 # emit-closure
 # si = -28
-# env = ((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986)))
+# env = ((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr = (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985)))
     movl $_L_1884892, 0(%ebp)  # closure label
 # emit-variable-ref
-# env=((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310986
-    movl -20(%esp), %eax  # stack load f310986
+# env=((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310985
+    movl -20(%esp), %eax  # stack load f310985
 # end emit-variable-ref
-   movl  %eax, 4(%ebp)  # f310986
+   movl  %eax, 4(%ebp)  # f310985
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
     add $8, %ebp     # bump ebp
@@ -22651,46 +22651,46 @@ _L_1884892:
 _L_1884894:
 # emit-tail-expr
 # si=-12
-# env=((f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986))
+# env=((f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985))
 # emit-tail-let
 #  si   = -12
-#  env  = ((f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  env  = ((f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #  bindings = ((f310988 f310988))
-#  body = ((primitive-ref write-char) f310988 f310986)
+#  body = ((primitive-ref write-char) f310988 f310985)
 # emit-expr f310988
 # emit-variable-ref
-# env=((f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310988
     movl -8(%esp), %eax  # stack load f310988
 # end emit-variable-ref
     movl %eax, -12(%esp)  # stack save
 # emit-tail-expr
 # si=-16
-# env=((f310988 . -12) (f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) f310988 f310986)
+# env=((f310988 . -12) (f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) f310988 f310985)
 # emit-tail-funcall
 #    si   =-16
-#    env  = ((f310988 . -12) (f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) f310988 f310986)
+#    env  = ((f310988 . -12) (f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) f310988 f310985)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
    movl %eax,  -16(%esp)  # stash funcall-oper in next closure slot
 # emit-expr f310988
 # emit-variable-ref
-# env=((f310988 . -12) (f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310988 . -12) (f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310988
     movl -12(%esp), %eax  # stack load f310988
 # end emit-variable-ref
     mov %eax, -20(%esp)    # arg f310988
-# emit-expr f310986
+# emit-expr f310985
 # emit-variable-ref
-# env=((f310988 . -12) (f310988 . -8) (f310986 . 4) (f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310986
-    movl 2(%edi), %eax  # frame load f310986
+# env=((f310988 . -12) (f310988 . -8) (f310985 . 4) (f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310985
+    movl 2(%edi), %eax  # frame load f310985
 # end emit-variable-ref
-    mov %eax, -24(%esp)    # arg f310986
+    mov %eax, -24(%esp)    # arg f310985
     movl -16(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-16  delta=12
     mov -16(%esp), %ebx  # shift frame cell
@@ -22706,12 +22706,12 @@ _L_1884894:
     jmp *-2(%edi)  # tail-funcall
     .align 4,0x90
 _L_1884893:
-    mov %eax, -28(%esp)    # arg (closure (f310988) (f310986) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310986)))
-# emit-expr ((primitive-ref string->list) f310985)
+    mov %eax, -28(%esp)    # arg (closure (f310988) (f310985) (let ((f310988 f310988)) ((primitive-ref write-char) f310988 f310985)))
+# emit-expr ((primitive-ref string->list) f310986)
 # funcall
 #    si   =-32
-#    env  = ((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref string->list) f310985)
+#    env  = ((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref string->list) f310986)
 # emit-expr (primitive-ref string->list)
     .extern mrc_string$m$glist
     movl mrc_string$m$glist,%eax
@@ -22727,20 +22727,20 @@ _L_1884893:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884895":
    movl %eax,  -40(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310985
+# emit-expr f310986
 # emit-variable-ref
-# env=((f310986 . -20) (f310985 . -16) (f310986 . -12) (f310985 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310985
-    movl -16(%esp), %eax  # stack load f310985
+# env=((f310985 . -20) (f310986 . -16) (f310985 . -12) (f310986 . -8) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310986
+    movl -16(%esp), %eax  # stack load f310986
 # end emit-variable-ref
-    mov %eax, -44(%esp)  # arg f310985
+    mov %eax, -44(%esp)  # arg f310986
     movl -40(%esp), %edi   # load new closure to %edi
     add $-32, %esp   # adjust base
     movl $4,%eax   # save arg count
     call *-2(%edi)        # call thru closure ptr
     add $32, %esp   # adjust base
     movl -4(%esp), %edi   # restore closure frame ptr
-    mov %eax, -32(%esp)    # arg ((primitive-ref string->list) f310985)
+    mov %eax, -32(%esp)    # arg ((primitive-ref string->list) f310986)
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -22759,11 +22759,11 @@ _L_1884890:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))) (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))) (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310953 0 (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984)))))
+# emit-expr (vector-set! f310953 0 (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983)))))
 # emit-expr f310953
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -22812,11 +22812,11 @@ _L_1884899:
     jmp *-2(%edi)  # jump to handler
 _L_1884898:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))
+# emit-expr (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310983 f310984) (f310952) (let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))))
+# expr = (closure (f310984 f310983) (f310952) (let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))))
     movl $_L_1884900, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -22840,38 +22840,38 @@ _L_1884900:
 _L_1884902:
 # emit-tail-expr
 # si=-16
-# env=((f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310983 f310983) (f310984 f310984)) (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984)))
+# env=((f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310984 f310984) (f310983 f310983)) (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310983 f310983) (f310984 f310984))
-#  body = (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))
-# emit-expr f310983
-# emit-variable-ref
-# env=((f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310983
-    movl -8(%esp), %eax  # stack load f310983
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310984 f310984) (f310983 f310983))
+#  body = (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))
 # emit-expr f310984
 # emit-variable-ref
-# env=((f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310984
-    movl -12(%esp), %eax  # stack load f310984
+    movl -8(%esp), %eax  # stack load f310984
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310983
+# emit-variable-ref
+# env=((f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310983
+    movl -12(%esp), %eax  # stack load f310983
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))
-# tail-begin (begin ((primitive-ref write-char) #\( f310984) ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))
-#   env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\( f310984)
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))
+# tail-begin (begin ((primitive-ref write-char) #\( f310983) ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))
+#   env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\( f310983)
 # funcall
 #    si   =-24
-#    env  = ((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\( f310984)
+#    env  = ((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\( f310983)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -22890,13 +22890,13 @@ _L_1884902:
 # emit-expr #\(
     movl $10255, %eax     # immed #\(
     mov %eax, -36(%esp)  # arg (
-# emit-expr f310984
+# emit-expr f310983
 # emit-variable-ref
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310984
-    movl -20(%esp), %eax  # stack load f310984
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310983
+    movl -20(%esp), %eax  # stack load f310983
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310984
+    mov %eax, -40(%esp)  # arg f310983
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -22905,19 +22905,19 @@ _L_1884902:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))
-# tail-begin (begin ((vector-ref f310952 0) f310983 f310984) ((primitive-ref write-char) #\) f310984))
-#   env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((vector-ref f310952 0) f310983 f310984)
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))
+# tail-begin (begin ((vector-ref f310952 0) f310984 f310983) ((primitive-ref write-char) #\) f310983))
+#   env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((vector-ref f310952 0) f310984 f310983)
 # funcall
 #    si   =-24
-#    env  = ((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310952 0) f310983 f310984)
+#    env  = ((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310952 0) f310984 f310983)
 # emit-expr (vector-ref f310952 0)
 # emit-expr f310952
 # emit-variable-ref
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310952
     movl 2(%edi), %eax  # frame load f310952
 # end emit-variable-ref
@@ -22976,20 +22976,20 @@ _L_1884906:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884908":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr f310983
-# emit-variable-ref
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310983
-    movl -16(%esp), %eax  # stack load f310983
-# end emit-variable-ref
-    mov %eax, -36(%esp)  # arg f310983
 # emit-expr f310984
 # emit-variable-ref
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310984
-    movl -20(%esp), %eax  # stack load f310984
+    movl -16(%esp), %eax  # stack load f310984
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310984
+    mov %eax, -36(%esp)  # arg f310984
+# emit-expr f310983
+# emit-variable-ref
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310983
+    movl -20(%esp), %eax  # stack load f310983
+# end emit-variable-ref
+    mov %eax, -40(%esp)  # arg f310983
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -22998,18 +22998,18 @@ _L_1884906:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\) f310984))
-# tail-begin (begin ((primitive-ref write-char) #\) f310984))
-#   env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\) f310983))
+# tail-begin (begin ((primitive-ref write-char) #\) f310983))
+#   env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) #\) f310984)
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) #\) f310983)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\) f310984)
+#    env  = ((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\) f310983)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -23017,13 +23017,13 @@ _L_1884906:
 # emit-expr #\)
     movl $10511, %eax     # immed #\)
     mov %eax, -28(%esp)    # arg )
-# emit-expr f310984
+# emit-expr f310983
 # emit-variable-ref
-# env=((f310984 . -20) (f310983 . -16) (f310984 . -12) (f310983 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310984
-    movl -20(%esp), %eax  # stack load f310984
+# env=((f310983 . -20) (f310984 . -16) (f310983 . -12) (f310984 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310983
+    movl -20(%esp), %eax  # stack load f310983
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310984
+    mov %eax, -32(%esp)    # arg f310983
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -23043,11 +23043,11 @@ _L_1884901:
     movl -32(%esp), %ebx
     movl -36(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-# emit-expr (begin (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+# emit-expr (begin (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 # emit-begin
-#   expr=(begin (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))))
+#   expr=(begin (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (vector-set! f310952 0 (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))))
+# emit-expr (vector-set! f310952 0 (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))))
 # emit-expr f310952
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -23096,11 +23096,11 @@ _L_1884912:
     jmp *-2(%edi)  # jump to handler
 _L_1884911:
     movl %eax, -36(%esp)
-# emit-expr (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))
+# emit-expr (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))
 # emit-closure
 # si = -40
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f310981 f310982) (f310952) (let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))))
+# expr = (closure (f310982 f310981) (f310952) (let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))))
     movl $_L_1884913, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -23124,38 +23124,38 @@ _L_1884913:
 _L_1884915:
 # emit-tail-expr
 # si=-16
-# env=((f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f310981 f310981) (f310982 f310982)) (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))))
+# env=((f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f310982 f310982) (f310981 f310981)) (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f310981 f310981) (f310982 f310982))
-#  body = (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))
-# emit-expr f310981
-# emit-variable-ref
-# env=((f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -8(%esp), %eax  # stack load f310981
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f310982 f310982) (f310981 f310981))
+#  body = (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))
 # emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310982
-    movl -12(%esp), %eax  # stack load f310982
+    movl -8(%esp), %eax  # stack load f310982
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f310981
+# emit-variable-ref
+# env=((f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -12(%esp), %eax  # stack load f310981
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))
-# tail-begin (begin ((primitive-ref write) (car f310981) f310982) (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write) (car f310981) f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))
+# tail-begin (begin ((primitive-ref write) (car f310982) f310981) (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write) (car f310982) f310981)
 # funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write) (car f310981) f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write) (car f310982) f310981)
 # emit-expr (primitive-ref write)
     .extern mrc_write
     movl mrc_write,%eax
@@ -23171,12 +23171,12 @@ _L_1884915:
     jmp *-2(%edi)  # jump to the handler
 "_L_1884916":
    movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
-# emit-expr (car f310981)
-# emit-expr f310981
+# emit-expr (car f310982)
+# emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -16(%esp), %eax  # stack load f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310982
+    movl -16(%esp), %eax  # stack load f310982
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -23191,14 +23191,14 @@ _L_1884915:
     jmp *-2(%edi)  # jump to the handler
 _L_1884917:
     movl -1(%eax), %eax
-    mov %eax, -36(%esp)  # arg (car f310981)
-# emit-expr f310982
+    mov %eax, -36(%esp)  # arg (car f310982)
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310982
+    mov %eax, -40(%esp)  # arg f310981
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -23207,21 +23207,21 @@ _L_1884917:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))
-# tail-begin (begin (if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))
+# tail-begin (begin (if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (null? (cdr f310981)) #t (if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))))
-# emit-expr (null? (cdr f310981))
-# emit-expr (cdr f310981)
-# emit-expr f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (null? (cdr f310982)) #t (if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))))
+# emit-expr (null? (cdr f310982))
+# emit-expr (cdr f310982)
+# emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -16(%esp), %eax  # stack load f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310982
+    movl -16(%esp), %eax  # stack load f310982
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -23246,7 +23246,7 @@ _L_1884920:
     je _L_1884918
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # expr=#t
     movl $111, %eax     # immed #t
     ret                  # immediate tail return
@@ -23254,15 +23254,15 @@ _L_1884920:
 _L_1884918:
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (pair? (cdr f310981)) (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982)) (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982)))
-# emit-expr (pair? (cdr f310981))
-# emit-expr (cdr f310981)
-# emit-expr f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (pair? (cdr f310982)) (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981)) (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981)))
+# emit-expr (pair? (cdr f310982))
+# emit-expr (cdr f310982)
+# emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -16(%esp), %eax  # stack load f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310982
+    movl -16(%esp), %eax  # stack load f310982
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -23287,15 +23287,15 @@ _L_1884923:
     je _L_1884921
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))
-# tail-begin (begin ((primitive-ref write-char) #\space f310982) ((vector-ref f310952 0) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\space f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))
+# tail-begin (begin ((primitive-ref write-char) #\space f310981) ((vector-ref f310952 0) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\space f310981)
 # funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\space f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\space f310981)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -23314,13 +23314,13 @@ _L_1884923:
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
     mov %eax, -36(%esp)  # arg  
-# emit-expr f310982
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310982
+    mov %eax, -40(%esp)  # arg f310981
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -23329,22 +23329,22 @@ _L_1884923:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((vector-ref f310952 0) (cdr f310981) f310982))
-# tail-begin (begin ((vector-ref f310952 0) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((vector-ref f310952 0) (cdr f310982) f310981))
+# tail-begin (begin ((vector-ref f310952 0) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310952 0) (cdr f310981) f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310952 0) (cdr f310982) f310981)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310952 0) (cdr f310981) f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310952 0) (cdr f310982) f310981)
 # emit-expr (vector-ref f310952 0)
 # emit-expr f310952
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310952
     movl 2(%edi), %eax  # frame load f310952
 # end emit-variable-ref
@@ -23392,12 +23392,12 @@ _L_1884927:
     movl -24(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (cdr f310981)
-# emit-expr f310981
+# emit-expr (cdr f310982)
+# emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -16(%esp), %eax  # stack load f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310982
+    movl -16(%esp), %eax  # stack load f310982
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -23412,14 +23412,14 @@ _L_1884927:
     jmp *-2(%edi)  # jump to the handler
 _L_1884929:
     movl 3(%eax), %eax
-    mov %eax, -28(%esp)    # arg (cdr f310981)
-# emit-expr f310982
+    mov %eax, -28(%esp)    # arg (cdr f310982)
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310982
+    mov %eax, -32(%esp)    # arg f310981
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -23438,15 +23438,15 @@ _L_1884929:
 _L_1884921:
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-# tail-begin (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\space f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+# tail-begin (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\space f310981)
 # funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\space f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\space f310981)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -23465,13 +23465,13 @@ _L_1884921:
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
     mov %eax, -36(%esp)  # arg  
-# emit-expr f310982
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310982
+    mov %eax, -40(%esp)  # arg f310981
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -23480,15 +23480,15 @@ _L_1884921:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-# tail-begin (begin ((primitive-ref write-char) #\. f310982) ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\. f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+# tail-begin (begin ((primitive-ref write-char) #\. f310981) ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\. f310981)
 # funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\. f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\. f310981)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -23507,13 +23507,13 @@ _L_1884921:
 # emit-expr #\.
     movl $11791, %eax     # immed #\.
     mov %eax, -36(%esp)  # arg .
-# emit-expr f310982
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310982
+    mov %eax, -40(%esp)  # arg f310981
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -23522,15 +23522,15 @@ _L_1884921:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-# tail-begin (begin ((primitive-ref write-char) #\space f310982) ((primitive-ref write) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr ((primitive-ref write-char) #\space f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+# tail-begin (begin ((primitive-ref write-char) #\space f310981) ((primitive-ref write) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# emit-expr ((primitive-ref write-char) #\space f310981)
 # funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) #\space f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) #\space f310981)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
@@ -23549,13 +23549,13 @@ _L_1884921:
 # emit-expr #\space
     movl $8207, %eax     # immed #\space
     mov %eax, -36(%esp)  # arg  
-# emit-expr f310982
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -40(%esp)  # arg f310982
+    mov %eax, -40(%esp)  # arg f310981
     movl -32(%esp), %edi   # load new closure to %edi
     add $-24, %esp   # adjust base
     movl $8,%eax   # save arg count
@@ -23564,28 +23564,28 @@ _L_1884921:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(begin ((primitive-ref write) (cdr f310981) f310982))
-# tail-begin (begin ((primitive-ref write) (cdr f310981) f310982))
-#   env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(begin ((primitive-ref write) (cdr f310982) f310981))
+# tail-begin (begin ((primitive-ref write) (cdr f310982) f310981))
+#   env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # emit-tail-expr
 # si=-24
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write) (cdr f310981) f310982)
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write) (cdr f310982) f310981)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write) (cdr f310981) f310982)
+#    env  = ((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write) (cdr f310982) f310981)
 # emit-expr (primitive-ref write)
     .extern mrc_write
     movl mrc_write,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr (cdr f310981)
-# emit-expr f310981
+# emit-expr (cdr f310982)
+# emit-expr f310982
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310981
-    movl -16(%esp), %eax  # stack load f310981
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310982
+    movl -16(%esp), %eax  # stack load f310982
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -23600,14 +23600,14 @@ _L_1884921:
     jmp *-2(%edi)  # jump to the handler
 _L_1884933:
     movl 3(%eax), %eax
-    mov %eax, -28(%esp)    # arg (cdr f310981)
-# emit-expr f310982
+    mov %eax, -28(%esp)    # arg (cdr f310982)
+# emit-expr f310981
 # emit-variable-ref
-# env=((f310982 . -20) (f310981 . -16) (f310982 . -12) (f310981 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f310982
-    movl -20(%esp), %eax  # stack load f310982
+# env=((f310981 . -20) (f310982 . -16) (f310981 . -12) (f310982 . -8) (f310952 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f310981
+    movl -20(%esp), %eax  # stack load f310981
 # end emit-variable-ref
-    mov %eax, -32(%esp)    # arg f310982
+    mov %eax, -32(%esp)    # arg f310981
     movl -24(%esp), %edi   # load new closure to %edi
 # emit-shift-args:  size=3   si=-24  delta=20
     mov -24(%esp), %ebx  # shift frame cell
@@ -23634,15 +23634,15 @@ _L_1884914:
 # emit-begin
 #   expr=(begin)
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (begin (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
+# emit-expr (begin (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
 # emit-begin
-#   expr=(begin (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
+#   expr=(begin (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))))
 #   env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# emit-expr (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))
+# emit-expr (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))
 # emit-closure
 # si = -32
 # env = ((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr = (closure (f311005 f311006 f311007) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))
+# expr = (closure (f311007 f311006 f311005) (f310959 f310958 f310957 f310956 f310954 f310955 f310953) (let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))))
     movl $_L_1884934, 0(%ebp)  # closure label
 # emit-variable-ref
 # env=((f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
@@ -23702,44 +23702,44 @@ _L_1884934:
 _L_1884936:
 # emit-tail-expr
 # si=-20
-# env=((f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(let ((f311005 f311005) (f311006 f311006) (f311007 f311007)) (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))
+# env=((f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(let ((f311007 f311007) (f311006 f311006) (f311005 f311005)) (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#  bindings = ((f311005 f311005) (f311006 f311006) (f311007 f311007))
-#  body = (if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))
-# emit-expr f311005
+#  env  = ((f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#  bindings = ((f311007 f311007) (f311006 f311006) (f311005 f311005))
+#  body = (if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -8(%esp), %eax  # stack load f311005
+# env=((f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -8(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -12(%esp), %eax  # stack load f311006
 # end emit-variable-ref
     movl %eax, -24(%esp)  # stack save
-# emit-expr f311007
+# emit-expr f311005
 # emit-variable-ref
-# env=((f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311007
-    movl -16(%esp), %eax  # stack load f311007
+# env=((f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311005
+    movl -16(%esp), %eax  # stack load f311005
 # end emit-variable-ref
     movl %eax, -28(%esp)  # stack save
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (boolean? f311005) ((vector-ref f310959 0) f311005 f311006) (if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))
-# emit-expr (boolean? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (boolean? f311007) ((vector-ref f310959 0) f311007 f311006) (if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))))
+# emit-expr (boolean? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     and $191, %eax
     cmp $47, %eax
@@ -23751,16 +23751,16 @@ _L_1884936:
     je _L_1884937
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310959 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310959 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310959 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310959 0) f311007 f311006)
 # emit-expr (vector-ref f310959 0)
 # emit-expr f310959
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310959
     movl 2(%edi), %eax  # frame load f310959
 # end emit-variable-ref
@@ -23808,16 +23808,16 @@ _L_1884941:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -23839,14 +23839,14 @@ _L_1884941:
 _L_1884937:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (null? f311005) ((vector-ref f310958 0) f311006) (if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))
-# emit-expr (null? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (null? f311007) ((vector-ref f310958 0) f311006) (if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))))
+# emit-expr (null? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -23858,16 +23858,16 @@ _L_1884937:
     je _L_1884943
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # expr=((vector-ref f310958 0) f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #    expr = (funcall (vector-ref f310958 0) f311006)
 # emit-expr (vector-ref f310958 0)
 # emit-expr f310958
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310958
     movl 6(%edi), %eax  # frame load f310958
 # end emit-variable-ref
@@ -23917,7 +23917,7 @@ _L_1884947:
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -23936,14 +23936,14 @@ _L_1884947:
 _L_1884943:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (char? f311005) (if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006)) (if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))
-# emit-expr (char? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (char? f311007) (if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006)) (if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))))
+# emit-expr (char? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     and $255, %eax
     cmp $15, %eax
@@ -23955,38 +23955,38 @@ _L_1884943:
     je _L_1884949
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if f311007 ((primitive-ref write-char) f311005 f311006) ((vector-ref f310957 0) f311005 f311006))
-# emit-expr f311007
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if f311005 ((primitive-ref write-char) f311007 f311006) ((vector-ref f310957 0) f311007 f311006))
+# emit-expr f311005
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311007
-    movl -28(%esp), %eax  # stack load f311007
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311005
+    movl -28(%esp), %eax  # stack load f311005
 # end emit-variable-ref
     cmp $47, %al
     je _L_1884951
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((primitive-ref write-char) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((primitive-ref write-char) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (primitive-ref write-char) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (primitive-ref write-char) f311007 f311006)
 # emit-expr (primitive-ref write-char)
     .extern mrc_write$mchar
     movl mrc_write$mchar,%eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24008,16 +24008,16 @@ _L_1884943:
 _L_1884951:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310957 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310957 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310957 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310957 0) f311007 f311006)
 # emit-expr (vector-ref f310957 0)
 # emit-expr f310957
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310957
     movl 10(%edi), %eax  # frame load f310957
 # end emit-variable-ref
@@ -24065,16 +24065,16 @@ _L_1884955:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24097,14 +24097,14 @@ _L_1884952:
 _L_1884949:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (fixnum? f311005) ((vector-ref f310956 0) f311005 f311006) (if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))
-# emit-expr (fixnum? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (fixnum? f311007) ((vector-ref f310956 0) f311007 f311006) (if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))))
+# emit-expr (fixnum? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     and $3, %al
     cmp $0, %al
@@ -24116,16 +24116,16 @@ _L_1884949:
     je _L_1884957
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310956 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310956 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310956 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310956 0) f311007 f311006)
 # emit-expr (vector-ref f310956 0)
 # emit-expr f310956
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310956
     movl 14(%edi), %eax  # frame load f310956
 # end emit-variable-ref
@@ -24173,16 +24173,16 @@ _L_1884961:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24204,14 +24204,14 @@ _L_1884961:
 _L_1884957:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (string? f311005) (if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006)) (if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))
-# emit-expr (string? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (string? f311007) (if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006)) (if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")))
+# emit-expr (string? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     and $7, %al
     cmp $6, %al
@@ -24223,28 +24223,28 @@ _L_1884957:
     je _L_1884963
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if f311007 ((vector-ref f310954 0) f311005 f311006) ((vector-ref f310955 0) f311005 f311006))
-# emit-expr f311007
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if f311005 ((vector-ref f310954 0) f311007 f311006) ((vector-ref f310955 0) f311007 f311006))
+# emit-expr f311005
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311007
-    movl -28(%esp), %eax  # stack load f311007
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311005
+    movl -28(%esp), %eax  # stack load f311005
 # end emit-variable-ref
     cmp $47, %al
     je _L_1884965
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310954 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310954 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310954 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310954 0) f311007 f311006)
 # emit-expr (vector-ref f310954 0)
 # emit-expr f310954
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310954
     movl 18(%edi), %eax  # frame load f310954
 # end emit-variable-ref
@@ -24292,16 +24292,16 @@ _L_1884969:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24323,16 +24323,16 @@ _L_1884969:
 _L_1884965:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310955 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310955 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310955 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310955 0) f311007 f311006)
 # emit-expr (vector-ref f310955 0)
 # emit-expr f310955
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310955
     movl 22(%edi), %eax  # frame load f310955
 # end emit-variable-ref
@@ -24380,16 +24380,16 @@ _L_1884973:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24412,14 +24412,14 @@ _L_1884966:
 _L_1884963:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=(if (pair? f311005) ((vector-ref f310953 0) f311005 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))
-# emit-expr (pair? f311005)
-# emit-expr f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=(if (pair? f311007) ((vector-ref f310953 0) f311007 f311006) ((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression"))
+# emit-expr (pair? f311007)
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
     and $7, %al
     cmp $1, %al
@@ -24431,16 +24431,16 @@ _L_1884963:
     je _L_1884975
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# expr=((vector-ref f310953 0) f311005 f311006)
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# expr=((vector-ref f310953 0) f311007 f311006)
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-#    expr = (funcall (vector-ref f310953 0) f311005 f311006)
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    expr = (funcall (vector-ref f310953 0) f311007 f311006)
 # emit-expr (vector-ref f310953 0)
 # emit-expr f310953
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f310953
     movl 26(%edi), %eax  # frame load f310953
 # end emit-variable-ref
@@ -24488,16 +24488,16 @@ _L_1884979:
     movl -32(%esp), %esi
     movl -1(%eax,%esi), %eax
    movl %eax,  -32(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311005
+# emit-expr f311007
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
-# var=f311005
-    movl -20(%esp), %eax  # stack load f311005
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# var=f311007
+    movl -20(%esp), %eax  # stack load f311007
 # end emit-variable-ref
-    mov %eax, -36(%esp)    # arg f311005
+    mov %eax, -36(%esp)    # arg f311007
 # emit-expr f311006
 # emit-variable-ref
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # var=f311006
     movl -24(%esp), %eax  # stack load f311006
 # end emit-variable-ref
@@ -24519,11 +24519,11 @@ _L_1884979:
 _L_1884975:
 # emit-tail-expr
 # si=-32
-# env=((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+# env=((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 # expr=((primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")
 # emit-tail-funcall
 #    si   =-32
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #    expr = (funcall (primitive-ref error) ((primitive-ref string->symbol) "write") "unrecognized expression")
 # emit-expr (primitive-ref error)
     .extern mrc_error
@@ -24532,7 +24532,7 @@ _L_1884975:
 # emit-expr ((primitive-ref string->symbol) "write")
 # funcall
 #    si   =-36
-#    env  = ((f311007 . -28) (f311006 . -24) (f311005 . -20) (f311007 . -16) (f311006 . -12) (f311005 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
+#    env  = ((f311005 . -28) (f311006 . -24) (f311007 . -20) (f311005 . -16) (f311006 . -12) (f311007 . -8) (f310953 . 28) (f310955 . 24) (f310954 . 20) (f310956 . 16) (f310957 . 12) (f310958 . 8) (f310959 . 4) (f310952 . -28) (f310953 . -24) (f310954 . -20) (f310955 . -16) (f310956 . -12) (f310957 . -8) (f310958 . -4) (f310959 . 0))
 #    expr = (funcall (primitive-ref string->symbol) "write")
 # emit-expr (primitive-ref string->symbol)
     .extern mrc_string$m$gsymbol
@@ -24609,26 +24609,26 @@ _L_1884935:
 # == eliminate-let*  ==>
 # (lambda (expr . args) (let ((p (if (null? args) (current-output-port) (car args)))) (base-write expr p #f)))
 # == uniquify-variables  ==>
-# (lambda (f311008 . f311009) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f)))
+# (lambda (f311009 . f311008) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f)))
 # == vectorize-letrec  ==>
-# (lambda (f311008 . f311009) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f)))
+# (lambda (f311009 . f311008) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f)))
 # == eliminate-set!  ==>
-# (lambda (f311008 . f311009) (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f))))
+# (lambda (f311009 . f311008) (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f))))
 # == close-free-variables  ==>
-# (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f))))
+# (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f))))
 # == eliminate-quote  ==>
-# (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f))))
+# (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f))))
 # == eliminate-when/unless  ==>
-# (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f))))
+# (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f))))
 # == eliminate-cond  ==>
-# (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) (current-output-port) (car f311009)))) (base-write f311008 f311011 #f))))
+# (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) (current-output-port) (car f311008)))) (base-write f311009 f311011 #f))))
 # == external-symbols  ==>
-# (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f))))
-# emit-expr (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f))))
+# (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f))))
+# emit-expr (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f311008 . f311009) () (let ((f311008 f311008)) (let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f))))
+# expr = (closure (f311009 . f311008) () (let ((f311009 f311009)) (let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f))))
     movl $_L_1884986, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -24664,36 +24664,36 @@ _L_1884989:
     movl %esi, -12(%esp)  # set args
 # emit-tail-expr
 # si=-16
-# env=((f311009 . -12) (f311008 . -8))
-# expr=(let ((f311008 f311008)) (let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f)))
+# env=((f311008 . -12) (f311009 . -8))
+# expr=(let ((f311009 f311009)) (let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f311009 . -12) (f311008 . -8))
-#  bindings = ((f311008 f311008))
-#  body = (let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f))
-# emit-expr f311008
+#  env  = ((f311008 . -12) (f311009 . -8))
+#  bindings = ((f311009 f311009))
+#  body = (let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f))
+# emit-expr f311009
 # emit-variable-ref
-# env=((f311009 . -12) (f311008 . -8))
-# var=f311008
-    movl -8(%esp), %eax  # stack load f311008
+# env=((f311008 . -12) (f311009 . -8))
+# var=f311009
+    movl -8(%esp), %eax  # stack load f311009
 # end emit-variable-ref
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f311008 . -16) (f311009 . -12) (f311008 . -8))
-# expr=(let ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009)))) ((primitive-ref base-write) f311008 f311011 #f))
+# env=((f311009 . -16) (f311008 . -12) (f311009 . -8))
+# expr=(let ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008)))) ((primitive-ref base-write) f311009 f311011 #f))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f311008 . -16) (f311009 . -12) (f311008 . -8))
-#  bindings = ((f311011 (if (null? f311009) ((primitive-ref current-output-port)) (car f311009))))
-#  body = ((primitive-ref base-write) f311008 f311011 #f)
-# emit-expr (if (null? f311009) ((primitive-ref current-output-port)) (car f311009))
-# emit-expr (null? f311009)
-# emit-expr f311009
+#  env  = ((f311009 . -16) (f311008 . -12) (f311009 . -8))
+#  bindings = ((f311011 (if (null? f311008) ((primitive-ref current-output-port)) (car f311008))))
+#  body = ((primitive-ref base-write) f311009 f311011 #f)
+# emit-expr (if (null? f311008) ((primitive-ref current-output-port)) (car f311008))
+# emit-expr (null? f311008)
+# emit-expr f311008
 # emit-variable-ref
-# env=((f311008 . -16) (f311009 . -12) (f311008 . -8))
-# var=f311009
-    movl -12(%esp), %eax  # stack load f311009
+# env=((f311009 . -16) (f311008 . -12) (f311009 . -8))
+# var=f311008
+    movl -12(%esp), %eax  # stack load f311008
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -24706,7 +24706,7 @@ _L_1884989:
 # emit-expr ((primitive-ref current-output-port))
 # funcall
 #    si   =-20
-#    env  = ((f311008 . -16) (f311009 . -12) (f311008 . -8))
+#    env  = ((f311009 . -16) (f311008 . -12) (f311009 . -8))
 #    expr = (funcall (primitive-ref current-output-port))
 # emit-expr (primitive-ref current-output-port)
     .extern mrc_current$moutput$mport
@@ -24731,12 +24731,12 @@ _L_1884989:
     movl -4(%esp), %edi   # restore closure frame ptr
     jmp _L_1884992
 _L_1884991:
-# emit-expr (car f311009)
-# emit-expr f311009
+# emit-expr (car f311008)
+# emit-expr f311008
 # emit-variable-ref
-# env=((f311008 . -16) (f311009 . -12) (f311008 . -8))
-# var=f311009
-    movl -12(%esp), %eax  # stack load f311009
+# env=((f311009 . -16) (f311008 . -12) (f311009 . -8))
+# var=f311008
+    movl -12(%esp), %eax  # stack load f311008
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -24755,26 +24755,26 @@ _L_1884992:
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f311011 . -20) (f311008 . -16) (f311009 . -12) (f311008 . -8))
-# expr=((primitive-ref base-write) f311008 f311011 #f)
+# env=((f311011 . -20) (f311009 . -16) (f311008 . -12) (f311009 . -8))
+# expr=((primitive-ref base-write) f311009 f311011 #f)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f311011 . -20) (f311008 . -16) (f311009 . -12) (f311008 . -8))
-#    expr = (funcall (primitive-ref base-write) f311008 f311011 #f)
+#    env  = ((f311011 . -20) (f311009 . -16) (f311008 . -12) (f311009 . -8))
+#    expr = (funcall (primitive-ref base-write) f311009 f311011 #f)
 # emit-expr (primitive-ref base-write)
     .extern mrc_base$mwrite
     movl mrc_base$mwrite,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311008
+# emit-expr f311009
 # emit-variable-ref
-# env=((f311011 . -20) (f311008 . -16) (f311009 . -12) (f311008 . -8))
-# var=f311008
-    movl -16(%esp), %eax  # stack load f311008
+# env=((f311011 . -20) (f311009 . -16) (f311008 . -12) (f311009 . -8))
+# var=f311009
+    movl -16(%esp), %eax  # stack load f311009
 # end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f311008
+    mov %eax, -28(%esp)    # arg f311009
 # emit-expr f311011
 # emit-variable-ref
-# env=((f311011 . -20) (f311008 . -16) (f311009 . -12) (f311008 . -8))
+# env=((f311011 . -20) (f311009 . -16) (f311008 . -12) (f311009 . -8))
 # var=f311011
     movl -20(%esp), %eax  # stack load f311011
 # end emit-variable-ref
@@ -24806,26 +24806,26 @@ _L_1884987:
 # == eliminate-let*  ==>
 # (lambda (expr . args) (let ((p (if (null? args) (current-output-port) (car args)))) (base-write expr p #t)))
 # == uniquify-variables  ==>
-# (lambda (f311012 . f311013) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t)))
+# (lambda (f311013 . f311012) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t)))
 # == vectorize-letrec  ==>
-# (lambda (f311012 . f311013) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t)))
+# (lambda (f311013 . f311012) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t)))
 # == eliminate-set!  ==>
-# (lambda (f311012 . f311013) (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t))))
+# (lambda (f311013 . f311012) (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t))))
 # == close-free-variables  ==>
-# (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t))))
+# (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t))))
 # == eliminate-quote  ==>
-# (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t))))
+# (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t))))
 # == eliminate-when/unless  ==>
-# (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t))))
+# (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t))))
 # == eliminate-cond  ==>
-# (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) (current-output-port) (car f311013)))) (base-write f311012 f311015 #t))))
+# (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) (current-output-port) (car f311012)))) (base-write f311013 f311015 #t))))
 # == external-symbols  ==>
-# (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t))))
-# emit-expr (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t))))
+# (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t))))
+# emit-expr (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f311012 . f311013) () (let ((f311012 f311012)) (let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t))))
+# expr = (closure (f311013 . f311012) () (let ((f311013 f311013)) (let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t))))
     movl $_L_1884995, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -24861,36 +24861,36 @@ _L_1884998:
     movl %esi, -12(%esp)  # set args
 # emit-tail-expr
 # si=-16
-# env=((f311013 . -12) (f311012 . -8))
-# expr=(let ((f311012 f311012)) (let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t)))
+# env=((f311012 . -12) (f311013 . -8))
+# expr=(let ((f311013 f311013)) (let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t)))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f311013 . -12) (f311012 . -8))
-#  bindings = ((f311012 f311012))
-#  body = (let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t))
-# emit-expr f311012
+#  env  = ((f311012 . -12) (f311013 . -8))
+#  bindings = ((f311013 f311013))
+#  body = (let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t))
+# emit-expr f311013
 # emit-variable-ref
-# env=((f311013 . -12) (f311012 . -8))
-# var=f311012
-    movl -8(%esp), %eax  # stack load f311012
+# env=((f311012 . -12) (f311013 . -8))
+# var=f311013
+    movl -8(%esp), %eax  # stack load f311013
 # end emit-variable-ref
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f311012 . -16) (f311013 . -12) (f311012 . -8))
-# expr=(let ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013)))) ((primitive-ref base-write) f311012 f311015 #t))
+# env=((f311013 . -16) (f311012 . -12) (f311013 . -8))
+# expr=(let ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012)))) ((primitive-ref base-write) f311013 f311015 #t))
 # emit-tail-let
 #  si   = -20
-#  env  = ((f311012 . -16) (f311013 . -12) (f311012 . -8))
-#  bindings = ((f311015 (if (null? f311013) ((primitive-ref current-output-port)) (car f311013))))
-#  body = ((primitive-ref base-write) f311012 f311015 #t)
-# emit-expr (if (null? f311013) ((primitive-ref current-output-port)) (car f311013))
-# emit-expr (null? f311013)
-# emit-expr f311013
+#  env  = ((f311013 . -16) (f311012 . -12) (f311013 . -8))
+#  bindings = ((f311015 (if (null? f311012) ((primitive-ref current-output-port)) (car f311012))))
+#  body = ((primitive-ref base-write) f311013 f311015 #t)
+# emit-expr (if (null? f311012) ((primitive-ref current-output-port)) (car f311012))
+# emit-expr (null? f311012)
+# emit-expr f311012
 # emit-variable-ref
-# env=((f311012 . -16) (f311013 . -12) (f311012 . -8))
-# var=f311013
-    movl -12(%esp), %eax  # stack load f311013
+# env=((f311013 . -16) (f311012 . -12) (f311013 . -8))
+# var=f311012
+    movl -12(%esp), %eax  # stack load f311012
 # end emit-variable-ref
     cmp $63, %eax
     mov $0, %eax
@@ -24903,7 +24903,7 @@ _L_1884998:
 # emit-expr ((primitive-ref current-output-port))
 # funcall
 #    si   =-20
-#    env  = ((f311012 . -16) (f311013 . -12) (f311012 . -8))
+#    env  = ((f311013 . -16) (f311012 . -12) (f311013 . -8))
 #    expr = (funcall (primitive-ref current-output-port))
 # emit-expr (primitive-ref current-output-port)
     .extern mrc_current$moutput$mport
@@ -24928,12 +24928,12 @@ _L_1884998:
     movl -4(%esp), %edi   # restore closure frame ptr
     jmp _L_1885001
 _L_1885000:
-# emit-expr (car f311013)
-# emit-expr f311013
+# emit-expr (car f311012)
+# emit-expr f311012
 # emit-variable-ref
-# env=((f311012 . -16) (f311013 . -12) (f311012 . -8))
-# var=f311013
-    movl -12(%esp), %eax  # stack load f311013
+# env=((f311013 . -16) (f311012 . -12) (f311013 . -8))
+# var=f311012
+    movl -12(%esp), %eax  # stack load f311012
 # end emit-variable-ref
 # check the argument is a pair
     movl %eax,%ebx
@@ -24952,26 +24952,26 @@ _L_1885001:
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f311015 . -20) (f311012 . -16) (f311013 . -12) (f311012 . -8))
-# expr=((primitive-ref base-write) f311012 f311015 #t)
+# env=((f311015 . -20) (f311013 . -16) (f311012 . -12) (f311013 . -8))
+# expr=((primitive-ref base-write) f311013 f311015 #t)
 # emit-tail-funcall
 #    si   =-24
-#    env  = ((f311015 . -20) (f311012 . -16) (f311013 . -12) (f311012 . -8))
-#    expr = (funcall (primitive-ref base-write) f311012 f311015 #t)
+#    env  = ((f311015 . -20) (f311013 . -16) (f311012 . -12) (f311013 . -8))
+#    expr = (funcall (primitive-ref base-write) f311013 f311015 #t)
 # emit-expr (primitive-ref base-write)
     .extern mrc_base$mwrite
     movl mrc_base$mwrite,%eax
    movl %eax,  -24(%esp)  # stash funcall-oper in next closure slot
-# emit-expr f311012
+# emit-expr f311013
 # emit-variable-ref
-# env=((f311015 . -20) (f311012 . -16) (f311013 . -12) (f311012 . -8))
-# var=f311012
-    movl -16(%esp), %eax  # stack load f311012
+# env=((f311015 . -20) (f311013 . -16) (f311012 . -12) (f311013 . -8))
+# var=f311013
+    movl -16(%esp), %eax  # stack load f311013
 # end emit-variable-ref
-    mov %eax, -28(%esp)    # arg f311012
+    mov %eax, -28(%esp)    # arg f311013
 # emit-expr f311015
 # emit-variable-ref
-# env=((f311015 . -20) (f311012 . -16) (f311013 . -12) (f311012 . -8))
+# env=((f311015 . -20) (f311013 . -16) (f311012 . -12) (f311013 . -8))
 # var=f311015
     movl -20(%esp), %eax  # stack load f311015
 # end emit-variable-ref
@@ -25957,26 +25957,26 @@ _L_1885057:
 # == eliminate-let*  ==>
 # (lambda (p x) (vector-set! p 6 x))
 # == uniquify-variables  ==>
-# (lambda (f311022 f311023) (vector-set! f311022 6 f311023))
+# (lambda (f311023 f311022) (vector-set! f311023 6 f311022))
 # == vectorize-letrec  ==>
-# (lambda (f311022 f311023) (vector-set! f311022 6 f311023))
+# (lambda (f311023 f311022) (vector-set! f311023 6 f311022))
 # == eliminate-set!  ==>
-# (lambda (f311022 f311023) (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (lambda (f311023 f311022) (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # == close-free-variables  ==>
-# (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # == eliminate-quote  ==>
-# (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # == eliminate-when/unless  ==>
-# (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # == eliminate-cond  ==>
-# (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # == external-symbols  ==>
-# (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
-# emit-expr (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
+# emit-expr (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f311022 f311023) () (let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023)))
+# expr = (closure (f311023 f311022) () (let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022)))
     movl $_L_1885063, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -25994,37 +25994,37 @@ _L_1885063:
 _L_1885065:
 # emit-tail-expr
 # si=-16
-# env=((f311023 . -12) (f311022 . -8))
-# expr=(let ((f311022 f311022) (f311023 f311023)) (vector-set! f311022 6 f311023))
+# env=((f311022 . -12) (f311023 . -8))
+# expr=(let ((f311023 f311023) (f311022 f311022)) (vector-set! f311023 6 f311022))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f311023 . -12) (f311022 . -8))
-#  bindings = ((f311022 f311022) (f311023 f311023))
-#  body = (vector-set! f311022 6 f311023)
-# emit-expr f311022
-# emit-variable-ref
-# env=((f311023 . -12) (f311022 . -8))
-# var=f311022
-    movl -8(%esp), %eax  # stack load f311022
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f311022 . -12) (f311023 . -8))
+#  bindings = ((f311023 f311023) (f311022 f311022))
+#  body = (vector-set! f311023 6 f311022)
 # emit-expr f311023
 # emit-variable-ref
-# env=((f311023 . -12) (f311022 . -8))
+# env=((f311022 . -12) (f311023 . -8))
 # var=f311023
-    movl -12(%esp), %eax  # stack load f311023
+    movl -8(%esp), %eax  # stack load f311023
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f311022
+# emit-variable-ref
+# env=((f311022 . -12) (f311023 . -8))
+# var=f311022
+    movl -12(%esp), %eax  # stack load f311022
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f311023 . -20) (f311022 . -16) (f311023 . -12) (f311022 . -8))
-# expr=(vector-set! f311022 6 f311023)
+# env=((f311022 . -20) (f311023 . -16) (f311022 . -12) (f311023 . -8))
+# expr=(vector-set! f311023 6 f311022)
 # tail primcall
-# emit-expr f311022
+# emit-expr f311023
 # emit-variable-ref
-# env=((f311023 . -20) (f311022 . -16) (f311023 . -12) (f311022 . -8))
-# var=f311022
-    movl -16(%esp), %eax  # stack load f311022
+# env=((f311022 . -20) (f311023 . -16) (f311022 . -12) (f311023 . -8))
+# var=f311023
+    movl -16(%esp), %eax  # stack load f311023
 # end emit-variable-ref
 # check the argument is a vector
     movl %eax,%ebx
@@ -26068,16 +26068,16 @@ _L_1885069:
     jmp *-2(%edi)  # jump to handler
 _L_1885068:
     movl %eax, -28(%esp)
-# emit-expr f311023
+# emit-expr f311022
 # emit-variable-ref
-# env=((f311023 . -20) (f311022 . -16) (f311023 . -12) (f311022 . -8))
-# var=f311023
-    movl -20(%esp), %eax  # stack load f311023
+# env=((f311022 . -20) (f311023 . -16) (f311022 . -12) (f311023 . -8))
+# var=f311022
+    movl -20(%esp), %eax  # stack load f311022
 # end emit-variable-ref
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-#return from tail (vector-set! f311022 6 f311023)
+#return from tail (vector-set! f311023 6 f311022)
     ret
     .align 4,0x90
 _L_1885064:
@@ -26202,26 +26202,26 @@ _L_1885071:
 # == eliminate-let*  ==>
 # (lambda (p i) (vector-set! p 7 i))
 # == uniquify-variables  ==>
-# (lambda (f311025 f311026) (vector-set! f311025 7 f311026))
+# (lambda (f311026 f311025) (vector-set! f311026 7 f311025))
 # == vectorize-letrec  ==>
-# (lambda (f311025 f311026) (vector-set! f311025 7 f311026))
+# (lambda (f311026 f311025) (vector-set! f311026 7 f311025))
 # == eliminate-set!  ==>
-# (lambda (f311025 f311026) (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (lambda (f311026 f311025) (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # == close-free-variables  ==>
-# (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # == eliminate-quote  ==>
-# (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # == eliminate-when/unless  ==>
-# (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # == eliminate-cond  ==>
-# (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # == external-symbols  ==>
-# (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
-# emit-expr (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
+# emit-expr (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure (f311025 f311026) () (let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026)))
+# expr = (closure (f311026 f311025) () (let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025)))
     movl $_L_1885077, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -26239,37 +26239,37 @@ _L_1885077:
 _L_1885079:
 # emit-tail-expr
 # si=-16
-# env=((f311026 . -12) (f311025 . -8))
-# expr=(let ((f311025 f311025) (f311026 f311026)) (vector-set! f311025 7 f311026))
+# env=((f311025 . -12) (f311026 . -8))
+# expr=(let ((f311026 f311026) (f311025 f311025)) (vector-set! f311026 7 f311025))
 # emit-tail-let
 #  si   = -16
-#  env  = ((f311026 . -12) (f311025 . -8))
-#  bindings = ((f311025 f311025) (f311026 f311026))
-#  body = (vector-set! f311025 7 f311026)
-# emit-expr f311025
-# emit-variable-ref
-# env=((f311026 . -12) (f311025 . -8))
-# var=f311025
-    movl -8(%esp), %eax  # stack load f311025
-# end emit-variable-ref
-    movl %eax, -16(%esp)  # stack save
+#  env  = ((f311025 . -12) (f311026 . -8))
+#  bindings = ((f311026 f311026) (f311025 f311025))
+#  body = (vector-set! f311026 7 f311025)
 # emit-expr f311026
 # emit-variable-ref
-# env=((f311026 . -12) (f311025 . -8))
+# env=((f311025 . -12) (f311026 . -8))
 # var=f311026
-    movl -12(%esp), %eax  # stack load f311026
+    movl -8(%esp), %eax  # stack load f311026
+# end emit-variable-ref
+    movl %eax, -16(%esp)  # stack save
+# emit-expr f311025
+# emit-variable-ref
+# env=((f311025 . -12) (f311026 . -8))
+# var=f311025
+    movl -12(%esp), %eax  # stack load f311025
 # end emit-variable-ref
     movl %eax, -20(%esp)  # stack save
 # emit-tail-expr
 # si=-24
-# env=((f311026 . -20) (f311025 . -16) (f311026 . -12) (f311025 . -8))
-# expr=(vector-set! f311025 7 f311026)
+# env=((f311025 . -20) (f311026 . -16) (f311025 . -12) (f311026 . -8))
+# expr=(vector-set! f311026 7 f311025)
 # tail primcall
-# emit-expr f311025
+# emit-expr f311026
 # emit-variable-ref
-# env=((f311026 . -20) (f311025 . -16) (f311026 . -12) (f311025 . -8))
-# var=f311025
-    movl -16(%esp), %eax  # stack load f311025
+# env=((f311025 . -20) (f311026 . -16) (f311025 . -12) (f311026 . -8))
+# var=f311026
+    movl -16(%esp), %eax  # stack load f311026
 # end emit-variable-ref
 # check the argument is a vector
     movl %eax,%ebx
@@ -26313,16 +26313,16 @@ _L_1885083:
     jmp *-2(%edi)  # jump to handler
 _L_1885082:
     movl %eax, -28(%esp)
-# emit-expr f311026
+# emit-expr f311025
 # emit-variable-ref
-# env=((f311026 . -20) (f311025 . -16) (f311026 . -12) (f311025 . -8))
-# var=f311026
-    movl -20(%esp), %eax  # stack load f311026
+# env=((f311025 . -20) (f311026 . -16) (f311025 . -12) (f311026 . -8))
+# var=f311025
+    movl -20(%esp), %eax  # stack load f311025
 # end emit-variable-ref
     movl -24(%esp), %ebx
     movl -28(%esp), %esi
     movl %eax, -1(%ebx,%esi)
-#return from tail (vector-set! f311025 7 f311026)
+#return from tail (vector-set! f311026 7 f311025)
     ret
     .align 4,0x90
 _L_1885078:
@@ -27833,26 +27833,26 @@ _L_1885113:
 # == eliminate-let*  ==>
 # (lambda args (let ((p (if (null? args) (current-input-port) (car args)))) (cond ((port-unread p) (let ((ch (port-unread p))) (begin (unless (eof-object? (port-unread p)) (port-unread-clear p)) ch))) (else (begin (when (fx= (port-last p) (port-ndx p)) (fill-input-buffer p)) (if (port-unread p) (port-unread p) (let ((ch (string-ref (port-buf p) (port-ndx p)))) (begin (port-ndx-add1 p) ch))))))))
 # == uniquify-variables  ==>
-# (lambda f311040 (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311049))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050))))))))
+# (lambda f311040 (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311050))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049))))))))
 # == vectorize-letrec  ==>
-# (lambda f311040 (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311049))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050))))))))
+# (lambda f311040 (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311050))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049))))))))
 # == eliminate-set!  ==>
-# (lambda f311040 (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311049))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050)))))))))
+# (lambda f311040 (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311050))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049)))))))))
 # == close-free-variables  ==>
-# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311049))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050)))))))))
+# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311050))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049)))))))))
 # == eliminate-quote  ==>
-# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311049))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050)))))))))
+# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (unless (eof-object? (port-unread f311046)) (port-unread-clear f311046)) f311050))) (else (begin (when (fx= (port-last f311046) (port-ndx f311046)) (fill-input-buffer f311046)) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049)))))))))
 # == eliminate-when/unless  ==>
-# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (if (not (eof-object? (port-unread f311046))) (begin (port-unread-clear f311046)) #f) f311049))) (else (begin (if (fx= (port-last f311046) (port-ndx f311046)) (begin (fill-input-buffer f311046)) #f) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050)))))))))
+# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (cond ((port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (if (not (eof-object? (port-unread f311046))) (begin (port-unread-clear f311046)) #f) f311050))) (else (begin (if (fx= (port-last f311046) (port-ndx f311046)) (begin (fill-input-buffer f311046)) #f) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049)))))))))
 # == eliminate-cond  ==>
-# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (if (port-unread f311046) (let ((f311049 (port-unread f311046))) (begin (if (not (eof-object? (port-unread f311046))) (begin (port-unread-clear f311046)) #f) f311049)) (begin (if (fx= (port-last f311046) (port-ndx f311046)) (begin (fill-input-buffer f311046)) #f) (if (port-unread f311046) (port-unread f311046) (let ((f311050 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311050))))))))
+# (closure f311040 () (let () (let ((f311046 (if (null? f311040) (current-input-port) (car f311040)))) (if (port-unread f311046) (let ((f311050 (port-unread f311046))) (begin (if (not (eof-object? (port-unread f311046))) (begin (port-unread-clear f311046)) #f) f311050)) (begin (if (fx= (port-last f311046) (port-ndx f311046)) (begin (fill-input-buffer f311046)) #f) (if (port-unread f311046) (port-unread f311046) (let ((f311049 (string-ref (port-buf f311046) (port-ndx f311046)))) (begin (port-ndx-add1 f311046) f311049))))))))
 # == external-symbols  ==>
-# (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))))))
-# emit-expr (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))))))
+# (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))))))
+# emit-expr (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))))))
 # emit-closure
 # si = 0
 # env = ()
-# expr = (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))))))
+# expr = (closure f311040 () (let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))))))
     movl $_L_1885171, 0(%ebp)  # closure label
     movl %ebp, %eax   # get the base ptr
     add $2, %eax     # add the closure tag
@@ -27889,21 +27889,21 @@ _L_1885174:
 # emit-tail-expr
 # si=-12
 # env=((f311040 . -8))
-# expr=(let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050)))))))
+# expr=(let () (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049)))))))
 # emit-tail-let
 #  si   = -12
 #  env  = ((f311040 . -8))
 #  bindings = ()
-#  body = (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))))
+#  body = (let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))))
 # emit-tail-expr
 # si=-12
 # env=((f311040 . -8))
-# expr=(let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))))
+# expr=(let ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040)))) (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))))
 # emit-tail-let
 #  si   = -12
 #  env  = ((f311040 . -8))
 #  bindings = ((f311046 (if (null? f311040) ((primitive-ref current-input-port)) (car f311040))))
-#  body = (if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050)))))
+#  body = (if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049)))))
 # emit-expr (if (null? f311040) ((primitive-ref current-input-port)) (car f311040))
 # emit-expr (null? f311040)
 # emit-expr f311040
@@ -27973,7 +27973,7 @@ _L_1885177:
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(if ((primitive-ref port-unread) f311046) (let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050)))))
+# expr=(if ((primitive-ref port-unread) f311046) (let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)) (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049)))))
 # emit-expr ((primitive-ref port-unread) f311046)
 # funcall
 #    si   =-16
@@ -28012,12 +28012,12 @@ _L_1885177:
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(let ((f311049 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049))
+# expr=(let ((f311050 ((primitive-ref port-unread) f311046))) (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050))
 # emit-tail-let
 #  si   = -16
 #  env  = ((f311046 . -12) (f311040 . -8))
-#  bindings = ((f311049 ((primitive-ref port-unread) f311046)))
-#  body = (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)
+#  bindings = ((f311050 ((primitive-ref port-unread) f311046)))
+#  body = (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)
 # emit-expr ((primitive-ref port-unread) f311046)
 # funcall
 #    si   =-16
@@ -28054,17 +28054,17 @@ _L_1885177:
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
-# expr=(begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)
-# tail-begin (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311049)
-#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# expr=(begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)
+# tail-begin (begin (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f) f311050)
+#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
 # emit-expr (if (not (eof-object? ((primitive-ref port-unread) f311046))) (begin ((primitive-ref port-unread-clear) f311046)) #f)
 # emit-expr (not (eof-object? ((primitive-ref port-unread) f311046)))
 # emit-expr (eof-object? ((primitive-ref port-unread) f311046))
 # emit-expr ((primitive-ref port-unread) f311046)
 # funcall
 #    si   =-20
-#    env  = ((f311049 . -16) (f311046 . -12) (f311040 . -8))
+#    env  = ((f311050 . -16) (f311046 . -12) (f311040 . -8))
 #    expr = (funcall (primitive-ref port-unread) f311046)
 # emit-expr (primitive-ref port-unread)
     .extern mrc_port$munread
@@ -28083,7 +28083,7 @@ _L_1885177:
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr f311046
 # emit-variable-ref
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
 # var=f311046
     movl -12(%esp), %eax  # stack load f311046
 # end emit-variable-ref
@@ -28110,11 +28110,11 @@ _L_1885177:
 # emit-expr (begin ((primitive-ref port-unread-clear) f311046))
 # emit-begin
 #   expr=(begin ((primitive-ref port-unread-clear) f311046))
-#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
 # emit-expr ((primitive-ref port-unread-clear) f311046)
 # funcall
 #    si   =-20
-#    env  = ((f311049 . -16) (f311046 . -12) (f311040 . -8))
+#    env  = ((f311050 . -16) (f311046 . -12) (f311040 . -8))
 #    expr = (funcall (primitive-ref port-unread-clear) f311046)
 # emit-expr (primitive-ref port-unread-clear)
     .extern mrc_port$munread$mclear
@@ -28133,7 +28133,7 @@ _L_1885177:
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr f311046
 # emit-variable-ref
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
 # var=f311046
     movl -12(%esp), %eax  # stack load f311046
 # end emit-variable-ref
@@ -28147,7 +28147,7 @@ _L_1885177:
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
     jmp _L_1885185
 _L_1885184:
 # emit-expr #f
@@ -28155,19 +28155,19 @@ _L_1885184:
 _L_1885185:
 # emit-tail-expr
 # si=-20
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
-# expr=(begin f311049)
-# tail-begin (begin f311049)
-#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# expr=(begin f311050)
+# tail-begin (begin f311050)
+#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
 # emit-tail-expr
 # si=-20
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
-# expr=f311049
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# expr=f311050
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
-# var=f311049
-    movl -16(%esp), %eax  # stack load f311049
+# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# var=f311050
+    movl -16(%esp), %eax  # stack load f311050
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
@@ -28177,8 +28177,8 @@ _L_1885180:
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))
-# tail-begin (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))
+# expr=(begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))
+# tail-begin (begin (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f) (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))
 #   env=((f311046 . -12) (f311040 . -8))
 # emit-expr (if (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046)) (begin ((primitive-ref fill-input-buffer) f311046)) #f)
 # emit-expr (fx= ((primitive-ref port-last) f311046) ((primitive-ref port-ndx) f311046))
@@ -28329,13 +28329,13 @@ _L_1885189:
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(begin (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))
-# tail-begin (begin (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))))
+# expr=(begin (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))
+# tail-begin (begin (if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))))
 #   env=((f311046 . -12) (f311040 . -8))
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050)))
+# expr=(if ((primitive-ref port-unread) f311046) ((primitive-ref port-unread) f311046) (let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049)))
 # emit-expr ((primitive-ref port-unread) f311046)
 # funcall
 #    si   =-16
@@ -28405,12 +28405,12 @@ _L_1885195:
 # emit-tail-expr
 # si=-16
 # env=((f311046 . -12) (f311040 . -8))
-# expr=(let ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311050))
+# expr=(let ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046)))) (begin ((primitive-ref port-ndx-add1) f311046) f311049))
 # emit-tail-let
 #  si   = -16
 #  env  = ((f311046 . -12) (f311040 . -8))
-#  bindings = ((f311050 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046))))
-#  body = (begin ((primitive-ref port-ndx-add1) f311046) f311050)
+#  bindings = ((f311049 (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046))))
+#  body = (begin ((primitive-ref port-ndx-add1) f311046) f311049)
 # emit-expr (string-ref ((primitive-ref port-buf) f311046) ((primitive-ref port-ndx) f311046))
 # emit-expr ((primitive-ref port-buf) f311046)
 # funcall
@@ -28525,14 +28525,14 @@ _L_1885202:
     movl %eax, -16(%esp)  # stack save
 # emit-tail-expr
 # si=-20
-# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
-# expr=(begin ((primitive-ref port-ndx-add1) f311046) f311050)
-# tail-begin (begin ((primitive-ref port-ndx-add1) f311046) f311050)
-#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# expr=(begin ((primitive-ref port-ndx-add1) f311046) f311049)
+# tail-begin (begin ((primitive-ref port-ndx-add1) f311046) f311049)
+#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
 # emit-expr ((primitive-ref port-ndx-add1) f311046)
 # funcall
 #    si   =-20
-#    env  = ((f311050 . -16) (f311046 . -12) (f311040 . -8))
+#    env  = ((f311049 . -16) (f311046 . -12) (f311040 . -8))
 #    expr = (funcall (primitive-ref port-ndx-add1) f311046)
 # emit-expr (primitive-ref port-ndx-add1)
     .extern mrc_port$mndx$madd1
@@ -28551,7 +28551,7 @@ _L_1885202:
    movl %eax,  -28(%esp)  # stash funcall-oper in closure slot
 # emit-expr f311046
 # emit-variable-ref
-# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
 # var=f311046
     movl -12(%esp), %eax  # stack load f311046
 # end emit-variable-ref
@@ -28564,19 +28564,19 @@ _L_1885202:
     movl -4(%esp), %edi   # restore closure frame ptr
 # emit-tail-expr
 # si=-20
-# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
-# expr=(begin f311050)
-# tail-begin (begin f311050)
-#   env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
+# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# expr=(begin f311049)
+# tail-begin (begin f311049)
+#   env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
 # emit-tail-expr
 # si=-20
-# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
-# expr=f311050
+# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# expr=f311049
 # emit-tail-variable-ref
 # emit-variable-ref
-# env=((f311050 . -16) (f311046 . -12) (f311040 . -8))
-# var=f311050
-    movl -16(%esp), %eax  # stack load f311050
+# env=((f311049 . -16) (f311046 . -12) (f311040 . -8))
+# var=f311049
+    movl -16(%esp), %eax  # stack load f311049
 # end emit-variable-ref
     ret
 # end emit-tail-variable ref
