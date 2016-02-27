@@ -62,6 +62,7 @@
     (printf " ok\n")))
 
 (define (test-all)
+  (run-compil-lib) ;; compil library only at start of test all
   (let f ([i 0] [ls (reverse all-tests)])
     (if (null? ls)
         (printf "passed all ~s tests\n" i)
@@ -78,7 +79,7 @@
                  (g (add1 i) (cdr tests))])))))))
 
 (define (test-with-string-output test-id expr expected-output)
-   (run-compil-lib) ;; compile library every time
+  ;; (run-compil-lib) ;; compile library every time
    (run-compil expr)
    (build)
    (execute)

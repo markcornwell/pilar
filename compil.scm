@@ -167,6 +167,9 @@
 ;; (load "tests/tests-5.3-req.scm")  ;; call/cc
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
+
+ (load "tests/tests-4.4-req.scm")   ;; implicit begin revisited
+
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 
 (load "tests/tests-4.2-req.scm")  ;; eof-object  read-char
@@ -298,13 +301,16 @@
 ;;  (let ((v E) ...) E E* ...)  =>  (let ((v E) ...) (begin E E* ...))
 ;;  (let* ((v E) ...) E E* ...)  =>  (let* ((v E) ...) (begin E E* ...))
 ;;  (letrec ((v E) ...) E E* ...)  =>  (letrec ((v E) ...) (begin E E* ...))
-;;  (let* ((v E) ...) E E* ...)  =>  (let* ((v E) ...) (begin E E* ...))
 ;;  (lambda (v ...) E E* ...)  => (lambda (v* .... ) (begin E E* ...))
 ;;
-;; Puts all let and lambda in form where body is a single element
+;; Puts all let, let*, letrec and lambda in form where body is a single element
 ;;
 ;;  (let ((v E) ...) E)
+;;  (let* ((v E) ...) E)
+;;  (letrec ((v E) ...) E)
 ;;  (lambda (v ...) E)
+;;
+;;
 ;;-----------------------------------------------------------------------------------
 
 (define-transform (explicit-begins expr)
@@ -327,7 +333,7 @@
 	   [new-body (if (fx> (length long-body) 1)
 			 (cons 'begin long-body)
 			 (car long-body))])
-      (list 'lambda formals new-body))]      
+      (list 'lambda formals new-body))]
    [(pair? expr)
     (cons (explicit-begins (car expr))
 	  (explicit-begins (cdr expr)))]
@@ -983,20 +989,34 @@
 ;;-----------------------------------------------------------------------------------
 ;;  eliminate-cond
 ;;-----------------------------------------------------------------------------------
-;;  T(cond)           => #f
-;;  T(cond (B))       => error
-;;  T(cond [else E])  => T[E]
-;;  T(cond [B E])     => (if T[B] T[E] #f)
-;;  T(cond [B E] ...) => (if T[B] T[E] (cond T[...]))
-;;  T(X . Y)          => (T[X] . T[Y])
-;;  T[a]              => a
+;;  T(cond)                   => #f
+;;  T(cond (B))              => error
+;;x T(cond [else E])         => T[E]
+;;  T(cond [else E E* ...])  => (begin T[E] T[E*] ...)
+;;x T(cond [B E])            => (if T[B] T[E] #f)
+;;  T(cond [B E E* ...])     => (if T[B] (begin T[E] T[E*] ...))
+;;x T(cond [B E] ...)        => (if T[B] T[E] (cond T[...]))
+;;  T(cond [B E E* ...] ...) => (if T[B] (begin T[E] T[E*] ...) (cond T[...])) 
+;;  T(X . Y)                 => (T[X] . T[Y])
+;;  T[a]                     => a
+;;-----------------------------------------------------------------------------------
+;;  Handle implicit begins for cond
+;;
+;;  (cond (E E E*) ...)   =>  (cond (E (begin E E*)) ...)
+;;
 ;;-----------------------------------------------------------------------------------
 
 (define (cond? exp)
   (and (pair? exp) (eq? (car exp) 'cond)))
+
 (define (clause? exp) (and (pair? exp) (not (null? (cdr exp)))))
+
 (define cond-clause second)
-(define (else? exp)
+
+(define cond-clause-test first)
+(define cond-clause-sequence rest)
+
+(define (else-clause? exp)
   (and (pair? exp) (eq? (car exp) 'else)))
 
 (define-transform (eliminate-cond exp)
@@ -1006,14 +1026,33 @@
         [(null? (cdr exp)) #f]
 	[(not (clause? (second exp)))
 	 (error 'cond (format "bad cond clause: ~s" (second exp)))]
-	[(else? (cond-clause exp)) (eliminate-cond (second (cond-clause exp)))]
-	[else (list 'if (eliminate-cond (first (cond-clause exp)))
-		    (eliminate-cond (second (cond-clause exp)))
-		    (eliminate-cond (cons 'cond (cddr exp))))])]
+	[(else-clause? (cond-clause exp))
+	 (cons 'begin (map eliminate-cond (cond-clause-sequence (cond-clause exp))))]
+	
+	[else (list 'if (eliminate-cond (cond-clause-test (cond-clause exp)))
+		        (cons 'begin (map eliminate-cond (cond-clause-sequence (cond-clause exp))))
+			(eliminate-cond (cons 'cond (cddr exp))))])]
    [(pair? exp)
     (cons (eliminate-cond (car exp))
 	  (eliminate-cond (cdr exp)))]
    [else exp]))
+
+;; (define-transform (eliminate-cond exp)
+;;   (cond
+;;    [(cond? exp)
+;;     (cond
+;;         [(null? (cdr exp)) #f]
+;; 	[(not (clause? (second exp)))
+;; 	 (error 'cond (format "bad cond clause: ~s" (second exp)))]
+;; 	[(else-clause? (cond-clause exp))
+;; 	 (eliminate-cond (second (cond-clause exp)))]
+;; 	[else (list 'if (eliminate-cond (first (cond-clause exp)))
+;; 		    (eliminate-cond (second (cond-clause exp)))
+;; 		    (eliminate-cond (cons 'cond (cddr exp))))])]
+;;    [(pair? exp)
+;;     (cons (eliminate-cond (car exp))
+;; 	  (eliminate-cond (cdr exp)))]
+;;    [else exp]))
 
 
 ;;-----------------------------------------------------------------------------------
@@ -2015,12 +2054,19 @@
   (emit-expr si env str)
   (emit-check-string 'string-set!)
   (emit "    movl %eax, ~s(%esp)" si)               ;; save the string
-  (emit-expr si env k)                              ;; eax = k (4 x bytes)
+  
+ ;(emit-expr si env k)                              ;; eax = k (4 x bytes)
+  (emit-expr (- si wordsize) env k)
+  
   (emit-check-fixnum 'string-set!)
-  (emit-check-string-index si 'string-set!)
+  (emit-check-string-index si 'string-set!)         ;; why si??
+
+  
   (emit "    movl %eax, ~s(%esp)" (- si wordsize))  ;; save k
+  
   (emit-expr (- si (* 2 wordsize)) env char)        ;; eax <- char
   (emit-check-character 'string-set!)
+
   (emit "    movl ~s(%esp), %ebx" si)               ;; ebx <- string + 6
   (emit "    movl ~s(%esp), %esi" (- si wordsize))  ;; esi = k (4 x bytes)
   (emit "    sar $~s, %esi" fixnum-shift)                ;; esi = k bytes
