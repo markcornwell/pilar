@@ -13,9 +13,18 @@
 ;;                   Think first, then try.     -- The Little Schemer.
 ;;------------------------------------------------------------------------------
 ;;
-;; Runs under petite chez scheme.  See makefile for details.
+;;                                    Abstract
 ;;
-;;  REFERENCES
+;;  Scheme is a programming language with a lisp like syntax and algol 60 like
+;;  block structure.  The langague was designed for teaching with the intent
+;;  creating an expressive language with just small number of features.
+;;
+;;  This compiler is written mostly in Scheme and translates Scheme to x86
+;;  assembly language which is then compiled by the gnu compiler tool stack.
+;;
+;;  Pilar currently runs under petite chez scheme.  See makefile for details.
+;;
+;; REFERENCES
 ;;
 ;; (R5RS) KELSEY, R., CLINGER, W., AND (EDITORS), J. R. Revised5 report on the
 ;;        algorithmic language Scheme. ACM SIGPLAN Notices 33, 9 (1998), 26–76.
@@ -28,7 +37,7 @@
 ;; (ABI)  SCO. System V Application Binary Interface, Intel386TM Architecture
 ;;        Processor Supplement Fourth Edition, 1997.
 ;;
-;;  INTRODUCTION
+;;  I. INTRODUCTION
 ;;
 ;;  This compiler translates programs expressed in the Source Language (fig 1)
 ;;  into assembly code that can be run through a conventional assembler and linked
@@ -62,8 +71,12 @@
 ;;             +--------------+         +-----------+           +-----------+
 ;;                Stage  I                Stage II               Stage III
 ;;
+;;
+;;
 ;;------------------------------------------------------------------------------
 ;; Pilar Source Language (SL) -- Used by the Human Programmer
+;;
+;;  TBD -- expanded out to the full R5RS grammer
 ;;
 ;;   E -> I | V | P
 ;;     |  (begin E ...)
@@ -84,6 +97,9 @@
 ;;                                     Figure 1
 ;;------------------------------------------------------------------------------
 ;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
+;;
+;;  TBD -- update this to include letrec, primitive-ref, foreign-call, 
+;;
 ;;
 ;;   E   ->  I | V | P
 ;;       |  (begin E ...)
@@ -168,7 +184,7 @@
 ;; (load "tests/tests-5.2-req.scm")  ;; overflow
 ;; (load "tests/tests-5.1-req.scm")  ;; tokenizer reader
 
- (load "tests/tests-4.4-req.scm")   ;; implicit begin revisited
+; (load "tests/tests-4.4-req.scm")   ;; implicit begin revisited
 
 ;; (load "tests/tests-4.3-req.scm")  ;; tokenizer reader
 
@@ -208,14 +224,28 @@
 (define rest cdr)
 
 ;;------------------------------------------------------------------------------------
-;;                           PART I - SOURCE CODE TRANSFORMATIONS
+;;                           STAGE I - SOURCE CODE TRANSFORMATIONS
 ;;------------------------------------------------------------------------------------
 ;;
-;; The first passes of the compiler are a series of source to source transformations.
+;; The first stage of the compiler is a series of source to source transformations.
 ;; Theses transformations convert the source language into a far more normalized
 ;; language processed by the code generator.
 ;;
-;; The order of the passes is important.
+;;  We start with a source language L0 which is the Scheme language used by the
+;;  programmer.  A Language transform T1 takes a Program in L0 and converts it
+;;  to an equivalent program in L1.
+;;
+;;  More generally each Transform Ti takes a program in L(i-1) to an equivalent
+;;  program in Li.
+;;
+;;   L0 ->[T1]-> L1 ->[T2]-> L2 ->[T3]-> L3 ->  ... -> L(n-1) ->[Tn]-> Ln
+;;
+;;  So Ln is the intermediate language that is the input for the code generator
+;;  which makes up Stage 2.
+;;
+;; The order of the tansformations (passes) is important.  Each transform Ti need
+;; only worry about processing the language L(i-1) which we consider the domaain
+;; of the transformation.
 ;;
 ;; emit-program works with the macro define-transform defined near the top of this
 ;; file. Stuff we need to know about the transform hangs off the property list of the
@@ -224,17 +254,19 @@
 ;;
 ;;-----------------------------------------------------------------------------------
 
-(define *transform-list*         ;; all transforms get applied in the order below
-  (list 'explicit-begins         ;; add implicit begin to make bodies a single expression
-	'eliminate-let*          ;; transform all let* to nested lets	
-	'uniquify-variables           ;; uniquely rename all lambda variables
-	'vectorize-letrec        ;; rewrite letrec as let with vars transformed to vectors
-	'eliminate-set!          ;; rewrite settable variables as vectors
-	'close-free-variables    ;; do free variable analysis, rewrite lambdas as closures
-	'eliminate-quote         ;; eliminate complex constants
-	'eliminate-when/unless   ;; when/unless translate to corresponding if expressions
-	'eliminate-cond          ;; rewrite cond as if
-	'external-symbols        ;; substitute primitive-ref and primitive-set!
+(define *transform-list*         ;; all transforms Ti get applied in the order below
+  (list
+        'explicit-begins         ;; L1 add implicit begin to make bodies a single expression
+        'elim-local-defines     ;; L2 rewrite local defines inside lambda, let, let*, letrec	
+	'eliminate-let*          ;; L3 transform all let* to nested lets	
+	'uniquify-variables      ;; L4 uniquely rename all lambda variables
+	'vectorize-letrec        ;; L5 rewrite letrec as let with vars transformed to vectors
+	'eliminate-set!          ;; L6 rewrite settable variables as vectors
+	'close-free-variables    ;; L7 do free variable analysis, rewrite lambdas as closures
+	'eliminate-quote         ;; L8 eliminate complex constants
+	'eliminate-when/unless   ;; L9 when/unless translate to corresponding if expressions
+	'eliminate-cond          ;; L10 rewrite cond as if
+	'external-symbols        ;; L11 substitute primitive-ref and primitive-set!
 	))
 
 (define (apply-transforms expr)   ;; CLEAN UP emit program and emit library program
@@ -303,14 +335,20 @@
 ;;  (letrec ((v E) ...) E E* ...)  =>  (letrec ((v E) ...) (begin E E* ...))
 ;;  (lambda (v ...) E E* ...)  => (lambda (v* .... ) (begin E E* ...))
 ;;
-;; Puts all let, let*, letrec and lambda in form where body is a single element
+;; Puts all let, let*, letrec and lambda in form where body is a single element,
+;; essentially creating a sub-language.
 ;;
 ;;  (let ((v E) ...) E)
 ;;  (let* ((v E) ...) E)
 ;;  (letrec ((v E) ...) E)
 ;;  (lambda (v ...) E)
 ;;
+;; This takes care of sequences everywhere but inside cond/while/unless which we
+;; treat separately.
 ;;
+;; NOTE: By convention productions using concise non-terminals are not canonical
+;;       R5RS grammar productions.  When we put non-terminals in angle brackets, that
+;;       implies those are canonical R5RS productions.
 ;;-----------------------------------------------------------------------------------
 
 (define-transform (explicit-begins expr)
@@ -338,6 +376,71 @@
     (cons (explicit-begins (car expr))
 	  (explicit-begins (cdr expr)))]
    [else expr]))
+
+;;-----------------------------------------------------------------------------------
+;;                        Eliminate Local Defines
+;;-----------------------------------------------------------------------------------
+;;
+;; Expand optional local defines to a letrec.  Local define are optional inside the
+;; body of lambda, let, let*, letrec.  The grammar (R5RS Section 7.1.3 Expressions)
+;; defines <body> with the following production rules:
+;;
+;;   <body>  =>  <definition>*  <sequence>
+;;
+;; The productions that refer to <body> are:
+;;
+;;   <lambda expression>   => (lambda <formals> <body>)
+;;
+;;   <derived expression>  => (let (<binding spec>*) <body>)
+;;                         |  (let <variable> (<bindings spec>*) <body>      [TBD]
+;;                         |  (let* (<binding spec>*) <body>
+;;                         |  (letrec (<binding spec>*) <body>)
+;;
+;; The production for definition is given in (R5RS 7.1.6 Programs and Definitions)
+;;
+;;   <definition>  =>  (define <variable> <expression>)
+;;                 |   (define (<variable> <def formals>)  <body>)
+;;                 |   (begin <definition>*)
+;;
+;;   <def formals> =>  <variable>*
+;;                 |   <variable>* . <variable>
+;;
+;; After the explicit-begins transform all of the <body> forms are single
+;; element.  Any body that had multiple elements is noew enclolsed in
+;; a begin.
+;;
+;; Our transform rewrites a sequence of defines appearing at the start of a body into
+;; a letrec form.
+;;
+;;    T[(let ((v E)...) <body>)]  =>  (let ((v T[E])...) T[<body>])
+;;    T[(let f ((v E)...) <body>)]  =>  (let f ((v T[E])...) T[<body>])  [TBD]
+;;    T[(let* ((v E)...) <body>)]  =>  (let* ((v T[E])...) T[<body>])
+;;    T[(letrec ((v E)...) <body)]  =>  (letrec ((v T[E])...) T[<body>])
+;;    T[(lambda <formals> <body>))] => (lambda <formals> T[<body>])
+;;
+;;    T[(begin (define v E)* E)] => (letrec T[(define v E)*] (begin E))
+;;    T[(begin E ... ) => (begin T[E]...)
+;;
+;;    T[(define v E) ... )] => ((v T[E]) . D[...])
+;;
+;;    T[(E1 . E2)] => (T[E1] . T[E2])
+;;    T[V] => V
+;;    T[I] => I
+;;
+;;-----------------------------------------------------------------------------------
+
+
+(define let-body third)  ;; since L1 has singleton bodies
+
+(define lambda-formals second)
+(define lambda-body third)
+
+(define (define? expr)
+  (and (pair? expr) (eq? (car expr) 'define)))
+
+(define define-var second)
+(define define-expr third)
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Eliminate-let*
@@ -380,7 +483,6 @@
     (cons (eliminate-let* (car expr))
 	  (eliminate-let* (cdr expr)))]
    [else expr]))
-
 
 ;;--------------------------------------------------------------------------------------
 ;;                                Uniquify-variables
@@ -1211,10 +1313,95 @@
 	  (external-symbols (cdr expr)))]
    [else expr])) 
 
-;;-----------------------------------------------------------------------------------
-;;                              PART II  -- CODE GENERATION
-;;-----------------------------------------------------------------------------------
 
+;;-----------------------------------------------------------------------------------
+;;                              STAGE II  -- CODE GENERATION
+;;-----------------------------------------------------------------------------------
+;;
+;;
+;;
+;;
+;;
+
+
+
+;;-----------------------------------------------------------------------------------
+;;                           Value Representation
+;;-----------------------------------------------------------------------------------
+;;  All values are represented in a 'datum' of 32-bits.  Low order bits are reserved
+;;  for a tag unique to the type.  Some types (e.g. fixnum, character, boolean) have
+;;  their values encoded in the datum itself. have their values represented in the
+;;  datum itself.  For others (pair, vector, string, closure) the datum holds a
+;;  pointer to heap allocated objects.
+;;
+;;  Type tags are of varying length. But each type is a type specific mask defined so
+;;  that testing for membership in the type is a simple mask and compare.  As
+;;  specified by the Scheme standard (R5RS) types are disjoint.  Each datum belongs
+;;  to exactly one type.
+;;-----------------------------------------------------------------------------------
+;;  Constants
+
+(define fixnum-shift         2)
+(define fixnum-mask       #b00000011)   ; #x03
+(define fixnum-tag        #b00000000)   ; #x00
+
+(define char-shift          8)
+(define char-tag         #b00001111) ; #x0F
+(define char-mask        #b11111111)
+
+(define bool-f       #b00101111) ; #x2F
+(define bool-t       #b01101111) ; #x6F
+(define bool-bit        6)
+(define bmask        #b10111111)
+(define btag         #b00101111)
+
+(define pair-shift      3)
+(define pair-mask    #b00000111) ; #x07
+(define pair-tag     #b00000001) ; #x01
+(define size-pair       8)
+(define car-offset      0)
+(define cdr-offset      4)
+
+(define vector-shift    3)
+(define vector-mask  #b00000111) ; #x07 
+(define vector-tag   #b00000101) ; #x05
+
+(define string-shift    3)
+(define string-mask  #b00000111) ; #x07
+(define string-tag   #b00000110) ; #x06
+
+(define closure-mask  #b00000111) ; #x07
+(define closure-tag   #b00000010) ; #x02
+
+(define symbol-shift    3)
+(define symbol-mask   #b00000111) ; #x07     ;; Symbols are under construction
+(define symbol-tag    #b00000011) ; #x03     ;; Still thinking it through
+(define size-symbol     8)
+(define string-offset   0)
+(define value-offset    4)
+
+(define nil-value    #b00111111) ; #x3F)
+(define eof-value    #b01011111) ; #x5F)   
+(define wordsize        4) ; bytes
+
+(define fixnum-bits (- (* wordsize 8) fixnum-shift))
+
+(define fxlower (- (expt 2 (- fixnum-bits 1))))
+
+(define fxupper (sub1 (expt 2 (- fixnum-bits 1))))
+
+(define (fixnum? x)
+   (and (integer? x) (exact? x) (<= fxlower x fxupper)))
+
+(define (immediate? x)
+   (or (fixnum? x)(boolean? x)(char? x)(null? x)))
+
+(define (immediate-rep x)
+   (cond
+      [(fixnum? x) (ash x fixnum-shift)]
+      [(boolean? x) (if x bool-t bool-f) ]
+      [(char? x) (logor (ash (char->integer x) char-shift) char-tag) ]
+      [(null? x) nil-value ]))
 
 
 ;;-----------------------------------------------------------------------------------
@@ -1374,83 +1561,6 @@
   (emit "    .globl ~a" label)
   (emit "~a:" label))
 
-;;-----------------------------------------------------------------------------------
-;;                       Value Representation
-;;-----------------------------------------------------------------------------------
-;;  All values are represented in a 'datum' of 32-bits.  Low order bits are reserved
-;;  for a tag unique to the type.  Some types (e.g. fixnum, character, boolean) have
-;;  their values encoded in the datum itself. have their values represented in the
-;;  datum itself.  For others (pair, vector, string, closure) the datum holds a
-;;  pointer to heap allocated objects.
-;;
-;;  Type tags are of varying length. But each type is a type specific mask defined so
-;;  that testing for membership in the type is a simple mask and compare.  As
-;;  specified by the Scheme standard (R5RS) types are disjoint.  Each datum belongs
-;;  to exactly one type.
-;;-----------------------------------------------------------------------------------
-;;  Constants
-
-(define fixnum-shift         2)
-(define fixnum-mask       #b00000011)   ; #x03
-(define fixnum-tag        #b00000000)   ; #x00
-
-(define char-shift          8)
-(define char-tag         #b00001111) ; #x0F
-(define char-mask        #b11111111)
-
-(define bool-f       #b00101111) ; #x2F
-(define bool-t       #b01101111) ; #x6F
-(define bool-bit        6)
-(define bmask        #b10111111)
-(define btag         #b00101111)
-
-(define pair-shift      3)
-(define pair-mask    #b00000111) ; #x07
-(define pair-tag     #b00000001) ; #x01
-(define size-pair       8)
-(define car-offset      0)
-(define cdr-offset      4)
-
-(define vector-shift    3)
-(define vector-mask  #b00000111) ; #x07 
-(define vector-tag   #b00000101) ; #x05
-
-(define string-shift    3)
-(define string-mask  #b00000111) ; #x07
-(define string-tag   #b00000110) ; #x06
-
-(define closure-mask  #b00000111) ; #x07
-(define closure-tag   #b00000010) ; #x02
-
-(define symbol-shift    3)
-(define symbol-mask   #b00000111) ; #x07     ;; Symbols are under construction
-(define symbol-tag    #b00000011) ; #x03     ;; Still thinking it through
-(define size-symbol     8)
-(define string-offset   0)
-(define value-offset    4)
-
-(define nil-value    #b00111111) ; #x3F)
-(define eof-value    #b01011111) ; #x5F)   
-(define wordsize        4) ; bytes
-
-(define fixnum-bits (- (* wordsize 8) fixnum-shift))
-
-(define fxlower (- (expt 2 (- fixnum-bits 1))))
-
-(define fxupper (sub1 (expt 2 (- fixnum-bits 1))))
-
-(define (fixnum? x)
-   (and (integer? x) (exact? x) (<= fxlower x fxupper)))
-
-(define (immediate? x)
-   (or (fixnum? x)(boolean? x)(char? x)(null? x)))
-
-(define (immediate-rep x)
-   (cond
-      [(fixnum? x) (ash x fixnum-shift)]
-      [(boolean? x) (if x bool-t bool-f) ]
-      [(char? x) (logor (ash (char->integer x) char-shift) char-tag) ]
-      [(null? x) nil-value ]))
 
 ;;-----------------------------------------------------------------------------------
 ;;                             Macros to define Primitives
@@ -2633,8 +2743,7 @@
   (emit-adjust-base (- si))        ;; After return the value of %esp is adjusted back
                                    ;; for tail recursive version below, we do not adjust
                                    ;; adjust the base, we shift args instead
-  (emit "    movl -4(%esp), %edi   # restore closure frame ptr")
-  )
+  (emit "    movl -4(%esp), %edi   # restore closure frame ptr"))
 
 ;;-----------------------------------------------------------------------------------
 ;; In tail position, we do not need to allocate a new frame.  Instead, we will re-use
@@ -2649,7 +2758,8 @@
   (define (emit-arguments si env args)
     (unless (empty? args)
         (emit-expr si env (first args))                ;; evaluated arg in %eax
-        (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))   ;; save %eax as evaluated arg    
+       ; (emit "    mov %eax, ~s(%esp)    # arg ~a" si (first args))   ;; save %eax as evaluated arg
+	(emit "    mov %eax, ~s(%esp)    # arg" si)   ;; save %eax as evaluated arg 
         (emit-arguments (- si wordsize) env (rest args)))) ;; recursively emit the rest
   
   (define (emit-shift-frame size si delta)
@@ -3253,13 +3363,13 @@
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" closure-mask)
 	  (emit "    cmp $~s, %bl" closure-tag)
-	  (emit "    je ~s" cont)
+	  (emit "    je ~a" cont)
           (emit "# invoke error handler funcall_non_procedure")
 	  (emit "    .extern ~a" eh)
           (emit "    movl ~a, %edi  # load handler" eh)
           (emit "    movl $0, %eax  # set arg count")
           (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~s:" cont))))
+	  (emit "~a:" cont))))
 
 (define (emit-check-fixnum f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
@@ -3269,7 +3379,8 @@
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" fixnum-mask)
 	  (emit "    cmp $~s, %bl" fixnum-tag)
-	  (emit "    je ~s" cont)
+	  ;(emit "    je ~a" cont)
+	  (emit "    je ~s" cont)	  
           (emit "# error handler eh_fixnum")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
@@ -3277,7 +3388,9 @@
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~s(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~a:" cont))))
+	 ; (emit "~a:" cont)
+	  (emit "~s:" cont)
+	  )))
 
 (define (emit-check-character f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
@@ -3287,7 +3400,8 @@
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" char-mask)
 	  (emit "    cmp $~s, %bl" char-tag)
-	  (emit "    je ~s" cont)
+	  ;(emit "    je ~a" cont)
+	  (emit "    je ~s" cont)	  
           (emit "# invoke error handler eh_character")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
@@ -3295,7 +3409,9 @@
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))	  
 	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~a:" cont))))
+	  ;(emit "~a:" cont)
+	  (emit "~s:" cont)
+	  )))
 
 (define (emit-check-pair f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*
@@ -3305,7 +3421,8 @@
 	  (emit "    movl %eax,%ebx")
 	  (emit "    and $~s, %bl" pair-mask)
 	  (emit "    cmp $~s, %bl" pair-tag)
-	  (emit "    je ~a" cont)
+	  ;(emit "    je ~a" cont)
+	  (emit "    je ~s" cont)	  
           (emit "# invoke error handler eh_pair")
 	  (emit "    .extern ~a" eh)
 	  (emit "    movl ~a, %edi  # load handler" eh)
@@ -3313,7 +3430,9 @@
 	  ;; step on arg1 -- its ok, exiting ... can re-use stack frame
 	  (emit "    movl $~a,-8(%esp)" (* 4 (primitive-code f)))
 	  (emit "    jmp *~a(%edi)  # jump to the handler" (- closure-tag))
-	  (emit "~a:" cont))))
+	 ; (emit "~a:" cont)
+	  (emit "~s:" cont)
+	  )))
 
 (define (emit-check-vector f)  ;; uses ebx as a scratch register to check eax
   (when *safe-primitives*

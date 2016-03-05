@@ -1,38 +1,43 @@
-
-(let ((n 3))
-  (let ((v0 (make-string n)))
-    (let ((v1 (make-string (string-length v0))))
-      (string-set! v0 (fx- (string-length v0) 3) #\a)
-      (string-ref v0 0))))
-
+# (begin (let ((p (open-output-file "stst.tmp" (quote replace)))) (display "Hello World!" p) (close-output-port p)) (let ((p (open-input-file "stst.tmp"))) (define loop (lambda () (let ((x (read-char p))) (if (eof-object? x) (begin (close-input-port p) (quote ())) (begin (display x) (loop)))))) (loop)) (exit))
 # == explicit-begins  ==>
-# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-ref v0 0)))))
+# (begin (let ((p (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" p) (close-output-port p))) (let ((p (open-input-file "stst.tmp"))) (begin (define loop (lambda () (let ((x (read-char p))) (if (eof-object? x) (begin (close-input-port p) (quote ())) (begin (display x) (loop)))))) (loop))) (exit))
+# == elim-local-defines  ==>
+
+(begin (let ((p (open-output-file "stst.tmp" (quote replace))))
+	 (begin (display "Hello World!" p) (close-output-port p)))
+       (let ((p (open-input-file "stst.tmp")))
+	 (begin
+	   (define loop
+	     (lambda ()
+	       (let ((x (read-char p)))
+		 (if (eof-object? x)
+		     (begin
+		       (close-input-port p)
+		       (quote ()))
+		     (begin
+		       (display x)
+		       (loop))))))
+	   (loop)))
+       (exit))
+
 # == eliminate-let*  ==>
-# (let ((n 3)) (let ((v0 (make-string n))) (let ((v1 (make-string (string-length v0)))) (begin (string-set! v0 (fx- (string-length v0) 3) #\a) (string-ref v0 0)))))
+# (begin (let ((p (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" p) (close-output-port p))) (let ((p (open-input-file "stst.tmp"))) (begin (define loop (lambda () (let ((x (read-char p))) (if (eof-object? x) (begin (close-input-port p) (quote ())) (begin (display x) (loop)))))) (loop))) (exit))
 # == uniquify-variables  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (lambda () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) (quote ())) (begin (display f310) (loop)))))) (loop))) (exit))
 # == vectorize-letrec  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (lambda () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) (quote ())) (begin (display f310) (loop)))))) (loop))) (exit))
 # == eliminate-set!  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (lambda () (let () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) (quote ())) (begin (display f310) (loop))))))) (loop))) (exit))
 # == close-free-variables  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (quote replace)))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) (quote ())) (begin (display f310) (loop))))))) (loop))) (exit))
 # == eliminate-quote  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (string->symbol "replace")))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) ()) (begin (display f310) (loop))))))) (loop))) (exit))
 # == eliminate-when/unless  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# (begin (let ((f305 (open-output-file "stst.tmp" (string->symbol "replace")))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) ()) (begin (display f310) (loop))))))) (loop))) (exit))
 # == eliminate-cond  ==>
-# (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
-
+# (begin (let ((f305 (open-output-file "stst.tmp" (string->symbol "replace")))) (begin (display "Hello World!" f305) (close-output-port f305))) (let ((f306 (open-input-file "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 (read-char f306))) (if (eof-object? f310) (begin (close-input-port f306) ()) (begin (display f310) (loop))))))) (loop))) (exit))
 # == external-symbols  ==>
-
-# (let ((f298 3))
-    (let ((f302 (make-string f298)))
-      (let ((f304 (make-string (string-length f302))))
-	(begin
-	  (string-set! f302 (fx- (string-length f302) 3) #\a)
-	  (string-ref f302 0)))))
-
+# (begin (let ((f305 ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace")))) (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))) (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))) ((primitive-ref exit)))
 # emit-scheme-entry
     .text
     .align 16, 0x90
@@ -45,319 +50,236 @@ _L_scheme_entry:
     jmp base_init
 base_init_callback:
     addl $4,%esp
-# emit-expr (let ((f298 3)) (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))))
+# emit-expr (begin (let ((f305 ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace")))) (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))) (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))) ((primitive-ref exit)))
+# emit-begin
+#   expr=(begin (let ((f305 ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace")))) (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))) (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))) ((primitive-ref exit)))
+#   env=()
+# emit-expr (let ((f305 ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace")))) (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305)))
 # emit-let
 #  si   = -8
 #  env  = ()
-#  bindings = ((f298 3))
-#  body = (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0))))
-# emit-expr 3
-    movl $12, %eax     # immed 3
+#  bindings = ((f305 ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace"))))
+#  body = (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))
+# emit-expr ((primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace"))
+# funcall
+#    si   =-8
+#    env  = ()
+#    expr = (funcall (primitive-ref open-output-file) "stst.tmp" ((primitive-ref string->symbol) "replace"))
+# emit-expr (primitive-ref open-output-file)
+    .extern mrc_open$moutput$mfile
+    movl mrc_open$moutput$mfile,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je _L_1768
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+_L_1768:
+   movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
+# emit-expr "stst.tmp"
+# string literal
+    jmp _L_1770
+    .align 8,0x90
+_L_1769 :
+    .int 32
+    .ascii "stst.tmp"
+_L_1770:
+    movl $_L_1769, %eax
+    orl $6, %eax
+    mov %eax, -20(%esp)  # arg stst.tmp
+# emit-expr ((primitive-ref string->symbol) "replace")
+# funcall
+#    si   =-24
+#    env  = ()
+#    expr = (funcall (primitive-ref string->symbol) "replace")
+# emit-expr (primitive-ref string->symbol)
+    .extern mrc_string$m$gsymbol
+    movl mrc_string$m$gsymbol,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je _L_1771
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+_L_1771:
+   movl %eax,  -32(%esp)  # stash funcall-oper in closure slot
+# emit-expr "replace"
+# string literal
+    jmp _L_1773
+    .align 8,0x90
+_L_1772 :
+    .int 28
+    .ascii "replace"
+_L_1773:
+    movl $_L_1772, %eax
+    orl $6, %eax
+    mov %eax, -36(%esp)  # arg replace
+    movl -32(%esp), %edi   # load new closure to %edi
+    add $-24, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $24, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    mov %eax, -24(%esp)  # arg ((primitive-ref string->symbol) replace)
+    movl -16(%esp), %edi   # load new closure to %edi
+    add $-8, %esp   # adjust base
+    movl $8,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $8, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
     movl %eax, -8(%esp)  # stack save
-# emit-expr (let ((f302 (make-string f298))) (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0))))
-# emit-let
-#  si   = -12
-#  env  = ((f298 . -8))
-#  bindings = ((f302 (make-string f298)))
-#  body = (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))
-# emit-expr (make-string f298)
-# make-string len=f298
-# emit-expr f298
-# emit-variable-ref
-# env=((f298 . -8))
-# var=f298
-    movl -8(%esp), %eax  # stack load f298
-# end emit-variable-ref
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1716"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $152,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1716:
-# check the argument is a fixnum >= 0
-    cmp $0,%eax
-    jge _L_1717
-# invoke error handler eh_length
-    .extern mrc_eh$ulength
-    movl mrc_eh$ulength, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $152,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1717:
-    movl %eax, %esi
-    movl %eax, 0(%ebp)
-    movl %ebp, %eax
-    orl $6, %eax
-    sar $2, %esi
-    add $4, %esi
-    add $7, %esi
-    andl $-8, %esi
-    add  %esi, %ebp
-# make-string end
-    movl %eax, -12(%esp)  # stack save
-# emit-expr (let ((f304 (make-string (string-length f302)))) (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0)))
-# emit-let
-#  si   = -16
-#  env  = ((f302 . -12) (f298 . -8))
-#  bindings = ((f304 (make-string (string-length f302))))
-#  body = (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0))
-# emit-expr (make-string (string-length f302))
-# make-string len=(string-length f302)
-# emit-expr (string-length f302)
-# emit-expr f302
-# emit-variable-ref
-# env=((f302 . -12) (f298 . -8))
-# var=f302
-    movl -12(%esp), %eax  # stack load f302
-# end emit-variable-ref
-# check the argument is a string
-    movl %eax,%ebx
-    and $7, %bl
-    cmp $6, %bl
-    je _L_1718
-# invoke error handler eh_string
-    .extern mrc_eh$ustring
-    movl mrc_eh$ustring, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $160,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1718:
-    movl -6(%eax), %eax
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1719"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $152,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1719:
-# check the argument is a fixnum >= 0
-    cmp $0,%eax
-    jge _L_1720
-# invoke error handler eh_length
-    .extern mrc_eh$ulength
-    movl mrc_eh$ulength, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $152,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1720:
-    movl %eax, %esi
-    movl %eax, 0(%ebp)
-    movl %ebp, %eax
-    orl $6, %eax
-    sar $2, %esi
-    add $4, %esi
-    add $7, %esi
-    andl $-8, %esi
-    add  %esi, %ebp
-# make-string end
-    movl %eax, -16(%esp)  # stack save
-# emit-expr (begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0))
+# emit-expr (begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))
 # emit-begin
-#   expr=(begin (string-set! f302 (fx- (string-length f302) 3) #\a) (string-ref f302 0))
-#   env=((f304 . -16) (f302 . -12) (f298 . -8))
-# emit-expr (string-set! f302 (fx- (string-length f302) 3) #\a)
-# emit-expr f302
-# emit-variable-ref
-# env=((f304 . -16) (f302 . -12) (f298 . -8))
-# var=f302
-    movl -12(%esp), %eax  # stack load f302
-# end emit-variable-ref
-# check the argument is a string
+#   expr=(begin ((primitive-ref display) "Hello World!" f305) ((primitive-ref close-output-port) f305))
+#   env=((f305 . -8))
+# emit-expr ((primitive-ref display) "Hello World!" f305)
+# funcall
+#    si   =-12
+#    env  = ((f305 . -8))
+#    expr = (funcall (primitive-ref display) "Hello World!" f305)
+# emit-expr (primitive-ref display)
+    .extern mrc_display
+    movl mrc_display,%eax
+# check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
-    cmp $6, %bl
-    je _L_1721
-# invoke error handler eh_string
-    .extern mrc_eh$ustring
-    movl mrc_eh$ustring, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $168,-8(%esp)
+    cmp $2, %bl
+    je _L_1774
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-_L_1721:
-    movl %eax, -20(%esp)
-# emit-expr (fx- (string-length f302) 3)
-# emit-expr 3
-    movl $12, %eax     # immed 3
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1722"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $92,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1722:
-    movl %eax, -20(%esp)
-# emit-expr (string-length f302)
-# emit-expr f302
+_L_1774:
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr "Hello World!"
+# string literal
+    jmp _L_1776
+    .align 8,0x90
+_L_1775 :
+    .int 48
+    .ascii "Hello World!"
+_L_1776:
+    movl $_L_1775, %eax
+    orl $6, %eax
+    mov %eax, -24(%esp)  # arg Hello World!
+# emit-expr f305
 # emit-variable-ref
-# env=((f304 . -16) (f302 . -12) (f298 . -8))
-# var=f302
-    movl -12(%esp), %eax  # stack load f302
+# env=((f305 . -8))
+# var=f305
+    movl -8(%esp), %eax  # stack load f305
 # end emit-variable-ref
-# check the argument is a string
-    movl %eax,%ebx
-    and $7, %bl
-    cmp $6, %bl
-    je _L_1723
-# invoke error handler eh_string
-    .extern mrc_eh$ustring
-    movl mrc_eh$ustring, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $160,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1723:
-    movl -6(%eax), %eax
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1724"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $92,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1724:
-    subl -20(%esp), %eax
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1725"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $168,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1725:
-# check bounds on string index
-    movl -20(%esp), %ebx
-    cmp  %eax,-6(%ebx) 
-    jle _L_1727
-    cmp  $0,%eax
-    jge _L_1726
-_L_1727:
-# invoke error handler eh_string_index
-    .extern mrc_eh$ustring$uindex
-    movl mrc_eh$ustring$uindex,%edi   # load handler
-    movl $4, %eax  # set arg count
-    movl $168,-8(%esp)
-    jmp *-2(%edi)  # jump to handler
-_L_1726:
-    movl %eax, -24(%esp)
-# emit-expr #\a
-    movl $24847, %eax     # immed #\a
-# check the argument is a char
-    movl %eax,%ebx
-    and $255, %bl
-    cmp $15, %bl
-    je "_L_1728"
-# invoke error handler eh_character
-    .extern mrc_eh$ucharacter
-    movl mrc_eh$ucharacter, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $168,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1728:
-    movl -20(%esp), %ebx
-    movl -24(%esp), %esi
-    sar $2, %esi
-    movb  %ah, -2(%ebx,%esi)
-# emit-expr (begin (string-ref f302 0))
+    mov %eax, -28(%esp)  # arg f305
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    movl $8,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+# emit-expr (begin ((primitive-ref close-output-port) f305))
 # emit-begin
-#   expr=(begin (string-ref f302 0))
-#   env=((f304 . -16) (f302 . -12) (f298 . -8))
-# emit-expr (string-ref f302 0)
-# emit-expr f302
-# emit-variable-ref
-# env=((f304 . -16) (f302 . -12) (f298 . -8))
-# var=f302
-    movl -12(%esp), %eax  # stack load f302
-# end emit-variable-ref
-# check the argument is a string
+#   expr=(begin ((primitive-ref close-output-port) f305))
+#   env=((f305 . -8))
+# emit-expr ((primitive-ref close-output-port) f305)
+# funcall
+#    si   =-12
+#    env  = ((f305 . -8))
+#    expr = (funcall (primitive-ref close-output-port) f305)
+# emit-expr (primitive-ref close-output-port)
+    .extern mrc_close$moutput$mport
+    movl mrc_close$moutput$mport,%eax
+# check the funcall op is a procedure
     movl %eax,%ebx
     and $7, %bl
-    cmp $6, %bl
-    je _L_1729
-# invoke error handler eh_string
-    .extern mrc_eh$ustring
-    movl mrc_eh$ustring, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $164,-8(%esp)
+    cmp $2, %bl
+    je _L_1777
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
     jmp *-2(%edi)  # jump to the handler
-_L_1729:
-    movl %eax, -20(%esp)
-# emit-expr 0
-    movl $0, %eax     # immed 0
-# check the argument is a fixnum
-    movl %eax,%ebx
-    and $3, %bl
-    cmp $0, %bl
-    je "_L_1730"
-# error handler eh_fixnum
-    .extern mrc_eh$ufixnum
-    movl mrc_eh$ufixnum, %edi  # load handler
-    movl $4, %eax  # set arg count
-    movl $164,-8(%esp)
-    jmp *-2(%edi)  # jump to the handler
-_L_1730:
-# check bounds on string index
-    movl -20(%esp), %ebx
-    cmp  %eax,-6(%ebx) 
-    jle _L_1732
-    cmp  $0,%eax
-    jge _L_1731
-_L_1732:
-# invoke error handler eh_string_index
-    .extern mrc_eh$ustring$uindex
-    movl mrc_eh$ustring$uindex,%edi   # load handler
-    movl $4, %eax  # set arg count
-    movl $164,-8(%esp)
-    jmp *-2(%edi)  # jump to handler
-_L_1731:
-    sar $2, %eax
-    movl -20(%esp), %esi
-    movl -2(%eax,%esi), %eax
-    sal $8, %eax
-    or  $15, %eax
+_L_1777:
+   movl %eax,  -20(%esp)  # stash funcall-oper in closure slot
+# emit-expr f305
+# emit-variable-ref
+# env=((f305 . -8))
+# var=f305
+    movl -8(%esp), %eax  # stack load f305
+# end emit-variable-ref
+    mov %eax, -24(%esp)  # arg f305
+    movl -20(%esp), %edi   # load new closure to %edi
+    add $-12, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $12, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
 # emit-expr (begin)
 # emit-begin
 #   expr=(begin)
-#   env=((f304 . -16) (f302 . -12) (f298 . -8))
-    ret
-    .text
-    .align 16, 0x90
-    .globl _scheme_entry
-_scheme_entry:
-    movl 4(%esp), %ecx
-    movl %ebx, 4(%ecx)
-    movl %esi, 16(%ecx)
-    movl %edi, 20(%ecx)
-    movl %ebp, 24(%ecx)
-    movl %esp, 28(%ecx)
-    movl 12(%esp), %ebp
-    movl 8(%esp), %esp
-    call _L_scheme_entry
-    movl 4(%ecx), %ebx
-    movl 16(%ecx), %esi
-    movl 20(%ecx), %edi
-    movl 24(%ecx), %ebp
-    movl 28(%ecx), %esp
-    ret
+#   env=((f305 . -8))
+# emit-expr (begin (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))) ((primitive-ref exit)))
+# emit-begin
+#   expr=(begin (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))) ((primitive-ref exit)))
+#   env=()
+# emit-expr (let ((f306 ((primitive-ref open-input-file) "stst.tmp"))) (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop)))
+# emit-let
+#  si   = -8
+#  env  = ()
+#  bindings = ((f306 ((primitive-ref open-input-file) "stst.tmp")))
+#  body = (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))
+# emit-expr ((primitive-ref open-input-file) "stst.tmp")
+# funcall
+#    si   =-8
+#    env  = ()
+#    expr = (funcall (primitive-ref open-input-file) "stst.tmp")
+# emit-expr (primitive-ref open-input-file)
+    .extern mrc_open$minput$mfile
+    movl mrc_open$minput$mfile,%eax
+# check the funcall op is a procedure
+    movl %eax,%ebx
+    and $7, %bl
+    cmp $2, %bl
+    je _L_1778
+# invoke error handler funcall_non_procedure
+    .extern mrc_eh$uprocedure
+    movl mrc_eh$uprocedure, %edi  # load handler
+    movl $0, %eax  # set arg count
+    jmp *-2(%edi)  # jump to the handler
+_L_1778:
+   movl %eax,  -16(%esp)  # stash funcall-oper in closure slot
+# emit-expr "stst.tmp"
+# string literal
+    jmp _L_1780
+    .align 8,0x90
+_L_1779 :
+    .int 32
+    .ascii "stst.tmp"
+_L_1780:
+    movl $_L_1779, %eax
+    orl $6, %eax
+    mov %eax, -20(%esp)  # arg stst.tmp
+    movl -16(%esp), %edi   # load new closure to %edi
+    add $-8, %esp   # adjust base
+    movl $4,%eax   # save arg count
+    call *-2(%edi)        # call thru closure ptr
+    add $8, %esp   # adjust base
+    movl -4(%esp), %edi   # restore closure frame ptr
+    movl %eax, -8(%esp)  # stack save
+# emit-expr (begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))
+# emit-begin
+#   expr=(begin (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop))))))) (loop))
+#   env=((f306 . -8))
+# emit-expr (define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop)))))))
+# funcall
+#    si   =-12
+#    env  = ((f306 . -8))
+#    expr = (funcall define loop (closure () (f306 loop) (let () (let ((f310 ((primitive-ref read-char) f306))) (if (eof-object? f310) (begin ((primitive-ref close-input-port) f306) ()) (begin ((primitive-ref display) f310) (loop)))))))
+# emit-expr define

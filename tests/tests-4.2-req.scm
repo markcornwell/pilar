@@ -11,7 +11,6 @@
   [(procedure? (eof-object)) => "#f\n"]
   [(vector? (eof-object)) => "#f\n"]
   [(not (eof-object)) => "#f\n"]
-
   [(eof-object? #\a) => "#f\n"]
   [(eof-object? #t) => "#f\n"]
   [(eof-object? 12) => "#f\n"]
@@ -120,24 +119,24 @@
      (exit))
    => "Hello World!"]
 
-  ;; [(begin
-  ;;    (let ([p (open-output-file "stst.tmp" 'replace)])
-  ;;      (display "Hello World!" p)
-  ;;      (close-output-port p))
-  ;;    (let ([p (open-input-file "stst.tmp")])
-  ;;      (define loop 
-  ;;        (lambda ()
-  ;;          (let ([x (read-char p)])
-  ;;            (if (eof-object? x)
-  ;;                (begin
-  ;;                  (close-input-port p)
-  ;;                  '())
-  ;;                (begin
-  ;;                  (display x)
-  ;;                  (loop))))))
-  ;;      (loop))
-  ;;    (exit))
-  ;;  => "Hello World!"]
+  [(begin
+     (let ([p (open-output-file "stst.tmp" 'replace)])
+       (display "Hello World!" p)
+       (close-output-port p))
+     (let ([p (open-input-file "stst.tmp")])
+       (define loop 
+         (lambda ()
+           (let ([x (read-char p)])
+             (if (eof-object? x)
+                 (begin
+                   (close-input-port p)
+                   '())
+                 (begin
+                   (display x)
+                   (loop))))))
+       (loop))
+     (exit))
+   => "Hello World!"]   ;; experimental
   
   ;; [(let ([s (make-string 10000)]
   ;;        [t "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz12344567890<>,./?;:'\"[]{}\\|`~!@#$%^&*()-_=+"])
@@ -169,7 +168,7 @@
   ;;            [else (error 'verify "mismatch")]))))
   ;;    (fill-string! 0 0)
   ;;    (write-string! 0 (open-output-file "stst.tmp" 'replace))
-  ;;    (verify 0 (open-input-file "stst.tmp"))) => "#t\n"]
+  ;;    (verify 0 (open-input-file "stst.tmp"))) => "#t\n"]    ;; experimental
 
   
   [(let ([s (make-string 10000)]
