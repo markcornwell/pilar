@@ -71,50 +71,6 @@
 ;;             +--------------+         +-----------+           +-----------+
 ;;                Stage  I                Stage II               Stage III
 ;;
-;;
-;;
-;;------------------------------------------------------------------------------
-;; Pilar Source Language (SL) -- Used by the Human Programmer
-;;
-;;  TBD -- expanded out to the full R5RS grammer
-;;
-;;   E -> I | V | P
-;;     |  (begin E ...)
-;;     |  (if E E E)
-;;     |  (cond (E E) ...)
-;;     |  (P E ...)
-;;     |  (E E ...)
-;;     |  (lambda (V ...) E E* ...)
-;;     |  (let ((V E) ...) E E* ...)
-;;     |  (letrec ((V E) ...) E E* ...)
-;;     |  (let* ((V E) ...) E E* ...)
-;;     |  (set! V E)
-;;
-;;   I  ->  fixnum | boolean | char | ()
-;;   P  ->  any primitive function
-;;   V  ->  variable
-;;
-;;                                     Figure 1
-;;------------------------------------------------------------------------------
-;; Pilar Intermediate Language (IL) -- Accepted by the Code Generator
-;;
-;;  TBD -- update this to include letrec, primitive-ref, foreign-call, 
-;;
-;;
-;;   E   ->  I | V | P
-;;       |  (begin E ...)
-;;       |  (if E E E)
-;;       |  (P E E* ...)        
-;;       |  (E E E* ...)      
-;;       |  (closure (V ...) (V...) E)
-;;       |  (let ((V E) ...) E)
-;;       |  (labels ((V E) ...) E)
-;;
-;;   I  ->  fixnum | boolean | char | ()
-;;   P  ->  any primitive function
-;;   V  ->  variable
-;;
-;;                                    Figure 2
 ;;------------------------------------------------------------------------------
 ;;  Feature List - The compiler is being developed itteratively by extending the
 ;;  following feature list.  The numbers correspond to sections in Ghuloum's
@@ -194,7 +150,6 @@
 (load "tests/tests-3.3-req.scm")  ;; string-set! errors
 (load "tests/tests-3.2-req.scm")  ;; error, argcheck
 (load "tests/tests-3.1-req.scm")  ;; vector
-
 (load "tests/tests-2.6-req.scm")  ;; variable arguments to lambda
 (if *safe*
     (load "tests/tests-2.9-req.scm"))  ;; foreign call,s exit, S_error
@@ -231,33 +186,87 @@
 ;; Theses transformations convert the source language into a far more normalized
 ;; language processed by the code generator.
 ;;
-;;  We start with a source language L0 which is the Scheme language used by the
-;;  programmer.  A Language transform T1 takes a Program in L0 and converts it
-;;  to an equivalent program in L1.
+;; We start with a source language L0 which is the Scheme language used by the
+;; programmer.  A Language transform T1 takes a Program in L0 and converts it
+;; to an equivalent program in L1.
 ;;
-;;  More generally each Transform Ti takes a program in L(i-1) to an equivalent
-;;  program in Li.
+;; More generally each Transform Ti takes a program in L(i-1) to an equivalent
+;; program in Li.
 ;;
-;;   L0 ->[T1]-> L1 ->[T2]-> L2 ->[T3]-> L3 ->  ... -> L(n-1) ->[Tn]-> Ln
+;;     L0 ->[T1]-> L1 ->[T2]-> L2 ->[T3]-> L3 ->  ... -> L(n-1) ->[Tn]-> Ln
 ;;
-;;  So Ln is the intermediate language that is the input for the code generator
-;;  which makes up Stage 2.
+;; So Ln is the Intermediate Language (IL) that the code generator takes as
+;; it's input in Stage II.
 ;;
 ;; The order of the tansformations (passes) is important.  Each transform Ti need
 ;; only worry about processing the language L(i-1) which we consider the domaain
 ;; of the transformation.
 ;;
-;; emit-program works with the macro define-transform defined near the top of this
-;; file. Stuff we need to know about the transform hangs off the property list of the
-;; transform.  Makes code to compose lots of tranforms cleaner -- especially when we
-;; need look at the intermediate results for debugging.
+;; The function emit-program works with the macro define-transform defined near the
+;; top of this file. Stuff we need to know about the transform hangs off the property
+;; list of the transform name; things like the print name tranform and the procedue
+;; we call to apply the transform.
 ;;
-;;-----------------------------------------------------------------------------------
+;; It is critical to have a precise description of the language Li that is
+;; processed at each pass.  Failure to do this will create a good deal of grief
+;; as cases are not considered or fall through to processing for other cases.
+;; To avoid these difficulties we create a formal grammar for the language
+;; starting and ending each pass.  Understanding each grammar is key to
+;; gaining assurance about the correctness of each transformation.
+;;
+;;------------------------------------------------------------------------------
+;;                               Formal Grammar
+;;------------------------------------------------------------------------------
+;; Notation. Our grammar notation uses captial letters for non-terminals.
+;; Elipsis (...) is used like a Kleene-star to mean zero or more repetitions of
+;; the prior term. Star (*) has no specical meaning and is just another character
+;; making up a term.  The parenthesis are used as in scheme s-expressions.
+;;
+;; All our langauges L0...Lk are all sub-languages of scheme s-expressions.  That
+;; way we can use the sceme reader to read our programs into internal form and
+;; easily process them with scheme programs.  As the compiler matures it will
+;; become possible for the compiler to compile itself.
+;;
+;; Our compiler compiles scheme expressions. L0 is the langague of consisting
+;; of all expressions E defined by the following grammar.
+;;
+;; Language L0
+;;
+;;   E ->                                              Expression
+;;         I | V | P                                   Literal
+;;     |  (begin E ...)                                Derived Expression
+;;     |  (if E1 E2 E3)
+;;     |  (cond (E1 E2) ...)
+;;     |  (P E ...)
+;;     |  (E E ...)
+;;     |  (lambda (V ...) D ... E E* ...)
+;;     |  (let ((V E) ...) D ... E E* ...)
+;;     |  (letrec ((V E) ...) D ... E E* ...)
+;;     |  (let* ((V E) ...) D ... E E* ...)
+;;     |  (set! V E)
+;;
+;;   I ->  fixnum | boolean | char | '()               Immediate
+;;
+;;   P ->  any primitive function                      Primitive
+;;
+;;   V ->  variable                                    Variable
+;;
+;;   D ->  (define V E)                                 Definition
+;;      |  (define (V F) B)
+;;      |  (define (V1 . V2) B)
+;;
+;;   F ->  V ...                                        Formals
+;;      |  V ...  . V
+;;
+;; Eventually we intend to expand this to cover the full R5RS language. That
+;; way we leverage the fact the Steele, Sussman and others have thought this
+;; through.
+;;------------------------------------------------------------------------------
 
 (define *transform-list*         ;; all transforms Ti get applied in the order below
   (list
-        'explicit-begins         ;; L1 add implicit begin to make bodies a single expression
-        'elim-local-defines     ;; L2 rewrite local defines inside lambda, let, let*, letrec	
+   ;     'elim-local-defines      ;; L1 rewrite local defines inside lambda, let, let*, letrec	  
+        'explicit-begins         ;; L2 add implicit begin to make bodies a single expression
 	'eliminate-let*          ;; L3 transform all let* to nested lets	
 	'uniquify-variables      ;; L4 uniquely rename all lambda variables
 	'vectorize-letrec        ;; L5 rewrite letrec as let with vars transformed to vectors
@@ -303,26 +312,83 @@
 ;;-----------------------------------------------------------------------------------
 ;;                         Special Forms
 ;;-----------------------------------------------------------------------------------
-;; Used by eliminate-closure and perhaps other places.
+;; Used by close-free-variables and perhaps other places.  close-free-variables needs
+;; to know special forms to know not to treat them as free variables and flow them
+;; into the free variables list.
 ;;-----------------------------------------------------------------------------------
 
 (define (special-form? x)
-  (memq x '( apply
-	     begin
-	     closure
-	     cond
-	     else
-	     foreign-call
-	     if
-	     lambda
-	     let
-	     let*
-	     letrec
-	     primitive-ref
-	     quote
-	     unless
-	     when
-	     )))
+  (memq x '( apply begin closure cond else foreign-call if lambda let let* letrec
+	     primitive-ref quote unless when)))
+
+;;-----------------------------------------------------------------------------------
+;;                        Eliminate Local Defines
+;;-----------------------------------------------------------------------------------
+;;
+;; Expand optional local defines to a letrec.
+;;
+;; Local define are optional inside the body of lambda, let, let*, letrec.
+;;
+;; The grammar (R5RS Section 7.1.3 Expressions) defines <body> with the following
+;; production rules:
+;;
+;;   <body>        ->   <definition>*  <sequence>
+;;   <sequence>    ->   <command>* <expression>
+;;   <command>     ->   <expression>
+;;
+;; The productions that refer to <body> are:
+;;
+;;   <lambda expression>   ->  (lambda <formals> <body>)
+;;
+;;   <derived expression>  ->  (let (<binding spec>*) <body>)
+;;                          |  (let <variable> (<bindings spec>*) <body>      [TBD]
+;;                          |  (let* (<binding spec>*) <body>
+;;                          |  (letrec (<binding spec>*) <body>)
+;;
+;; The production for definition is given in (R5RS 7.1.6 Programs and Definitions)
+;;
+;;   <definition>  =>  (define <variable> <expression>)
+;;                 |   (define (<variable> <def formals>)  <body>)
+;;                 |   (begin <definition>*)
+;;
+;;   <def formals> =>  <variable>*
+;;                 |   <variable>* . <variable>
+;;
+;; After the explicit-begins transform all of the <body> forms are single
+;; element.  Any body that had multiple elements is noew enclolsed in
+;; a begin.
+;;
+;; Our transform rewrites a sequence of defines appearing at the start of a body into
+;; a letrec form.
+;;
+;;    T[(let ((v E)...) <body>)]  =>  (let ((v T[E])...) T[<body>])
+;;    T[(let f ((v E)...) <body>)]  =>  (let f ((v T[E])...) T[<body>])  [TBD]
+;;    T[(let* ((v E)...) <body>)]  =>  (let* ((v T[E])...) T[<body>])
+;;    T[(letrec ((v E)...) <body)]  =>  (letrec ((v T[E])...) T[<body>])
+;;    T[(lambda <formals> <body>))] => (lambda <formals> T[<body>])
+;;
+;;    T[(begin (define v E)* E)] => (letrec T[(define v E)*] (begin E))
+;;    T[(begin E ... ) => (begin T[E]...)
+;;
+;;    T[(define v E) ... )] => ((v T[E]) . D[...])
+;;
+;;    T[(E1 . E2)] => (T[E1] . T[E2])
+;;    T[V] => V
+;;    T[I] => I
+;;
+;;-----------------------------------------------------------------------------------
+
+(define let-body third)  ;; since L1 has singleton bodies
+
+(define lambda-formals second)
+(define lambda-body third)
+
+(define (define? expr)
+  (and (pair? expr) (eq? (car expr) 'define)))
+
+(define define-var second)
+(define define-expr third)
+
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Explicit Begins
@@ -376,71 +442,6 @@
     (cons (explicit-begins (car expr))
 	  (explicit-begins (cdr expr)))]
    [else expr]))
-
-;;-----------------------------------------------------------------------------------
-;;                        Eliminate Local Defines
-;;-----------------------------------------------------------------------------------
-;;
-;; Expand optional local defines to a letrec.  Local define are optional inside the
-;; body of lambda, let, let*, letrec.  The grammar (R5RS Section 7.1.3 Expressions)
-;; defines <body> with the following production rules:
-;;
-;;   <body>  =>  <definition>*  <sequence>
-;;
-;; The productions that refer to <body> are:
-;;
-;;   <lambda expression>   => (lambda <formals> <body>)
-;;
-;;   <derived expression>  => (let (<binding spec>*) <body>)
-;;                         |  (let <variable> (<bindings spec>*) <body>      [TBD]
-;;                         |  (let* (<binding spec>*) <body>
-;;                         |  (letrec (<binding spec>*) <body>)
-;;
-;; The production for definition is given in (R5RS 7.1.6 Programs and Definitions)
-;;
-;;   <definition>  =>  (define <variable> <expression>)
-;;                 |   (define (<variable> <def formals>)  <body>)
-;;                 |   (begin <definition>*)
-;;
-;;   <def formals> =>  <variable>*
-;;                 |   <variable>* . <variable>
-;;
-;; After the explicit-begins transform all of the <body> forms are single
-;; element.  Any body that had multiple elements is noew enclolsed in
-;; a begin.
-;;
-;; Our transform rewrites a sequence of defines appearing at the start of a body into
-;; a letrec form.
-;;
-;;    T[(let ((v E)...) <body>)]  =>  (let ((v T[E])...) T[<body>])
-;;    T[(let f ((v E)...) <body>)]  =>  (let f ((v T[E])...) T[<body>])  [TBD]
-;;    T[(let* ((v E)...) <body>)]  =>  (let* ((v T[E])...) T[<body>])
-;;    T[(letrec ((v E)...) <body)]  =>  (letrec ((v T[E])...) T[<body>])
-;;    T[(lambda <formals> <body>))] => (lambda <formals> T[<body>])
-;;
-;;    T[(begin (define v E)* E)] => (letrec T[(define v E)*] (begin E))
-;;    T[(begin E ... ) => (begin T[E]...)
-;;
-;;    T[(define v E) ... )] => ((v T[E]) . D[...])
-;;
-;;    T[(E1 . E2)] => (T[E1] . T[E2])
-;;    T[V] => V
-;;    T[I] => I
-;;
-;;-----------------------------------------------------------------------------------
-
-
-(define let-body third)  ;; since L1 has singleton bodies
-
-(define lambda-formals second)
-(define lambda-body third)
-
-(define (define? expr)
-  (and (pair? expr) (eq? (car expr) 'define)))
-
-(define define-var second)
-(define define-expr third)
-
 
 ;;-----------------------------------------------------------------------------------
 ;;                              Eliminate-let*
@@ -573,7 +574,6 @@
     (cons (cons (car formals)
 		(unique-lvar))
 	  (map-lambda-args (cdr formals)))]))
-
 
 ;;-----------------------------------------------------------------------------------
 ;;                        Close-free-variables      
@@ -781,7 +781,6 @@
 ;;
 ;;      T(vi)[a]                         => a
 ;;
-;;
 ;; After using the above notation to clarify my thinking, re-implemented vectorize
 ;; from scratch and it worked the first time.  Good notation helps you think!
 ;;-----------------------------------------------------------------------------------
@@ -890,7 +889,7 @@
 				(settable-vars (cdr expr) vlst))]
    [else vlst]))
 
-(define (vectorize svars expr) ;references to svars into vector-ref, set! to vector-set!
+(define (vectorize svars expr) ;; references to svars into vector-ref, set! to vector-set!
   (cond
    [(set!? expr)
     (list 'vector-set!
@@ -915,7 +914,8 @@
     ;; with new grammar     formals := (v1...vk) | args | (v1..vK . args)
     ;; NOTE: extended args variable is *not* assignable
     ;;
-    ;(format #t "lambda~%")
+    ;; (format #t "lambda~%")
+    ;;
     (let* ([formals (lambda-formals expr)]
 	   [new-formals (map-formals (lambda (v) (if (memq v svars)
 					     (unique-rename v)
@@ -930,7 +930,7 @@
 				  (base-formals new-formals))]
 	   [body (lambda-body expr)]
 	   [new-body (vectorize svars body)])
-     ; (format #t "formals ~s" formals)  ;; DEBUG
+     ;; (format #t "formals ~s" formals)  ;; DEBUG
       (list
        'lambda new-formals (list 'let new-let-bindings new-body)))]
    [(and (symbol? expr) (memq expr svars)) 
@@ -1209,19 +1209,25 @@
 
 
 ;;--------------------------------------------------------------------------------
+;;                  Separate Compilation and import-from
+;;--------------------------------------------------------------------------------
 ;; We need to know what symbols come from separately compiled libraries at compile
-;; time.  A transform uses this list to wrap those symbols in a primitive-ref
-;; form, e.g. (primitive-ref string->symbol)
+;; time.  We use import-from to record what symbols come from external libraries.
+;; A transform uses this information to wrap those symbols in a primitive-ref
+;; form, e.g. (primitive-ref string->symbol) before they go to the code generator.
 ;;
 ;; Then at code generation time, we recognize those forms and emit code to fetch
-;; the datum from memory using the global labels defined by the library.
+;; the datum from memory using it's global labels as defined in the library.
+;;
 ;;---------------------------------------------------------------------------------
 ;;
 ;; ISSUE: Should we provide a way to pull this list from a header file or the
-;; library's published interface?
+;; library's published interface?  
 ;;
 ;; There are decent reasons for enumerating imports as we do here.  Makes it
-;; explicit what we are importing and from where we import it.
+;; explicit what we are importing and from where we import it.  Downside is that
+;; we have to carefully maintain the list in this file, while the functions are
+;; all defined in a different file.
 ;;--------------------------------------------------------------------------------
 
 (define-syntax import-from
@@ -1318,10 +1324,26 @@
 ;;                              STAGE II  -- CODE GENERATION
 ;;-----------------------------------------------------------------------------------
 ;;
+;;  Pilar Intermediate Language (IL) -- Accepted by the Code Generator
 ;;
+;;  TBD -- update this to include primitive-ref
 ;;
+;;   E   ->  I | V | P
+;;       |  (begin E ...)
+;;       |  (if E E E)
+;;       |  (P E E* ...)        
+;;       |  (E E E* ...)      
+;;       |  (closure (V ...) (V ...) E)
+;;       |  (let ((V E) ...) E)
+;;       |  (letrec ((V E) ...) E)
+;;       |  (labels ((V E) ...) E)
+;;       |  (foreign-call S E ...)
 ;;
+;;   I  ->  fixnum | boolean | char | ()
+;;   P  ->  any primitive function
+;;   V  ->  variable
 ;;
+;;-------------------------------------------------------------------------------
 
 
 
